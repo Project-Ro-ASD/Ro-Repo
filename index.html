@@ -32,13 +32,18 @@
         p {
             font-size: 1.05rem;
         }
+        
+        /* Satır içi ufak kod vurguları */
         code {
             background: #e9ecef;
             padding: 0.2rem 0.4rem;
             border-radius: 4px;
             font-family: "Courier New", Courier, monospace;
             font-size: 0.95em;
+            color: #d63384; /* Satır içi kodları biraz renklendirdim */
         }
+        
+        /* Büyük karanlık kod blokları */
         pre {
             background: #1e1e1e;
             color: #d4d4d4;
@@ -48,6 +53,14 @@
             font-family: "Courier New", Courier, monospace;
             line-height: 1.4;
         }
+        
+        /* ÇAKIŞMAYI DÜZELTEN KISIM: Karanlık kutu içindeki kodları şeffaf yap */
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        
         .header-info {
             background-color: #e6f2ff;
             border-left: 4px solid #294172;
@@ -98,7 +111,7 @@ sudo dnf makecache</code></pre>
         <p>Artık depomuzdaki paketleri kurmaya hazırsınız! Repodaki mevcut paketleri listelemek için aşağıdaki komutu kullanabilirsiniz:</p>
 <pre><code>dnf repo-pkgs ro-repo list</code></pre>
         
-        <p>Bir paketi kurmak için standart DNF komutunu kullanın (örneğin ro-control paketi için):</p>
+        <p>Bir paketi kurmak için standart DNF komutunu kullanın (örneğin <code>ro-control</code> paketi için):</p>
 <pre><code>sudo dnf install ro-control</code></pre>
 
         <footer>
