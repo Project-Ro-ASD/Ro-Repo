@@ -1,0 +1,15 @@
+Window.SetBackgroundTopColor(0.02, 0.047, 0.09);
+Window.SetBackgroundBottomColor(0.02, 0.047, 0.09);
+
+text_image = Image.Text("S İ S T E M   B A Ş L A T I L I Y O R", 0.0, 0.95, 0.99, 1.0, "Cantarell 14");
+text_sprite = Sprite(text_image);
+text_sprite.SetX(Window.GetWidth() / 2 - text_image.GetWidth() / 2);
+text_sprite.SetY(Window.GetHeight() / 2 - text_image.GetHeight() / 2);
+
+progress = 0;
+fun refresh_callback () {
+    progress++;
+    opacity = 0.4 + (Math.sin(progress / 20.0) * 0.4);
+    text_sprite.SetOpacity(opacity);
+}
+Plymouth.SetRefreshFunction(refresh_callback);

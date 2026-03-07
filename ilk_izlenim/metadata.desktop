@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=Ilk Izlenim
+Description=Grup 4 Siber Tasarimi
+Author=Tugba
+Copyright=2026
+License=GPL
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf

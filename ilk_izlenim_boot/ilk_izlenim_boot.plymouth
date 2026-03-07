@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Ilk Izlenim Boot
+Description=Siber Boot Ekrani
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/ilk_izlenim_boot
+ScriptFile=/usr/share/plymouth/themes/ilk_izlenim_boot/ilk_izlenim_boot.script
