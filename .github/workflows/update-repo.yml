@@ -22,8 +22,13 @@ jobs:
           # Gerekli tüm mimari klasörlerini oluşturuyoruz (SRPMS kaynak kodlar içindir)
           mkdir -p temp-downloads x86_64 noarch aarch64 SRPMS
           
-          # DİKKAT: Repo adını kontrol etmeyi unutma!
-          gh release download --repo Acik-Kaynak-Gelistirme-Toplulugu/ro-Control --pattern "*.rpm" --dir temp-downloads
+          # 1. ro-Control reposundan RPM'leri indir
+          echo "ro-Control paketleri indiriliyor..."
+          gh release download --repo Acik-Kaynak-Gelistirme-Toplulugu/ro-Control --pattern "*.rpm" --dir temp-downloads || echo "ro-Control için RPM bulunamadı veya hata oluştu."
+          
+          # 2. ro-Assist reposundan RPM'leri indir
+          echo "ro-Assist paketleri indiriliyor..."
+          gh release download --repo Acik-Kaynak-Gelistirme-Toplulugu/ro-Assist --pattern "*.rpm" --dir temp-downloads || echo "ro-Assist için RPM bulunamadı veya hata oluştu."
           
           # İnen dosyaları tam uzantılarına göre doğru klasörlere dağıtıyoruz
           for file in temp-downloads/*.rpm; do
@@ -64,5 +69,5 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add x86_64/ noarch/ aarch64/ SRPMS/
-          git commit -m "Otomatik Güncelleme: Paketler mimarilerine göre ayrıştırıldı ve metadata güncellendi" || echo "Değişiklik yok"
+          git commit -m "Otomatik Güncelleme: ro-Control ve ro-Assist paketleri çekildi, metadata güncellendi" || echo "Değişiklik yok"
           git push
