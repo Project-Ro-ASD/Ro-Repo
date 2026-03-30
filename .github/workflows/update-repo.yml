@@ -10,32 +10,36 @@ jobs:
       contents: write # Dosya yükleme yetkisi!
 
     steps:
-      # 1. Hedef depoyu (ro-repo) çalışma alanına alıyoruz
       - name: Checkout ro-repo
         uses: actions/checkout@v4
 
-      # 2. GitHub CLI kullanarak diğer reponun Releases kısmından en son RPM'leri indiriyoruz
-      - name: Download Latest Release RPMs
+      - name: Download Latest Release RPMs and Sort
         env:
-          # Eğer RPM'lerin olduğu repo herkese açıksa GITHUB_TOKEN yeterlidir.
-          # Gizliyse (private), buraya kendi oluşturduğun bir PAT (Personal Access Token) eklemelisin.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         run: |
-          mkdir -p temp-downloads x86_64 noarch
+          # Gerekli tüm mimari klasörlerini oluşturuyoruz (SRPMS kaynak kodlar içindir)
+          mkdir -p temp-downloads x86_64 noarch aarch64 SRPMS
           
-          # DİKKAT: Aşağıdaki repo adını, RPM'lerin bulunduğu gerçek repo adıyla değiştir!
-          # Şimdilik "Acik-Kaynak-Gelistirme-Toplulugu/ro-Control" olarak yazdım.
+          # DİKKAT: Repo adını kontrol etmeyi unutma!
           gh release download --repo Acik-Kaynak-Gelistirme-Toplulugu/ro-Control --pattern "*.rpm" --dir temp-downloads
           
-          # İnen dosyaları isimlerine bakarak uygun klasörlere taşıyoruz
+          # İnen dosyaları tam uzantılarına göre doğru klasörlere dağıtıyoruz
           for file in temp-downloads/*.rpm; do
             if [[ -f "$file" ]]; then
-              if [[ "$file" == *"noarch"* ]]; then
-                mv "$file" noarch/
-                echo "$(basename $file) -> noarch/ klasörüne eklendi."
-              else
+              if [[ "$file" == *".x86_64.rpm" ]]; then
                 mv "$file" x86_64/
-                echo "$(basename $file) -> x86_64/ klasörüne eklendi."
+                echo "$(basename $file) -> x86_64/ klasörüne taşındı."
+              elif [[ "$file" == *".aarch64.rpm" ]]; then
+                mv "$file" aarch64/
+                echo "$(basename $file) -> aarch64/ klasörüne taşındı."
+              elif [[ "$file" == *".src.rpm" ]]; then
+                mv "$file" SRPMS/
+                echo "$(basename $file) -> SRPMS/ klasörüne taşındı."
+              elif [[ "$file" == *".noarch.rpm" ]]; then
+                mv "$file" noarch/
+                echo "$(basename $file) -> noarch/ klasörüne taşındı."
+              else
+                echo "Bilinmeyen format, atlanıyor: $(basename $file)"
               fi
             fi
           done
@@ -43,21 +47,20 @@ jobs:
           # İşimiz bitince geçici klasörü siliyoruz
           rm -rf temp-downloads
 
-      # 3. Metadata oluşturucu aracı kuruyoruz
       - name: Install createrepo_c
         run: sudo apt-get update && sudo apt-get install -y createrepo-c
 
-      # 4. Metadata dosyalarını yeniliyoruz
-      - name: Rebuild Metadata
+      - name: Rebuild Metadata for All Architectures
         run: |
           createrepo_c x86_64/
           createrepo_c noarch/
+          createrepo_c aarch64/
+          createrepo_c SRPMS/
 
-      # 5. Değişiklikleri kaydedip ro-repo'ya gönderiyoruz
       - name: Commit and Push changes
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add x86_64/ noarch/
-          git commit -m "Otomatik Güncelleme: Release üzerinden yeni RPM paketleri çekildi ve metadata güncellendi" || echo "Değişiklik yok"
+          git add x86_64/ noarch/ aarch64/ SRPMS/
+          git commit -m "Otomatik Güncelleme: Paketler mimarilerine göre ayrıştırıldı ve metadata güncellendi" || echo "Değişiklik yok"
           git push
