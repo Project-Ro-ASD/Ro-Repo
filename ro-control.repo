@@ -1,6 +1,0 @@
-[ro-control]
-name=ro-Control - Smart GPU Driver Manager
-baseurl=https://raw.githubusercontent.com/Acik-Kaynak-Gelistirme-Toplulugu/ro-repo/main/packages
-enabled=1
-gpgcheck=0
-metadata_expire=12h
