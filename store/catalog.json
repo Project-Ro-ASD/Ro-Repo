@@ -21,6 +21,7 @@
       "latestVersion": "1.1.0",
       "installPackage": "ro-control",
       "icon": "ro-control",
+      "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-control.svg",
       "architectures": [
         "x86_64"
       ],
@@ -44,6 +45,7 @@
       "latestVersion": "0.1.1",
       "installPackage": "ro-assist",
       "icon": "ro-assist",
+      "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-assist.svg",
       "architectures": [
         "x86_64"
       ],
