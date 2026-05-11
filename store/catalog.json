@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "id": "ro-repo",
+    "name": "Ro-Repo",
+    "baseUrl": "https://project-ro-asd.github.io/Ro-Repo",
+    "description": "Project Ro resmi uygulama deposu"
+  },
+  "apps": [
+    {
+      "id": "ro-control",
+      "packageName": "ro-control",
+      "name": "ro-Control",
+      "summary": "Ro sistem ayarlarını kolayca yönetin.",
+      "description": "ro-Control, Ro dağıtımına özel sistem ayarlarını ve temel yapılandırmaları tek yerden yönetmek için geliştirilen resmi uygulamadır.",
+      "category": "Sistem",
+      "developer": "Project Ro",
+      "source": "Ro-Repo",
+      "featured": true,
+      "priority": 1,
+      "latestVersion": "1.1.0",
+      "installPackage": "ro-control",
+      "icon": "ro-control",
+      "architectures": [
+        "x86_64"
+      ],
+      "tags": [
+        "system",
+        "settings",
+        "official"
+      ]
+    },
+    {
+      "id": "ro-assist",
+      "packageName": "ro-assist",
+      "name": "ro-Assist",
+      "summary": "Ro için yardımcı araçlar ve rehberler.",
+      "description": "ro-Assist, Ro kullanıcılarına sistem kullanımı, temel işlemler ve yardımcı araçlar konusunda sade bir deneyim sunmak için geliştirilen resmi yardımcı uygulamadır.",
+      "category": "Yardımcı Araçlar",
+      "developer": "Project Ro",
+      "source": "Ro-Repo",
+      "featured": true,
+      "priority": 2,
+      "latestVersion": "0.1.1",
+      "installPackage": "ro-assist",
+      "icon": "ro-assist",
+      "architectures": [
+        "x86_64"
+      ],
+      "tags": [
+        "assistant",
+        "tools",
+        "official"
+      ]
+    }
+  ]
+}
