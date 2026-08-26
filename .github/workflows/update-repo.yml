@@ -4,7 +4,10 @@ on:
   workflow_dispatch: # Botu Actions sekmesinden manuel çalıştırmak için
   schedule:
     - cron: '0 0 * * *' # Her gece Gece Yarısı (00:00 UTC) çalışır
-
+concurrency:
+  group: update-rpm-repository
+  cancel-in-progress: false
+  
 jobs:
   rebuild-repo:
     runs-on: ubuntu-latest
