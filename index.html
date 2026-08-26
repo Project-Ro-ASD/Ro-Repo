@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ro-repo | Fedora Paket Deposu</title>
+    <title>Ro-Repo | Ro-ASD Paket Deposu</title>
     <style>
         /* Temel Karanlık Tema Ayarları */
         body {
@@ -112,26 +112,26 @@
 <body>
 
     <div class="container">
-        <h1>ro-repo Fedora Paket Deposu</h1>
+        <h1>Ro-Repo | Fedora Paket Deposu</h1>
         
         <div class="header-info">
-            <p><strong>Açık Kaynak Geliştirme Topluluğu</strong> tarafından sunulan resmi Fedora RPM paket deposuna hoş geldiniz. Bu rehber, repoyu sisteminize nasıl ekleyeceğinizi ve paketleri nasıl kuracağınızı açıklamaktadır.</p>
+            <p><strong>Project Ro-ASD</strong> tarafından sunulan resmi Fedora RPM paket deposuna hoş geldiniz. Bu sayfa, repoyu sisteminize eklemeyi ve paketleri kurmayı açıklamaktadır.</p>
         </div>
 
         <h2>1. Depoyu Sisteme Eklemek</h2>
-        <p>Aşağıdaki komutu kopyalayarak terminalinize yapıştırın. Bu komut, hem 64-bit (<code>x86_64</code>) hem de mimariden bağımsız (<code>noarch</code>) paketler için gerekli depo yapılandırmasını sisteminize ekleyecektir:</p>
+        <p>Bu yapılandırma, sisteminize uygun <code>x86_64</code> veya <code>aarch64</code> deposuyla birlikte mimariden bağımsız <code>noarch</code> deposunu etkinleştirir:</p>
         
         <div class="code-block-wrapper">
             <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
 <pre><code>sudo tee /etc/yum.repos.d/ro-repo.repo &lt;&lt;'EOF'
 [ro-repo]
-name=Acik Kaynak Gelistirme Toplulugu Repo
+name=Ro-ASD Repository
 baseurl=https://project-ro-asd.github.io/Ro-Repo/$basearch/
 enabled=1
 gpgcheck=0
 
 [ro-repo-noarch]
-name=Acik Kaynak Gelistirme Toplulugu Repo - Noarch
+name=Ro-ASD Repository - Noarch
 baseurl=https://project-ro-asd.github.io/Ro-Repo/noarch/
 enabled=1
 gpgcheck=0
@@ -143,8 +143,7 @@ EOF</code></pre>
         
         <div class="code-block-wrapper">
             <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
-<pre><code>sudo dnf clean all
-sudo dnf makecache</code></pre>
+<pre><code>sudo dnf makecache --refresh</code></pre>
         </div>
 
         <h2>3. Paket Kurulumu</h2>
@@ -152,18 +151,19 @@ sudo dnf makecache</code></pre>
         
         <div class="code-block-wrapper">
             <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
-<pre><code>dnf repo-pkgs ro-repo list</code></pre>
-        </div>
+<pre><code>dnf repoquery --available --repo=ro-repo --repo=ro-repo-noarch</code></pre>
         
         <p>Bir paketi kurmak için standart DNF komutunu kullanın (örneğin <code>ro-control</code> paketi için):</p>
         
         <div class="code-block-wrapper">
             <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
-<pre><code>sudo dnf install ro-control</code></pre>
+<pre><code>sudo dnf install ro-control
+sudo dnf install ro-assist
+sudo dnf install ro-theme</code></pre>
         </div>
 
         <footer>
-            MADE BY SURHAYKOC &bull; Açık Kaynak Geliştirme Topluluğu
+            Project Ro-ASD
         </footer>
     </div>
 
