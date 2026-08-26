@@ -37,35 +37,41 @@ jobs:
           echo "Ro-Theme paketleri indiriliyor..."
           gh release download --repo Project-Ro-ASD/Ro-Theme --pattern "*.rpm" --dir temp-downloads
           
-                   # RPM başlığındaki gerçek mimariye göre paketleri doğrula ve ayır
+          # RPM başlığındaki gerçek paket türü ve mimariye göre doğrula
           for file in temp-downloads/*.rpm; do
             [[ -f "$file" ]] || continue
 
-            if ! arch=$(rpm -qp --qf '%{ARCH}' "$file"); then
+            if ! package_info=$(rpm -qp --qf '%|SOURCEPACKAGE?{source}:{binary}|:%{ARCH}' "$file"); then
               echo "::error::Geçersiz RPM dosyası: $(basename "$file")"
               exit 1
             fi
 
-            case "$arch" in
-              x86_64|aarch64|noarch)
-                if [[ "$file" != *".${arch}.rpm" ]]; then
-                  echo "::error::Dosya adı ile RPM mimarisi uyuşmuyor: $(basename "$file") (gerçek mimari: $arch)"
-                  exit 1
-                fi
-                destination="$arch"
-                ;;
-              src|nosrc)
-                if [[ "$file" != *".${arch}.rpm" ]]; then
-                  echo "::error::Kaynak RPM uzantısı hatalı: $(basename "$file") (gerçek mimari: $arch)"
-                  exit 1
-                fi
-                destination="SRPMS"
-                ;;
-              *)
-                echo "::error::Desteklenmeyen RPM mimarisi: $(basename "$file") ($arch)"
+            package_type="${package_info%%:*}"
+            arch="${package_info#*:}"
+
+            if [[ "$package_type" == "source" ]]; then
+              if [[ "$file" != *".src.rpm" && "$file" != *".nosrc.rpm" ]]; then
+                echo "::error::Kaynak RPM uzantısı hatalı: $(basename "$file")"
                 exit 1
-                ;;
-            esac
+              fi
+
+              destination="SRPMS"
+            else
+              case "$arch" in
+                x86_64|aarch64|noarch)
+                  if [[ "$file" != *".${arch}.rpm" ]]; then
+                    echo "::error::Dosya adı ile RPM mimarisi uyuşmuyor: $(basename "$file") (gerçek mimari: $arch)"
+                    exit 1
+                  fi
+
+                  destination="$arch"
+                  ;;
+                *)
+                  echo "::error::Desteklenmeyen RPM mimarisi: $(basename "$file") ($arch)"
+                  exit 1
+                  ;;
+              esac
+            fi
 
             mv "$file" "$destination/"
             echo "$(basename "$file") -> ${destination}/ klasörüne taşındı."
