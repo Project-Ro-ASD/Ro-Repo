@@ -58,7 +58,7 @@ jobs:
           # İşimiz bitince geçici klasörü siliyoruz
           rm -rf temp-downloads
 
-                - name: Check for RPM changes
+              - name: Check for RPM changes
         id: rpm_changes
         run: |
           if git status --porcelain --untracked-files=all -- x86_64/ noarch/ aarch64/ SRPMS/ | grep -qE '\.rpm$'; then
@@ -69,7 +69,7 @@ jobs:
             echo "RPM değişikliği yok; metadata güncellenmeyecek."
           fi
 
-           - name: Install createrepo_c
+      - name: Install createrepo_c
         if: steps.rpm_changes.outputs.changed == 'true'
         run: sudo apt-get update && sudo apt-get install -y createrepo-c
 
