@@ -27,15 +27,15 @@ jobs:
           
           # 1. ro-Control reposundan RPM'leri indir
           echo "ro-Control paketleri indiriliyor..."
-          gh release download --repo Project-Ro-ASD/ro-Control --pattern "*.rpm" --dir temp-downloads || echo "ro-Control için RPM bulunamadı veya hata oluştu."
+          gh release download --repo Project-Ro-ASD/ro-Control --pattern "*.rpm" --dir temp-downloads
           
           # 2. ro-Assist reposundan RPM'leri indir
           echo "ro-Assist paketleri indiriliyor..."
-          gh release download --repo Project-Ro-ASD/ro-Assist --pattern "*.rpm" --dir temp-downloads || echo "ro-Assist için RPM bulunamadı veya hata oluştu."
+          gh release download --repo Project-Ro-ASD/ro-Assist --pattern "*.rpm" --dir temp-downloads
 
           # 3. Ro-Theme paketlerini indir
           echo "Ro-Theme paketleri indiriliyor..."
-          gh release download --repo Project-Ro-ASD/Ro-Theme --pattern "*.rpm" --dir temp-downloads || echo "Ro-Theme için RPM bulunamadı."
+          gh release download --repo Project-Ro-ASD/Ro-Theme --pattern "*.rpm" --dir temp-downloads
           
           # İnen dosyaları tam uzantılarına göre doğru klasörlere dağıtıyoruz
           for file in temp-downloads/*.rpm; do
