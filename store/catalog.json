@@ -23,8 +23,9 @@
       "icon": "ro-control",
       "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-control.svg",
       "architectures": [
-        "x86_64"
-      ],
+  "x86_64",
+  "aarch64"
+],
       "tags": [
         "system",
         "settings",
@@ -42,13 +43,14 @@
       "source": "Ro-Repo",
       "featured": true,
       "priority": 2,
-      "latestVersion": "0.1.1",
+      "latestVersion": "0.2.0",
       "installPackage": "ro-assist",
       "icon": "ro-assist",
       "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-assist.svg",
       "architectures": [
-        "x86_64"
-      ],
+  "x86_64",
+  "aarch64"
+],
       "tags": [
         "assistant",
         "tools",
