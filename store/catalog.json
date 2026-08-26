@@ -4,7 +4,7 @@
     "id": "ro-repo",
     "name": "Ro-Repo",
     "baseUrl": "https://project-ro-asd.github.io/Ro-Repo",
-    "description": "Project Ro resmi uygulama deposu"
+    "description": "Ro-ASD resmi uygulama deposu"
   },
   "apps": [
     {
@@ -14,7 +14,7 @@
       "summary": "Ro sistem ayarlarını kolayca yönetin.",
       "description": "ro-Control, Ro dağıtımına özel sistem ayarlarını ve temel yapılandırmaları tek yerden yönetmek için geliştirilen resmi uygulamadır.",
       "category": "Sistem",
-      "developer": "Project Ro",
+      "developer": "Project Ro-ASD",
       "source": "Ro-Repo",
       "featured": true,
       "priority": 1,
@@ -23,9 +23,9 @@
       "icon": "ro-control",
       "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-control.svg",
       "architectures": [
-  "x86_64",
-  "aarch64"
-],
+        "x86_64",
+        "aarch64"
+      ],
       "tags": [
         "system",
         "settings",
@@ -48,9 +48,9 @@
       "icon": "ro-assist",
       "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-assist.svg",
       "architectures": [
-  "x86_64",
-  "aarch64"
-],
+        "x86_64",
+        "aarch64"
+      ],
       "tags": [
         "assistant",
         "tools",
