@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout ro-repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download Latest Release RPMs and Sort
         env:
