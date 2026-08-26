@@ -58,10 +58,23 @@ jobs:
           # İşimiz bitince geçici klasörü siliyoruz
           rm -rf temp-downloads
 
-      - name: Install createrepo_c
+                - name: Check for RPM changes
+        id: rpm_changes
+        run: |
+          if git status --porcelain --untracked-files=all -- x86_64/ noarch/ aarch64/ SRPMS/ | grep -qE '\.rpm$'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Yeni veya değişen RPM bulundu."
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "RPM değişikliği yok; metadata güncellenmeyecek."
+          fi
+
+           - name: Install createrepo_c
+        if: steps.rpm_changes.outputs.changed == 'true'
         run: sudo apt-get update && sudo apt-get install -y createrepo-c
 
       - name: Rebuild Metadata for All Architectures
+        if: steps.rpm_changes.outputs.changed == 'true'
         run: |
           createrepo_c x86_64/
           createrepo_c noarch/
@@ -69,9 +82,10 @@ jobs:
           createrepo_c SRPMS/
 
       - name: Commit and Push changes
+        if: steps.rpm_changes.outputs.changed == 'true'
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add x86_64/ noarch/ aarch64/ SRPMS/
-          git commit -m "Otomatik Güncelleme: ro-Control ve ro-Assist paketleri çekildi, metadata güncellendi" || echo "Değişiklik yok"
+          git commit -m "Otomatik Güncelleme: RPM paketleri ve metadata güncellendi"
           git push
