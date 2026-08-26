@@ -54,9 +54,16 @@ jobs:
               fi
             fi
           done
+
+          # Bilinen hatalı veya yanlış etiketlenmiş RPM'leri repoya alma
+          rm -f \
+            x86_64/ro-assist-0.1.1-.x86_64.rpm \
+            noarch/ro-theme-1.0.5-1.fc43.noarch.rpm \
+            SRPMS/ro-theme-1.0.5-1.fc43.src.rpm
           
           # İşimiz bitince geçici klasörü siliyoruz
           rm -rf temp-downloads
+      
 
       - name: Check for RPM changes
         id: rpm_changes
