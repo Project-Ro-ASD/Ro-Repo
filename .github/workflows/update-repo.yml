@@ -37,25 +37,38 @@ jobs:
           echo "Ro-Theme paketleri indiriliyor..."
           gh release download --repo Project-Ro-ASD/Ro-Theme --pattern "*.rpm" --dir temp-downloads
           
-          # İnen dosyaları tam uzantılarına göre doğru klasörlere dağıtıyoruz
+                   # RPM başlığındaki gerçek mimariye göre paketleri doğrula ve ayır
           for file in temp-downloads/*.rpm; do
-            if [[ -f "$file" ]]; then
-              if [[ "$file" == *".x86_64.rpm" ]]; then
-                mv "$file" x86_64/
-                echo "$(basename $file) -> x86_64/ klasörüne taşındı."
-              elif [[ "$file" == *".aarch64.rpm" ]]; then
-                mv "$file" aarch64/
-                echo "$(basename $file) -> aarch64/ klasörüne taşındı."
-              elif [[ "$file" == *".src.rpm" ]]; then
-                mv "$file" SRPMS/
-                echo "$(basename $file) -> SRPMS/ klasörüne taşındı."
-              elif [[ "$file" == *".noarch.rpm" ]]; then
-                mv "$file" noarch/
-                echo "$(basename $file) -> noarch/ klasörüne taşındı."
-              else
-                echo "Bilinmeyen format, atlanıyor: $(basename $file)"
-              fi
+            [[ -f "$file" ]] || continue
+
+            if ! arch=$(rpm -qp --qf '%{ARCH}' "$file"); then
+              echo "::error::Geçersiz RPM dosyası: $(basename "$file")"
+              exit 1
             fi
+
+            case "$arch" in
+              x86_64|aarch64|noarch)
+                if [[ "$file" != *".${arch}.rpm" ]]; then
+                  echo "::error::Dosya adı ile RPM mimarisi uyuşmuyor: $(basename "$file") (gerçek mimari: $arch)"
+                  exit 1
+                fi
+                destination="$arch"
+                ;;
+              src|nosrc)
+                if [[ "$file" != *".${arch}.rpm" ]]; then
+                  echo "::error::Kaynak RPM uzantısı hatalı: $(basename "$file") (gerçek mimari: $arch)"
+                  exit 1
+                fi
+                destination="SRPMS"
+                ;;
+              *)
+                echo "::error::Desteklenmeyen RPM mimarisi: $(basename "$file") ($arch)"
+                exit 1
+                ;;
+            esac
+
+            mv "$file" "$destination/"
+            echo "$(basename "$file") -> ${destination}/ klasörüne taşındı."
           done
 
           # Bilinen hatalı veya yanlış etiketlenmiş RPM'leri repoya alma
