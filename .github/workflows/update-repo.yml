@@ -58,7 +58,7 @@ jobs:
           # İşimiz bitince geçici klasörü siliyoruz
           rm -rf temp-downloads
 
-              - name: Check for RPM changes
+      - name: Check for RPM changes
         id: rpm_changes
         run: |
           if git status --porcelain --untracked-files=all -- x86_64/ noarch/ aarch64/ SRPMS/ | grep -qE '\.rpm$'; then
