@@ -1,0 +1,10 @@
+/out/
+/.work/
+/incoming/
+/**/__pycache__/
+*.pyc
+*.key
+*.secret
+.pytest_cache/
+.env
+.env.*

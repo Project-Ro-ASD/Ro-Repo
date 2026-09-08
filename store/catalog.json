@@ -1,61 +1,7 @@
 {
-  "schemaVersion": 1,
-  "repository": {
-    "id": "ro-repo",
-    "name": "Ro-Repo",
-    "baseUrl": "https://project-ro-asd.github.io/Ro-Repo",
-    "description": "Ro-ASD resmi uygulama deposu"
-  },
-  "apps": [
-    {
-      "id": "ro-control",
-      "packageName": "ro-control",
-      "name": "ro-Control",
-      "summary": "Ro sistem ayarlarını kolayca yönetin.",
-      "description": "ro-Control, Ro dağıtımına özel sistem ayarlarını ve temel yapılandırmaları tek yerden yönetmek için geliştirilen resmi uygulamadır.",
-      "category": "Sistem",
-      "developer": "Project Ro-ASD",
-      "source": "Ro-Repo",
-      "featured": true,
-      "priority": 1,
-      "latestVersion": "1.1.0",
-      "installPackage": "ro-control",
-      "icon": "ro-control",
-      "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-control.svg",
-      "architectures": [
-        "x86_64",
-        "aarch64"
-      ],
-      "tags": [
-        "system",
-        "settings",
-        "official"
-      ]
-    },
-    {
-      "id": "ro-assist",
-      "packageName": "ro-assist",
-      "name": "ro-Assist",
-      "summary": "Ro için yardımcı araçlar ve rehberler.",
-      "description": "ro-Assist, Ro kullanıcılarına sistem kullanımı, temel işlemler ve yardımcı araçlar konusunda sade bir deneyim sunmak için geliştirilen resmi yardımcı uygulamadır.",
-      "category": "Yardımcı Araçlar",
-      "developer": "Project Ro-ASD",
-      "source": "Ro-Repo",
-      "featured": true,
-      "priority": 2,
-      "latestVersion": "0.2.0",
-      "installPackage": "ro-assist",
-      "icon": "ro-assist",
-      "iconUrl": "https://project-ro-asd.github.io/Ro-Repo/store/icons/ro-assist.svg",
-      "architectures": [
-        "x86_64",
-        "aarch64"
-      ],
-      "tags": [
-        "assistant",
-        "tools",
-        "official"
-      ]
-    }
-  ]
+  "schemaVersion": 2,
+  "legacy": true,
+  "generated": false,
+  "apps": [],
+  "notice": "V2 catalog is generated from an immutable repository snapshot; versions are not maintained in Git."
 }

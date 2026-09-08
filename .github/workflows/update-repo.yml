@@ -1,120 +1,16 @@
-name: Update RPM Repository from Releases
+name: Legacy repository publication (disabled)
 
-on:
-  workflow_dispatch: # Botu Actions sekmesinden manuel çalıştırmak için
-  schedule:
-    - cron: '0 0 * * *' # Her gece Gece Yarısı (00:00 UTC) çalışır
-concurrency:
-  group: update-rpm-repository
-  cancel-in-progress: false
-  
+"on":
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
-  rebuild-repo:
+  legacy-disabled:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Dosya yükleme yetkisi!
-
     steps:
-      - name: Checkout ro-repo
-        uses: actions/checkout@v7
-
-      - name: Download Latest Release RPMs and Sort
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-        run: |
-          # Gerekli tüm mimari klasörlerini oluşturuyoruz (SRPMS kaynak kodlar içindir)
-          mkdir -p temp-downloads x86_64 noarch aarch64 SRPMS
-          
-          # 1. ro-Control reposundan RPM'leri indir
-          echo "ro-Control paketleri indiriliyor..."
-          gh release download --repo Project-Ro-ASD/ro-Control --pattern "*.rpm" --dir temp-downloads
-          
-          # 2. ro-Assist reposundan RPM'leri indir
-          echo "ro-Assist paketleri indiriliyor..."
-          gh release download --repo Project-Ro-ASD/ro-Assist --pattern "*.rpm" --dir temp-downloads
-
-          # 3. Ro-Theme paketlerini indir
-          echo "Ro-Theme paketleri indiriliyor..."
-          gh release download --repo Project-Ro-ASD/Ro-Theme --pattern "*.rpm" --dir temp-downloads
-          
-          # RPM başlığındaki gerçek paket türü ve mimariye göre doğrula
-          for file in temp-downloads/*.rpm; do
-            [[ -f "$file" ]] || continue
-
-            if ! package_info=$(rpm -qp --qf '%|SOURCEPACKAGE?{source}:{binary}|:%{ARCH}' "$file"); then
-              echo "::error::Geçersiz RPM dosyası: $(basename "$file")"
-              exit 1
-            fi
-
-            package_type="${package_info%%:*}"
-            arch="${package_info#*:}"
-
-            if [[ "$package_type" == "source" ]]; then
-              if [[ "$file" != *".src.rpm" && "$file" != *".nosrc.rpm" ]]; then
-                echo "::error::Kaynak RPM uzantısı hatalı: $(basename "$file")"
-                exit 1
-              fi
-
-              destination="SRPMS"
-            else
-              case "$arch" in
-                x86_64|aarch64|noarch)
-                  if [[ "$file" != *".${arch}.rpm" ]]; then
-                    echo "::error::Dosya adı ile RPM mimarisi uyuşmuyor: $(basename "$file") (gerçek mimari: $arch)"
-                    exit 1
-                  fi
-
-                  destination="$arch"
-                  ;;
-                *)
-                  echo "::error::Desteklenmeyen RPM mimarisi: $(basename "$file") ($arch)"
-                  exit 1
-                  ;;
-              esac
-            fi
-
-            mv "$file" "$destination/"
-            echo "$(basename "$file") -> ${destination}/ klasörüne taşındı."
-          done
-
-          # Bilinen hatalı veya yanlış etiketlenmiş RPM'leri repoya alma
-          rm -f \
-            x86_64/ro-assist-0.1.1-.x86_64.rpm \
-            noarch/ro-theme-1.0.5-1.fc43.noarch.rpm \
-            SRPMS/ro-theme-1.0.5-1.fc43.src.rpm
-          
-          # İşimiz bitince geçici klasörü siliyoruz
-          rm -rf temp-downloads
-      
-
-      - name: Check for RPM changes
-        id: rpm_changes
-        run: |
-          if git status --porcelain --untracked-files=all -- x86_64/ noarch/ aarch64/ SRPMS/ | grep -qE '\.rpm$'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Yeni veya değişen RPM bulundu."
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "RPM değişikliği yok; metadata güncellenmeyecek."
-          fi
-
-      - name: Install createrepo_c
-        if: steps.rpm_changes.outputs.changed == 'true'
-        run: sudo apt-get update && sudo apt-get install -y createrepo-c
-
-      - name: Rebuild Metadata for All Architectures
-        if: steps.rpm_changes.outputs.changed == 'true'
-        run: |
-          createrepo_c x86_64/
-          createrepo_c noarch/
-          createrepo_c aarch64/
-          createrepo_c SRPMS/
-
-      - name: Commit and Push changes
-        if: steps.rpm_changes.outputs.changed == 'true'
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add x86_64/ noarch/ aarch64/ SRPMS/
-          git commit -m "Otomatik Güncelleme: RPM paketleri ve metadata güncellendi"
-          git push
+      - run: |
+          echo "Ro-Repo V1 is frozen and cannot publish packages."
+          echo "Use the manifest-pinned Ro-Repo V2 acceptance workflow."
+          exit 1

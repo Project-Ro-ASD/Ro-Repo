@@ -1,0 +1,19 @@
+%global debug_package %{nil}
+Name: ro-control
+Version: 9.9.9
+Release: 1%{?dist}
+Summary: Ro-Repo V2 test fixture
+License: GPL-3.0-or-later
+Source0: @SOURCE@
+ExclusiveArch: x86_64
+%description
+Test-only package for the local publication pipeline.
+%prep
+%setup -q
+%install
+install -Dm0755 ro-control %{buildroot}%{_bindir}/ro-control
+%files
+%{_bindir}/ro-control
+%changelog
+* Tue Sep 08 2026 Ro-Repo Test <test@invalid> - 9.9.9-1
+- Test fixture.

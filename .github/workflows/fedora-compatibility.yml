@@ -1,0 +1,30 @@
+name: Fedora 44 stable compatibility
+"on":
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compatibility:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install dependencies
+        run: dnf -y install dnf-plugins-core python3
+      - name: Check package name collisions
+        run: |
+          echo "Fetching available Fedora 44 package names..."
+          dnf repoquery --available --qf '%{name}' | sort -u > fedora_names.txt
+          echo "Checking for collisions with allowed Ro-ASD producers..."
+          python3 -c '
+          import json
+          fedora = set(line.strip() for line in open("fedora_names.txt") if line.strip())
+          config = json.load(open("config/producers-v1.yaml"))
+          for p in config.get("producers", []):
+              allowed = set(p.get("allowed_package_names", []))
+              collision = allowed.intersection(fedora)
+              if collision and not p.get("allow_fedora_override"):
+                  print(f"WARNING: Collision detected for {p[\"repository\"]}: {collision}")
+          '

@@ -1,0 +1,8 @@
+/config/ @Project-Ro-ASD/release-engineering
+/schemas/ @Project-Ro-ASD/release-engineering
+/tools/ @Project-Ro-ASD/release-engineering
+/.github/workflows/ @Project-Ro-ASD/release-engineering
+/docs/ @Project-Ro-ASD/release-engineering
+/tests/ @Project-Ro-ASD/release-engineering
+/store/ @Project-Ro-ASD/release-engineering
+/fixtures/ @Project-Ro-ASD/release-engineering

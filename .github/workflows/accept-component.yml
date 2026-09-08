@@ -1,0 +1,58 @@
+name: Accept pinned producer component
+"on":
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: Exact allowlisted owner/repository
+        required: true
+        type: string
+      tag:
+        description: Exact release tag, never latest
+        required: true
+        type: string
+      commit:
+        description: Exact 40-character source commit SHA
+        required: true
+        type: string
+      release_id:
+        description: Exact numeric GitHub release ID
+        required: true
+        type: string
+permissions:
+  contents: read
+  attestations: read
+jobs:
+  accept:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install acceptance tools
+        run: dnf -y install gh python3 rpm dnf-plugins-core
+      - name: Download and verify exact release identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRODUCER: ${{ inputs.repository }}
+          TAG: ${{ inputs.tag }}
+          COMMIT: ${{ inputs.commit }}
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: |
+          test "${#COMMIT}" -eq 40
+          test "$(gh api "repos/$PRODUCER/commits/$TAG" --jq .sha)" = "$COMMIT"
+          test "$(gh api "repos/$PRODUCER/releases/tags/$TAG" --jq .id)" = "$RELEASE_ID"
+          test "$(gh api "repos/$PRODUCER/releases/tags/$TAG" --jq .tag_name)" = "$TAG"
+          mkdir incoming accepted
+          gh release download "$TAG" --repo "$PRODUCER" --dir incoming
+          test -f incoming/component-artifact-manifest-v1.json
+          test "$(python3 -c 'import json; print(json.load(open("incoming/component-artifact-manifest-v1.json"))["source_commit"])')" = "$COMMIT"
+          for artifact in incoming/*.rpm incoming/SHA256SUMS incoming/component-artifact-manifest-v1.json; do
+            gh attestation verify "$artifact" --repo "$PRODUCER"
+          done
+          dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
+          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: accepted-component-${{ github.run_id }}
+          path: accepted/
+          retention-days: 30
+          if-no-files-found: error
