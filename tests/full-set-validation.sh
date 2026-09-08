@@ -13,4 +13,13 @@ if [ -n "$pkgs" ]; then
     test "${status:-1}" -eq 1
 fi
 rpm_files=("$repo_dir"/*.rpm)
-rpmlint "${rpm_files[@]}" || true
+command -v rpmlint >/dev/null || { echo "ERROR: rpmlint is not installed"; exit 1; }
+rpmlint "${rpm_files[@]}" || {
+    status=$?
+    if [ $status -eq 64 ]; then
+        echo "rpmlint executed successfully but found badness (acceptable for test fixtures)"
+    else
+        echo "ERROR: rpmlint execution failed with code $status"
+        exit $status
+    fi
+}

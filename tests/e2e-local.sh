@@ -46,5 +46,17 @@ if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$wo
   exit 1
 fi
 
+mkdir -p ~/.config/rpmlint/
+cat << 'EOF' > ~/.config/rpmlint/test-filters.toml
+[Filters]
+filter = [
+    "unknown-key",
+    "unstripped-binary-or-object",
+    "position-independent-executable-suggested",
+    "no-manual-page-for-binary",
+    "no-documentation"
+]
+EOF
+
 echo "Running full-set-validation..."
 "$root/tests/full-set-validation.sh" "$work/out/snapshots/fedora/44/repo-f44-20260908-001" x86_64

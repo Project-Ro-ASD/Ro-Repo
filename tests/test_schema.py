@@ -35,5 +35,22 @@ class SchemaTests(unittest.TestCase):
         with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
             ro_repo.validate_schema(data, "component-artifact-manifest-v1")
 
+    def test_invalid_date_time_rejected(self):
+        data = {
+            "schema_version": 1,
+            "snapshot_id": "repo-f44-20260908-001",
+            "from": "beta",
+            "to": "stable",
+            "risk_class": "normal-app",
+            "promotion_group": "ro-control",
+            "beta_started_at": "not-a-date-time",
+            "evidence": [],
+            "approved_by": "test",
+            "approved_at": "2026-09-08", # Missing time/timezone
+            "emergency": False
+        }
+        with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
+            ro_repo.validate_schema(data, "promotion-manifest-v1")
+
 if __name__ == '__main__':
     unittest.main()

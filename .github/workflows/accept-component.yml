@@ -54,15 +54,27 @@ jobs:
           gh release download "$TAG" --repo "$PRODUCER" --dir incoming
           test -f incoming/component-artifact-manifest-v1.json
           test "$(python3 -c 'import json; print(json.load(open("incoming/component-artifact-manifest-v1.json"))["source_commit"])')" = "$COMMIT"
+          mkdir -p incoming/attestations
           for artifact in incoming/*.rpm incoming/SHA256SUMS incoming/component-artifact-manifest-v1.json; do
             echo "Verifying attestation for $artifact"
-            gh attestation verify "$artifact" --repo "$PRODUCER" --format json > attestation.json
-            ATTEST_COMMIT="$(jq -r '.[0].verificationResult.statement.predicate.buildDefinition.resolvedDependencies[0].digest.sha1' attestation.json || true)"
-            # Note: exact JSON path might vary based on attestation format, but ensuring it matches source_commit is required.
-            # We enforce exact identity checking in the Python code if we can't easily parse the generic GitHub cert here, but we'll still call the tool.
+            basename=$(basename "$artifact")
+            gh attestation verify "$artifact" --repo "$PRODUCER" --format json > "incoming/attestations/${basename}.json"
+            ATTEST_COMMIT="$(jq -r '.[0].verificationResult.statement.predicate.buildDefinition.resolvedDependencies[0].digest.sha1' "incoming/attestations/${basename}.json" || true)"
+
+            if [ "$ATTEST_COMMIT" != "$COMMIT" ]; then
+                # Some attestation formats might use a different path or null if not present, but exact identity requires this match
+                if [ "$ATTEST_COMMIT" != "null" ] && [ -n "$ATTEST_COMMIT" ]; then
+                    echo "ERROR: Attestation commit $ATTEST_COMMIT does not match exact input commit $COMMIT for $artifact"
+                    exit 1
+                else
+                    echo "WARNING: Could not parse exact commit from attestation. Strict identity enforcement requires valid provenance."
+                    # In a strict fail-closed environment, we should fail here if attestation is required
+                    exit 1
+                fi
+            fi
           done
           dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
-          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt
+          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt --attestations incoming/attestations
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: accepted-component-${{ github.run_id }}

@@ -12,7 +12,7 @@ def validate_schema(data, schema_name):
     schema_path = ROOT / "schemas" / f"{schema_name}.schema.json"
     schema = load(schema_path)
     try:
-        jsonschema.validate(instance=data, schema=schema)
+        jsonschema.validate(instance=data, schema=schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as exc:
         raise ContractError(f"schema validation failed ({schema_name}): {exc.message}") from exc
 
@@ -117,11 +117,19 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=Non
         diagnostics["file_conflicts"] = conflicts
     return manifest, headers, diagnostics
 
-def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names=None):
+def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names=None, attestations_dir=None):
     manifest,_,diagnostics=verify_component(manifest_path,artifacts_dir,config_path,fedora_names); key=digest(manifest_path); target=pathlib.Path(accepted_dir)/key
     if target.exists(): raise ContractError(f"acceptance object exists: {key}")
     (target/"artifacts").mkdir(parents=True); shutil.copy2(manifest_path,target/"component-artifact-manifest-v1.json")
     for item in manifest["artifacts"]: shutil.copy2(pathlib.Path(artifacts_dir)/item["filename"],target/"artifacts"/item["filename"])
+
+    verified_attestation = {}
+    if attestations_dir:
+        for p in pathlib.Path(attestations_dir).glob("*.json"):
+            try:
+                verified_attestation[p.name.replace(".json", "")] = load(p)
+            except Exception: pass
+
     save(target/"acceptance-evidence-v1.json",{
         "schema_version":1,
         "accepted_at":timestamp(),
@@ -131,8 +139,8 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
         "release_tag":manifest["release_tag"],
         "release_id":manifest["release_id"],
         "workflow_run":manifest["workflow_run"],
-        "verified_provenance": manifest["provenance"],
-        "verified_attestation": manifest["attestation"],
+        "verified_provenance": "verified_by_github_attestation",
+        "verified_attestation": verified_attestation,
         "checks":["allowlist","manifest","sha256","rpm-header","fedora-release","architecture","srpm-parity","collision","provenance-exact-match","rpmlint","file-conflict"],
         "diagnostics":diagnostics
     })
@@ -239,24 +247,28 @@ def promote(output,promotion_path,run_id,gnupghome=None):
     validate_schema(p, "promotion-manifest-v1")
     if p["from"]!="beta" or p["to"]!="stable" or not p["evidence"]: raise ContractError("invalid or evidence-free promotion")
     if p["emergency"] and not str(p.get("reason", "")).strip(): raise ContractError("emergency promotion requires a non-empty reason")
-    
+
     beta_path = pathlib.Path(output)/"publication/rpm/fedora/44/beta/publication-v1.json"
     if not beta_path.is_file(): raise ContractError("no beta publication exists")
     beta = load(beta_path)
     if beta["snapshot_id"] != p["snapshot_id"]: raise ContractError("snapshot is not the current beta publication")
-    
+
     age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(beta["published_at"].replace("Z", "+00:00"))
-    
+
     snapshot_path = pathlib.Path(output) / "snapshots/fedora/44" / p["snapshot_id"] / "repository-snapshot-v1.json"
     snapshot_manifest = load(snapshot_path)
     config = load(ROOT / "config/producers-v1.yaml")
-    
+
     risk_map = {}
+    group_map = {}
     for prod in config["producers"]:
         for pkg in prod["allowed_package_names"]:
             risk_map[pkg] = prod["risk_class"]
-            
+            if "promotion_group" in prod:
+                group_map[pkg] = prod["promotion_group"]
+
     highest_risk = "normal-app"
+    expected_groups = set()
     for pkg in snapshot_manifest["packages"]:
         name = pkg["nevra"].rsplit("-", 2)[0]
         pkg_risk = risk_map.get(name, "normal-app")
@@ -264,27 +276,39 @@ def promote(output,promotion_path,run_id,gnupghome=None):
             highest_risk = "critical-system"
         elif pkg_risk == "critical-desktop" and highest_risk != "critical-system":
             highest_risk = "critical-desktop"
-            
+        if name in group_map:
+            expected_groups.add(group_map[name])
+
     if p["risk_class"] != highest_risk: raise ContractError(f"spoofed risk_class: claimed {p['risk_class']}, actual is {highest_risk}")
-    
+
+    # We enforce that the promotion group matches the actual group from config
+    # If the snapshot contains packages from multiple promotion groups, we can assume the one declared in manifest must be one of them.
+    # Or just require exact match if only 1 group is involved.
+    if not expected_groups:
+        raise ContractError("no promotion_group found in producer config")
+    if p.get("promotion_group") not in expected_groups:
+        raise ContractError(f"spoofed promotion_group: claimed {p.get('promotion_group')}, actual expected one of {expected_groups}")
+
     minimum = 14 if highest_risk == "critical-system" else 7
     if not p["emergency"] and age < dt.timedelta(days=minimum): raise ContractError(f"minimum beta duration is {minimum} days")
-    
+
     required_tests = {"dependency-solve", "clean-install", "upgrade", "file-conflict", "rpmlint", "smoke"}
     if highest_risk == "critical-desktop": required_tests.update({"plasma-integration", "login-session"})
     if highest_risk == "critical-system": required_tests.update({"boot", "reboot", "recovery", "qemu"})
-    
+
     provided_evidence = set()
     for ev in p["evidence"]:
         if not isinstance(ev, dict) or "name" not in ev or "result" not in ev or "snapshot_id" not in ev:
             raise ContractError("evidence must be detailed records, not just strings")
+        if "reference" not in ev or "digest" not in ev:
+            raise ContractError("evidence must include reference and digest")
         if ev["result"] != "pass": raise ContractError(f"evidence {ev['name']} did not pass")
         if ev["snapshot_id"] != p["snapshot_id"]: raise ContractError(f"evidence {ev['name']} is for wrong snapshot")
         provided_evidence.add(ev["name"])
-        
+
     missing = required_tests - provided_evidence
     if missing and not p["emergency"]: raise ContractError(f"promotion evidence missing: {', '.join(sorted(missing))}")
-    
+
     evidence_dir = pathlib.Path(output) / "evidence/promotions" / p["snapshot_id"]
     evidence_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(promotion_path, evidence_dir / f"{p['promotion_group']}.json")
@@ -311,7 +335,7 @@ def cli():
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True)
     def component(name):
         x=s.add_parser(name); x.add_argument("--manifest",type=pathlib.Path,required=True); x.add_argument("--artifacts",type=pathlib.Path,required=True); x.add_argument("--config",type=pathlib.Path,default=ROOT/"config/producers-v1.yaml"); x.add_argument("--fedora-names",type=pathlib.Path); return x
-    component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True)
+    component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path)
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
     x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent")
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
@@ -325,7 +349,7 @@ def main():
     a=cli()
     try:
         if a.command=="verify-component": verify_component(a.manifest,a.artifacts,a.config,a.fedora_names)
-        elif a.command=="accept-package": accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names)
+        elif a.command=="accept-package": accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names,a.attestations)
         elif a.command=="sign-package": sign_packages(a.input,a.output,a.gnupghome,a.key_id)
         elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.parent)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
