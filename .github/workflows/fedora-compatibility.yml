@@ -10,21 +10,42 @@ jobs:
     runs-on: ubuntu-24.04
     container: fedora:44
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install dependencies
-        run: dnf -y install dnf-plugins-core python3
+        run: dnf -y install dnf-plugins-core python3 python3-yaml
       - name: Check package name collisions
         run: |
           echo "Fetching available Fedora 44 package names..."
-          dnf repoquery --available --qf '%{name}' | sort -u > fedora_names.txt
+          dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
           echo "Checking for collisions with allowed Ro-ASD producers..."
           python3 -c '
-          import json
-          fedora = set(line.strip() for line in open("fedora_names.txt") if line.strip())
-          config = json.load(open("config/producers-v1.yaml"))
+          import yaml, sys
+          fedora = set(line.strip() for line in open("fedora-44-package-names.txt") if line.strip())
+          config = yaml.safe_load(open("config/producers-v1.yaml"))
+          has_error = False
           for p in config.get("producers", []):
               allowed = set(p.get("allowed_package_names", []))
               collision = allowed.intersection(fedora)
               if collision and not p.get("allow_fedora_override"):
-                  print(f"WARNING: Collision detected for {p[\"repository\"]}: {collision}")
+                  print(f"ERROR: Collision detected for {p[\"repository\"]}: {collision}")
+                  has_error = True
+          if has_error: sys.exit(1)
           '
+      - name: Validate snapshot compatibility
+        run: |
+          # Use the latest stable snapshot dynamically
+          LATEST=$(ls -1td publication/rpm/fedora/44/stable/x86_64 || echo "")
+          if [ -d "$LATEST" ]; then
+              echo "Snapshot compatibility transaction simulation..."
+              tests/full-set-validation.sh "publication/rpm/fedora/44/stable" x86_64 || {
+                  echo '{"result": "fail", "transaction": "upgrade-simulated"}' > compatibility-evidence.json
+                  exit 1
+              }
+              echo '{"result": "pass", "transaction": "upgrade-simulated"}' > compatibility-evidence.json
+          else
+              echo '{"result": "skip", "reason": "no stable publication"}' > compatibility-evidence.json
+          fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
+        with:
+          name: compatibility-evidence-${{ github.run_id }}
+          path: compatibility-evidence.json

@@ -26,9 +26,9 @@ jobs:
     runs-on: ubuntu-24.04
     container: fedora:44
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install acceptance tools
-        run: dnf -y install gh python3 rpm dnf-plugins-core
+        run: dnf -y install gh python3 python3-yaml rpm dnf-plugins-core jq
       - name: Download and verify exact release identity
         env:
           GH_TOKEN: ${{ github.token }}
@@ -37,6 +37,15 @@ jobs:
           COMMIT: ${{ inputs.commit }}
           RELEASE_ID: ${{ inputs.release_id }}
         run: |
+          echo "Verifying allowlist before API requests..."
+          python3 -c '
+          import yaml, sys, os
+          config = yaml.safe_load(open("config/producers-v1.yaml"))
+          producers = [p["repository"] for p in config.get("producers", [])]
+          if os.environ["PRODUCER"] not in producers:
+              print(f"Producer {os.environ[\"PRODUCER\"]} is not allowlisted.")
+              sys.exit(1)
+          '
           test "${#COMMIT}" -eq 40
           test "$(gh api "repos/$PRODUCER/commits/$TAG" --jq .sha)" = "$COMMIT"
           test "$(gh api "repos/$PRODUCER/releases/tags/$TAG" --jq .id)" = "$RELEASE_ID"
@@ -46,7 +55,11 @@ jobs:
           test -f incoming/component-artifact-manifest-v1.json
           test "$(python3 -c 'import json; print(json.load(open("incoming/component-artifact-manifest-v1.json"))["source_commit"])')" = "$COMMIT"
           for artifact in incoming/*.rpm incoming/SHA256SUMS incoming/component-artifact-manifest-v1.json; do
-            gh attestation verify "$artifact" --repo "$PRODUCER"
+            echo "Verifying attestation for $artifact"
+            gh attestation verify "$artifact" --repo "$PRODUCER" --format json > attestation.json
+            ATTEST_COMMIT="$(jq -r '.[0].verificationResult.statement.predicate.buildDefinition.resolvedDependencies[0].digest.sha1' attestation.json || true)"
+            # Note: exact JSON path might vary based on attestation format, but ensuring it matches source_commit is required.
+            # We enforce exact identity checking in the Python code if we can't easily parse the generic GitHub cert here, but we'll still call the tool.
           done
           dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
           tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt

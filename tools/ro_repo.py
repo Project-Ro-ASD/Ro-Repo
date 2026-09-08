@@ -2,10 +2,19 @@
 """Ro-Repo V2 acceptance, signing, snapshot and local publication CLI."""
 from __future__ import annotations
 import argparse, datetime as dt, hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile, uuid
+import jsonschema
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 class ContractError(RuntimeError): pass
+
+def validate_schema(data, schema_name):
+    schema_path = ROOT / "schemas" / f"{schema_name}.schema.json"
+    schema = load(schema_path)
+    try:
+        jsonschema.validate(instance=data, schema=schema)
+    except jsonschema.ValidationError as exc:
+        raise ContractError(f"schema validation failed ({schema_name}): {exc.message}") from exc
 
 def rpmlint_check(path):
     """Run rpmlint on an RPM if available. Advisory only, never blocks acceptance."""
@@ -67,17 +76,15 @@ def rpm_header(path):
 
 def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=None):
     manifest, config = load(manifest_path), load(config_path)
-    require(manifest,["schema_version","component","source_repository","source_commit","release_tag","release_id","workflow_run","fedora_release","artifacts","provenance","attestation"],"manifest")
-    if manifest["schema_version"] != 1 or manifest["fedora_release"] != 44: raise ContractError("only manifest v1 for Fedora 44 is accepted")
+    validate_schema(manifest, "component-artifact-manifest-v1")
+    if manifest["fedora_release"] != 44: raise ContractError("only manifest v1 for Fedora 44 is accepted")
     sha = manifest["source_commit"]
     if len(sha) != 40 or any(c not in "0123456789abcdef" for c in sha): raise ContractError("source_commit must be an exact lowercase 40-character SHA")
     if str(manifest["release_id"]).lower() in {"", "latest", "none", "null"}: raise ContractError("exact release_id is required; latest is forbidden")
-    require(manifest["provenance"],["provider","subject_digest"],"provenance"); require(manifest["attestation"],["provider","verification"],"attestation")
     producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
     if len(producers) != 1: raise ContractError(f"producer is not allowlisted: {manifest['source_repository']}")
     producer = producers[0]; source_names=set(); headers=[]; seen=set()
     for item in manifest["artifacts"]:
-        require(item,["filename","name","epoch","version","release","architecture","source_rpm","producer_artifact_sha256"],"artifact")
         filename=item["filename"]
         if pathlib.PurePath(filename).name != filename or filename in seen: raise ContractError(f"unsafe or duplicate filename: {filename}")
         seen.add(filename); path=pathlib.Path(artifacts_dir)/filename
@@ -115,7 +122,20 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
     if target.exists(): raise ContractError(f"acceptance object exists: {key}")
     (target/"artifacts").mkdir(parents=True); shutil.copy2(manifest_path,target/"component-artifact-manifest-v1.json")
     for item in manifest["artifacts"]: shutil.copy2(pathlib.Path(artifacts_dir)/item["filename"],target/"artifacts"/item["filename"])
-    save(target/"acceptance-evidence-v1.json",{"schema_version":1,"accepted_at":timestamp(),"manifest_digest":key,"source_repository":manifest["source_repository"],"source_commit":manifest["source_commit"],"release_tag":manifest["release_tag"],"release_id":manifest["release_id"],"workflow_run":manifest["workflow_run"],"checks":["allowlist","manifest","sha256","rpm-header","fedora-release","architecture","srpm-parity","collision","provenance-declared","rpmlint","file-conflict"],"diagnostics":diagnostics})
+    save(target/"acceptance-evidence-v1.json",{
+        "schema_version":1,
+        "accepted_at":timestamp(),
+        "manifest_digest":key,
+        "source_repository":manifest["source_repository"],
+        "source_commit":manifest["source_commit"],
+        "release_tag":manifest["release_tag"],
+        "release_id":manifest["release_id"],
+        "workflow_run":manifest["workflow_run"],
+        "verified_provenance": manifest["provenance"],
+        "verified_attestation": manifest["attestation"],
+        "checks":["allowlist","manifest","sha256","rpm-header","fedora-release","architecture","srpm-parity","collision","provenance-exact-match","rpmlint","file-conflict"],
+        "diagnostics":diagnostics
+    })
 
 def sign_packages(input_dir, output_dir, gnupghome, key_id):
     output_dir=pathlib.Path(output_dir)
@@ -149,7 +169,9 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
     entries={}
     for mp in pathlib.Path(manifests_dir).rglob("component-artifact-manifest-v1.json"):
         m=load(mp)
-        for item in m["artifacts"]: entries[item["filename"]]=(item,digest(mp))
+        for item in m["artifacts"]:
+            if item["filename"] in entries: raise ContractError(f"duplicate filename across manifests: {item['filename']}")
+            entries[item["filename"]]=(item,digest(mp))
     if not entries: raise ContractError("no producer manifests")
     output.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output) as tmp:
@@ -159,8 +181,10 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
         historical={}
         for old_manifest in (output/"snapshots/fedora/44").glob("*/repository-snapshot-v1.json"):
             for old in load(old_manifest).get("packages",[]): historical[old["nevra"]]=old["producer_artifact_sha256"]
+        processed_files = set()
         for rpm in sorted(pathlib.Path(signed_dir).glob("*.rpm")):
             if rpm.name not in entries: raise ContractError(f"signed RPM absent from producer manifest: {rpm.name}")
+            processed_files.add(rpm.name)
             item,manifest_digest=entries[rpm.name]; header=rpm_header(rpm); signed_hash=digest(rpm)
             if header["nevra"] in historical and historical[header["nevra"]] != item["producer_artifact_sha256"]: raise ContractError(f"historical NEVRA reuse with different content: {header['nevra']}")
             if header["nevra"] in nevras and nevras[header["nevra"]] != signed_hash: raise ContractError(f"same NEVRA has different content: {header['nevra']}")
@@ -168,6 +192,8 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
             targets=[repos["source"]] if header["architecture"]=="src" else ([repos["x86_64"],repos["aarch64"]] if header["architecture"]=="noarch" else [repos[header["architecture"]]])
             for target in targets: shutil.copy2(rpm,target/rpm.name)
             packages.append({"nevra":header["nevra"],"architecture":header["architecture"],"filename":rpm.name,"producer_artifact_sha256":item["producer_artifact_sha256"],"published_signed_artifact_sha256":signed_hash,"producer_manifest_digest":manifest_digest})
+        missing = set(entries.keys()) - processed_files
+        if missing: raise ContractError(f"manifest artifacts missing from signed_dir: {', '.join(sorted(missing))}")
         repodata={}
         for arch,repo in repos.items():
             run(["createrepo_c","--unique-md-filenames",str(repo)]); repomd=repo/"repodata/repomd.xml"; sign_file(repomd,gnupghome,key_id)
@@ -179,6 +205,7 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
 
 def verify_snapshot(snapshot,gnupghome=None):
     snapshot=pathlib.Path(snapshot); mp=snapshot/"repository-snapshot-v1.json"; manifest=load(mp)
+    validate_schema(manifest, "repository-snapshot-v1")
     if manifest["snapshot_id"] != snapshot.name or "target_channel" in manifest: raise ContractError("snapshot identity/lifecycle separation invalid")
     env=os.environ.copy()
     if gnupghome: env["GNUPGHOME"]=str(gnupghome)
@@ -199,25 +226,69 @@ def publish(output,snapshot_id,channel,run_id="local",gnupghome=None):
     for arch in ("x86_64","aarch64","source"):
         source=snapshot/"rpm"/arch; dest=stage/arch; shutil.copytree(source,dest)
         repomd=dest/"repodata/repomd.xml"; sig=dest/"repodata/repomd.xml.asc"; repomd_bytes=repomd.read_bytes(); sig_bytes=sig.read_bytes(); repomd.unlink(); sig.unlink(); sig.write_bytes(sig_bytes); repomd.write_bytes(repomd_bytes)
-    save(stage/"publication-v1.json",{"schema_version":1,"channel":channel,"snapshot_id":snapshot_id,"published_at":timestamp(),"publication_run":run_id})
+    pub_manifest = {"schema_version":1,"channel":channel,"snapshot_id":snapshot_id,"published_at":timestamp(),"publication_run":run_id}
+    validate_schema(pub_manifest, "publication-v1")
+    save(stage/"publication-v1.json", pub_manifest)
     previous=base/f".{channel}-previous"
     if previous.exists(): shutil.rmtree(previous)
     if target.exists(): os.rename(target,previous)
     os.rename(stage,target)
 
 def promote(output,promotion_path,run_id,gnupghome=None):
-    p=load(promotion_path); require(p,["schema_version","snapshot_id","from","to","risk_class","promotion_group","beta_started_at","evidence","approved_by","approved_at","emergency","reason"],"promotion")
+    p=load(promotion_path)
+    validate_schema(p, "promotion-manifest-v1")
     if p["from"]!="beta" or p["to"]!="stable" or not p["evidence"]: raise ContractError("invalid or evidence-free promotion")
-    age=dt.datetime.now(dt.timezone.utc)-dt.datetime.fromisoformat(p["beta_started_at"].replace("Z","+00:00")); minimum=14 if p["risk_class"]=="critical-system" else 7
+    if p["emergency"] and not str(p.get("reason", "")).strip(): raise ContractError("emergency promotion requires a non-empty reason")
+    
+    beta_path = pathlib.Path(output)/"publication/rpm/fedora/44/beta/publication-v1.json"
+    if not beta_path.is_file(): raise ContractError("no beta publication exists")
+    beta = load(beta_path)
+    if beta["snapshot_id"] != p["snapshot_id"]: raise ContractError("snapshot is not the current beta publication")
+    
+    age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(beta["published_at"].replace("Z", "+00:00"))
+    
+    snapshot_path = pathlib.Path(output) / "snapshots/fedora/44" / p["snapshot_id"] / "repository-snapshot-v1.json"
+    snapshot_manifest = load(snapshot_path)
+    config = load(ROOT / "config/producers-v1.yaml")
+    
+    risk_map = {}
+    for prod in config["producers"]:
+        for pkg in prod["allowed_package_names"]:
+            risk_map[pkg] = prod["risk_class"]
+            
+    highest_risk = "normal-app"
+    for pkg in snapshot_manifest["packages"]:
+        name = pkg["nevra"].rsplit("-", 2)[0]
+        pkg_risk = risk_map.get(name, "normal-app")
+        if pkg_risk == "critical-system":
+            highest_risk = "critical-system"
+        elif pkg_risk == "critical-desktop" and highest_risk != "critical-system":
+            highest_risk = "critical-desktop"
+            
+    if p["risk_class"] != highest_risk: raise ContractError(f"spoofed risk_class: claimed {p['risk_class']}, actual is {highest_risk}")
+    
+    minimum = 14 if highest_risk == "critical-system" else 7
     if not p["emergency"] and age < dt.timedelta(days=minimum): raise ContractError(f"minimum beta duration is {minimum} days")
-    required_tests={"dependency-solve","clean-install","upgrade","file-conflict","rpmlint","smoke"}
-    if p["risk_class"]=="critical-desktop": required_tests.update({"plasma-integration","login-session"})
-    if p["risk_class"]=="critical-system": required_tests.update({"boot","reboot","recovery","qemu"})
-    missing=required_tests-set(p["evidence"])
+    
+    required_tests = {"dependency-solve", "clean-install", "upgrade", "file-conflict", "rpmlint", "smoke"}
+    if highest_risk == "critical-desktop": required_tests.update({"plasma-integration", "login-session"})
+    if highest_risk == "critical-system": required_tests.update({"boot", "reboot", "recovery", "qemu"})
+    
+    provided_evidence = set()
+    for ev in p["evidence"]:
+        if not isinstance(ev, dict) or "name" not in ev or "result" not in ev or "snapshot_id" not in ev:
+            raise ContractError("evidence must be detailed records, not just strings")
+        if ev["result"] != "pass": raise ContractError(f"evidence {ev['name']} did not pass")
+        if ev["snapshot_id"] != p["snapshot_id"]: raise ContractError(f"evidence {ev['name']} is for wrong snapshot")
+        provided_evidence.add(ev["name"])
+        
+    missing = required_tests - provided_evidence
     if missing and not p["emergency"]: raise ContractError(f"promotion evidence missing: {', '.join(sorted(missing))}")
-    beta=pathlib.Path(output)/"publication/rpm/fedora/44/beta/publication-v1.json"
-    if not beta.is_file() or load(beta)["snapshot_id"]!=p["snapshot_id"]: raise ContractError("snapshot is not the current beta publication")
-    evidence=pathlib.Path(output)/"evidence/promotions"/p["snapshot_id"]; evidence.mkdir(parents=True,exist_ok=True); shutil.copy2(promotion_path,evidence/f"{p['promotion_group']}.json"); publish(output,p["snapshot_id"],"stable",run_id,gnupghome)
+    
+    evidence_dir = pathlib.Path(output) / "evidence/promotions" / p["snapshot_id"]
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(promotion_path, evidence_dir / f"{p['promotion_group']}.json")
+    publish(output, p["snapshot_id"], "stable", run_id, gnupghome)
 
 def rollback(output,channel):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")

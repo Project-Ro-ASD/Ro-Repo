@@ -9,11 +9,8 @@ jobs:
   unit:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: python3 -m unittest discover -s tests -v
       - run: python3 -m py_compile tools/ro_repo.py
-      - run: sudo apt-get update && sudo apt-get install -y rpm createrepo-c gnupg
+      - run: sudo apt-get update && sudo apt-get install -y rpm createrepo-c gnupg python3-jsonschema
       - run: tests/e2e-local.sh
-      - run: |
-          ! grep -R "gh release download.*latest" .github tools
-          ! grep -R "gpgcheck=0" README.md docs

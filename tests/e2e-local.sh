@@ -13,7 +13,8 @@ fi
 top="$work/rpmbuild"
 mkdir -p "$top"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} "$work/incoming" "$work/rpm-tmp"
 mkdir -p "$work/source/ro-control-9.9.9"
-printf '#!/bin/sh\necho test\n' > "$work/source/ro-control-9.9.9/ro-control"
+printf '#include <stdio.h>\nint main(){printf("test\\n");return 0;}\n' > "$work/source/ro-control-9.9.9/ro-control.c"
+printf 'all: ro-control\nro-control: ro-control.c\n\tgcc -O2 -g $(CFLAGS) -o ro-control ro-control.c\n' > "$work/source/ro-control-9.9.9/Makefile"
 tar -C "$work/source" -czf "$top/SOURCES/ro-control-9.9.9.tar.gz" ro-control-9.9.9
 sed "s|@SOURCE@|$top/SOURCES/ro-control-9.9.9.tar.gz|" "$root/fixtures/ro-control-test.spec.in" > "$top/SPECS/ro-control.spec"
 rpmbuild -ba --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define "dist .fc44" "$top/SPECS/ro-control.spec" >/dev/null
@@ -44,3 +45,6 @@ if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$wo
   echo "same NEVRA with different producer hash was accepted" >&2
   exit 1
 fi
+
+echo "Running full-set-validation..."
+"$root/tests/full-set-validation.sh" "$work/out/snapshots/fedora/44/repo-f44-20260908-001" x86_64
