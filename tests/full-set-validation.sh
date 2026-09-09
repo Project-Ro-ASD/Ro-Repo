@@ -30,6 +30,8 @@ run_assumeno_transaction() {
     return "$status"
 }
 
+rpmkeys --import "$public_key"
+
 dnf -y "${repo_args[@]}" --repo ro-snapshot makecache
 pkgs=$(dnf "${repo_args[@]}" repoquery --disablerepo="*" --enablerepo="ro-snapshot" --qf '%{name}' | sort -u)
 if [ -n "$pkgs" ]; then
@@ -43,6 +45,7 @@ if [ -n "$pkgs" ]; then
     rpmdb="$installroot/usr/lib/sysimage/rpm"
     mkdir -p "$rpmdb"
     rpm --dbpath "$rpmdb" --initdb
+    rpmkeys --dbpath "$rpmdb" --import "$public_key"
     rpm --dbpath "$rpmdb" --justdb --nodeps -Uvh "$baseline_dir"/*.rpm
     dnf -y "${repo_args[@]}" --installroot "$installroot" --releasever=44 --use-host-config --repo ro-snapshot makecache
     run_assumeno_transaction --installroot "$installroot" --releasever=44 --use-host-config upgrade $pkgs
@@ -69,8 +72,6 @@ if conflicts:
     print("\n".join(conflicts))
     raise SystemExit(1)
 PY
-
-rpmkeys --import "$public_key"
 
 rpmlint_args=(-c "$script_root/tests/rpmlint-tests.toml")
 rpmlint "${rpmlint_args[@]}" "${rpm_files[@]}"
