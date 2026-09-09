@@ -19,7 +19,7 @@ repo_args=(
     --repofrompath "ro-snapshot,file://$repo_dir"
     --setopt=ro-snapshot.gpgcheck=1
     --setopt=ro-snapshot.repo_gpgcheck=1
-    --setopt="ro-snapshot.gpgkey=file://$public_key file://$metadata_key"
+    --setopt="ro-snapshot.gpgkey=file://$metadata_key file://$public_key"
     --setopt="cachedir=$validation_root/dnf-cache"
     --setopt="persistdir=$validation_root/dnf-persist"
 )

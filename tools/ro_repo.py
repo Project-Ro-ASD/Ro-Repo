@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ro-Repo V2 acceptance, signing, snapshot and local publication CLI."""
 from __future__ import annotations
-import argparse, datetime as dt, hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile, uuid
+import argparse, datetime as dt, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tempfile, uuid
 import jsonschema
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -202,7 +202,7 @@ def sign_packages(input_dir, output_dir, gnupghome, key_id):
     output_dir.mkdir(parents=True); env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
     with tempfile.TemporaryDirectory() as verify_dir:
         verify_root=pathlib.Path(verify_dir); rpmdb=verify_root/"rpmdb"; rpmdb.mkdir(); public_key=verify_root/"test-public-key.asc"
-        exported=run(["gpg","--batch","--armor","--export",key_id],env).stdout
+        exported=export_role_public_key(gnupghome,key_id)
         public_key.write_text(exported,encoding="ascii"); run(["rpmkeys","--dbpath",str(rpmdb),"--import",str(public_key)])
         for source in sorted(pathlib.Path(input_dir).rglob("*.rpm")):
             target=output_dir/source.name
@@ -210,6 +210,7 @@ def sign_packages(input_dir, output_dir, gnupghome, key_id):
             signer=os.getenv("RO_RPMSIGN") or shutil.which("rpmsign") or "/usr/bin/rpmsign"
             shutil.copy2(source,target); run([signer,"--define",f"_gpg_name {key_id}!","--define","__gpg /usr/bin/gpg","--addsign",str(target)],env); run(["rpmkeys","--dbpath",str(rpmdb),"--checksig",str(target)])
     if not list(output_dir.glob("*.rpm")): raise ContractError("no RPMs to sign")
+
 
 def fingerprint(gnupghome,key_id):
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
@@ -219,6 +220,45 @@ def fingerprint(gnupghome,key_id):
     if key_id in fprs: return key_id
     if len(fprs) > 1: return fprs[-1]
     return fprs[0]
+
+def gpg_fingerprint_records(text):
+    records=[]; current=None
+    for line in text.splitlines():
+        parts=line.split(":")
+        if not parts: continue
+        if parts[0] in {"pub","sub"}:
+            current=parts
+        elif parts[0]=="fpr" and current and len(parts) > 9:
+            capabilities=current[11] if len(current) > 11 else ""
+            records.append({"type":current[0],"fingerprint":parts[9].upper(),"capabilities":capabilities})
+    return records
+
+def require_signing_subkey(gnupghome,subkey_fingerprint):
+    fpr=str(subkey_fingerprint).upper()
+    if not re.fullmatch(r"[0-9A-F]{40}",fpr):
+        raise ContractError("signing subkey fingerprint must be exact 40-hex")
+    env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
+    records=gpg_fingerprint_records(run(["gpg","--batch","--with-colons","--fingerprint",fpr],env).stdout)
+    matches=[record for record in records if record["fingerprint"]==fpr]
+    if len(matches)!=1: raise ContractError(f"GPG signing subkey not found: {fpr}")
+    if matches[0]["type"]!="sub": raise ContractError("role key must be a signing subkey, not a primary key")
+    if "s" not in matches[0]["capabilities"].lower(): raise ContractError("role subkey must have signing capability")
+    return fpr
+
+def export_role_public_key(gnupghome,subkey_fingerprint):
+    fpr=require_signing_subkey(gnupghome,subkey_fingerprint)
+    env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
+    exported=run(["gpg","--batch","--armor","--export-filter",f"drop-subkey=fpr <> {fpr}","--export",fpr],env).stdout
+    if not exported.strip(): raise ContractError(f"empty GPG role public key export: {fpr}")
+    with tempfile.TemporaryDirectory() as tmp:
+        key_path=pathlib.Path(tmp)/"role-public-key.asc"
+        key_path.write_text(exported,encoding="ascii")
+        records=gpg_fingerprint_records(run(["gpg","--batch","--import-options","show-only","--with-colons","--import",str(key_path)],env).stdout)
+    primary=[record["fingerprint"] for record in records if record["type"]=="pub"]
+    subkeys=[record["fingerprint"] for record in records if record["type"]=="sub"]
+    if len(primary)!=1 or subkeys!=[fpr]:
+        raise ContractError(f"GPG role public key export is not isolated for {fpr}")
+    return exported
 
 def sign_file(path,gnupghome,key_id):
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
@@ -245,6 +285,10 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadat
         if not mp.is_file(): raise ContractError(f"manifest missing for acceptance evidence: {acc}")
         if digest(mp) != evidence.get("manifest_digest"): raise ContractError(f"acceptance evidence manifest digest mismatch for {acc}")
         m=load(mp)
+        
+        for field in ("source_repository","source_commit","release_tag","release_id","workflow_run"):
+            if evidence.get(field) != m.get(field):
+                raise ContractError(f"acceptance evidence identity mismatch for {field}: {acc}")
         for item in m["artifacts"]:
             if item["filename"] in entries: raise ContractError(f"duplicate filename across manifests: {item['filename']}")
             entries[item["filename"]]=(item,digest(mp))
@@ -260,9 +304,10 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadat
         processed_files = set()
         
         env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
-        rpmdb=stage/"rpmdb"; rpmdb.mkdir()
-        public_key=stage/"test-public-key.asc"
-        exported=run(["gpg","--batch","--armor","--export",rpm_key_id],env).stdout
+        verify_root=pathlib.Path(tmp)/"rpm-verify"; verify_root.mkdir()
+        rpmdb=verify_root/"rpmdb"; rpmdb.mkdir()
+        public_key=verify_root/"test-public-key.asc"
+        exported=export_role_public_key(gnupghome,rpm_key_id)
         public_key.write_text(exported,encoding="ascii")
         run(["rpmkeys","--dbpath",str(rpmdb),"--import",str(public_key)])
         
@@ -290,7 +335,7 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadat
             repodata[arch]={"repomd_sha256":digest(repomd),"repomd_signature_sha256":digest(str(repomd)+".asc")}
         keys=stage/"keys"; keys.mkdir()
         (keys/"RPM-GPG-KEY-ro-asd-TEST-ONLY").write_text(exported,encoding="ascii")
-        exported_meta = run(["gpg","--batch","--armor","--export",metadata_key_id],env).stdout
+        exported_meta = export_role_public_key(gnupghome,metadata_key_id)
         (keys/"REPODATA-GPG-KEY-ro-asd-TEST-ONLY").write_text(exported_meta,encoding="ascii")
         rpm_fpr=fingerprint(gnupghome,rpm_key_id)
         meta_fpr=fingerprint(gnupghome,metadata_key_id)
