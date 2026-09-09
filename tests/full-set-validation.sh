@@ -7,6 +7,11 @@ baseline_dir="${3:-}"
 repo_dir="$repo_root/rpm/$arch"
 public_key="$repo_root/keys/RPM-GPG-KEY-ro-asd-TEST-ONLY"
 metadata_key="$repo_root/keys/REPODATA-GPG-KEY-ro-asd-TEST-ONLY"
+validation_root="$(mktemp -d)"
+cleanup() {
+    rm -rf "$validation_root"
+}
+trap cleanup EXIT
 test -f "$repo_dir/repodata/repomd.xml"
 test -f "$public_key"
 test -f "$metadata_key"
@@ -15,6 +20,18 @@ repo_args=(
     --setopt=ro-snapshot.gpgcheck=1
     --setopt=ro-snapshot.repo_gpgcheck=1
     --setopt="ro-snapshot.gpgkey=file://$public_key file://$metadata_key"
+    --setopt="cachedir=$validation_root/dnf-cache"
+    --setopt="persistdir=$validation_root/dnf-persist"
+)
+solve_repos=(
+    --disablerepo="*"
+    --enablerepo="fedora"
+    --enablerepo="updates"
+    --enablerepo="ro-snapshot"
+)
+snapshot_repo_only=(
+    --disablerepo="*"
+    --enablerepo="ro-snapshot"
 )
 
 run_assumeno_transaction() {
@@ -30,37 +47,39 @@ run_assumeno_transaction() {
     return "$status"
 }
 
-rpmkeys --import "$public_key"
-
-dnf -y "${repo_args[@]}" --repo ro-snapshot makecache
-pkgs=$(dnf "${repo_args[@]}" repoquery --disablerepo="*" --enablerepo="ro-snapshot" --qf '%{name}' | sort -u)
+dnf -y "${repo_args[@]}" --installroot "$validation_root/query-root" --releasever=44 --use-host-config "${snapshot_repo_only[@]}" makecache
+pkgs=$(dnf "${repo_args[@]}" --installroot "$validation_root/query-root" --releasever=44 --use-host-config repoquery "${snapshot_repo_only[@]}" --qf '%{name}' | sort -u)
 if [ -n "$pkgs" ]; then
-    run_assumeno_transaction install $pkgs
+    run_assumeno_transaction --installroot "$validation_root/clean-root" --releasever=44 --use-host-config "${solve_repos[@]}" install $pkgs
     if [ -z "$baseline_dir" ]; then
         echo "ERROR: upgrade simulation requires a baseline RPM directory" >&2
         exit 1
     fi
-    installroot="$(mktemp -d)"
-    trap 'rm -rf "$installroot"' EXIT
+    installroot="$validation_root/upgrade-root"
     rpmdb="$installroot/usr/lib/sysimage/rpm"
     mkdir -p "$rpmdb"
     rpm --dbpath "$rpmdb" --initdb
     rpmkeys --dbpath "$rpmdb" --import "$public_key"
     rpm --dbpath "$rpmdb" --justdb --nodeps -Uvh "$baseline_dir"/*.rpm
-    dnf -y "${repo_args[@]}" --installroot "$installroot" --releasever=44 --use-host-config --repo ro-snapshot makecache
-    run_assumeno_transaction --installroot "$installroot" --releasever=44 --use-host-config upgrade $pkgs
+    dnf -y "${repo_args[@]}" --installroot "$installroot" --releasever=44 --use-host-config "${snapshot_repo_only[@]}" makecache
+    run_assumeno_transaction --installroot "$installroot" --releasever=44 --use-host-config "${solve_repos[@]}" upgrade $pkgs
 fi
 rpm_files=("$repo_dir"/*.rpm)
 command -v rpmlint >/dev/null || { echo "ERROR: rpmlint is not installed"; exit 1; }
-python3 - "${rpm_files[@]}" <<'PY'
+filecheck_rpmdb="$validation_root/filecheck-rpmdb"
+mkdir -p "$filecheck_rpmdb"
+rpm --dbpath "$filecheck_rpmdb" --initdb
+rpmkeys --dbpath "$filecheck_rpmdb" --import "$public_key"
+python3 - "$filecheck_rpmdb" "${rpm_files[@]}" <<'PY'
 import pathlib
 import subprocess
 import sys
 
+rpmdb = sys.argv[1]
 owners = {}
 conflicts = []
-for rpm in map(pathlib.Path, sys.argv[1:]):
-    files = subprocess.check_output(["rpm", "-qpl", str(rpm)], text=True).splitlines()
+for rpm in map(pathlib.Path, sys.argv[2:]):
+    files = subprocess.check_output(["rpm", "--dbpath", rpmdb, "-qpl", str(rpm)], text=True).splitlines()
     for item in files:
         if item.endswith("/"):
             continue
@@ -74,4 +93,17 @@ if conflicts:
 PY
 
 rpmlint_args=(-c "$script_root/tests/rpmlint-tests.toml")
-rpmlint "${rpmlint_args[@]}" "${rpm_files[@]}"
+rpmlint_rpmdb="$validation_root/rpmlint-rpmdb"
+rpmlint_keyring="$rpmlint_rpmdb/pubkeys"
+rpmlint_home="$validation_root/rpmlint-home"
+rpmlint_bin="$validation_root/rpmlint-bin"
+mkdir -p "$rpmlint_rpmdb" "$rpmlint_keyring" "$rpmlint_home/.config/rpm" "$rpmlint_bin"
+rpm --dbpath "$rpmlint_rpmdb" --initdb
+rpmkeys --dbpath "$rpmlint_rpmdb" --import "$public_key"
+{
+    printf '%%_dbpath %s\n' "$rpmlint_rpmdb"
+    printf '%%_keyringpath %s\n' "$rpmlint_keyring"
+} > "$rpmlint_home/.config/rpm/macros"
+printf '#!/usr/bin/env bash\nexec /usr/bin/rpm --define %q --define %q "$@"\n' "_dbpath $rpmlint_rpmdb" "_keyringpath $rpmlint_keyring" > "$rpmlint_bin/rpm"
+chmod +x "$rpmlint_bin/rpm"
+HOME="$rpmlint_home" PATH="$rpmlint_bin:$PATH" rpmlint "${rpmlint_args[@]}" "${rpm_files[@]}"

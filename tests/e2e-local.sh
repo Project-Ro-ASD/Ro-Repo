@@ -34,6 +34,11 @@ find "$top/RPMS" -type f -name 'ro-control-9.9.8-*.rpm' -exec cp {} "$work/basel
 find "$top/RPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incoming/" \;
 find "$top/SRPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incoming/" \;
 python3 "$root/fixtures/make-test-manifest.py" "$work/incoming" "$work/incoming/component-artifact-manifest-v1.json"
+(
+  cd "$work/incoming"
+  sha256sum *.rpm > SHA256SUMS
+)
+printf 'bash\ncoreutils\n' > "$work/fedora-44-package-names.txt"
 mkdir -m 700 "$work/gnupg"
 GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY <test@invalid>' rsa2048 cert 1d >/dev/null 2>&1
 primary_fpr="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-keys | awk -F: '/^fpr/ {print $10}' | head -n1)"
@@ -44,8 +49,8 @@ fprs=($(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-keys | awk -F: 
 rpm_key="${fprs[1]}"
 meta_key="${fprs[2]}"
 
-"$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming"
-"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --test-only-allow-unattested --test-only-allow-empty-fedora --test-only-allow-missing-sha256sums
+"$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --fedora-names "$work/fedora-44-package-names.txt"
+"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
 "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance
 
@@ -70,7 +75,28 @@ path=next(pathlib.Path(sys.argv[1]).rglob('component-artifact-manifest-v1.json')
 data=json.loads(path.read_text()); data['artifacts'][0]['producer_artifact_sha256']='c'*64
 path.write_text(json.dumps(data))
 PY
-if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/mutated-manifests" --output "$work/out" --snapshot-id repo-f44-20260908-002 --gnupghome "$work/gnupg" --metadata-key-id "$metadata_key" --rpm-key-id "$rpm_key"; then
+if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/mutated-manifests" --output "$work/out" --snapshot-id repo-f44-20260908-002 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance; then
+  echo "mutated manifest with stale acceptance evidence was accepted" >&2
+  exit 1
+fi
+
+printf '#include <stdio.h>\nint main(){printf("changed\\n");return 0;}\n' > "$work/source/ro-control-9.9.9/ro-control.c"
+tar -C "$work/source" -czf "$top/SOURCES/ro-control-9.9.9.tar.gz" ro-control-9.9.9
+rpmbuild -ba --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define "dist .fc44" "$top/SPECS/ro-control.spec" > "$work/rpmbuild-reuse.log" 2>&1 || {
+  tail -200 "$work/rpmbuild-reuse.log" >&2
+  exit 1
+}
+mkdir -p "$work/reused-incoming"
+find "$top/RPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/reused-incoming/" \;
+find "$top/SRPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/reused-incoming/" \;
+python3 "$root/fixtures/make-test-manifest.py" "$work/reused-incoming" "$work/reused-incoming/component-artifact-manifest-v1.json"
+(
+  cd "$work/reused-incoming"
+  sha256sum *.rpm > SHA256SUMS
+)
+"$root/tools/ro-repo" accept-package --manifest "$work/reused-incoming/component-artifact-manifest-v1.json" --artifacts "$work/reused-incoming" --accepted "$work/reused-accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested
+"$root/tools/ro-repo" sign-package --input "$work/reused-accepted" --output "$work/reused-signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
+if "$root/tools/ro-repo" build-snapshot --signed "$work/reused-signed" --manifests "$work/reused-accepted" --output "$work/out" --snapshot-id repo-f44-20260908-003 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance; then
   echo "same NEVRA with different producer hash was accepted" >&2
   exit 1
 fi

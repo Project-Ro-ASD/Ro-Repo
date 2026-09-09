@@ -208,7 +208,7 @@ def sign_packages(input_dir, output_dir, gnupghome, key_id):
             target=output_dir/source.name
             if target.exists(): raise ContractError(f"duplicate RPM filename: {source.name}")
             signer=os.getenv("RO_RPMSIGN") or shutil.which("rpmsign") or "/usr/bin/rpmsign"
-            shutil.copy2(source,target); run([signer,"--define",f"_gpg_name {key_id}","--define","__gpg /usr/bin/gpg","--addsign",str(target)],env); run(["rpmkeys","--dbpath",str(rpmdb),"--checksig",str(target)])
+            shutil.copy2(source,target); run([signer,"--define",f"_gpg_name {key_id}!","--define","__gpg /usr/bin/gpg","--addsign",str(target)],env); run(["rpmkeys","--dbpath",str(rpmdb),"--checksig",str(target)])
     if not list(output_dir.glob("*.rpm")): raise ContractError("no RPMs to sign")
 
 def fingerprint(gnupghome,key_id):
@@ -222,7 +222,15 @@ def fingerprint(gnupghome,key_id):
 
 def sign_file(path,gnupghome,key_id):
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
-    run(["gpg","--batch","--yes","--armor","--local-user",key_id,"--detach-sign","--output",str(path)+".asc",str(path)],env)
+    run(["gpg","--batch","--yes","--armor","--local-user",f"{key_id}!","--detach-sign","--output",str(path)+".asc",str(path)],env)
+
+def verify_gpg_signature(file_path, asc_path, expected_fingerprint, env):
+    out = run(["gpg", "--status-fd", "1", "--verify", str(asc_path), str(file_path)], env).stdout
+    for line in out.splitlines():
+        if line.startswith("[GNUPG:] VALIDSIG "):
+            if line.split()[2] == expected_fingerprint:
+                return
+    raise ContractError(f"GPG signature verification error: wrong key used for {file_path}")
 
 def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadata_key_id,rpm_key_id,parent=None,test_only_allow_unattested_acceptance=False):
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID")
@@ -296,14 +304,6 @@ def verify_snapshot(snapshot,gnupghome=None):
     if manifest["snapshot_id"] != snapshot.name or "target_channel" in manifest: raise ContractError("snapshot identity/lifecycle separation invalid")
     env=os.environ.copy()
     if gnupghome: env["GNUPGHOME"]=str(gnupghome)
-    def verify_gpg_signature(file_path, asc_path, expected_fingerprint, env):
-        out = run(["gpg", "--status-fd", "1", "--verify", str(asc_path), str(file_path)], env).stdout
-        for line in out.splitlines():
-            if line.startswith("[GNUPG:] VALIDSIG "):
-                if line.split()[2] == expected_fingerprint:
-                    return
-        raise ContractError(f"GPG signature verification error: wrong key used for {file_path}")
-
     verify_gpg_signature(mp, str(mp)+".asc", manifest["metadata_signing_fingerprint"], env)
     
     with tempfile.TemporaryDirectory() as tmp:
@@ -498,7 +498,7 @@ def cli():
         x=s.add_parser(name); x.add_argument("--manifest",type=pathlib.Path,required=True); x.add_argument("--artifacts",type=pathlib.Path,required=True); x.add_argument("--config",type=pathlib.Path,default=ROOT/"config/producers-v1.yaml"); x.add_argument("--fedora-names",type=pathlib.Path); return x
     component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
-    x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent")
+    x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent"); x.add_argument("--test-only-allow-unattested-acceptance",action="store_true")
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
@@ -510,9 +510,9 @@ def main():
     a=cli()
     try:
         if a.command=="verify-component": verify_component(a.manifest,a.artifacts,a.config,a.fedora_names)
-        elif a.command=="accept-package": accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names,a.attestations,a.test_only_allow_unattested)
+        elif a.command=="accept-package": accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names,a.test_only_allow_unattested)
         elif a.command=="sign-package": sign_packages(a.input,a.output,a.gnupghome,a.key_id)
-        elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent)
+        elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent,a.test_only_allow_unattested_acceptance)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)
