@@ -35,7 +35,7 @@ jobs:
         run: |
           # Faz 1 remote stable backend sunmaz; bu job yalniz deterministic local
           # snapshot uzerinde gercek DNF/rpmlint execution evidence uretir.
-          RO_REPO_E2E_EVIDENCE=compatibility-evidence.json RO_REPO_RPMLINT_PERMISSIVE=1 tests/e2e-local.sh
+          RO_REPO_E2E_EVIDENCE=compatibility-evidence.json tests/e2e-local.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
         with:
           name: compatibility-evidence-${{ github.run_id }}

@@ -96,7 +96,7 @@ class PromotionPolicyTests(unittest.TestCase):
     @mock.patch("tools.ro_repo.validate_schema")
     def test_fake_evidence_rejected(self, m_schema, m_pub):
         self.setup_env({"ro-control": "normal-app"}, ["ro-control"], beta_age_days=8)
-        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "result": "pass"}
+        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "name": "smoke", "result": "pass"}
         ev_path = self.out / "evidence/test.json"
         ev_path.parent.mkdir(parents=True, exist_ok=True)
         ro_repo.save(ev_path, evidence_content)
@@ -112,7 +112,7 @@ class PromotionPolicyTests(unittest.TestCase):
     @mock.patch("tools.ro_repo.validate_schema")
     def test_evidence_traversal_rejected(self, m_schema, m_pub):
         self.setup_env({"ro-control": "normal-app"}, ["ro-control"], beta_age_days=8)
-        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "result": "pass"}
+        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "name": "smoke", "result": "pass"}
         ev_path = self.out / "evidence-evil/test.json"
         ev_path.parent.mkdir(parents=True, exist_ok=True)
         ro_repo.save(ev_path, evidence_content)
@@ -166,7 +166,7 @@ class PromotionPolicyTests(unittest.TestCase):
         ro_repo.save(self.tmp/"config/producers-v1.yaml", config)
 
         # Build evidence content
-        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "result": "pass"}
+        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "name": "smoke", "result": "pass"}
         ev_path = self.out / "evidence/test.json"
         ev_path.parent.mkdir(parents=True, exist_ok=True)
         ro_repo.save(ev_path, evidence_content)

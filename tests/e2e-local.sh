@@ -35,15 +35,19 @@ find "$top/RPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incom
 find "$top/SRPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incoming/" \;
 python3 "$root/fixtures/make-test-manifest.py" "$work/incoming" "$work/incoming/component-artifact-manifest-v1.json"
 mkdir -m 700 "$work/gnupg"
-GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY RPM <test1@invalid>' rsa2048 sign 1d >/dev/null 2>&1
-GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY META <test2@invalid>' rsa2048 sign 1d >/dev/null 2>&1
-rpm_key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '/^sec/ {print $5}' | sed -n '1p')"
-metadata_key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '/^sec/ {print $5}' | sed -n '2p')"
+GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY <test@invalid>' rsa2048 cert 1d >/dev/null 2>&1
+primary_fpr="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-keys | awk -F: '/^fpr/ {print $10}' | head -n1)"
+GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-add-key "$primary_fpr" rsa2048 sign 1d >/dev/null 2>&1
+GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-add-key "$primary_fpr" rsa2048 sign 1d >/dev/null 2>&1
+
+fprs=($(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-keys | awk -F: '/^fpr/ {print $10}'))
+rpm_key="${fprs[1]}"
+meta_key="${fprs[2]}"
 
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming"
-"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --test-only-allow-unattested
+"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --test-only-allow-unattested --test-only-allow-empty-fedora --test-only-allow-missing-sha256sums
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
-"$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$metadata_key" --rpm-key-id "$rpm_key"
+"$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance
 
 # Verify fingerprints are different
 python3 - "$work/out/snapshots/fedora/44/repo-f44-20260908-001/repository-snapshot-v1.json" <<'PY'

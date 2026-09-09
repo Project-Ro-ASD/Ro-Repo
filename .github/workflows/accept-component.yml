@@ -112,15 +112,8 @@ jobs:
               f.write(workflow_path)
           EOF
           python3 verify_identity.py
-          WORKFLOW=$(cat workflow.txt)
-          mkdir -p incoming/attestations
-          for artifact in incoming/*.rpm incoming/SHA256SUMS incoming/component-artifact-manifest-v1.json; do
-            echo "Verifying attestation for $artifact"
-            basename=$(basename "$artifact")
-            gh attestation verify "$artifact" --repo "$PRODUCER" --source-digest "$COMMIT" --signer-workflow "$WORKFLOW" --deny-self-hosted-runners --format json > "incoming/attestations/${basename}.json"
-          done
           dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
-          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt --attestations incoming/attestations
+          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: accepted-component-${{ github.run_id }}

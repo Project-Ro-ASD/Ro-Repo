@@ -65,8 +65,7 @@ def require(obj, fields, where):
     missing = sorted(set(fields) - set(obj))
     if missing: raise ContractError(f"{where} missing fields: {', '.join(missing)}")
 
-def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path, trusted_workflow):
-    attestations = pathlib.Path(attestations_dir)
+def verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow):
     targets = {item["filename"]: pathlib.Path(artifacts_dir) / item["filename"] for item in manifest["artifacts"]}
     if (pathlib.Path(artifacts_dir) / "SHA256SUMS").is_file():
         targets["SHA256SUMS"] = pathlib.Path(artifacts_dir) / "SHA256SUMS"
@@ -75,44 +74,12 @@ def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path
     repo = manifest["source_repository"]
     commit = manifest["source_commit"]
     for name, path in sorted(targets.items()):
-        attest_path = attestations / f"{name}.json"
-        if not attest_path.is_file():
-            raise ContractError(f"missing attestation evidence: {name}")
-        data = load(attest_path)
-        if not isinstance(data, list): data = [data]
-        artifact_digest = digest(path)
-        
-        found_valid = False
-        for entry in data:
-            if not isinstance(entry, dict): continue
-            vr = entry.get("verificationResult", {})
-            stmt = vr.get("statement", {})
-            subjects = stmt.get("subject", [])
-            subject_digests = [s.get("digest", {}).get("sha256") for s in subjects if isinstance(s, dict)]
-            if artifact_digest not in subject_digests: continue
-            
-            pred = stmt.get("predicate", {})
-            inv = pred.get("invocation", {})
-            cs = inv.get("configSource", {})
-            actual_commit = cs.get("digest", {}).get("sha1")
-            
-            bd = pred.get("buildDefinition", {})
-            ep = bd.get("externalParameters", {})
-            actual_repo = ep.get("sourceURI", "") or ep.get("repository", "")
-            actual_workflow = ep.get("workflow", "")
-            
-            if actual_repo not in (repo, f"https://github.com/{repo}"): continue
-            if actual_commit != commit: continue
-            if trusted_workflow not in actual_workflow: continue
-            
-            found_valid = True
-            break
-            
-        if not found_valid:
-            raise ContractError(f"attestation validation failed (wrong subject, repo, commit, or workflow): {name}")
-            
+        try:
+            run(["gh", "attestation", "verify", str(path), "--repo", repo, "--source-digest", commit, "--signer-workflow", trusted_workflow, "--deny-self-hosted-runners"])
+        except Exception:
+            raise ContractError(f"attestation validation failed (gh cli rejection): {name}")
         verified[name] = {
-            "artifact_sha256": artifact_digest,
+            "artifact_sha256": digest(path),
             "source_repository": repo,
             "source_commit": commit,
             "workflow_identity": trusted_workflow,
@@ -128,7 +95,7 @@ def rpm_header(path):
     return {"name":name,"epoch":int(epoch or 0),"version":version,"release":release,"architecture":arch,
             "source_rpm":None if is_source == "true" else source_rpm,"nevra":f"{name}-{int(epoch or 0)}:{version}-{release}.{arch}"}
 
-def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=None):
+def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_path=None, test_only_allow_empty_fedora=False, test_only_allow_missing_sha256sums=False):
     manifest, config = load(manifest_path), load(config_path)
     validate_schema(manifest, "component-artifact-manifest-v1")
     if manifest["fedora_release"] != 44: raise ContractError("only manifest v1 for Fedora 44 is accepted")
@@ -145,12 +112,19 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=Non
         raise ContractError(f"RPM set mismatch. Manifest has: {manifest_rpms}. Directory has: {actual_rpms}.")
 
     sha256sums_path = pathlib.Path(artifacts_dir) / "SHA256SUMS"
+    if not sha256sums_path.is_file() and not test_only_allow_missing_sha256sums:
+        raise ContractError("SHA256SUMS file is strictly required in production")
+    
     if sha256sums_path.is_file():
         sums = {}
         for line in sha256sums_path.read_text().splitlines():
             if not line.strip(): continue
             parts = line.strip().split(maxsplit=1)
-            if len(parts) == 2: sums[parts[1].strip("*")] = parts[0]
+            if len(parts) != 2: raise ContractError(f"malformed line in SHA256SUMS: {line}")
+            h, fname = parts[0], parts[1].strip("*")
+            if not __import__("re").fullmatch(r"^[a-f0-9]{64}$", h): raise ContractError(f"malformed SHA256 hash: {h}")
+            if fname in sums: raise ContractError(f"duplicate filename in SHA256SUMS: {fname}")
+            sums[fname] = h
         for item in manifest["artifacts"]:
             if item["filename"] not in sums: raise ContractError(f"SHA256SUMS missing entry for {item['filename']}")
             if sums[item["filename"]] != item["producer_artifact_sha256"]: raise ContractError(f"SHA256SUMS digest mismatch for {item['filename']}")
@@ -174,8 +148,10 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=Non
         for item in manifest["artifacts"]:
             if item["architecture"] not in {"src","nosrc"} and item["source_rpm"] not in source_names: raise ContractError(f"missing matching SRPM: {item['source_rpm']}")
     if producer.get("sbom_required") and not manifest.get("sbom"): raise ContractError("SBOM required")
-    names_path=pathlib.Path(fedora_names) if fedora_names else ROOT/config["fedora_package_names_file"]
+    names_path=pathlib.Path(fedora_names_path) if fedora_names_path else ROOT/config["fedora_package_names_file"]
     fedora=set(line.strip() for line in names_path.read_text().splitlines() if line.strip() and not line.startswith("#"))
+    if not fedora and not test_only_allow_empty_fedora:
+        raise ContractError("empty Fedora package list is not allowed in production")
     collision=set(producer["allowed_package_names"]) & fedora
     if collision and not producer.get("allow_fedora_override"): raise ContractError(f"Fedora package collision denied: {', '.join(sorted(collision))}")
     # --- advisory diagnostics ---
@@ -190,23 +166,20 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=Non
         diagnostics["file_conflicts"] = conflicts
     return manifest, headers, diagnostics
 
-def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names=None, attestations_dir=None, test_only_allow_unattested=False):
-    manifest,_,diagnostics=verify_component(manifest_path,artifacts_dir,config_path,fedora_names); key=digest(manifest_path); target=pathlib.Path(accepted_dir)/key
+def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names=None, test_only_allow_unattested=False, test_only_allow_empty_fedora=False, test_only_allow_missing_sha256sums=False):
+    manifest,_,diagnostics=verify_component(manifest_path,artifacts_dir,config_path,fedora_names,test_only_allow_empty_fedora,test_only_allow_missing_sha256sums); key=digest(manifest_path); target=pathlib.Path(accepted_dir)/key
     if target.exists(): raise ContractError(f"acceptance object exists: {key}")
     
-    if not attestations_dir and not test_only_allow_unattested:
-        raise ContractError("attestations are strictly required unless --test-only-allow-unattested is given")
-        
-    (target/"artifacts").mkdir(parents=True); shutil.copy2(manifest_path,target/"component-artifact-manifest-v1.json")
-    for item in manifest["artifacts"]: shutil.copy2(pathlib.Path(artifacts_dir)/item["filename"],target/"artifacts"/item["filename"])
-
     verified_attestation = {}
-    if attestations_dir:
+    if not test_only_allow_unattested:
         config = load(config_path)
         producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
         trusted_workflow = producers[0].get("trusted_signer_workflow")
         if not trusted_workflow: raise ContractError("producer missing trusted_signer_workflow")
-        verified_attestation = verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path, trusted_workflow)
+        verified_attestation = verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow)
+        
+    (target/"artifacts").mkdir(parents=True); shutil.copy2(manifest_path,target/"component-artifact-manifest-v1.json")
+    for item in manifest["artifacts"]: shutil.copy2(pathlib.Path(artifacts_dir)/item["filename"],target/"artifacts"/item["filename"])
 
     save(target/"acceptance-evidence-v1.json",{
         "schema_version":1,
@@ -240,20 +213,29 @@ def sign_packages(input_dir, output_dir, gnupghome, key_id):
 
 def fingerprint(gnupghome,key_id):
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
-    lines=run(["gpg","--batch","--with-colons","--fingerprint",key_id],env).stdout.splitlines(); values=[x.split(":")[9] for x in lines if x.startswith("fpr:")]
-    if not values: raise ContractError("GPG fingerprint not found")
-    return values[0]
+    lines=run(["gpg","--batch","--with-colons","--fingerprint",key_id],env).stdout.splitlines()
+    fprs=[x.split(":")[9] for x in lines if x.startswith("fpr:")]
+    if not fprs: raise ContractError("GPG fingerprint not found")
+    if key_id in fprs: return key_id
+    if len(fprs) > 1: return fprs[-1]
+    return fprs[0]
 
 def sign_file(path,gnupghome,key_id):
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
     run(["gpg","--batch","--yes","--armor","--local-user",key_id,"--detach-sign","--output",str(path)+".asc",str(path)],env)
 
-def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadata_key_id,rpm_key_id,parent=None):
+def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadata_key_id,rpm_key_id,parent=None,test_only_allow_unattested_acceptance=False):
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID")
     output=pathlib.Path(output); final=output/"snapshots/fedora/44"/snapshot_id
     if final.exists(): raise ContractError("immutable snapshot already exists")
     entries={}
-    for mp in pathlib.Path(manifests_dir).rglob("component-artifact-manifest-v1.json"):
+    for acc in pathlib.Path(manifests_dir).rglob("acceptance-evidence-v1.json"):
+        evidence = load(acc)
+        if not test_only_allow_unattested_acceptance and evidence.get("verified_provenance") != "github_attestation_exact_match":
+            raise ContractError("unattested component rejected in production")
+        mp = acc.parent / "component-artifact-manifest-v1.json"
+        if not mp.is_file(): raise ContractError(f"manifest missing for acceptance evidence: {acc}")
+        if digest(mp) != evidence.get("manifest_digest"): raise ContractError(f"acceptance evidence manifest digest mismatch for {acc}")
         m=load(mp)
         for item in m["artifacts"]:
             if item["filename"] in entries: raise ContractError(f"duplicate filename across manifests: {item['filename']}")
@@ -392,16 +374,19 @@ def promote(output,promotion_path,run_id,gnupghome=None):
 
     beta_path = pathlib.Path(output)/"publication/rpm/fedora/44/beta/publication-v1.json"
     if not beta_path.is_file(): raise ContractError("no beta publication exists")
-    if gnupghome:
-        env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
-        run(["gpg","--verify",str(beta_path)+".asc",str(beta_path)],env)
     beta = load(beta_path)
     if beta["snapshot_id"] != p["snapshot_id"]: raise ContractError("snapshot is not the current beta publication")
 
-    age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(beta["published_at"].replace("Z", "+00:00"))
-
-    snapshot_path = pathlib.Path(output) / "snapshots/fedora/44" / p["snapshot_id"] / "repository-snapshot-v1.json"
+    snapshot_dir = pathlib.Path(output) / "snapshots/fedora/44" / p["snapshot_id"]
+    snapshot_path = snapshot_dir / "repository-snapshot-v1.json"
     snapshot_manifest = load(snapshot_path)
+    
+    if gnupghome:
+        verify_snapshot(snapshot_dir, gnupghome)
+        env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
+        verify_gpg_signature(beta_path, str(beta_path)+".asc", snapshot_manifest["metadata_signing_fingerprint"], env)
+
+    age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(beta["published_at"].replace("Z", "+00:00"))
     config = load(ROOT / "config/producers-v1.yaml")
 
     risk_map = {}
@@ -458,8 +443,13 @@ def promote(output,promotion_path,run_id,gnupghome=None):
         if digest(ref_path) != ev["digest"]: raise ContractError("evidence reference digest mismatch")
         
         ref_data = load(ref_path)
+        if "tests" in ref_data:
+            test_results = {t.get("name"): t.get("result") for t in ref_data["tests"]}
+            if test_results.get(ev["name"]) != "pass": raise ContractError("evidence content result not pass")
+        else:
+            if ref_data.get("name") != ev["name"] or ref_data.get("result") != "pass": raise ContractError("evidence content result not pass")
+        
         if ref_data.get("snapshot_id") != p["snapshot_id"]: raise ContractError("evidence content snapshot mismatch")
-        if ref_data.get("result") != "pass": raise ContractError("evidence content result not pass")
         
         if ev["result"] != "pass": raise ContractError(f"evidence {ev['name']} did not pass")
         if ev["snapshot_id"] != p["snapshot_id"]: raise ContractError(f"evidence {ev['name']} is for wrong snapshot")
