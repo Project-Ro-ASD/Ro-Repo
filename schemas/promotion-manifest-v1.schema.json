@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "from",
+    "to",
+    "risk_class",
+    "promotion_groups",
+    "beta_started_at",
+    "evidence",
+    "approved_by",
+    "approved_at",
+    "emergency",
+    "reason"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "snapshot_id": { "type": "string", "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$" },
+    "from": { "const": "beta" },
+    "to": { "const": "stable" },
+    "risk_class": { "enum": ["normal-app", "critical-desktop", "critical-system"] },
+    "promotion_groups": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "beta_started_at": { "type": "string", "format": "date-time" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "approved_by": { "type": "string", "minLength": 1 },
+    "approved_at": { "type": "string", "format": "date-time" },
+    "emergency": { "type": "boolean" },
+    "reason": { "type": "string" }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "result", "snapshot_id", "timestamp", "reference", "digest"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "result": { "const": "pass" },
+        "snapshot_id": { "type": "string", "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "reference": { "type": "string", "minLength": 1 },
+        "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

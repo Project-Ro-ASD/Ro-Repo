@@ -1,0 +1,3 @@
+# Bu dosya referans veya test amaciyla manuel/script ile uretilebilir.
+# CI haftalik fedora-compatibility workflow'unda bu dosyayi guncel repodan uretip
+# artifact olarak kullanir. (Guncel versiyon artifact olarak alinir, buraya check-in yapilmasina gerek yoktur.)

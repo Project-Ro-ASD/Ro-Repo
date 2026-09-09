@@ -1,0 +1,25 @@
+name: Ro-Repo V2 tests
+"on":
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  unit-policy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - run: sudo apt-get update && sudo apt-get install -y python3-jsonschema
+      - run: python3 -m unittest discover -s tests -v
+      - run: python3 -m py_compile tools/ro_repo.py
+
+  fedora44-e2e:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install dependencies
+        run: dnf -y install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c dnf-plugins-core gnupg2 rpmlint gcc make jq python3-yaml
+      - name: Run E2E Local
+        run: tests/e2e-local.sh

@@ -1,0 +1,7 @@
+[Filters]
+filter = [
+    "unstripped-binary-or-object",
+    "position-independent-executable-suggested",
+    "no-manual-page-for-binary",
+    "no-documentation"
+]

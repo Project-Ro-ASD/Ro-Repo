@@ -1,0 +1,42 @@
+name: Fedora 44 stable compatibility
+"on":
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compatibility:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install dependencies
+        run: dnf -y install dnf-plugins-core python3 python3-yaml python3-jsonschema rpm rpm-build rpm-sign createrepo_c gnupg2 rpmlint gcc make
+      - name: Check package name collisions
+        run: |
+          echo "Fetching available Fedora 44 package names..."
+          dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
+          echo "Checking for collisions with allowed Ro-ASD producers..."
+          python3 -c '
+          import yaml, sys
+          fedora = set(line.strip() for line in open("fedora-44-package-names.txt") if line.strip())
+          config = yaml.safe_load(open("config/producers-v1.yaml"))
+          has_error = False
+          for p in config.get("producers", []):
+              allowed = set(p.get("allowed_package_names", []))
+              collision = allowed.intersection(fedora)
+              if collision and not p.get("allow_fedora_override"):
+                  print(f"ERROR: Collision detected for {p[\"repository\"]}: {collision}")
+                  has_error = True
+          if has_error: sys.exit(1)
+          '
+      - name: Validate snapshot compatibility
+        run: |
+          # Faz 1 remote stable backend sunmaz; bu job yalniz deterministic local
+          # snapshot uzerinde gercek DNF/rpmlint execution evidence uretir.
+          RO_REPO_E2E_EVIDENCE=compatibility-evidence.json tests/e2e-local.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
+        with:
+          name: compatibility-evidence-${{ github.run_id }}
+          path: compatibility-evidence.json

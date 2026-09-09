@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "fedora_release": 44,
+  "fedora_package_names_file": "config/fedora-44-package-names.txt",
+  "producers": [
+    {
+      "repository": "Project-Ro-ASD/ro-Control",
+      "allowed_package_names": [
+        "ro-control"
+      ],
+      "fedora_release": 44,
+      "architectures": [
+        "x86_64",
+        "aarch64"
+      ],
+      "owner": "Project-Ro-ASD/ro-Control maintainers",
+      "risk_class": "normal-app",
+      "promotion_group": "ro-control",
+      "required_tests": [
+        "dependency-solve",
+        "clean-install",
+        "upgrade",
+        "file-conflict",
+        "rpmlint",
+        "smoke"
+      ],
+      "srpm_required": true,
+      "sbom_required": false,
+      "allow_fedora_override": false,
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Control/.github/workflows/release.yml"
+    },
+    {
+      "repository": "Project-Ro-ASD/ro-Assist",
+      "allowed_package_names": [
+        "ro-assist"
+      ],
+      "fedora_release": 44,
+      "architectures": [
+        "x86_64",
+        "aarch64"
+      ],
+      "owner": "Project-Ro-ASD/ro-Assist maintainers",
+      "risk_class": "normal-app",
+      "promotion_group": "ro-assist",
+      "required_tests": [
+        "dependency-solve",
+        "clean-install",
+        "upgrade",
+        "file-conflict",
+        "rpmlint",
+        "smoke"
+      ],
+      "srpm_required": true,
+      "sbom_required": false,
+      "allow_fedora_override": false,
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Assist/.github/workflows/release.yml"
+    },
+    {
+      "repository": "Project-Ro-ASD/Ro-Theme",
+      "allowed_package_names": [
+        "ro-theme"
+      ],
+      "fedora_release": 44,
+      "architectures": [
+        "noarch"
+      ],
+      "owner": "Project-Ro-ASD/Ro-Theme maintainers",
+      "risk_class": "critical-desktop",
+      "promotion_group": "desktop-theme",
+      "required_tests": [
+        "dependency-solve",
+        "clean-install",
+        "upgrade",
+        "file-conflict",
+        "rpmlint",
+        "smoke",
+        "plasma-integration",
+        "login-session"
+      ],
+      "srpm_required": true,
+      "sbom_required": false,
+      "allow_fedora_override": false,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-Theme/.github/workflows/release.yml"
+    }
+  ]
+}
