@@ -37,28 +37,82 @@ jobs:
           COMMIT: ${{ inputs.commit }}
           RELEASE_ID: ${{ inputs.release_id }}
         run: |
-          echo "Verifying allowlist before API requests..."
-          python3 -c '
-          import yaml, sys, os
-          config = yaml.safe_load(open("config/producers-v1.yaml"))
-          producers = [p["repository"] for p in config.get("producers", [])]
-          if os.environ["PRODUCER"] not in producers:
-              print(f"Producer {os.environ[\"PRODUCER\"]} is not allowlisted.")
-              sys.exit(1)
-          '
-          test "${#COMMIT}" -eq 40
-          test "$(gh api "repos/$PRODUCER/commits/$TAG" --jq .sha)" = "$COMMIT"
-          test "$(gh api "repos/$PRODUCER/releases/tags/$TAG" --jq .id)" = "$RELEASE_ID"
-          test "$(gh api "repos/$PRODUCER/releases/tags/$TAG" --jq .tag_name)" = "$TAG"
-          mkdir incoming accepted
-          gh release download "$TAG" --repo "$PRODUCER" --dir incoming
-          test -f incoming/component-artifact-manifest-v1.json
-          test "$(python3 -c 'import json; print(json.load(open("incoming/component-artifact-manifest-v1.json"))["source_commit"])')" = "$COMMIT"
+          cat << 'EOF' > verify_identity.py
+          import yaml, json, sys, os, subprocess
+
+          PRODUCER = os.environ["PRODUCER"]
+          TAG = os.environ["TAG"]
+          COMMIT = os.environ["COMMIT"]
+          RELEASE_ID = os.environ["RELEASE_ID"]
+
+          print("Verifying allowlist before API requests...")
+          with open("config/producers-v1.yaml") as f:
+              config = yaml.safe_load(f)
+
+          producers = [p for p in config.get("producers", []) if p["repository"] == PRODUCER]
+          if not producers:
+              sys.exit(f"Producer {PRODUCER} is not allowlisted.")
+
+          if len(COMMIT) != 40:
+              sys.exit("Commit length is not 40")
+
+          def gh_api(path):
+              return json.loads(subprocess.check_output(["gh", "api", path]))
+
+          commit_data = gh_api(f"repos/{PRODUCER}/commits/{TAG}")
+          if commit_data["sha"] != COMMIT:
+              sys.exit("Tag commit mismatch")
+
+          release_data = gh_api(f"repos/{PRODUCER}/releases/tags/{TAG}")
+          if str(release_data["id"]) != RELEASE_ID:
+              sys.exit("Release ID mismatch")
+          if release_data["tag_name"] != TAG:
+              sys.exit("Release tag mismatch")
+
+          print("Release verified. Downloading...")
+          os.makedirs("incoming", exist_ok=True)
+          os.makedirs("accepted", exist_ok=True)
+          subprocess.check_call(["gh", "release", "download", TAG, "--repo", PRODUCER, "--dir", "incoming"])
+
+          if not os.path.isfile("incoming/component-artifact-manifest-v1.json"):
+              sys.exit("Missing manifest")
+
+          with open("incoming/component-artifact-manifest-v1.json") as f:
+              manifest = json.load(f)
+
+          if manifest["source_repository"] != PRODUCER:
+              sys.exit("Manifest source_repository mismatch")
+          if manifest["release_tag"] != TAG:
+              sys.exit("Manifest release_tag mismatch")
+          if manifest["source_commit"] != COMMIT:
+              sys.exit("Manifest source_commit mismatch")
+          if str(manifest["release_id"]) != RELEASE_ID:
+              sys.exit("Manifest release_id mismatch")
+
+          workflow_path = producers[0]["trusted_signer_workflow"]
+          run_id = manifest["workflow_run"]
+          run_data = gh_api(f"repos/{PRODUCER}/actions/runs/{run_id}")
+
+          if run_data["head_repository"]["full_name"] != PRODUCER:
+              sys.exit("Workflow run repository mismatch")
+          if run_data["head_sha"] != COMMIT:
+              sys.exit("Workflow run commit mismatch")
+          if run_data["conclusion"] != "success":
+              sys.exit("Workflow run not success")
+          if not run_data["path"].endswith(workflow_path):
+              sys.exit(f"Workflow path mismatch: {run_data['path']} vs {workflow_path}")
+
+          print("Manifest and workflow run identity matches.")
+          with open("workflow.txt", "w") as f:
+              f.write(workflow_path)
+          EOF
+          python3 verify_identity.py
+          WORKFLOW=$(cat workflow.txt)
           mkdir -p incoming/attestations
           for artifact in incoming/*.rpm incoming/SHA256SUMS incoming/component-artifact-manifest-v1.json; do
             echo "Verifying attestation for $artifact"
             basename=$(basename "$artifact")
-            gh attestation verify "$artifact" --repo "$PRODUCER" --format json > "incoming/attestations/${basename}.json"
+            gh attestation verify "$artifact" --repo "$PRODUCER" --source-digest "$COMMIT" --signer-workflow "$WORKFLOW" --deny-self-hosted-runners --format json > "incoming/attestations/${basename}.json"
           done
           dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
           tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt --attestations incoming/attestations

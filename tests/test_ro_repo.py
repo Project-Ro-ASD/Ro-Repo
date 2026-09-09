@@ -40,7 +40,7 @@ class ContractTests(unittest.TestCase):
             data[0]["verificationResult"]["statement"]["predicate"]["buildDefinition"]["externalParameters"].pop("workflow")
         (directory / f"{name}.json").write_text(json.dumps(data))
     def test_valid_component_and_acceptance(self):
-        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers): ro_repo.verify_component(self.mp,self.artifacts,self.config); ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config)
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers): ro_repo.verify_component(self.mp,self.artifacts,self.config); ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_unattested=True)
         self.assertTrue(list((self.root/"accepted").rglob("acceptance-evidence-v1.json")))
     def test_attestation_exact_match_acceptance(self):
         attest=self.root/"attestations"; attest.mkdir()
@@ -57,14 +57,14 @@ class ContractTests(unittest.TestCase):
         self.write_attestation(attest,self.rpm.name,self.rpm,commit="b"*40)
         self.write_attestation(attest,self.srpm.name,self.srpm)
         self.write_attestation(attest,self.mp.name,self.mp)
-        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError,"source commit"):
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError,"attestation validation failed"):
             ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,attestations_dir=attest)
     def test_attestation_workflow_identity_missing_rejected(self):
         attest=self.root/"attestations"; attest.mkdir()
         self.write_attestation(attest,self.rpm.name,self.rpm,workflow=False)
         self.write_attestation(attest,self.srpm.name,self.srpm)
         self.write_attestation(attest,self.mp.name,self.mp)
-        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError,"workflow identity"):
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError,"attestation validation failed"):
             ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,attestations_dir=attest)
     def test_digest_mutation_is_rejected(self):
         self.rpm.write_bytes(b"mutated")

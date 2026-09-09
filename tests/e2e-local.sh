@@ -38,9 +38,9 @@ mkdir -m 700 "$work/gnupg"
 GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY <test@invalid>' rsa2048 sign 1d >/dev/null 2>&1
 key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '$1=="sec" {print $5; exit}')"
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming"
-"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted"
+"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --test-only-allow-unattested
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$key"
-"$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$key"
+"$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$key" --rpm-key-id "$key"
 "$root/tools/ro-repo" verify-snapshot --snapshot "$work/out/snapshots/fedora/44/repo-f44-20260908-001" --gnupghome "$work/gnupg"
 "$root/tools/ro-repo" publish-local --output "$work/out" --snapshot-id repo-f44-20260908-001 --channel beta --gnupghome "$work/gnupg"
 "$root/tools/ro-repo" publish-local --output "$work/out" --snapshot-id repo-f44-20260908-001 --channel beta --gnupghome "$work/gnupg"
@@ -55,13 +55,13 @@ path=next(pathlib.Path(sys.argv[1]).rglob('component-artifact-manifest-v1.json')
 data=json.loads(path.read_text()); data['artifacts'][0]['producer_artifact_sha256']='c'*64
 path.write_text(json.dumps(data))
 PY
-if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/mutated-manifests" --output "$work/out" --snapshot-id repo-f44-20260908-002 --gnupghome "$work/gnupg" --metadata-key-id "$key"; then
+if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/mutated-manifests" --output "$work/out" --snapshot-id repo-f44-20260908-002 --gnupghome "$work/gnupg" --metadata-key-id "$key" --rpm-key-id "$key"; then
   echo "same NEVRA with different producer hash was accepted" >&2
   exit 1
 fi
 
 echo "Running full-set-validation..."
-RO_REPO_RPMLINT_PERMISSIVE=1 "$root/tests/full-set-validation.sh" "$work/out/snapshots/fedora/44/repo-f44-20260908-001" x86_64 "$work/baseline"
+"$root/tests/full-set-validation.sh" "$work/out/snapshots/fedora/44/repo-f44-20260908-001" x86_64 "$work/baseline"
 
 if [ -n "$evidence_out" ]; then
   python3 - "$work/out/snapshots/fedora/44/repo-f44-20260908-001" "$evidence_out" <<'PY'

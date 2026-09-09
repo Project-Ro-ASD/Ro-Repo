@@ -30,9 +30,9 @@ def file_conflict_check(rpm_paths):
     conflicts = []
     for path in rpm_paths:
         try:
-            files = subprocess.check_output(["rpm", "-qpl", str(path)], text=True).strip().splitlines()
-        except (OSError, subprocess.CalledProcessError):
-            continue
+            files = subprocess.check_output(["rpm", "-qpl", str(path)], text=True, stderr=subprocess.PIPE).strip().splitlines()
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise ContractError(f"failed to query rpm contents for {path.name}: {exc}") from exc
         for f in files:
             if f in file_owners and file_owners[f] != path.name:
                 conflicts.append(f"{f} owned by both {file_owners[f]} and {path.name}")
@@ -65,25 +65,7 @@ def require(obj, fields, where):
     missing = sorted(set(fields) - set(obj))
     if missing: raise ContractError(f"{where} missing fields: {', '.join(missing)}")
 
-def _walk(value):
-    yield value
-    if isinstance(value, dict):
-        for child in value.values():
-            yield from _walk(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _walk(child)
-
-def _strings(value):
-    return [item for item in _walk(value) if isinstance(item, str)]
-
-def _has_subject_sha(value, expected):
-    for item in _walk(value):
-        if isinstance(item, dict) and isinstance(item.get("digest"), dict) and item["digest"].get("sha256") == expected:
-            return True
-    return False
-
-def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path):
+def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path, trusted_workflow):
     attestations = pathlib.Path(attestations_dir)
     targets = {item["filename"]: pathlib.Path(artifacts_dir) / item["filename"] for item in manifest["artifacts"]}
     if (pathlib.Path(artifacts_dir) / "SHA256SUMS").is_file():
@@ -97,24 +79,43 @@ def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path
         if not attest_path.is_file():
             raise ContractError(f"missing attestation evidence: {name}")
         data = load(attest_path)
+        if not isinstance(data, list): data = [data]
         artifact_digest = digest(path)
-        values = _strings(data)
-        repo_ok = any(value == repo or f"github.com/{repo}" in value for value in values)
-        commit_ok = commit in values
-        workflow_values = sorted({value for value in values if ".github/workflows/" in value or "github-hosted-runner" in value})
-        if not _has_subject_sha(data, artifact_digest):
-            raise ContractError(f"attestation subject digest mismatch or missing: {name}")
-        if not repo_ok:
-            raise ContractError(f"attestation repository mismatch or missing: {name}")
-        if not commit_ok:
-            raise ContractError(f"attestation source commit mismatch or missing: {name}")
-        if not workflow_values:
-            raise ContractError(f"attestation workflow identity missing: {name}")
+        
+        found_valid = False
+        for entry in data:
+            if not isinstance(entry, dict): continue
+            vr = entry.get("verificationResult", {})
+            stmt = vr.get("statement", {})
+            subjects = stmt.get("subject", [])
+            subject_digests = [s.get("digest", {}).get("sha256") for s in subjects if isinstance(s, dict)]
+            if artifact_digest not in subject_digests: continue
+            
+            pred = stmt.get("predicate", {})
+            inv = pred.get("invocation", {})
+            cs = inv.get("configSource", {})
+            actual_commit = cs.get("digest", {}).get("sha1")
+            
+            bd = pred.get("buildDefinition", {})
+            ep = bd.get("externalParameters", {})
+            actual_repo = ep.get("sourceURI", "") or ep.get("repository", "")
+            actual_workflow = ep.get("workflow", "")
+            
+            if actual_repo not in (repo, f"https://github.com/{repo}"): continue
+            if actual_commit != commit: continue
+            if not actual_workflow.endswith(trusted_workflow): continue
+            
+            found_valid = True
+            break
+            
+        if not found_valid:
+            raise ContractError(f"attestation validation failed (wrong subject, repo, commit, or workflow): {name}")
+            
         verified[name] = {
             "artifact_sha256": artifact_digest,
             "source_repository": repo,
             "source_commit": commit,
-            "workflow_identity": workflow_values,
+            "workflow_identity": trusted_workflow,
         }
     return verified
 
@@ -137,6 +138,25 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=Non
     producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
     if len(producers) != 1: raise ContractError(f"producer is not allowlisted: {manifest['source_repository']}")
     producer = producers[0]; source_names=set(); headers=[]; seen=set()
+    
+    manifest_rpms = {item["filename"] for item in manifest["artifacts"]}
+    actual_rpms = {path.name for path in pathlib.Path(artifacts_dir).glob("*.rpm")}
+    if manifest_rpms != actual_rpms:
+        raise ContractError(f"RPM set mismatch. Manifest has: {manifest_rpms}. Directory has: {actual_rpms}.")
+
+    sha256sums_path = pathlib.Path(artifacts_dir) / "SHA256SUMS"
+    if sha256sums_path.is_file():
+        sums = {}
+        for line in sha256sums_path.read_text().splitlines():
+            if not line.strip(): continue
+            parts = line.strip().split(maxsplit=1)
+            if len(parts) == 2: sums[parts[1].strip("*")] = parts[0]
+        for item in manifest["artifacts"]:
+            if item["filename"] not in sums: raise ContractError(f"SHA256SUMS missing entry for {item['filename']}")
+            if sums[item["filename"]] != item["producer_artifact_sha256"]: raise ContractError(f"SHA256SUMS digest mismatch for {item['filename']}")
+        extra_sums = {k for k in sums.keys() if k.endswith('.rpm')} - manifest_rpms
+        if extra_sums: raise ContractError(f"SHA256SUMS contains unknown RPMs: {extra_sums}")
+
     for item in manifest["artifacts"]:
         filename=item["filename"]
         if pathlib.PurePath(filename).name != filename or filename in seen: raise ContractError(f"unsafe or duplicate filename: {filename}")
@@ -170,15 +190,23 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names=Non
         diagnostics["file_conflicts"] = conflicts
     return manifest, headers, diagnostics
 
-def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names=None, attestations_dir=None):
+def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names=None, attestations_dir=None, test_only_allow_unattested=False):
     manifest,_,diagnostics=verify_component(manifest_path,artifacts_dir,config_path,fedora_names); key=digest(manifest_path); target=pathlib.Path(accepted_dir)/key
     if target.exists(): raise ContractError(f"acceptance object exists: {key}")
+    
+    if not attestations_dir and not test_only_allow_unattested:
+        raise ContractError("attestations are strictly required unless --test-only-allow-unattested is given")
+        
     (target/"artifacts").mkdir(parents=True); shutil.copy2(manifest_path,target/"component-artifact-manifest-v1.json")
     for item in manifest["artifacts"]: shutil.copy2(pathlib.Path(artifacts_dir)/item["filename"],target/"artifacts"/item["filename"])
 
     verified_attestation = {}
     if attestations_dir:
-        verified_attestation = verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path)
+        config = load(config_path)
+        producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
+        trusted_workflow = producers[0].get("trusted_signer_workflow")
+        if not trusted_workflow: raise ContractError("producer missing trusted_signer_workflow")
+        verified_attestation = verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path, trusted_workflow)
 
     save(target/"acceptance-evidence-v1.json",{
         "schema_version":1,
@@ -189,7 +217,7 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
         "release_tag":manifest["release_tag"],
         "release_id":manifest["release_id"],
         "workflow_run":manifest["workflow_run"],
-        "verified_provenance": "github_attestation_exact_match" if verified_attestation else "not_provided_local_acceptance",
+        "verified_provenance": "github_attestation_exact_match" if verified_attestation else "unattested_test_only_override",
         "verified_attestation": verified_attestation,
         "checks":["allowlist","manifest","sha256","rpm-header","fedora-release","architecture","srpm-parity","collision","provenance-exact-match","rpmlint","file-conflict"],
         "diagnostics":diagnostics
@@ -220,7 +248,7 @@ def sign_file(path,gnupghome,key_id):
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
     run(["gpg","--batch","--yes","--armor","--local-user",key_id,"--detach-sign","--output",str(path)+".asc",str(path)],env)
 
-def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,parent=None):
+def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadata_key_id,rpm_key_id,parent=None):
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID")
     output=pathlib.Path(output); final=output/"snapshots/fedora/44"/snapshot_id
     if final.exists(): raise ContractError("immutable snapshot already exists")
@@ -240,8 +268,22 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
         for old_manifest in (output/"snapshots/fedora/44").glob("*/repository-snapshot-v1.json"):
             for old in load(old_manifest).get("packages",[]): historical[old["nevra"]]=old["producer_artifact_sha256"]
         processed_files = set()
+        
+        env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
+        rpmdb=stage/"rpmdb"; rpmdb.mkdir()
+        public_key=stage/"test-public-key.asc"
+        exported=run(["gpg","--batch","--armor","--export",rpm_key_id],env).stdout
+        public_key.write_text(exported,encoding="ascii")
+        run(["rpmkeys","--dbpath",str(rpmdb),"--import",str(public_key)])
+        
         for rpm in sorted(pathlib.Path(signed_dir).glob("*.rpm")):
             if rpm.name not in entries: raise ContractError(f"signed RPM absent from producer manifest: {rpm.name}")
+            
+            try:
+                run(["rpmkeys","--dbpath",str(rpmdb),"--checksig",str(rpm)])
+            except ContractError:
+                raise ContractError(f"unsigned or invalid signature on RPM: {rpm.name}")
+
             processed_files.add(rpm.name)
             item,manifest_digest=entries[rpm.name]; header=rpm_header(rpm); signed_hash=digest(rpm)
             if header["nevra"] in historical and historical[header["nevra"]] != item["producer_artifact_sha256"]: raise ContractError(f"historical NEVRA reuse with different content: {header['nevra']}")
@@ -254,13 +296,15 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
         if missing: raise ContractError(f"manifest artifacts missing from signed_dir: {', '.join(sorted(missing))}")
         repodata={}
         for arch,repo in repos.items():
-            run(["createrepo_c","--unique-md-filenames",str(repo)]); repomd=repo/"repodata/repomd.xml"; sign_file(repomd,gnupghome,key_id)
+            run(["createrepo_c","--unique-md-filenames",str(repo)]); repomd=repo/"repodata/repomd.xml"; sign_file(repomd,gnupghome,metadata_key_id)
             repodata[arch]={"repomd_sha256":digest(repomd),"repomd_signature_sha256":digest(str(repomd)+".asc")}
-        keys=stage/"keys"; keys.mkdir(); env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
-        (keys/"RPM-GPG-KEY-ro-asd-TEST-ONLY").write_text(run(["gpg","--batch","--armor","--export",key_id],env).stdout,encoding="ascii")
-        fpr=fingerprint(gnupghome,key_id); manifest={"schema_version":1,"snapshot_id":snapshot_id,"created_at":timestamp(),"fedora_release":44,"parent_snapshot":parent,"packages":packages,"repositories":repodata,"rpm_signing_fingerprint":fpr,"metadata_signing_fingerprint":fpr,"creation_provenance":{"tool":"ro-repo-v2","run":os.getenv("GITHUB_RUN_ID","local")}}
+        keys=stage/"keys"; keys.mkdir()
+        (keys/"RPM-GPG-KEY-ro-asd-TEST-ONLY").write_text(exported,encoding="ascii")
+        rpm_fpr=fingerprint(gnupghome,rpm_key_id)
+        meta_fpr=fingerprint(gnupghome,metadata_key_id)
+        manifest={"schema_version":1,"snapshot_id":snapshot_id,"created_at":timestamp(),"fedora_release":44,"parent_snapshot":parent,"packages":packages,"repositories":repodata,"rpm_signing_fingerprint":rpm_fpr,"metadata_signing_fingerprint":meta_fpr,"creation_provenance":{"tool":"ro-repo-v2","run":os.getenv("GITHUB_RUN_ID","local")}}
         validate_schema(manifest, "repository-snapshot-v1")
-        save(stage/"repository-snapshot-v1.json",manifest); sign_file(stage/"repository-snapshot-v1.json",gnupghome,key_id); final.parent.mkdir(parents=True,exist_ok=True); os.rename(stage,final)
+        save(stage/"repository-snapshot-v1.json",manifest); sign_file(stage/"repository-snapshot-v1.json",gnupghome,metadata_key_id); final.parent.mkdir(parents=True,exist_ok=True); os.rename(stage,final)
 
 def verify_snapshot(snapshot,gnupghome=None):
     snapshot=pathlib.Path(snapshot); mp=snapshot/"repository-snapshot-v1.json"; manifest=load(mp)
@@ -269,29 +313,66 @@ def verify_snapshot(snapshot,gnupghome=None):
     env=os.environ.copy()
     if gnupghome: env["GNUPGHOME"]=str(gnupghome)
     run(["gpg","--verify",str(mp)+".asc",str(mp)],env)
-    for arch,info in manifest["repositories"].items():
-        repomd=snapshot/"rpm"/arch/"repodata/repomd.xml"
-        if digest(repomd)!=info["repomd_sha256"] or digest(str(repomd)+".asc")!=info["repomd_signature_sha256"]: raise ContractError(f"repodata digest mismatch: {arch}")
-        run(["gpg","--verify",str(repomd)+".asc",str(repomd)],env)
-    for item in manifest["packages"]:
-        arch="source" if item["architecture"]=="src" else ("x86_64" if item["architecture"]=="noarch" else item["architecture"]); rpm=snapshot/"rpm"/arch/item["filename"]
-        if digest(rpm)!=item["published_signed_artifact_sha256"]: raise ContractError(f"signed RPM digest mismatch: {item['filename']}")
+    
+    with tempfile.TemporaryDirectory() as tmp:
+        rpmdb=pathlib.Path(tmp)/"rpmdb"; rpmdb.mkdir()
+        keys = list((snapshot/"keys").glob("RPM-GPG-KEY-*"))
+        for k in keys: run(["rpmkeys","--dbpath",str(rpmdb),"--import",str(k)])
+        
+        noarch_x86 = {}
+        
+        for arch,info in manifest["repositories"].items():
+            repomd=snapshot/"rpm"/arch/"repodata/repomd.xml"
+            if digest(repomd)!=info["repomd_sha256"] or digest(str(repomd)+".asc")!=info["repomd_signature_sha256"]: raise ContractError(f"repodata digest mismatch: {arch}")
+            run(["gpg","--verify",str(repomd)+".asc",str(repomd)],env)
+        for item in manifest["packages"]:
+            arch="source" if item["architecture"]=="src" else ("x86_64" if item["architecture"]=="noarch" else item["architecture"])
+            rpm=snapshot/"rpm"/arch/item["filename"]
+            d = digest(rpm)
+            if d!=item["published_signed_artifact_sha256"]: raise ContractError(f"signed RPM digest mismatch: {item['filename']}")
+            
+            try:
+                run(["rpmkeys","--dbpath",str(rpmdb),"--checksig",str(rpm)])
+            except ContractError:
+                raise ContractError(f"RPM signature validation failed: {rpm.name}")
+                
+            if item["architecture"] == "noarch":
+                noarch_x86[item["filename"]] = d
+                
+        for filename, d in noarch_x86.items():
+            aarch_rpm=snapshot/"rpm/aarch64"/filename
+            if not aarch_rpm.is_file() or digest(aarch_rpm)!=d:
+                raise ContractError(f"noarch aarch64 copy mismatch: {filename}")
+            
     return manifest
 
 def publish(output,snapshot_id,channel,run_id="local",gnupghome=None):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")
+    if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID schema")
     output=pathlib.Path(output); snapshot=output/"snapshots/fedora/44"/snapshot_id; verify_snapshot(snapshot,gnupghome)
-    base=output/"publication/rpm/fedora/44"; target=base/channel; stage=base/f".{channel}-{uuid.uuid4().hex}"; stage.mkdir(parents=True)
+    base=output/"publication/rpm/fedora/44"; target=base/channel; stage=base/f".data-{uuid.uuid4().hex}"; stage.mkdir(parents=True)
     for arch in ("x86_64","aarch64","source"):
         source=snapshot/"rpm"/arch; dest=stage/arch; shutil.copytree(source,dest)
         repomd=dest/"repodata/repomd.xml"; sig=dest/"repodata/repomd.xml.asc"; repomd_bytes=repomd.read_bytes(); sig_bytes=sig.read_bytes(); repomd.unlink(); sig.unlink(); sig.write_bytes(sig_bytes); repomd.write_bytes(repomd_bytes)
     pub_manifest = {"schema_version":1,"channel":channel,"snapshot_id":snapshot_id,"published_at":timestamp(),"publication_run":run_id}
     validate_schema(pub_manifest, "publication-v1")
     save(stage/"publication-v1.json", pub_manifest)
-    previous=base/f".{channel}-previous"
-    if previous.exists(): shutil.rmtree(previous)
-    if target.exists(): os.rename(target,previous)
-    os.rename(stage,target)
+    if gnupghome:
+        sign_file(stage/"publication-v1.json", gnupghome, load(snapshot/"repository-snapshot-v1.json")["metadata_signing_fingerprint"])
+    
+    # Atomic symlink swap
+    previous = base/f".{channel}-previous"
+    if target.is_symlink():
+        current_target = target.resolve()
+        tmp_prev = base/f".tmp-prev-{uuid.uuid4().hex}"
+        tmp_prev.symlink_to(current_target.name)
+        os.replace(tmp_prev, previous)
+        
+    symlink_target = stage.name
+    tmp_link = base/f".tmp-link-{uuid.uuid4().hex}"
+    tmp_link.symlink_to(symlink_target)
+    os.replace(tmp_link, target)
+
 
 def promote(output,promotion_path,run_id,gnupghome=None):
     p=load(promotion_path)
@@ -301,6 +382,9 @@ def promote(output,promotion_path,run_id,gnupghome=None):
 
     beta_path = pathlib.Path(output)/"publication/rpm/fedora/44/beta/publication-v1.json"
     if not beta_path.is_file(): raise ContractError("no beta publication exists")
+    if gnupghome:
+        env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
+        run(["gpg","--verify",str(beta_path)+".asc",str(beta_path)],env)
     beta = load(beta_path)
     if beta["snapshot_id"] != p["snapshot_id"]: raise ContractError("snapshot is not the current beta publication")
 
@@ -332,13 +416,13 @@ def promote(output,promotion_path,run_id,gnupghome=None):
 
     if p["risk_class"] != highest_risk: raise ContractError(f"spoofed risk_class: claimed {p['risk_class']}, actual is {highest_risk}")
 
-    # We enforce that the promotion group matches the actual group from config
-    # If the snapshot contains packages from multiple promotion groups, we can assume the one declared in manifest must be one of them.
-    # Or just require exact match if only 1 group is involved.
     if not expected_groups:
         raise ContractError("no promotion_group found in producer config")
-    if p.get("promotion_group") not in expected_groups:
-        raise ContractError(f"spoofed promotion_group: claimed {p.get('promotion_group')}, actual expected one of {expected_groups}")
+        
+    expected_groups_sorted = sorted(list(expected_groups))
+    claimed_groups = p.get("promotion_groups", [p.get("promotion_group")] if p.get("promotion_group") else [])
+    if sorted(claimed_groups) != expected_groups_sorted:
+        raise ContractError(f"spoofed promotion_groups: claimed {claimed_groups}, actual expected exactly {expected_groups_sorted}")
 
     minimum = 14 if highest_risk == "critical-system" else 7
     if not p["emergency"] and age < dt.timedelta(days=minimum): raise ContractError(f"minimum beta duration is {minimum} days")
@@ -353,6 +437,17 @@ def promote(output,promotion_path,run_id,gnupghome=None):
             raise ContractError("evidence must be detailed records, not just strings")
         if "reference" not in ev or "digest" not in ev:
             raise ContractError("evidence must include reference and digest")
+        
+        ref_path = (pathlib.Path(output) / ev["reference"]).resolve()
+        evidence_root = (pathlib.Path(output) / "evidence").resolve()
+        if not str(ref_path).startswith(str(evidence_root)): raise ContractError("path traversal in evidence reference")
+        if not ref_path.is_file(): raise ContractError("evidence reference file missing")
+        if digest(ref_path) != ev["digest"]: raise ContractError("evidence reference digest mismatch")
+        
+        ref_data = load(ref_path)
+        if ref_data.get("snapshot_id") != p["snapshot_id"]: raise ContractError("evidence content snapshot mismatch")
+        if ref_data.get("result") != "pass": raise ContractError("evidence content result not pass")
+        
         if ev["result"] != "pass": raise ContractError(f"evidence {ev['name']} did not pass")
         if ev["snapshot_id"] != p["snapshot_id"]: raise ContractError(f"evidence {ev['name']} is for wrong snapshot")
         provided_evidence.add(ev["name"])
@@ -368,9 +463,20 @@ def promote(output,promotion_path,run_id,gnupghome=None):
 def rollback(output,channel):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")
     base=pathlib.Path(output)/"publication/rpm/fedora/44"; target=base/channel; previous=base/f".{channel}-previous"
-    if not target.is_dir() or not previous.is_dir(): raise ContractError(f"no previous {channel} publication")
-    swap=base/f".{channel}-rollback-{uuid.uuid4().hex}"
-    os.rename(target,swap); os.rename(previous,target); os.rename(swap,previous)
+    if not target.is_symlink() or not previous.is_symlink(): raise ContractError(f"no previous {channel} publication or not symlink")
+    
+    current_target = target.resolve()
+    previous_target = previous.resolve()
+    
+    # Swap pointers
+    tmp_link = base/f".tmp-link-{uuid.uuid4().hex}"
+    tmp_link.symlink_to(previous_target.name)
+    os.replace(tmp_link, target)
+    
+    tmp_link_prev = base/f".tmp-link-{uuid.uuid4().hex}"
+    tmp_link_prev.symlink_to(current_target.name)
+    os.replace(tmp_link_prev, previous)
+    
     return load(target/"publication-v1.json")["snapshot_id"]
 
 def catalog(snapshot,editorial,out,gnupghome):
@@ -386,9 +492,9 @@ def cli():
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True)
     def component(name):
         x=s.add_parser(name); x.add_argument("--manifest",type=pathlib.Path,required=True); x.add_argument("--artifacts",type=pathlib.Path,required=True); x.add_argument("--config",type=pathlib.Path,default=ROOT/"config/producers-v1.yaml"); x.add_argument("--fedora-names",type=pathlib.Path); return x
-    component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path)
+    component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
-    x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent")
+    x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent")
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
@@ -400,9 +506,9 @@ def main():
     a=cli()
     try:
         if a.command=="verify-component": verify_component(a.manifest,a.artifacts,a.config,a.fedora_names)
-        elif a.command=="accept-package": accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names,a.attestations)
+        elif a.command=="accept-package": accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names,a.attestations,a.test_only_allow_unattested)
         elif a.command=="sign-package": sign_packages(a.input,a.output,a.gnupghome,a.key_id)
-        elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.parent)
+        elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)

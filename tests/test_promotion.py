@@ -96,8 +96,12 @@ class PromotionPolicyTests(unittest.TestCase):
     @mock.patch("tools.ro_repo.validate_schema")
     def test_fake_evidence_rejected(self, m_schema, m_pub):
         self.setup_env({"ro-control": "normal-app"}, ["ro-control"], beta_age_days=8)
-        # Missing clean-install, etc.
-        promo = self.build_promo("normal-app", evidence=[{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"http","digest":"a"*64}])
+        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "result": "pass"}
+        ev_path = self.out / "evidence/test.json"
+        ev_path.parent.mkdir(parents=True, exist_ok=True)
+        ro_repo.save(ev_path, evidence_content)
+        d = ro_repo.digest(ev_path)
+        promo = self.build_promo("normal-app", evidence=[{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"evidence/test.json","digest":d}])
         path = self.tmp / "promo.json"
         ro_repo.save(path, promo)
 

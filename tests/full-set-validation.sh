@@ -68,7 +68,4 @@ if conflicts:
     raise SystemExit(1)
 PY
 rpmlint_args=(-c "$script_root/tests/rpmlint-tests.toml")
-if [ "${RO_REPO_RPMLINT_PERMISSIVE:-0}" = "1" ]; then
-    rpmlint_args+=(-P)
-fi
 rpmlint "${rpmlint_args[@]}" "${rpm_files[@]}"
