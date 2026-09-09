@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install dependencies
-        run: dnf -y install dnf-plugins-core python3 python3-yaml
+        run: dnf -y install dnf-plugins-core python3 python3-yaml python3-jsonschema rpm rpm-build rpm-sign createrepo_c gnupg2 rpmlint gcc make
       - name: Check package name collisions
         run: |
           echo "Fetching available Fedora 44 package names..."
@@ -33,24 +33,9 @@ jobs:
           '
       - name: Validate snapshot compatibility
         run: |
-          # TODO(Faz 2/3): Implement adapter to fetch the actual remote stable snapshot.
-          # For Phase 1, we generate a local test snapshot to test the compatibility validation logic.
-          echo "Setting up local test snapshot fixture..."
-          tests/e2e-local.sh
-          # e2e-local.sh leaves its output in a tmp directory, but we can just use its internal logic
-          # Actually e2e-local.sh verifies full-set-validation on its own.
-          # We just need to make sure the compatibility workflow tests the transaction simulation successfully.
-          # Let's extract the snapshot path from e2e-local.sh output or just run a quick inline fixture.
-
-          # Since e2e-local.sh tests full-set-validation, we can just say this workflow
-          # verifies the script logic for now.
-          # Let's create a dummy metadata directory to satisfy the path contract.
-          mkdir -p dummy-snapshot/rpm/x86_64/repodata
-          touch dummy-snapshot/keys/RPM-GPG-KEY-ro-asd-TEST-ONLY
-          echo "This would be the real transaction validation against the stable snapshot"
-          # In the future, this will run: tests/full-set-validation.sh "$DOWNLOADED_SNAPSHOT_ROOT" x86_64
-
-          echo '{"result": "pass", "transaction": "upgrade-simulated", "note": "Phase 1 local fixture"}' > compatibility-evidence.json
+          # Faz 1 remote stable backend sunmaz; bu job yalniz deterministic local
+          # snapshot uzerinde gercek DNF/rpmlint execution evidence uretir.
+          RO_REPO_E2E_EVIDENCE=compatibility-evidence.json RO_REPO_RPMLINT_PERMISSIVE=1 tests/e2e-local.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v4
         with:
           name: compatibility-evidence-${{ github.run_id }}

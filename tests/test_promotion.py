@@ -1,10 +1,12 @@
-import tools.ro_repo
 import unittest
 import pathlib
 import json
 import datetime as dt
+import sys
 from unittest import mock
 
+sys.path.insert(0, str(pathlib.Path(__file__).parents[1]))
+import tools.ro_repo
 from tools import ro_repo
 
 class PromotionPolicyTests(unittest.TestCase):
@@ -28,8 +30,9 @@ class PromotionPolicyTests(unittest.TestCase):
 
         snap = self.out/"snapshots/fedora/44/repo-f44-20260908-001"
         snap.mkdir(parents=True, exist_ok=True)
-        pkgs = [{"nevra": f"{p}-0:1.0-1.x86_64", "architecture": "x86_64", "filename": f"{p}.rpm", "producer_artifact_sha256": "abc", "published_signed_artifact_sha256": "abc", "producer_manifest_digest": "abc"} for p in packages]
-        ro_repo.save(snap/"repository-snapshot-v1.json", {"schema_version":1,"snapshot_id":"repo-f44-20260908-001","created_at":"2026-09-08T00:00:00Z","fedora_release":44,"parent_snapshot":None,"packages":pkgs,"repositories":{},"rpm_signing_fingerprint":"fpr","metadata_signing_fingerprint":"fpr","creation_provenance":{"tool":"test","run":"local"}})
+        sha = "a" * 64
+        pkgs = [{"nevra": f"{p}-0:1.0-1.x86_64", "architecture": "x86_64", "filename": f"{p}.rpm", "producer_artifact_sha256": sha, "published_signed_artifact_sha256": sha, "producer_manifest_digest": sha} for p in packages]
+        ro_repo.save(snap/"repository-snapshot-v1.json", {"schema_version":1,"snapshot_id":"repo-f44-20260908-001","created_at":"2026-09-08T00:00:00Z","fedora_release":44,"parent_snapshot":None,"packages":pkgs,"repositories":{},"rpm_signing_fingerprint":"A"*40,"metadata_signing_fingerprint":"A"*40,"creation_provenance":{"tool":"ro-repo-v2","run":"local"}})
 
         # mock producers config
         config = {"producers": []}
@@ -46,7 +49,7 @@ class PromotionPolicyTests(unittest.TestCase):
 
     def build_promo(self, risk="normal-app", emergency=False, reason="", evidence=None, group="ro-control"):
         if evidence is None:
-            evidence = [{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","reference":"http","digest":"abc"}]
+            evidence = [{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"http","digest":"a"*64}]
         return {
             "schema_version":1, "snapshot_id":"repo-f44-20260908-001", "from":"beta", "to":"stable",
             "risk_class":risk, "promotion_group":group,
@@ -94,7 +97,7 @@ class PromotionPolicyTests(unittest.TestCase):
     def test_fake_evidence_rejected(self, m_schema, m_pub):
         self.setup_env({"ro-control": "normal-app"}, ["ro-control"], beta_age_days=8)
         # Missing clean-install, etc.
-        promo = self.build_promo("normal-app", evidence=[{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","reference":"http","digest":"abc"}])
+        promo = self.build_promo("normal-app", evidence=[{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"http","digest":"a"*64}])
         path = self.tmp / "promo.json"
         ro_repo.save(path, promo)
 

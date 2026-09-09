@@ -65,6 +65,59 @@ def require(obj, fields, where):
     missing = sorted(set(fields) - set(obj))
     if missing: raise ContractError(f"{where} missing fields: {', '.join(missing)}")
 
+def _walk(value):
+    yield value
+    if isinstance(value, dict):
+        for child in value.values():
+            yield from _walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _walk(child)
+
+def _strings(value):
+    return [item for item in _walk(value) if isinstance(item, str)]
+
+def _has_subject_sha(value, expected):
+    for item in _walk(value):
+        if isinstance(item, dict) and isinstance(item.get("digest"), dict) and item["digest"].get("sha256") == expected:
+            return True
+    return False
+
+def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path):
+    attestations = pathlib.Path(attestations_dir)
+    targets = {item["filename"]: pathlib.Path(artifacts_dir) / item["filename"] for item in manifest["artifacts"]}
+    if (pathlib.Path(artifacts_dir) / "SHA256SUMS").is_file():
+        targets["SHA256SUMS"] = pathlib.Path(artifacts_dir) / "SHA256SUMS"
+    targets[pathlib.Path(manifest_path).name] = pathlib.Path(manifest_path)
+    verified = {}
+    repo = manifest["source_repository"]
+    commit = manifest["source_commit"]
+    for name, path in sorted(targets.items()):
+        attest_path = attestations / f"{name}.json"
+        if not attest_path.is_file():
+            raise ContractError(f"missing attestation evidence: {name}")
+        data = load(attest_path)
+        artifact_digest = digest(path)
+        values = _strings(data)
+        repo_ok = any(value == repo or f"github.com/{repo}" in value for value in values)
+        commit_ok = commit in values
+        workflow_values = sorted({value for value in values if ".github/workflows/" in value or "github-hosted-runner" in value})
+        if not _has_subject_sha(data, artifact_digest):
+            raise ContractError(f"attestation subject digest mismatch or missing: {name}")
+        if not repo_ok:
+            raise ContractError(f"attestation repository mismatch or missing: {name}")
+        if not commit_ok:
+            raise ContractError(f"attestation source commit mismatch or missing: {name}")
+        if not workflow_values:
+            raise ContractError(f"attestation workflow identity missing: {name}")
+        verified[name] = {
+            "artifact_sha256": artifact_digest,
+            "source_repository": repo,
+            "source_commit": commit,
+            "workflow_identity": workflow_values,
+        }
+    return verified
+
 def rpm_header(path):
     query = "%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\t%{ARCH}\t%{SOURCERPM}\t%|SOURCEPACKAGE?{true}:{false}|"
     values = run(["rpm", "-qp", "--qf", query, str(path)]).stdout.split("\t")
@@ -125,10 +178,7 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
 
     verified_attestation = {}
     if attestations_dir:
-        for p in pathlib.Path(attestations_dir).glob("*.json"):
-            try:
-                verified_attestation[p.name.replace(".json", "")] = load(p)
-            except Exception: pass
+        verified_attestation = verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path)
 
     save(target/"acceptance-evidence-v1.json",{
         "schema_version":1,
@@ -139,7 +189,7 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
         "release_tag":manifest["release_tag"],
         "release_id":manifest["release_id"],
         "workflow_run":manifest["workflow_run"],
-        "verified_provenance": "verified_by_github_attestation",
+        "verified_provenance": "github_attestation_exact_match" if verified_attestation else "not_provided_local_acceptance",
         "verified_attestation": verified_attestation,
         "checks":["allowlist","manifest","sha256","rpm-header","fedora-release","architecture","srpm-parity","collision","provenance-exact-match","rpmlint","file-conflict"],
         "diagnostics":diagnostics
@@ -209,6 +259,7 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,key_id,
         keys=stage/"keys"; keys.mkdir(); env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
         (keys/"RPM-GPG-KEY-ro-asd-TEST-ONLY").write_text(run(["gpg","--batch","--armor","--export",key_id],env).stdout,encoding="ascii")
         fpr=fingerprint(gnupghome,key_id); manifest={"schema_version":1,"snapshot_id":snapshot_id,"created_at":timestamp(),"fedora_release":44,"parent_snapshot":parent,"packages":packages,"repositories":repodata,"rpm_signing_fingerprint":fpr,"metadata_signing_fingerprint":fpr,"creation_provenance":{"tool":"ro-repo-v2","run":os.getenv("GITHUB_RUN_ID","local")}}
+        validate_schema(manifest, "repository-snapshot-v1")
         save(stage/"repository-snapshot-v1.json",manifest); sign_file(stage/"repository-snapshot-v1.json",gnupghome,key_id); final.parent.mkdir(parents=True,exist_ok=True); os.rename(stage,final)
 
 def verify_snapshot(snapshot,gnupghome=None):

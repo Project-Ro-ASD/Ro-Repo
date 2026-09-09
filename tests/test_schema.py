@@ -2,7 +2,9 @@ import unittest
 import pathlib
 import json
 import jsonschema
+import sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).parents[1]))
 from tools import ro_repo
 
 class SchemaTests(unittest.TestCase):

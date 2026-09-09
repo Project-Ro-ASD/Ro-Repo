@@ -3,6 +3,7 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
+evidence_out="${RO_REPO_E2E_EVIDENCE:-}"
 if ! command -v rpmsign >/dev/null 2>&1; then
   rpm_sign_package="$(find /tmp -maxdepth 1 -type f -name 'rpm-sign-*.rpm' -print -quit)"
   test -n "$rpm_sign_package"
@@ -17,11 +18,24 @@ printf '#include <stdio.h>\nint main(){printf("test\\n");return 0;}\n' > "$work/
 printf 'all: ro-control\nro-control: ro-control.c\n\tgcc -O2 -g $(CFLAGS) -o ro-control ro-control.c\n' > "$work/source/ro-control-9.9.9/Makefile"
 tar -C "$work/source" -czf "$top/SOURCES/ro-control-9.9.9.tar.gz" ro-control-9.9.9
 sed "s|@SOURCE@|$top/SOURCES/ro-control-9.9.9.tar.gz|" "$root/fixtures/ro-control-test.spec.in" > "$top/SPECS/ro-control.spec"
-rpmbuild -ba --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define "dist .fc44" "$top/SPECS/ro-control.spec" >/dev/null
-find "$top/RPMS" "$top/SRPMS" -type f -name '*.rpm' -exec cp {} "$work/incoming/" \;
+rpmbuild -ba --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define "dist .fc44" "$top/SPECS/ro-control.spec" > "$work/rpmbuild.log" 2>&1 || {
+  tail -200 "$work/rpmbuild.log" >&2
+  exit 1
+}
+mkdir -p "$work/source/ro-control-9.9.8" "$work/baseline"
+cp "$work/source/ro-control-9.9.9/ro-control.c" "$work/source/ro-control-9.9.9/Makefile" "$work/source/ro-control-9.9.8/"
+tar -C "$work/source" -czf "$top/SOURCES/ro-control-9.9.8.tar.gz" ro-control-9.9.8
+sed -e "s|@SOURCE@|$top/SOURCES/ro-control-9.9.8.tar.gz|" -e "s|Version: 9.9.9|Version: 9.9.8|" "$root/fixtures/ro-control-test.spec.in" > "$top/SPECS/ro-control-old.spec"
+rpmbuild -bb --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define "dist .fc44" "$top/SPECS/ro-control-old.spec" > "$work/rpmbuild-old.log" 2>&1 || {
+  tail -200 "$work/rpmbuild-old.log" >&2
+  exit 1
+}
+find "$top/RPMS" -type f -name 'ro-control-9.9.8-*.rpm' -exec cp {} "$work/baseline/" \;
+find "$top/RPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incoming/" \;
+find "$top/SRPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incoming/" \;
 python3 "$root/fixtures/make-test-manifest.py" "$work/incoming" "$work/incoming/component-artifact-manifest-v1.json"
 mkdir -m 700 "$work/gnupg"
-GNUPGHOME="$work/gnupg" gpg --batch --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY <test@invalid>' rsa2048 sign 1d >/dev/null 2>&1
+GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY <test@invalid>' rsa2048 sign 1d >/dev/null 2>&1
 key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '$1=="sec" {print $5; exit}')"
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming"
 "$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted"
@@ -46,17 +60,38 @@ if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$wo
   exit 1
 fi
 
-mkdir -p ~/.config/rpmlint/
-cat << 'EOF' > ~/.config/rpmlint/test-filters.toml
-[Filters]
-filter = [
-    "unknown-key",
-    "unstripped-binary-or-object",
-    "position-independent-executable-suggested",
-    "no-manual-page-for-binary",
-    "no-documentation"
-]
-EOF
-
 echo "Running full-set-validation..."
-"$root/tests/full-set-validation.sh" "$work/out/snapshots/fedora/44/repo-f44-20260908-001" x86_64
+RO_REPO_RPMLINT_PERMISSIVE=1 "$root/tests/full-set-validation.sh" "$work/out/snapshots/fedora/44/repo-f44-20260908-001" x86_64 "$work/baseline"
+
+if [ -n "$evidence_out" ]; then
+  python3 - "$work/out/snapshots/fedora/44/repo-f44-20260908-001" "$evidence_out" <<'PY'
+import datetime as dt
+import hashlib
+import json
+import pathlib
+import sys
+
+snapshot = pathlib.Path(sys.argv[1])
+out = pathlib.Path(sys.argv[2])
+manifest = snapshot / "repository-snapshot-v1.json"
+digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text(json.dumps({
+    "schema_version": 1,
+    "scope": "phase1-local-fixture",
+    "snapshot_id": snapshot.name,
+    "result": "pass",
+    "tests": [
+        {"name": "dependency-solve", "result": "pass"},
+        {"name": "clean-install", "result": "pass"},
+        {"name": "upgrade", "result": "pass"},
+        {"name": "file-conflict", "result": "pass"},
+        {"name": "rpmlint", "result": "pass"},
+        {"name": "smoke", "result": "pass"}
+    ],
+    "reference": str(manifest),
+    "digest": digest,
+    "timestamp": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+PY
+fi

@@ -15,9 +15,57 @@ class ContractTests(unittest.TestCase):
     def tearDown(self): self.tmp.cleanup()
     def headers(self,path):
         source=path.name.endswith("src.rpm"); return {"name":"ro-control","epoch":0,"version":"1.0","release":"1.fc44","architecture":"src" if source else "x86_64","source_rpm":None if source else self.srpm.name,"nevra":"ro-control-0:1.0-1.fc44."+("src" if source else "x86_64")}
+    def write_attestation(self, directory, name, path, commit=None, workflow=True):
+        data = [{
+            "verificationResult": {
+                "statement": {
+                    "subject": [{"name": name, "digest": {"sha256": ro_repo.digest(path)}}],
+                    "predicate": {
+                        "buildDefinition": {
+                            "externalParameters": {
+                                "repository": "https://github.com/Project-Ro-ASD/ro-Control",
+                                "workflow": ".github/workflows/release.yml"
+                            }
+                        },
+                        "invocation": {
+                            "configSource": {
+                                "digest": {"sha1": commit or self.manifest["source_commit"]}
+                            }
+                        }
+                    }
+                }
+            }
+        }]
+        if not workflow:
+            data[0]["verificationResult"]["statement"]["predicate"]["buildDefinition"]["externalParameters"].pop("workflow")
+        (directory / f"{name}.json").write_text(json.dumps(data))
     def test_valid_component_and_acceptance(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers): ro_repo.verify_component(self.mp,self.artifacts,self.config); ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config)
         self.assertTrue(list((self.root/"accepted").rglob("acceptance-evidence-v1.json")))
+    def test_attestation_exact_match_acceptance(self):
+        attest=self.root/"attestations"; attest.mkdir()
+        self.write_attestation(attest,self.rpm.name,self.rpm)
+        self.write_attestation(attest,self.srpm.name,self.srpm)
+        self.write_attestation(attest,self.mp.name,self.mp)
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers):
+            ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,attestations_dir=attest)
+        evidence=json.loads(next((self.root/"accepted").rglob("acceptance-evidence-v1.json")).read_text())
+        self.assertEqual(evidence["verified_provenance"], "github_attestation_exact_match")
+        self.assertIn(self.rpm.name, evidence["verified_attestation"])
+    def test_attestation_commit_mismatch_rejected(self):
+        attest=self.root/"attestations"; attest.mkdir()
+        self.write_attestation(attest,self.rpm.name,self.rpm,commit="b"*40)
+        self.write_attestation(attest,self.srpm.name,self.srpm)
+        self.write_attestation(attest,self.mp.name,self.mp)
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError,"source commit"):
+            ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,attestations_dir=attest)
+    def test_attestation_workflow_identity_missing_rejected(self):
+        attest=self.root/"attestations"; attest.mkdir()
+        self.write_attestation(attest,self.rpm.name,self.rpm,workflow=False)
+        self.write_attestation(attest,self.srpm.name,self.srpm)
+        self.write_attestation(attest,self.mp.name,self.mp)
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError,"workflow identity"):
+            ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,attestations_dir=attest)
     def test_digest_mutation_is_rejected(self):
         self.rpm.write_bytes(b"mutated")
         with self.assertRaisesRegex(ro_repo.ContractError,"digest mismatch"): ro_repo.verify_component(self.mp,self.artifacts,self.config)

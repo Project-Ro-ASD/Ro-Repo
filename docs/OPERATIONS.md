@@ -19,9 +19,10 @@ Normal uygulama ve kritik masaustu paketleri en az 7, kritik sistem paketleri
 ve `emergency=true` ister.
 
 Bir stable Fedora tabani ve sonraki taban icin gecis testi desteklenir. Fedora
-44 stable iken Fedora 45 yalniz migration testing'dir. Haftalik is, hareketli
-Fedora updates ile stable snapshot icin dependency solve ve upgrade islemini
-yeniden dogrular.
+44 stable iken Fedora 45 yalniz migration testing'dir. Faz 1'de remote stable
+backend yoktur; haftalik is yalniz deterministic local snapshot fixture uzerinde
+gercek `dnf` dependency solve/install/upgrade ve `rpmlint` yolunu calistirir.
+Remote stable snapshot uyumluluk testi Faz 2 publication backend'ine baglanir.
 
 Publication rollback yalniz stable gorunumunu geri alir; istemciyi otomatik
 downgrade etmez. Client rollback ve boot/kernel/installer system recovery ayri
