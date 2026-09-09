@@ -102,4 +102,56 @@ class ContractTests(unittest.TestCase):
         (snap/"repository-snapshot-v1.json").write_text(json.dumps(m))
         with self.assertRaisesRegex(ro_repo.ContractError,"schema validation failed"): ro_repo.verify_snapshot(snap)
 
+    def test_snapshot_role_aware_signature(self):
+        snap=self.root/"repo-f44-20260908-001"; snap.mkdir()
+        (snap/"keys").mkdir()
+        (snap/"keys/RPM-GPG-KEY-TEST").touch()
+        m={"schema_version":1,"snapshot_id":"repo-f44-20260908-001","created_at":"2026-09-08T00:00:00Z","fedora_release":44,"parent_snapshot":None,
+           "packages":[{"architecture":"x86_64", "filename":"pkg.rpm", "nevra": "pkg-0:1-1.x86_64",
+                        "producer_artifact_sha256": "a"*64, "published_signed_artifact_sha256": ro_repo.digest(self.rpm), "producer_manifest_digest": "b"*64}],
+           "repositories":{"x86_64": {"repomd_sha256": "a"*64, "repomd_signature_sha256": "b"*64},
+                           "aarch64": {"repomd_sha256": "a"*64, "repomd_signature_sha256": "b"*64},
+                           "source": {"repomd_sha256": "a"*64, "repomd_signature_sha256": "b"*64}},
+           "rpm_signing_fingerprint":"A"*40,"metadata_signing_fingerprint":"B"*40,"creation_provenance":{"tool":"ro-repo-v2","run":"local"}}
+        (snap/"repository-snapshot-v1.json").write_text(json.dumps(m))
+        (snap/"repository-snapshot-v1.json.asc").touch()
+        for arch in ["x86_64", "aarch64", "source"]:
+            (snap/f"rpm/{arch}/repodata").mkdir(parents=True)
+            (snap/f"rpm/{arch}/repodata/repomd.xml").write_text("a")
+            (snap/f"rpm/{arch}/repodata/repomd.xml.asc").write_text("b")
+        (snap/"rpm/x86_64/pkg.rpm").write_bytes(self.rpm.read_bytes())
+
+        # mock digest to bypass hash checks
+        self_rpm_digest = ro_repo.digest(self.rpm)
+        def mock_digest(p):
+            name = p if isinstance(p, str) else p.name
+            if name.endswith("repomd.xml.asc"): return "b"*64
+            if name.endswith("repomd.xml"): return "a"*64
+            if name.endswith("pkg.rpm"): return self_rpm_digest
+            return "c"*64
+        with mock.patch("ro_repo.digest", side_effect=mock_digest), \
+             mock.patch("ro_repo.run") as m_run:
+
+            # 1. Metadata key missing / wrong key used for repomd
+            m_run.return_value.stdout = f"[GNUPG:] VALIDSIG {'C'*40} 2026\n"
+            with self.assertRaisesRegex(ro_repo.ContractError, "wrong key used for"):
+                ro_repo.verify_snapshot(snap)
+
+            # 2. RPM signed with wrong key (rpmkeys fails)
+            def side_effect(args, *a, **kw):
+                class R: stdout = f"[GNUPG:] VALIDSIG {'B'*40} 2026\n"
+                if "rpmkeys" in args and "--checksig" in args:
+                    raise ro_repo.ContractError("checksig failed")
+                return R()
+            m_run.side_effect = side_effect
+            with self.assertRaisesRegex(ro_repo.ContractError, "RPM signature validation failed"):
+                ro_repo.verify_snapshot(snap)
+
+            # 3. Success (both keys match)
+            def side_effect_success(args, *a, **kw):
+                class R: stdout = f"[GNUPG:] VALIDSIG {'B'*40} 2026\n"
+                return R()
+            m_run.side_effect = side_effect_success
+            ro_repo.verify_snapshot(snap)
+
 if __name__ == "__main__": unittest.main()

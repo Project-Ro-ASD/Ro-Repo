@@ -300,6 +300,8 @@ def build_snapshot(signed_dir,manifests_dir,output,snapshot_id,gnupghome,metadat
             repodata[arch]={"repomd_sha256":digest(repomd),"repomd_signature_sha256":digest(str(repomd)+".asc")}
         keys=stage/"keys"; keys.mkdir()
         (keys/"RPM-GPG-KEY-ro-asd-TEST-ONLY").write_text(exported,encoding="ascii")
+        exported_meta = run(["gpg","--batch","--armor","--export",metadata_key_id],env).stdout
+        (keys/"REPODATA-GPG-KEY-ro-asd-TEST-ONLY").write_text(exported_meta,encoding="ascii")
         rpm_fpr=fingerprint(gnupghome,rpm_key_id)
         meta_fpr=fingerprint(gnupghome,metadata_key_id)
         manifest={"schema_version":1,"snapshot_id":snapshot_id,"created_at":timestamp(),"fedora_release":44,"parent_snapshot":parent,"packages":packages,"repositories":repodata,"rpm_signing_fingerprint":rpm_fpr,"metadata_signing_fingerprint":meta_fpr,"creation_provenance":{"tool":"ro-repo-v2","run":os.getenv("GITHUB_RUN_ID","local")}}
@@ -312,7 +314,15 @@ def verify_snapshot(snapshot,gnupghome=None):
     if manifest["snapshot_id"] != snapshot.name or "target_channel" in manifest: raise ContractError("snapshot identity/lifecycle separation invalid")
     env=os.environ.copy()
     if gnupghome: env["GNUPGHOME"]=str(gnupghome)
-    run(["gpg","--verify",str(mp)+".asc",str(mp)],env)
+    def verify_gpg_signature(file_path, asc_path, expected_fingerprint, env):
+        out = run(["gpg", "--status-fd", "1", "--verify", str(asc_path), str(file_path)], env).stdout
+        for line in out.splitlines():
+            if line.startswith("[GNUPG:] VALIDSIG "):
+                if line.split()[2] == expected_fingerprint:
+                    return
+        raise ContractError(f"GPG signature verification error: wrong key used for {file_path}")
+
+    verify_gpg_signature(mp, str(mp)+".asc", manifest["metadata_signing_fingerprint"], env)
     
     with tempfile.TemporaryDirectory() as tmp:
         rpmdb=pathlib.Path(tmp)/"rpmdb"; rpmdb.mkdir()
@@ -324,7 +334,7 @@ def verify_snapshot(snapshot,gnupghome=None):
         for arch,info in manifest["repositories"].items():
             repomd=snapshot/"rpm"/arch/"repodata/repomd.xml"
             if digest(repomd)!=info["repomd_sha256"] or digest(str(repomd)+".asc")!=info["repomd_signature_sha256"]: raise ContractError(f"repodata digest mismatch: {arch}")
-            run(["gpg","--verify",str(repomd)+".asc",str(repomd)],env)
+            verify_gpg_signature(repomd, str(repomd)+".asc", manifest["metadata_signing_fingerprint"], env)
         for item in manifest["packages"]:
             arch="source" if item["architecture"]=="src" else ("x86_64" if item["architecture"]=="noarch" else item["architecture"])
             rpm=snapshot/"rpm"/arch/item["filename"]

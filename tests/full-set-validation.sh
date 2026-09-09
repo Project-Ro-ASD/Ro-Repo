@@ -6,13 +6,15 @@ arch="${2:-x86_64}"
 baseline_dir="${3:-}"
 repo_dir="$repo_root/rpm/$arch"
 public_key="$repo_root/keys/RPM-GPG-KEY-ro-asd-TEST-ONLY"
+metadata_key="$repo_root/keys/REPODATA-GPG-KEY-ro-asd-TEST-ONLY"
 test -f "$repo_dir/repodata/repomd.xml"
 test -f "$public_key"
+test -f "$metadata_key"
 repo_args=(
     --repofrompath "ro-snapshot,file://$repo_dir"
     --setopt=ro-snapshot.gpgcheck=1
     --setopt=ro-snapshot.repo_gpgcheck=1
-    --setopt="ro-snapshot.gpgkey=file://$public_key"
+    --setopt="ro-snapshot.gpgkey=file://$public_key file://$metadata_key"
 )
 
 run_assumeno_transaction() {
