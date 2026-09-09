@@ -67,5 +67,8 @@ if conflicts:
     print("\n".join(conflicts))
     raise SystemExit(1)
 PY
+
+rpmkeys --import "$public_key"
+
 rpmlint_args=(-c "$script_root/tests/rpmlint-tests.toml")
 rpmlint "${rpmlint_args[@]}" "${rpm_files[@]}"

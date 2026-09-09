@@ -52,7 +52,7 @@ class PromotionPolicyTests(unittest.TestCase):
             evidence = [{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"http","digest":"a"*64}]
         return {
             "schema_version":1, "snapshot_id":"repo-f44-20260908-001", "from":"beta", "to":"stable",
-            "risk_class":risk, "promotion_group":group,
+            "risk_class":risk, "promotion_groups":group if isinstance(group, list) else [group],
             "beta_started_at":dt.datetime.now(dt.timezone.utc).isoformat(), # fake date
             "evidence": evidence, "approved_by":"maintainer",
             "approved_at":dt.datetime.now(dt.timezone.utc).isoformat(), "emergency":emergency, "reason":reason
@@ -110,14 +110,88 @@ class PromotionPolicyTests(unittest.TestCase):
 
     @mock.patch("tools.ro_repo.publish")
     @mock.patch("tools.ro_repo.validate_schema")
+    def test_evidence_traversal_rejected(self, m_schema, m_pub):
+        self.setup_env({"ro-control": "normal-app"}, ["ro-control"], beta_age_days=8)
+        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "result": "pass"}
+        ev_path = self.out / "evidence-evil/test.json"
+        ev_path.parent.mkdir(parents=True, exist_ok=True)
+        ro_repo.save(ev_path, evidence_content)
+        d = ro_repo.digest(ev_path)
+
+        # Test 1: evil prefix
+        promo = self.build_promo("normal-app", evidence=[{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"evidence-evil/test.json","digest":d}])
+        path = self.tmp / "promo.json"
+        ro_repo.save(path, promo)
+        with self.assertRaisesRegex(ro_repo.ContractError, "path traversal"):
+            ro_repo.promote(self.out, path, "test")
+
+        # Test 2: dot-dot traversal
+        promo["evidence"][0]["reference"] = "evidence/../evidence-evil/test.json"
+        ro_repo.save(path, promo)
+        with self.assertRaisesRegex(ro_repo.ContractError, "path traversal"):
+            ro_repo.promote(self.out, path, "test")
+
+        # Test 3: symlink escape
+        (self.out / "evidence").mkdir(parents=True, exist_ok=True)
+        sym = self.out / "evidence/symlink.json"
+        sym.symlink_to(ev_path.resolve())
+        promo["evidence"][0]["reference"] = "evidence/symlink.json"
+        ro_repo.save(path, promo)
+        with self.assertRaisesRegex(ro_repo.ContractError, "path traversal"):
+            ro_repo.promote(self.out, path, "test")
+
+    @mock.patch("tools.ro_repo.publish")
+    @mock.patch("tools.ro_repo.validate_schema")
     def test_fake_group_rejected(self, m_schema, m_pub):
         self.setup_env({"ro-control": "normal-app"}, ["ro-control"], beta_age_days=8)
         promo = self.build_promo("normal-app", group="fake-group")
         path = self.tmp / "promo.json"
         ro_repo.save(path, promo)
 
-        with self.assertRaisesRegex(ro_repo.ContractError, "spoofed promotion_group"):
+        with self.assertRaisesRegex(ro_repo.ContractError, "spoofed promotion_groups"):
             ro_repo.promote(self.out, path, "test")
+
+    @mock.patch("tools.ro_repo.publish")
+    @mock.patch("tools.ro_repo.validate_schema")
+    def test_multi_group_rejected_and_accepted(self, m_schema, m_pub):
+        # Create an environment where the snapshot has two packages belonging to two DIFFERENT promotion groups
+        self.setup_env({"ro-control": "normal-app", "ro-assist": "normal-app"}, ["ro-control", "ro-assist"], beta_age_days=8)
+
+        # Override the mocked config to have multiple groups
+        config = ro_repo.load(self.tmp/"config/producers-v1.yaml")
+        config["producers"] = [
+            {"repository": "test/ro-control", "allowed_package_names": ["ro-control"], "risk_class": "normal-app", "promotion_group": "groupA"},
+            {"repository": "test/ro-assist", "allowed_package_names": ["ro-assist"], "risk_class": "normal-app", "promotion_group": "groupB"}
+        ]
+        ro_repo.save(self.tmp/"config/producers-v1.yaml", config)
+
+        # Build evidence content
+        evidence_content = {"snapshot_id": "repo-f44-20260908-001", "result": "pass"}
+        ev_path = self.out / "evidence/test.json"
+        ev_path.parent.mkdir(parents=True, exist_ok=True)
+        ro_repo.save(ev_path, evidence_content)
+        d = ro_repo.digest(ev_path)
+        evidence = [{"name":"smoke","result":"pass","snapshot_id":"repo-f44-20260908-001","timestamp":"2026-09-08T00:00:00Z","reference":"evidence/test.json","digest":d}]
+
+        path = self.tmp / "promo.json"
+
+        # Missing group
+        promo = self.build_promo("normal-app", group=["groupA"], evidence=evidence, emergency=True, reason="test")
+        ro_repo.save(path, promo)
+        with self.assertRaisesRegex(ro_repo.ContractError, "spoofed promotion_groups"):
+            ro_repo.promote(self.out, path, "test")
+
+        # Extra group
+        promo = self.build_promo("normal-app", group=["groupA", "groupB", "groupC"], evidence=evidence, emergency=True, reason="test")
+        ro_repo.save(path, promo)
+        with self.assertRaisesRegex(ro_repo.ContractError, "spoofed promotion_groups"):
+            ro_repo.promote(self.out, path, "test")
+
+        # Exact groups (ACCEPTED)
+        promo = self.build_promo("normal-app", group=["groupB", "groupA"], evidence=evidence, emergency=True, reason="test")
+        ro_repo.save(path, promo)
+        ro_repo.promote(self.out, path, "test")
+        self.assertTrue(m_pub.called)
 
 if __name__ == '__main__':
     unittest.main()

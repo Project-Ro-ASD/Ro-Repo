@@ -99,8 +99,13 @@ jobs:
               sys.exit("Workflow run commit mismatch")
           if run_data["conclusion"] != "success":
               sys.exit("Workflow run not success")
-          if not run_data["path"].endswith(workflow_path):
-              sys.exit(f"Workflow path mismatch: {run_data['path']} vs {workflow_path}")
+
+          # gh attestation uses the repo prefix for workflow matching, so does our trusted_signer_workflow
+          # The run_data["path"] from GitHub API is usually just '.github/workflows/something.yml'
+          # We check if PRODUCER + "/" + run_data["path"] matches exactly
+          actual_workflow_identity = f"{PRODUCER}/{run_data['path']}"
+          if actual_workflow_identity != workflow_path:
+              sys.exit(f"Workflow identity mismatch: {actual_workflow_identity} vs {workflow_path}")
 
           print("Manifest and workflow run identity matches.")
           with open("workflow.txt", "w") as f:

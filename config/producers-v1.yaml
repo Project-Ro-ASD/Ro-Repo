@@ -27,7 +27,7 @@
       "srpm_required": true,
       "sbom_required": false,
       "allow_fedora_override": false,
-      "trusted_signer_workflow": ".github/workflows/release.yml"
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Control/.github/workflows/release.yml"
     },
     {
       "repository": "Project-Ro-ASD/ro-Assist",
@@ -53,7 +53,7 @@
       "srpm_required": true,
       "sbom_required": false,
       "allow_fedora_override": false,
-      "trusted_signer_workflow": ".github/workflows/release.yml"
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Assist/.github/workflows/release.yml"
     },
     {
       "repository": "Project-Ro-ASD/Ro-Theme",
@@ -80,7 +80,7 @@
       "srpm_required": true,
       "sbom_required": false,
       "allow_fedora_override": false,
-      "trusted_signer_workflow": ".github/workflows/release.yml"
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-Theme/.github/workflows/release.yml"
     }
   ]
 }

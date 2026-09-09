@@ -103,7 +103,7 @@ def verify_attestations(manifest, artifacts_dir, attestations_dir, manifest_path
             
             if actual_repo not in (repo, f"https://github.com/{repo}"): continue
             if actual_commit != commit: continue
-            if not actual_workflow.endswith(trusted_workflow): continue
+            if trusted_workflow not in actual_workflow: continue
             
             found_valid = True
             break
@@ -440,7 +440,10 @@ def promote(output,promotion_path,run_id,gnupghome=None):
         
         ref_path = (pathlib.Path(output) / ev["reference"]).resolve()
         evidence_root = (pathlib.Path(output) / "evidence").resolve()
-        if not str(ref_path).startswith(str(evidence_root)): raise ContractError("path traversal in evidence reference")
+        try:
+            ref_path.relative_to(evidence_root)
+        except ValueError:
+            raise ContractError("path traversal in evidence reference")
         if not ref_path.is_file(): raise ContractError("evidence reference file missing")
         if digest(ref_path) != ev["digest"]: raise ContractError("evidence reference digest mismatch")
         
@@ -457,7 +460,8 @@ def promote(output,promotion_path,run_id,gnupghome=None):
 
     evidence_dir = pathlib.Path(output) / "evidence/promotions" / p["snapshot_id"]
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(promotion_path, evidence_dir / f"{p['promotion_group']}.json")
+    groups_str = "-".join(sorted(p["promotion_groups"]))
+    shutil.copy2(promotion_path, evidence_dir / f"{groups_str}.json")
     publish(output, p["snapshot_id"], "stable", run_id, gnupghome)
 
 def rollback(output,channel):

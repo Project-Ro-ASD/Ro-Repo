@@ -35,12 +35,23 @@ find "$top/RPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incom
 find "$top/SRPMS" -type f -name 'ro-control-9.9.9-*.rpm' -exec cp {} "$work/incoming/" \;
 python3 "$root/fixtures/make-test-manifest.py" "$work/incoming" "$work/incoming/component-artifact-manifest-v1.json"
 mkdir -m 700 "$work/gnupg"
-GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY <test@invalid>' rsa2048 sign 1d >/dev/null 2>&1
-key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '$1=="sec" {print $5; exit}')"
+GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY RPM <test1@invalid>' rsa2048 sign 1d >/dev/null 2>&1
+GNUPGHOME="$work/gnupg" gpg --batch --pinentry-mode loopback --passphrase '' --quick-generate-key 'Ro-Repo TEST ONLY META <test2@invalid>' rsa2048 sign 1d >/dev/null 2>&1
+rpm_key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '/^sec/ {print $5}' | sed -n '1p')"
+metadata_key="$(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-secret-keys | awk -F: '/^sec/ {print $5}' | sed -n '2p')"
+
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming"
 "$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --test-only-allow-unattested
-"$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$key"
-"$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$key" --rpm-key-id "$key"
+"$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
+"$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/accepted" --output "$work/out" --snapshot-id repo-f44-20260908-001 --gnupghome "$work/gnupg" --metadata-key-id "$metadata_key" --rpm-key-id "$rpm_key"
+
+# Verify fingerprints are different
+python3 - "$work/out/snapshots/fedora/44/repo-f44-20260908-001/repository-snapshot-v1.json" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1]))
+if data["rpm_signing_fingerprint"] == data["metadata_signing_fingerprint"]:
+    raise SystemExit("Error: rpm and metadata fingerprints are the same!")
+PY
 "$root/tools/ro-repo" verify-snapshot --snapshot "$work/out/snapshots/fedora/44/repo-f44-20260908-001" --gnupghome "$work/gnupg"
 "$root/tools/ro-repo" publish-local --output "$work/out" --snapshot-id repo-f44-20260908-001 --channel beta --gnupghome "$work/gnupg"
 "$root/tools/ro-repo" publish-local --output "$work/out" --snapshot-id repo-f44-20260908-001 --channel beta --gnupghome "$work/gnupg"
@@ -55,7 +66,7 @@ path=next(pathlib.Path(sys.argv[1]).rglob('component-artifact-manifest-v1.json')
 data=json.loads(path.read_text()); data['artifacts'][0]['producer_artifact_sha256']='c'*64
 path.write_text(json.dumps(data))
 PY
-if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/mutated-manifests" --output "$work/out" --snapshot-id repo-f44-20260908-002 --gnupghome "$work/gnupg" --metadata-key-id "$key" --rpm-key-id "$key"; then
+if "$root/tools/ro-repo" build-snapshot --signed "$work/signed" --manifests "$work/mutated-manifests" --output "$work/out" --snapshot-id repo-f44-20260908-002 --gnupghome "$work/gnupg" --metadata-key-id "$metadata_key" --rpm-key-id "$rpm_key"; then
   echo "same NEVRA with different producer hash was accepted" >&2
   exit 1
 fi
@@ -70,13 +81,15 @@ import hashlib
 import json
 import pathlib
 import sys
+import os
 
 snapshot = pathlib.Path(sys.argv[1])
 out = pathlib.Path(sys.argv[2])
 manifest = snapshot / "repository-snapshot-v1.json"
 digest = hashlib.sha256(manifest.read_bytes()).hexdigest()
 out.parent.mkdir(parents=True, exist_ok=True)
-out.write_text(json.dumps({
+tmp_out = out.with_name(out.name + ".tmp")
+tmp_out.write_text(json.dumps({
     "schema_version": 1,
     "scope": "phase1-local-fixture",
     "snapshot_id": snapshot.name,
@@ -89,9 +102,10 @@ out.write_text(json.dumps({
         {"name": "rpmlint", "result": "pass"},
         {"name": "smoke", "result": "pass"}
     ],
-    "reference": str(manifest),
+    "reference": str(manifest.relative_to(out.parent.parent)),
     "digest": digest,
     "timestamp": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+os.replace(tmp_out, out)
 PY
 fi

@@ -1,1 +1,35 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,"required":["schema_version","channel","snapshot_id","published_at","publication_run"],"properties":{"schema_version":{"const":1},"channel":{"enum":["beta","stable"]},"snapshot_id":{"type":"string"},"published_at":{"type":"string","format":"date-time"},"publication_run":{"type":"string","minLength":1}}}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "channel",
+    "snapshot_id",
+    "published_at",
+    "publication_run"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "channel": {
+      "enum": [
+        "beta",
+        "stable"
+      ]
+    },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "publication_run": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

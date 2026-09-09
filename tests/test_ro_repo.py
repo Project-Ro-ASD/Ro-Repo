@@ -24,7 +24,7 @@ class ContractTests(unittest.TestCase):
                         "buildDefinition": {
                             "externalParameters": {
                                 "repository": "https://github.com/Project-Ro-ASD/ro-Control",
-                                "workflow": ".github/workflows/release.yml"
+                                "workflow": "Project-Ro-ASD/ro-Control/.github/workflows/release.yml"
                             }
                         },
                         "invocation": {
