@@ -1,6 +1,7 @@
 # Ro-Repo V2 Phase 1 Closeout
 
 Date: 2026-09-09
+Status: CLOSED
 
 Bu belge Ro-Repo V2 Phase 1'in kapanis durumunu kaydeder. Phase 1'in teknik
 kapsami local filesystem publication backend'i, producer trust contract'i,
@@ -41,38 +42,42 @@ aittir.
   - subkey-only CI export testi.
 - Production key rotation/revocation ve backup policy'si
   `docs/PRODUCTION-KEY-MANAGEMENT.md` icinde kayda alindi.
+- Production public key seti canonical olarak `keys/production/` altinda
+  yayinlandi:
+  - `ro-asd-public.asc`
+  - `ro-asd-rpm-signing-public.asc`
+  - `ro-asd-metadata-signing-public.asc`
+  - `production-fingerprints.txt`
+- Ceremony makinesinden gelen exact public dosyalar repo icine kontrollu PR ile
+  aktarildi; secret key, revocation certificate veya backup materyali commit
+  edilmedi.
+- Dort repository'de GitHub Advanced Security ayarlari manuel olarak yeniden
+  kontrol edildi ve su korumalar etkinlestirildi:
+  - Secret Protection / secret scanning
+  - Push protection
+  - Dependabot alerts
+  - Dependabot security updates
 - Tek-maintainer yapisi acikca belgelenmistir; teknik rol ayrimi organizational
   separation-of-duties olarak sunulmaz.
 
-## Phase 2'ye gecmeden once canonical public key publication
+## Production key publication kaydi
 
-Production public key materyali secret degildir, ancak ceremony'den sonra local
-workstation'da uretilen exact dosyalar repoya kontrollu bir PR ile eklenmelidir:
+Canonical production public trust materyali:
 
 - `keys/production/ro-asd-public.asc`
 - `keys/production/ro-asd-rpm-signing-public.asc`
 - `keys/production/ro-asd-metadata-signing-public.asc`
 - `keys/production/production-fingerprints.txt`
 
-Bu dosyalar kullanicinin ceremony makinesindeki
-`~/Belgeler/ro-asd-public-keys/` klasorunden alinmalidir. Fingerprint veya public
-certificate icerigi model, dokumantasyon veya eski test anahtarindan tahmin
-edilmez. Public key PR'i production signing workflow'u devreye alinmadan once
-merge edilmelidir.
+Bu dosyalar public trust materyalidir. Primary private key, signing secret subkey
+exportlari, revocation certificate ve encrypted master backup repository disinda
+kalir.
 
-## GitHub UI tarafinda manuel dogrulama gerektiren security ayarlari
+## GitHub security kaydi
 
-2026-09-08 denetiminde Secret scanning, Push protection ve Dependabot security
-updates dort repoda kapali gorunmustu. Bu ayarlar repository kodundan guvenli
-sekilde acilamaz ve Phase 1 closeout icin GitHub UI uzerinden yeniden kontrol
-edilmelidir. Desteklenen plan/repository ayarlarinda su uc koruma etkinlestirilir:
-
-- Secret scanning
-- Push protection
-- Dependabot security updates
-
-Bu belge bunlarin etkinlestirildigini iddia etmez; UI dogrulamasi yapilmadan bu
-madde kapanmis sayilmaz.
+2026-09-08 denetiminde kapali gorunen Secret scanning, Push protection ve
+Dependabot security updates ayarlari 2026-09-09 tarihinde dort repoda GitHub UI
+uzerinden etkinlestirildi. Dependabot alerts de aktif olarak dogrulandi.
 
 ## Scope siniri
 
@@ -81,6 +86,8 @@ publication endpoint'i, production signing secret provisioning ve remote
 snapshot publication Phase 2 kapsamindadir. Cloudflare R2 canonical backend ise
 sonraki fazdadir.
 
-Phase 1'in local trust-chain kodu tamamlanmistir. Phase 2 baslangic kapisi,
-yukaridaki canonical public key publication ve GitHub UI security toggle
-kontrollerinin tamamlanmasidir.
+Phase 1'in local trust-chain kodu, producer contract'lari, manuel GitHub security
+yapilandirmalari, production key ceremony kaydi ve canonical public trust
+materyali tamamlanmistir.
+
+**Ro-Repo V2 Phase 1: CLOSED. Phase 2 entry gate aciktir.**
