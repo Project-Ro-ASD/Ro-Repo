@@ -71,6 +71,16 @@ GNUPGHOME="$work/production-signing-gnupg" gpg --batch --import "$work/rpm-signi
 GNUPGHOME="$work/gnupg" gpg --batch --armor \
   --export-filter "drop-subkey=fpr <> $rpm_key" \
   --export "$rpm_key" > "$work/rpm-signing-public.asc"
+
+mkdir -m 700 "$work/production-metadata-gnupg"
+GNUPGHOME="$work/gnupg" gpg --batch --armor \
+  --export-filter "drop-subkey=fpr <> $meta_key" \
+  --export-secret-subkeys "$primary_fpr" > "$work/metadata-signing-subkey.asc"
+GNUPGHOME="$work/production-metadata-gnupg" gpg --batch --import "$work/metadata-signing-subkey.asc" >/dev/null 2>&1
+GNUPGHOME="$work/gnupg" gpg --batch --armor \
+  --export-filter "drop-subkey=fpr <> $meta_key" \
+  --export "$meta_key" > "$work/metadata-signing-public.asc"
+
 : > "$work/test-passphrase"
 chmod 600 "$work/test-passphrase"
 
@@ -88,6 +98,58 @@ for artifact in evidence["artifacts"]:
     if artifact["producer_artifact_sha256"] == artifact["signed_artifact_sha256"]:
         raise SystemExit("signed RPM digest did not change")
 PY
+
+mkdir -p "$work/components/123/accepted" "$work/components/123/signed"
+cp -a "$work/accepted/." "$work/components/123/accepted/"
+cp -a "$work/production-signed/." "$work/components/123/signed/"
+printf '{"schema_version":1,"runs":[{"run_id":123}]}\n' > "$work/snapshot-input-v1.json"
+
+"$root/tools/ro-repo" build-production-snapshot \
+  --components "$work/components" \
+  --source-runs "$work/snapshot-input-v1.json" \
+  --output "$work/production-out" \
+  --snapshot-id repo-f44-20260920-020 \
+  --gnupghome "$work/production-metadata-gnupg" \
+  --rpm-key-id "$rpm_key" \
+  --metadata-key-id "$meta_key" \
+  --workflow-run 456 \
+  --passphrase-file "$work/test-passphrase" \
+  --test-only-metadata-public-key "$work/metadata-signing-public.asc" \
+  --test-only-rpm-public-key "$work/rpm-signing-public.asc" \
+  --test-only-allow-unattested
+
+python3 - \
+  "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020/repository-snapshot-v1.json" \
+  "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020/snapshot-build-evidence-v1.json" \
+  "$rpm_key" "$meta_key" <<'PY'
+import json, sys
+manifest=json.load(open(sys.argv[1]))
+evidence=json.load(open(sys.argv[2]))
+rpm_key, meta_key=sys.argv[3], sys.argv[4]
+if manifest["rpm_signing_fingerprint"] != rpm_key:
+    raise SystemExit("production snapshot RPM fingerprint mismatch")
+if manifest["metadata_signing_fingerprint"] != meta_key:
+    raise SystemExit("production snapshot metadata fingerprint mismatch")
+if evidence["source_signing_runs"] != [123] or evidence["workflow_run"] != 456:
+    raise SystemExit("production snapshot run binding mismatch")
+if evidence["rpm_signing_fingerprint"] == evidence["metadata_signing_fingerprint"]:
+    raise SystemExit("production snapshot role fingerprints unexpectedly match")
+PY
+
+expect_failure "workflow run mismatch" \
+  "$root/tools/ro-repo" build-production-snapshot \
+  --components "$work/components" \
+  --source-runs "$work/snapshot-input-v1.json" \
+  --output "$work/production-bad-out" \
+  --snapshot-id repo-f44-20260920-021 \
+  --gnupghome "$work/production-metadata-gnupg" \
+  --rpm-key-id "$rpm_key" \
+  --metadata-key-id "$meta_key" \
+  --workflow-run 457 \
+  --passphrase-file "$work/test-passphrase" \
+  --test-only-metadata-public-key "$work/metadata-signing-public.asc" \
+  --test-only-rpm-public-key "$work/rpm-signing-public.asc" \
+  --test-only-allow-unattested
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/wrong-rpm-role-signed" --gnupghome "$work/gnupg" --key-id "$meta_key"
 expect_failure "unsigned or invalid signature on RPM" "$root/tools/ro-repo" build-snapshot --signed "$work/wrong-rpm-role-signed" --manifests "$work/accepted" --output "$work/wrong-rpm-role-out" --snapshot-id repo-f44-20260908-010 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance
