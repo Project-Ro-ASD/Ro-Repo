@@ -1,0 +1,164 @@
+name: Roll back remote beta to signed history
+
+"on":
+  workflow_dispatch:
+    inputs:
+      target_publication_run:
+        description: Exact earlier beta publication run ID
+        required: true
+        type: string
+      reason:
+        description: Non-empty rollback reason
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ro-repo-remote-beta
+  cancel-in-progress: false
+
+jobs:
+  rollback-beta:
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    environment:
+      name: repo-beta
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      TARGET_PUBLICATION_RUN: ${{ inputs.target_publication_run }}
+      ROLLBACK_REASON: ${{ inputs.reason }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Install Git before writable Pages checkout
+        run: |
+          dnf -y install git
+
+      - name: Checkout persistent Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Install rollback verification tools
+        run: |
+          dnf -y install python3 python3-jsonschema rpm gnupg2
+
+      - name: Verify target signed history and roll back beta
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_PUBLICATION_RUN" =~ ^[1-9][0-9]*$ ]]
+          [[ -n "${ROLLBACK_REASON//[[:space:]]/}" ]]
+
+          verify_home="$RUNNER_TEMP/beta-rollback-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
+
+          result="$(source/tools/ro-repo rollback-remote-channel             --site-root pages-site             --channel beta             --target-publication-run "$TARGET_PUBLICATION_RUN"             --rollback-run "$GITHUB_RUN_ID"             --reason "$ROLLBACK_REASON"             --gnupghome "$verify_home")"
+          printf '%s
+' "$result"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+
+          git -C pages-site config user.name "Ro-Repo Beta Rollback"
+          git -C pages-site config user.email "actions@users.noreply.github.com"
+          git -C pages-site add             "rpm/fedora/44/beta"             "rollbacks/fedora/44/beta/$GITHUB_RUN_ID.json"
+
+          git -C pages-site commit             -m "beta: rollback to publication $TARGET_PUBLICATION_RUN via run $GITHUB_RUN_ID"
+          git -C pages-site push origin HEAD:pages-storage
+
+      - name: Rollback summary
+        shell: bash
+        run: |
+          {
+            echo "## Remote beta rollback"
+            echo
+            echo "- target publication run: `$TARGET_PUBLICATION_RUN`"
+            echo "- rollback run: `$GITHUB_RUN_ID`"
+            echo "- reason: `$ROLLBACK_REASON`"
+            echo
+            echo "No RPM, repodata, or publication manifest was re-signed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  verify-remote-beta-after-rollback:
+    needs: rollback-beta
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      TARGET_PUBLICATION_RUN: ${{ inputs.target_publication_run }}
+      REMOTE_BASE: https://repo.ro-asd.org/rpm/fedora/44/beta
+    steps:
+      - name: Checkout published Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install remote verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl gnupg
+
+      - name: Wait for rolled-back publication to reach Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          target_manifest="pages-site/publications/fedora/44/beta/$TARGET_PUBLICATION_RUN/publication-v1.json"
+          expected_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$target_manifest")"
+
+          found=0
+          for attempt in $(seq 1 30); do
+            if curl --proto '=https' --tlsv1.2 --fail --silent --show-error                 "$REMOTE_BASE/publication-v1.json?rollback=$GITHUB_RUN_ID-$attempt"                 -o "$RUNNER_TEMP/publication-v1.json"; then
+              remote_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              remote_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              if [[ "$remote_run" == "$TARGET_PUBLICATION_RUN" && "$remote_snapshot" == "$expected_snapshot" ]]; then
+                found=1
+                break
+              fi
+            fi
+            sleep 10
+          done
+          [[ "$found" -eq 1 ]]
+
+      - name: Verify remote beta tree equals rolled-back Pages view
+        shell: bash
+        run: |
+          set -euo pipefail
+          local_root="pages-site/rpm/fedora/44/beta"
+          remote_tmp="$RUNNER_TEMP/remote-beta-rollback"
+          mkdir -p "$remote_tmp"
+
+          while IFS= read -r -d '' path; do
+            rel="${path#"$local_root/"}"
+            mkdir -p "$remote_tmp/$(dirname "$rel")"
+            curl               --proto '=https'               --tlsv1.2               --fail               --silent               --show-error               "$REMOTE_BASE/$rel?rollback=$GITHUB_RUN_ID"               --output "$remote_tmp/$rel"
+            cmp --silent "$path" "$remote_tmp/$rel"
+          done < <(find "$local_root" -type f -print0 | sort -z)
+
+      - name: Verify rolled-back publication signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify_home="$RUNNER_TEMP/rollback-verify-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import             pages-site/snapshots/fedora/44/$(python3 -c 'import json; print(json.load(open("pages-site/rpm/fedora/44/beta/publication-v1.json"))["snapshot_id"])')/keys/REPODATA-GPG-KEY-ro-asd
+
+          GNUPGHOME="$verify_home" gpg --batch --verify             "$RUNNER_TEMP/remote-beta-rollback/publication-v1.json.asc"             "$RUNNER_TEMP/remote-beta-rollback/publication-v1.json"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
