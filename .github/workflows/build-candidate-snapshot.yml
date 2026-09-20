@@ -59,15 +59,15 @@ jobs:
           IFS=',' read -ra RAW_RUNS <<< "$SIGNING_RUNS"
           [[ "${#RAW_RUNS[@]}" -ge 1 ]]
           mkdir -p components
-          printf '{"schema_version":1,"runs":[' > snapshot-input-v1.json
-          first=1
           declare -A seen=()
+          normalized_runs=()
 
           for raw in "${RAW_RUNS[@]}"; do
             run_id="$(printf '%s' "$raw" | tr -d '[:space:]')"
             [[ "$run_id" =~ ^[1-9][0-9]*$ ]]
             [[ -z "${seen[$run_id]+x}" ]]
             seen[$run_id]=1
+            normalized_runs+=("$run_id")
 
             run_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")"
             [[ "$(jq -r '.repository.full_name' <<<"$run_json")" == "$GITHUB_REPOSITORY" ]]
@@ -86,22 +86,12 @@ jobs:
               --repo "$GITHUB_REPOSITORY" \
               --name "signed-component-$run_id" \
               --dir "components/$run_id/signed"
-
-            if [[ "$first" -eq 0 ]]; then printf ',' >> snapshot-input-v1.json; fi
-            printf '{"run_id":%s}' "$run_id" >> snapshot-input-v1.json
-            first=0
           done
-          printf '%s\\n' ']}' >> snapshot-input-v1.json
 
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          import sys
-          sys.path.insert(0, "tools")
-          import ro_repo
-          data=json.loads(Path("snapshot-input-v1.json").read_text())
-          ro_repo.validate_schema(data, "snapshot-input-v1")
-          PY
+          normalized_csv="$(IFS=,; printf '%s' "${normalized_runs[*]}")"
+          tools/ro-repo write-snapshot-input \
+            --runs "$normalized_csv" \
+            --output snapshot-input-v1.json
 
       - name: Build and sign immutable candidate snapshot
         env:
