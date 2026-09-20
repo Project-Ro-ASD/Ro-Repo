@@ -1,0 +1,274 @@
+name: Publish exact snapshot to remote beta
+
+"on":
+  workflow_dispatch:
+    inputs:
+      snapshot_id:
+        description: Exact immutable snapshot ID already present in Pages storage
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ro-repo-remote-beta
+  cancel-in-progress: false
+
+jobs:
+  sign-beta-publication:
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    environment:
+      name: repo-production-signing
+    timeout-minutes: 20
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout exact Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install publication tools
+        run: |
+          dnf -y install python3 python3-jsonschema rpm gnupg2
+
+      - name: Sign exact beta publication manifest
+        env:
+          RO_REPO_METADATA_SIGNING_SUBKEY_B64: ${{ secrets.RO_REPO_METADATA_SIGNING_SUBKEY_B64 }}
+          RO_REPO_METADATA_SIGNING_PASSPHRASE: ${{ secrets.RO_REPO_METADATA_SIGNING_PASSPHRASE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          [[ "$SNAPSHOT_ID" =~ ^repo-f44-[0-9]{8}-[0-9]{3}$ ]]
+          snapshot="pages-site/snapshots/fedora/44/$SNAPSHOT_ID"
+          [[ -d "$snapshot" ]]
+
+          signing_tmp=""
+          signing_home=""
+          key_file=""
+          passphrase_file=""
+          cleanup() {
+            set +e
+            if [[ -n "$signing_home" ]]; then
+              GNUPGHOME="$signing_home" gpgconf --kill gpg-agent >/dev/null 2>&1
+            fi
+            [[ -n "$key_file" ]] && rm -f -- "$key_file"
+            [[ -n "$passphrase_file" ]] && rm -f -- "$passphrase_file"
+            [[ -n "$signing_tmp" ]] && rm -rf -- "$signing_tmp"
+          }
+          trap cleanup EXIT
+
+          signing_tmp="$(mktemp -d)"
+          chmod 700 "$signing_tmp"
+          signing_home="$signing_tmp/gnupg"
+          key_file="$signing_tmp/metadata-signing-subkey.asc"
+          passphrase_file="$signing_tmp/passphrase"
+          mkdir -m 700 "$signing_home"
+          umask 077
+
+          printf '%s' "$RO_REPO_METADATA_SIGNING_SUBKEY_B64" | base64 --decode > "$key_file"
+          printf '%s' "$RO_REPO_METADATA_SIGNING_PASSPHRASE" > "$passphrase_file"
+          chmod 600 "$key_file" "$passphrase_file"
+          unset RO_REPO_METADATA_SIGNING_SUBKEY_B64 RO_REPO_METADATA_SIGNING_PASSPHRASE
+          GNUPGHOME="$signing_home" gpg --batch --import "$key_file"
+
+          metadata_fingerprint="$(awk -F= '$1 == "METADATA_SIGNING" {print $2}' source/keys/production/production-fingerprints.txt)"
+
+          source/tools/ro-repo verify-snapshot             --snapshot "$snapshot"             --gnupghome "$signing_home"
+
+          source/tools/ro-repo build-signed-remote-publication             --snapshot "$snapshot"             --channel beta             --output signed-publication             --publication-run "$GITHUB_RUN_ID"             --gnupghome "$signing_home"             --metadata-key-id "$metadata_fingerprint"             --passphrase-file "$passphrase_file"
+
+      - name: Upload signed beta publication
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: signed-beta-publication-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: signed-publication/beta/
+          retention-days: 90
+          if-no-files-found: error
+
+  publish-beta:
+    needs: sign-beta-publication
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    environment:
+      name: repo-beta
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout persistent Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Download exact signed beta publication
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: signed-beta-publication-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: signed-publication
+
+      - name: Install publication verification tools
+        run: |
+          dnf -y install git python3 python3-jsonschema rpm gnupg2
+
+      - name: Verify and stage exact beta view
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SNAPSHOT_ID" =~ ^repo-f44-[0-9]{8}-[0-9]{3}$ ]]
+          snapshot="pages-site/snapshots/fedora/44/$SNAPSHOT_ID"
+          [[ -d "$snapshot" ]]
+
+          verify_home="$RUNNER_TEMP/beta-verify-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
+
+          source/tools/ro-repo verify-snapshot             --snapshot "$snapshot"             --gnupghome "$verify_home"
+
+          result="$(source/tools/ro-repo stage-remote-channel             --publication signed-publication             --site-root pages-site             --channel beta             --gnupghome "$verify_home")"
+          printf '%s\n' "$result"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+
+          git -C pages-site config user.name "Ro-Repo Beta Publisher"
+          git -C pages-site config user.email "actions@users.noreply.github.com"
+          git -C pages-site add             "rpm/fedora/44/beta"             "publications/fedora/44/beta/$GITHUB_RUN_ID"
+
+          if git -C pages-site diff --cached --quiet; then
+            echo "Remote beta already matches this exact signed publication."
+            exit 0
+          fi
+
+          git -C pages-site commit -m "beta: publish $SNAPSHOT_ID from run $GITHUB_RUN_ID"
+          git -C pages-site push origin HEAD:pages-storage
+
+      - name: Beta publication summary
+        shell: bash
+        run: |
+          {
+            echo "## Remote beta publication"
+            echo
+            echo "- snapshot: `$SNAPSHOT_ID`"
+            echo "- publication run: `$GITHUB_RUN_ID`"
+            echo "- channel: `beta`"
+            echo "- remote base: `https://repo.ro-asd.org/rpm/fedora/44/beta/`"
+            echo
+            echo "Snapshot bytes were copied from the immutable Pages snapshot. No RPM or repodata was rebuilt or re-signed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  verify-remote-beta:
+    needs: publish-beta
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      PUBLICATION_RUN: ${{ github.run_id }}
+      REMOTE_BASE: https://repo.ro-asd.org/rpm/fedora/44/beta
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout published Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install remote verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl gnupg
+
+      - name: Wait for exact beta publication to reach Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_manifest="$REMOTE_BASE/publication-v1.json"
+          found=0
+          for attempt in $(seq 1 30); do
+            if curl --proto '=https' --tlsv1.2 --fail --silent --show-error                 "$remote_manifest?run=$PUBLICATION_RUN-$attempt"                 -o "$RUNNER_TEMP/publication-v1.json"; then
+              remote_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              remote_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              if [[ "$remote_run" == "$PUBLICATION_RUN" && "$remote_snapshot" == "$SNAPSHOT_ID" ]]; then
+                found=1
+                break
+              fi
+            fi
+            sleep 10
+          done
+          [[ "$found" -eq 1 ]]
+
+      - name: Verify complete remote beta tree byte-for-byte
+        shell: bash
+        run: |
+          set -euo pipefail
+          local_root="pages-site/rpm/fedora/44/beta"
+          remote_tmp="$RUNNER_TEMP/remote-beta"
+          mkdir -p "$remote_tmp"
+
+          while IFS= read -r -d '' path; do
+            rel="${path#"$local_root/"}"
+            mkdir -p "$remote_tmp/$(dirname "$rel")"
+            curl               --proto '=https'               --tlsv1.2               --fail               --silent               --show-error               "$REMOTE_BASE/$rel?run=$PUBLICATION_RUN"               --output "$remote_tmp/$rel"
+            cmp --silent "$path" "$remote_tmp/$rel"
+          done < <(find "$local_root" -type f -print0 | sort -z)
+
+          local_count="$(find "$local_root" -type f | wc -l)"
+          remote_count="$(find "$remote_tmp" -type f | wc -l)"
+          [[ "$local_count" -gt 0 ]]
+          [[ "$remote_count" -eq "$local_count" ]]
+
+      - name: Verify remote beta publication signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify_home="$RUNNER_TEMP/remote-beta-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
+
+          GNUPGHOME="$verify_home" gpg --batch --verify             "$RUNNER_TEMP/remote-beta/publication-v1.json.asc"             "$RUNNER_TEMP/remote-beta/publication-v1.json"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+
+      - name: Remote beta verification summary
+        shell: bash
+        run: |
+          {
+            echo "## Remote beta verified"
+            echo
+            echo "- snapshot: `$SNAPSHOT_ID`"
+            echo "- publication run: `$PUBLICATION_RUN`"
+            echo "- remote tree: byte-for-byte equal to pages-storage"
+            echo "- publication signature: verified"
+          } >> "$GITHUB_STEP_SUMMARY"
