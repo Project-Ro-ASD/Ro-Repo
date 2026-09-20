@@ -1387,6 +1387,89 @@ def stage_remote_channel(publication_dir, site_root, channel, gnupghome):
         shutil.rmtree(stage, ignore_errors=True)
 
 
+
+def rollback_remote_channel(site_root, channel, target_publication_run, rollback_run,
+                            reason, gnupghome):
+    """Rollback a mutable remote channel to an earlier signed publication history entry."""
+    if channel != "beta":
+        raise ContractError("remote rollback currently supports beta only")
+
+    target_run = _normalize_numeric_identity(target_publication_run)
+    current_rollback_run = _normalize_numeric_identity(rollback_run)
+    if target_run is None:
+        raise ContractError("target publication run must be a positive numeric identifier")
+    if current_rollback_run is None:
+        raise ContractError("rollback workflow run must be a positive numeric identifier")
+    if not isinstance(reason, str) or not reason.strip():
+        raise ContractError("rollback reason must be non-empty")
+
+    site_root = pathlib.Path(site_root)
+    base = site_root / "rpm" / "fedora" / "44"
+    current = base / channel
+    if not current.is_dir() or current.is_symlink():
+        raise ContractError("current remote beta publication is missing")
+
+    current_publication_path = current / "publication-v1.json"
+    current_publication = load(current_publication_path)
+    validate_schema(current_publication, "publication-v1")
+    if current_publication["channel"] != channel:
+        raise ContractError("current remote beta channel mismatch")
+
+    history = site_root / "publications" / "fedora" / "44" / channel
+    target_publication_dir = history / str(target_run)
+    if not target_publication_dir.is_dir() or target_publication_dir.is_symlink():
+        raise ContractError("target beta publication history entry is missing")
+
+    target_publication_path = target_publication_dir / "publication-v1.json"
+    target_publication = load(target_publication_path)
+    validate_schema(target_publication, "publication-v1")
+    if target_publication["channel"] != channel:
+        raise ContractError("target publication history channel mismatch")
+    if target_publication["publication_run"] != str(target_run):
+        raise ContractError("target publication history run identity mismatch")
+
+    if current_publication["publication_run"] == str(target_run):
+        raise ContractError("target publication is already the current beta")
+
+    snapshot_id = target_publication["snapshot_id"]
+    snapshot = site_root / "snapshots" / "fedora" / "44" / snapshot_id
+    if not snapshot.is_dir() or snapshot.is_symlink():
+        raise ContractError("rollback target immutable snapshot is missing")
+
+    verify_signed_remote_publication(
+        target_publication_dir, snapshot, channel, gnupghome
+    )
+
+    result = stage_remote_channel(
+        target_publication_dir, site_root, channel, gnupghome
+    )
+    if not result.get("changed"):
+        raise ContractError("rollback did not change the beta publication")
+
+    evidence_dir = site_root / "rollbacks" / "fedora" / "44" / channel
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    evidence_path = evidence_dir / f"{current_rollback_run}.json"
+    if evidence_path.exists():
+        raise ContractError("rollback evidence run already exists")
+
+    evidence = {
+        "schema_version": 1,
+        "channel": channel,
+        "rollback_run": str(current_rollback_run),
+        "rolled_back_at": timestamp(),
+        "reason": reason.strip(),
+        "from_publication_run": current_publication["publication_run"],
+        "from_snapshot_id": current_publication["snapshot_id"],
+        "from_publication_sha256": digest(current_publication_path),
+        "to_publication_run": target_publication["publication_run"],
+        "to_snapshot_id": target_publication["snapshot_id"],
+        "to_publication_sha256": digest(target_publication_path),
+    }
+    validate_schema(evidence, "rollback-evidence-v1")
+    save(evidence_path, evidence)
+    return evidence
+
+
 def publish(output,snapshot_id,channel,run_id="local",gnupghome=None):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID schema")
@@ -1556,6 +1639,7 @@ def cli():
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True)
     x=s.add_parser("stage-remote-channel"); x.add_argument("--publication",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
+    x=s.add_parser("rollback-remote-channel"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta"],required=True); x.add_argument("--target-publication-run",required=True); x.add_argument("--rollback-run",required=True); x.add_argument("--reason",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("rollback-publication"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True)
@@ -1606,6 +1690,7 @@ def main():
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
         elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file)
         elif a.command=="stage-remote-channel": print(json.dumps(stage_remote_channel(a.publication,a.site_root,a.channel,a.gnupghome),sort_keys=True))
+        elif a.command=="rollback-remote-channel": print(json.dumps(rollback_remote_channel(a.site_root,a.channel,a.target_publication_run,a.rollback_run,a.reason,a.gnupghome),sort_keys=True))
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)
         elif a.command=="rollback-publication": print(f"rolled back to: {rollback(a.output,a.channel)}")
