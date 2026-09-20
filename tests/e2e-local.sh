@@ -136,9 +136,17 @@ if evidence["rpm_signing_fingerprint"] == evidence["metadata_signing_fingerprint
     raise SystemExit("production snapshot role fingerprints unexpectedly match")
 PY
 
+cp -a "$work/components" "$work/components-bad-run"
+python3 - "$work/components-bad-run/123/signed/rpm-signing-evidence-v1.json" <<'PY'
+import json, pathlib, sys
+path=pathlib.Path(sys.argv[1])
+data=json.loads(path.read_text())
+data["workflow_run"]=999
+path.write_text(json.dumps(data))
+PY
 expect_failure "workflow run mismatch" \
   "$root/tools/ro-repo" build-production-snapshot \
-  --components "$work/components" \
+  --components "$work/components-bad-run" \
   --source-runs "$work/snapshot-input-v1.json" \
   --output "$work/production-bad-out" \
   --snapshot-id repo-f44-20260920-021 \
