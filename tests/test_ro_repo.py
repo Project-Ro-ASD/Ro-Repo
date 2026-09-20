@@ -53,6 +53,44 @@ class ContractTests(unittest.TestCase):
     def test_attestation_workflow_identity_missing_rejected(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", side_effect=ro_repo.ContractError("gh fail")):
             with self.assertRaisesRegex(ro_repo.ContractError,"gh cli rejection"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
+    def test_cross_arch_variants_do_not_conflict(self):
+        x86 = self.root/"pkg.x86_64.rpm"; x86.write_bytes(b"x86")
+        arm = self.root/"pkg.aarch64.rpm"; arm.write_bytes(b"arm")
+        with mock.patch("ro_repo.subprocess.check_output") as query:
+            ok, conflicts = ro_repo.repository_file_conflict_check([
+                (x86, "x86_64"),
+                (arm, "aarch64"),
+            ])
+        self.assertTrue(ok)
+        self.assertEqual(conflicts, [])
+        query.assert_not_called()
+
+    def test_same_arch_file_conflict_is_rejected(self):
+        first = self.root/"first.x86_64.rpm"; first.write_bytes(b"one")
+        second = self.root/"second.x86_64.rpm"; second.write_bytes(b"two")
+        with mock.patch("ro_repo.subprocess.check_output", return_value="/usr/bin/shared\n"):
+            ok, conflicts = ro_repo.repository_file_conflict_check([
+                (first, "x86_64"),
+                (second, "x86_64"),
+            ])
+        self.assertFalse(ok)
+        self.assertEqual(conflicts, [
+            "x86_64: /usr/bin/shared owned by both first.x86_64.rpm and second.x86_64.rpm"
+        ])
+
+    def test_noarch_conflicts_with_target_arch_package(self):
+        common = self.root/"common.noarch.rpm"; common.write_bytes(b"common")
+        native = self.root/"native.aarch64.rpm"; native.write_bytes(b"native")
+        with mock.patch("ro_repo.subprocess.check_output", return_value="/usr/share/shared\n"):
+            ok, conflicts = ro_repo.repository_file_conflict_check([
+                (common, "noarch"),
+                (native, "aarch64"),
+            ])
+        self.assertFalse(ok)
+        self.assertEqual(conflicts, [
+            "aarch64: /usr/share/shared owned by both common.noarch.rpm and native.aarch64.rpm"
+        ])
+
     def test_digest_mutation_is_rejected(self):
         self.rpm.write_bytes(b"mutated")
         with self.assertRaisesRegex(ro_repo.ContractError,"digest mismatch"): ro_repo.verify_component(self.mp,self.artifacts,self.config,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True)
