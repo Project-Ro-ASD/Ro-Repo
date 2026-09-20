@@ -1,0 +1,53 @@
+{
+  "created_at": "2026-09-20T16:36:15Z",
+  "creation_provenance": {
+    "run": "35523196901",
+    "tool": "ro-repo-v2"
+  },
+  "fedora_release": 44,
+  "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+  "packages": [
+    {
+      "architecture": "aarch64",
+      "filename": "ro-assist-0.2.4-1.fc44.aarch64.rpm",
+      "nevra": "ro-assist-0:0.2.4-1.fc44.aarch64",
+      "producer_artifact_sha256": "bcf3c7a8508fc21ee750322365d203e3b01f33b78f243818d5efdd34394ee5a0",
+      "producer_manifest_digest": "1b61f29523ae8e7a18be02fe53eb7447a7e85d39bef07e68512d0a867f68dcb8",
+      "published_signed_artifact_sha256": "653829d27decac6cd153ca928ddc8df4f3095156e4514c72d7fa945362c12956"
+    },
+    {
+      "architecture": "src",
+      "filename": "ro-assist-0.2.4-1.fc44.src.rpm",
+      "nevra": "ro-assist-0:0.2.4-1.fc44.src",
+      "producer_artifact_sha256": "1424c0e0bea2adcb4fa73ad293d03b9e175693c73c5f1002972d55ae836f5328",
+      "producer_manifest_digest": "1b61f29523ae8e7a18be02fe53eb7447a7e85d39bef07e68512d0a867f68dcb8",
+      "published_signed_artifact_sha256": "bba9e1b56b32edaa2b29a6a66c37062451bc04bba291a55bfdaf97f9ded0da3e"
+    },
+    {
+      "architecture": "x86_64",
+      "filename": "ro-assist-0.2.4-1.fc44.x86_64.rpm",
+      "nevra": "ro-assist-0:0.2.4-1.fc44.x86_64",
+      "producer_artifact_sha256": "a3e5975f3bd28d3c6281456d8af8136fefda4a7e72effdc218dc20b13ab2c2b7",
+      "producer_manifest_digest": "1b61f29523ae8e7a18be02fe53eb7447a7e85d39bef07e68512d0a867f68dcb8",
+      "published_signed_artifact_sha256": "2345ebce6ddd91ef495d9759db1590a1c4b97259ce05acf96a6007c8ccae9411"
+    }
+  ],
+  "parent_snapshot": null,
+  "repositories": {
+    "aarch64": {
+      "repomd_sha256": "68d932f63570ebedd540112cf5bc5d8f328a79d4d0f7fd719b13776dd129842f",
+      "repomd_signature_sha256": "8292e5238d0c0f889cc513e0405e21256e7d21d8fc99eee989bae97d6bba38f8"
+    },
+    "source": {
+      "repomd_sha256": "ab2f384f4527746cd4505969b82e6c10353cff7fbe87128165b63bc86f6179d6",
+      "repomd_signature_sha256": "48370fe48e937636f46636d2a8cb77fb323ec137f6c1aa591849cfb11264cf91"
+    },
+    "x86_64": {
+      "repomd_sha256": "58c9f01e68416d5f32fc47afb8bdbaab61fb2ae0a6c53a0dce7eea0020576c60",
+      "repomd_signature_sha256": "1a2d4f39eceb2dee1b9ce59415996f35f46de418d3de619bcf70ebc6943b5f85"
+    }
+  },
+  "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+  "schema_version": 1,
+  "snapshot_id": "repo-f44-20260920-001"
+}
