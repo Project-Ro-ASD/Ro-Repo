@@ -1095,6 +1095,116 @@ def verify_snapshot(snapshot,gnupghome=None):
             
     return manifest
 
+
+def verify_production_candidate(snapshot, gnupghome, candidate_run):
+    """Verify the complete Step 3 handoff object before remote publication."""
+    snapshot = pathlib.Path(snapshot)
+    expected_run = _normalize_numeric_identity(candidate_run)
+    if expected_run is None:
+        raise ContractError("candidate workflow run must be a positive numeric identifier")
+
+    manifest = verify_snapshot(snapshot, gnupghome)
+    evidence_path = snapshot / "snapshot-build-evidence-v1.json"
+    evidence_sig = pathlib.Path(str(evidence_path) + ".asc")
+    if evidence_path.is_symlink() or not evidence_path.is_file():
+        raise ContractError("snapshot build evidence is missing")
+    if evidence_sig.is_symlink() or not evidence_sig.is_file():
+        raise ContractError("snapshot build evidence signature is missing")
+
+    evidence = load(evidence_path)
+    validate_schema(evidence, "snapshot-build-evidence-v1")
+    if evidence["snapshot_id"] != manifest["snapshot_id"]:
+        raise ContractError("snapshot build evidence snapshot ID mismatch")
+    if evidence["workflow_run"] != expected_run:
+        raise ContractError("snapshot build evidence workflow run mismatch")
+    if evidence["repository_snapshot_sha256"] != digest(snapshot / "repository-snapshot-v1.json"):
+        raise ContractError("snapshot build evidence manifest digest mismatch")
+    if evidence["rpm_signing_fingerprint"] != manifest["rpm_signing_fingerprint"]:
+        raise ContractError("snapshot build evidence RPM fingerprint mismatch")
+    if evidence["metadata_signing_fingerprint"] != manifest["metadata_signing_fingerprint"]:
+        raise ContractError("snapshot build evidence metadata fingerprint mismatch")
+
+    env = os.environ.copy()
+    env["GNUPGHOME"] = str(gnupghome)
+    verify_gpg_signature(
+        evidence_path,
+        evidence_sig,
+        manifest["metadata_signing_fingerprint"],
+        env,
+    )
+    return manifest, evidence
+
+
+def directory_tree_digest(root):
+    """Return a deterministic digest for a regular-file-only publication tree."""
+    root = pathlib.Path(root)
+    if not root.is_dir():
+        raise ContractError(f"publication tree missing: {root}")
+    hasher = hashlib.sha256()
+    files = []
+    for path in root.rglob("*"):
+        if path.is_symlink():
+            raise ContractError(f"symlink forbidden in immutable publication tree: {path}")
+        if path.is_file():
+            files.append(path)
+        elif not path.is_dir():
+            raise ContractError(f"unsupported filesystem entry in publication tree: {path}")
+    for path in sorted(files, key=lambda p: p.relative_to(root).as_posix()):
+        rel = path.relative_to(root).as_posix().encode("utf-8")
+        hasher.update(len(rel).to_bytes(8, "big"))
+        hasher.update(rel)
+        size = path.stat().st_size
+        hasher.update(size.to_bytes(8, "big"))
+        with path.open("rb") as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                hasher.update(block)
+    return hasher.hexdigest()
+
+
+def stage_pages_snapshot(snapshot, site_root):
+    """Add one immutable verified snapshot tree to persistent Pages storage."""
+    snapshot = pathlib.Path(snapshot)
+    site_root = pathlib.Path(site_root)
+    manifest = load(snapshot / "repository-snapshot-v1.json")
+    validate_schema(manifest, "repository-snapshot-v1")
+    snapshot_id = manifest["snapshot_id"]
+    if snapshot.name != snapshot_id:
+        raise ContractError("snapshot directory name does not match signed snapshot identity")
+
+    target = site_root / "snapshots" / "fedora" / "44" / snapshot_id
+    candidate_digest = directory_tree_digest(snapshot)
+    site_root.mkdir(parents=True, exist_ok=True)
+    (site_root / ".nojekyll").touch(exist_ok=True)
+
+    if target.exists():
+        if not target.is_dir() or target.is_symlink():
+            raise ContractError("immutable Pages snapshot target is not a regular directory")
+        if directory_tree_digest(target) != candidate_digest:
+            raise ContractError("immutable Pages snapshot already exists with different bytes")
+        return {
+            "snapshot_id": snapshot_id,
+            "tree_sha256": candidate_digest,
+            "created": False,
+        }
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    stage = pathlib.Path(tempfile.mkdtemp(prefix=f".{snapshot_id}-", dir=target.parent))
+    try:
+        shutil.copytree(snapshot, stage / snapshot_id, symlinks=False)
+        copied = stage / snapshot_id
+        if directory_tree_digest(copied) != candidate_digest:
+            raise ContractError("Pages snapshot copy digest mismatch")
+        os.rename(copied, target)
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+    return {
+        "snapshot_id": snapshot_id,
+        "tree_sha256": candidate_digest,
+        "created": True,
+    }
+
+
 def publish(output,snapshot_id,channel,run_id="local",gnupghome=None):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID schema")
@@ -1259,6 +1369,8 @@ def cli():
     x=s.add_parser("write-snapshot-input"); x.add_argument("--runs",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
     x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent"); x.add_argument("--test-only-allow-unattested-acceptance",action="store_true")
     x=s.add_parser("build-production-snapshot"); x.add_argument("--components",type=pathlib.Path,required=True); x.add_argument("--source-runs",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--parent"); x.add_argument("--test-only-metadata-public-key",type=pathlib.Path); x.add_argument("--test-only-rpm-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
+    x=s.add_parser("verify-production-candidate"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--candidate-run",required=True)
+    x=s.add_parser("stage-pages-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True)
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
@@ -1305,6 +1417,8 @@ def main():
         elif a.command=="write-snapshot-input": write_snapshot_input(a.output,a.runs)
         elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent,a.test_only_allow_unattested_acceptance)
         elif a.command=="build-production-snapshot": build_production_snapshot(a.components,a.source_runs,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.workflow_run,a.passphrase_file,a.parent,a.test_only_metadata_public_key,a.test_only_rpm_public_key,a.test_only_allow_unattested)
+        elif a.command=="verify-production-candidate": verify_production_candidate(a.snapshot,a.gnupghome,a.candidate_run)
+        elif a.command=="stage-pages-snapshot": print(json.dumps(stage_pages_snapshot(a.snapshot,a.site_root),sort_keys=True))
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)
