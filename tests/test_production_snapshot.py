@@ -3,6 +3,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+import yaml
 from unittest import mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).parents[1] / "tools"))
@@ -158,6 +159,18 @@ class ProductionSnapshotTests(unittest.TestCase):
         data = {"schema_version": 1, "runs": [{"run_id": 1}, {"run_id": 1}]}
         with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
             ro_repo.validate_schema(data, "snapshot-input-v1")
+
+    def test_snapshot_workflow_yaml_is_valid_and_dispatchable(self):
+        workflow_path = (
+            pathlib.Path(__file__).parents[1]
+            / ".github/workflows/build-candidate-snapshot.yml"
+        )
+        data = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+        self.assertIsInstance(data, dict)
+        self.assertIn("on", data)
+        self.assertIn("workflow_dispatch", data["on"])
+        self.assertIn("jobs", data)
+        self.assertIn("build-candidate", data["jobs"])
 
     def test_snapshot_workflow_uses_metadata_secrets_only(self):
         workflow = (
