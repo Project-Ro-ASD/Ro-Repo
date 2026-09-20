@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "created_at",
+    "workflow_run",
+    "source_signing_runs",
+    "repository_snapshot_sha256",
+    "rpm_signing_fingerprint",
+    "metadata_signing_fingerprint",
+    "components"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "snapshot_id": { "type": "string", "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "workflow_run": { "type": "integer", "minimum": 1 },
+    "source_signing_runs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "integer", "minimum": 1 }
+    },
+    "repository_snapshot_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "rpm_signing_fingerprint": { "type": "string", "pattern": "^[A-F0-9]{40}$" },
+    "metadata_signing_fingerprint": { "type": "string", "pattern": "^[A-F0-9]{40}$" },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signing_run",
+          "source_repository",
+          "source_commit",
+          "release_tag",
+          "release_id",
+          "producer_workflow_run",
+          "acceptance_manifest_digest"
+        ],
+        "properties": {
+          "signing_run": { "type": "integer", "minimum": 1 },
+          "source_repository": { "type": "string", "minLength": 1 },
+          "source_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+          "release_tag": { "type": "string", "minLength": 1 },
+          "release_id": { "type": "integer", "minimum": 1 },
+          "producer_workflow_run": { "type": "integer", "minimum": 1 },
+          "acceptance_manifest_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}
