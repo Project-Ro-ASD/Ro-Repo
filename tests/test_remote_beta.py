@@ -138,6 +138,22 @@ class RemoteBetaPublicationTests(unittest.TestCase):
                     self.publication, self.site, "beta", self.root / "gnupg"
                 )
 
+    def test_publish_beta_installs_git_before_writable_pages_checkout(self):
+        path = (
+            pathlib.Path(__file__).parents[1]
+            / ".github/workflows/publish-remote-beta.yml"
+        )
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        steps = data["jobs"]["publish-beta"]["steps"]
+        names = [step.get("name") for step in steps]
+
+        install_index = names.index("Install Git before writable Pages checkout")
+        checkout_index = names.index("Checkout persistent Pages storage")
+        self.assertLess(install_index, checkout_index)
+
+        install_step = steps[install_index]
+        self.assertIn("dnf -y install git", install_step["run"])
+
     def test_remote_beta_workflow_separates_signing_and_publish_authority(self):
         path = (
             pathlib.Path(__file__).parents[1]
