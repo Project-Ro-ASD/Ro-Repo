@@ -66,8 +66,7 @@ jobs:
           GNUPGHOME="$verify_home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
 
           result="$(source/tools/ro-repo rollback-remote-channel             --site-root pages-site             --channel beta             --target-publication-run "$TARGET_PUBLICATION_RUN"             --rollback-run "$GITHUB_RUN_ID"             --reason "$ROLLBACK_REASON"             --gnupghome "$verify_home")"
-          printf '%s
-' "$result"
+          echo "$result"
 
           GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
           rm -rf "$verify_home"
