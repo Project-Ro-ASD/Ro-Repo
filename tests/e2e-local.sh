@@ -63,8 +63,31 @@ fprs=($(GNUPGHOME="$work/gnupg" gpg --batch --with-colons --list-keys | awk -F: 
 rpm_key="${fprs[1]}"
 meta_key="${fprs[2]}"
 
+mkdir -m 700 "$work/production-signing-gnupg"
+GNUPGHOME="$work/gnupg" gpg --batch --armor \
+  --export-filter "drop-subkey=fpr <> $rpm_key" \
+  --export-secret-subkeys "$primary_fpr" > "$work/rpm-signing-subkey.asc"
+GNUPGHOME="$work/production-signing-gnupg" gpg --batch --import "$work/rpm-signing-subkey.asc" >/dev/null 2>&1
+GNUPGHOME="$work/gnupg" gpg --batch --armor \
+  --export-filter "drop-subkey=fpr <> $rpm_key" \
+  --export "$rpm_key" > "$work/rpm-signing-public.asc"
+: > "$work/test-passphrase"
+chmod 600 "$work/test-passphrase"
+
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --fedora-names "$work/fedora-44-package-names.txt"
 "$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested --report "$work/acceptance-report-v1.json"
+"$root/tools/ro-repo" sign-accepted-component --accepted "$work/accepted" --output "$work/production-signed" --gnupghome "$work/production-signing-gnupg" --key-id "$rpm_key" --workflow-run 123 --passphrase-file "$work/test-passphrase" --test-only-public-key "$work/rpm-signing-public.asc" --test-only-allow-unattested
+expect_failure "not a primary key" "$root/tools/ro-repo" sign-accepted-component --accepted "$work/accepted" --output "$work/primary-key-output" --gnupghome "$work/production-signing-gnupg" --key-id "$primary_fpr" --workflow-run 123 --passphrase-file "$work/test-passphrase" --test-only-public-key "$work/rpm-signing-public.asc" --test-only-allow-unattested
+expect_failure "signing subkey not found|not isolated" "$root/tools/ro-repo" sign-accepted-component --accepted "$work/accepted" --output "$work/wrong-role-output" --gnupghome "$work/production-signing-gnupg" --key-id "$meta_key" --workflow-run 123 --passphrase-file "$work/test-passphrase" --test-only-public-key "$work/rpm-signing-public.asc" --test-only-allow-unattested
+python3 - "$work/production-signed/rpm-signing-evidence-v1.json" <<'PY'
+import json, sys
+evidence=json.load(open(sys.argv[1]))
+if evidence["schema_version"] != 1 or not evidence["artifacts"]:
+    raise SystemExit("invalid RPM signing evidence")
+for artifact in evidence["artifacts"]:
+    if artifact["producer_artifact_sha256"] == artifact["signed_artifact_sha256"]:
+        raise SystemExit("signed RPM digest did not change")
+PY
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/wrong-rpm-role-signed" --gnupghome "$work/gnupg" --key-id "$meta_key"
 expect_failure "unsigned or invalid signature on RPM" "$root/tools/ro-repo" build-snapshot --signed "$work/wrong-rpm-role-signed" --manifests "$work/accepted" --output "$work/wrong-rpm-role-out" --snapshot-id repo-f44-20260908-010 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance

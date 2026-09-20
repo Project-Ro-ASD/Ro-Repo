@@ -75,5 +75,24 @@ class SchemaTests(unittest.TestCase):
         with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
             ro_repo.validate_schema(data, "acceptance-report-v1")
 
+    def test_rpm_signing_evidence_unknown_fields_rejected(self):
+        data = {
+            "schema_version": 1,
+            "signed_at": "2026-09-20T00:00:00Z",
+            "workflow_run": 123,
+            "acceptance_manifest_digest": "a" * 64,
+            "rpm_signing_fingerprint": "B" * 40,
+            "artifacts": [{
+                "filename": "pkg.rpm",
+                "architecture": "x86_64",
+                "nevra": "pkg-0:1-1.x86_64",
+                "producer_artifact_sha256": "c" * 64,
+                "signed_artifact_sha256": "d" * 64,
+                "unexpected": "forbidden",
+            }],
+        }
+        with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
+            ro_repo.validate_schema(data, "rpm-signing-evidence-v1")
+
 if __name__ == '__main__':
     unittest.main()
