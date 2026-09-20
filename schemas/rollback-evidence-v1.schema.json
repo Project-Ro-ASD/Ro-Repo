@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "channel",
+    "rollback_run",
+    "rolled_back_at",
+    "reason",
+    "from_publication_run",
+    "from_snapshot_id",
+    "from_publication_sha256",
+    "to_publication_run",
+    "to_snapshot_id",
+    "to_publication_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "channel": { "const": "beta" },
+    "rollback_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "rolled_back_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "from_publication_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "from_snapshot_id": {
+      "type": "string",
+      "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+    },
+    "from_publication_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "to_publication_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "to_snapshot_id": {
+      "type": "string",
+      "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+    },
+    "to_publication_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
