@@ -117,6 +117,10 @@ jobs:
         with:
           path: source
 
+      - name: Install Git before writable Pages checkout
+        run: |
+          dnf -y install git
+
       - name: Checkout persistent Pages storage
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -133,7 +137,7 @@ jobs:
 
       - name: Install publication verification tools
         run: |
-          dnf -y install git python3 python3-jsonschema rpm gnupg2
+          dnf -y install python3 python3-jsonschema rpm gnupg2
 
       - name: Verify and stage exact beta view
         shell: bash
