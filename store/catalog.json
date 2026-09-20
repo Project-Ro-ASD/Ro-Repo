@@ -1,7 +1,0 @@
-{
-  "schemaVersion": 2,
-  "legacy": true,
-  "generated": false,
-  "apps": [],
-  "notice": "V2 catalog is generated from an immutable repository snapshot; versions are not maintained in Git."
-}
