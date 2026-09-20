@@ -64,7 +64,7 @@ rpm_key="${fprs[1]}"
 meta_key="${fprs[2]}"
 
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --fedora-names "$work/fedora-44-package-names.txt"
-"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested
+"$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested --report "$work/acceptance-report-v1.json"
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
 "$root/tools/ro-repo" sign-package --input "$work/accepted" --output "$work/wrong-rpm-role-signed" --gnupghome "$work/gnupg" --key-id "$meta_key"
 expect_failure "unsigned or invalid signature on RPM" "$root/tools/ro-repo" build-snapshot --signed "$work/wrong-rpm-role-signed" --manifests "$work/accepted" --output "$work/wrong-rpm-role-out" --snapshot-id repo-f44-20260908-010 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance
@@ -144,7 +144,7 @@ python3 "$root/fixtures/make-test-manifest.py" "$work/reused-incoming" "$work/re
   cd "$work/reused-incoming"
   sha256sum *.rpm > SHA256SUMS
 )
-"$root/tools/ro-repo" accept-package --manifest "$work/reused-incoming/component-artifact-manifest-v1.json" --artifacts "$work/reused-incoming" --accepted "$work/reused-accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested
+"$root/tools/ro-repo" accept-package --manifest "$work/reused-incoming/component-artifact-manifest-v1.json" --artifacts "$work/reused-incoming" --accepted "$work/reused-accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested --report "$work/reused-acceptance-report-v1.json"
 "$root/tools/ro-repo" sign-package --input "$work/reused-accepted" --output "$work/reused-signed" --gnupghome "$work/gnupg" --key-id "$rpm_key"
 expect_failure "historical NEVRA reuse with different content" "$root/tools/ro-repo" build-snapshot --signed "$work/reused-signed" --manifests "$work/reused-accepted" --output "$work/out" --snapshot-id repo-f44-20260908-003 --gnupghome "$work/gnupg" --metadata-key-id "$meta_key" --rpm-key-id "$rpm_key" --test-only-allow-unattested-acceptance
 

@@ -39,11 +39,42 @@ jobs:
         run: |
           cat << 'EOF' > verify_identity.py
           import yaml, json, sys, os, subprocess
+          sys.path.insert(0, "tools")
+          import ro_repo
 
           PRODUCER = os.environ["PRODUCER"]
           TAG = os.environ["TAG"]
           COMMIT = os.environ["COMMIT"]
           RELEASE_ID = os.environ["RELEASE_ID"]
+
+          identity = ro_repo.normalize_acceptance_identity({
+              "source_repository": PRODUCER,
+              "release_tag": TAG,
+              "source_commit": COMMIT,
+              "release_id": RELEASE_ID,
+              "workflow_run": None,
+          })
+
+          default_excepthook = sys.excepthook
+          def report_unexpected(error_type, error, traceback):
+              if not os.path.exists("acceptance-report-v1.json"):
+                  internal = ro_repo.ContractError(
+                      "unexpected internal acceptance error",
+                      code="INTERNAL_ACCEPTANCE_ERROR",
+                      stage="release-identity",
+                      hint="Inspect the acceptance job logs and retry after correcting the internal failure.",
+                  )
+                  ro_repo.write_acceptance_report("acceptance-report-v1.json", "rejected", identity, internal)
+              default_excepthook(error_type, error, traceback)
+          sys.excepthook = report_unexpected
+
+          def reject(message, code, stage, expected=None, received=None, hint=None):
+              error = ro_repo.ContractError(
+                  message, code=code, stage=stage, expected=expected,
+                  received=received, hint=hint,
+              )
+              ro_repo.write_acceptance_report("acceptance-report-v1.json", "rejected", identity, error)
+              raise error
 
           print("Verifying allowlist before API requests...")
           with open("config/producers-v1.yaml") as f:
@@ -51,23 +82,23 @@ jobs:
 
           producers = [p for p in config.get("producers", []) if p["repository"] == PRODUCER]
           if not producers:
-              sys.exit(f"Producer {PRODUCER} is not allowlisted.")
+              reject(f"Producer {PRODUCER} is not allowlisted.", "PRODUCER_NOT_ALLOWLISTED", "allowlist", received=PRODUCER, hint="Add the producer through the reviewed producer-registry process before retrying.")
 
           if len(COMMIT) != 40:
-              sys.exit("Commit length is not 40")
+              reject("Commit length is not 40", "TAG_COMMIT_MISMATCH", "tag-commit", expected="40-character commit SHA", received=COMMIT, hint="Dispatch the job with the exact commit referenced by the release tag.")
 
           def gh_api(path):
               return json.loads(subprocess.check_output(["gh", "api", path]))
 
           commit_data = gh_api(f"repos/{PRODUCER}/commits/{TAG}")
           if commit_data["sha"] != COMMIT:
-              sys.exit("Tag commit mismatch")
+              reject("Tag commit mismatch", "TAG_COMMIT_MISMATCH", "tag-commit", expected=COMMIT, received=commit_data["sha"], hint="Use the exact commit referenced by the immutable release tag.")
 
           release_data = gh_api(f"repos/{PRODUCER}/releases/tags/{TAG}")
           if str(release_data["id"]) != RELEASE_ID:
-              sys.exit("Release ID mismatch")
+              reject("Release ID mismatch", "RELEASE_ID_MISMATCH", "release-id", expected=RELEASE_ID, received=release_data["id"], hint="Use the numeric ID of the exact GitHub release.")
           if release_data["tag_name"] != TAG:
-              sys.exit("Release tag mismatch")
+              reject("Release tag mismatch", "MANIFEST_IDENTITY_MISMATCH", "release-identity", expected=TAG, received=release_data["tag_name"], hint="Use the exact immutable release tag.")
 
           print("Release verified. Downloading...")
           os.makedirs("incoming", exist_ok=True)
@@ -75,37 +106,41 @@ jobs:
           subprocess.check_call(["gh", "release", "download", TAG, "--repo", PRODUCER, "--dir", "incoming"])
 
           if not os.path.isfile("incoming/component-artifact-manifest-v1.json"):
-              sys.exit("Missing manifest")
+              reject("Missing manifest", "ARTIFACT_SET_MISMATCH", "artifact-set", expected="component-artifact-manifest-v1.json", hint="Publish the required manifest in the immutable release.")
 
           with open("incoming/component-artifact-manifest-v1.json") as f:
               manifest = json.load(f)
+          manifest_identity = ro_repo.normalize_acceptance_identity(manifest)
+          identity["workflow_run"] = manifest_identity["workflow_run"]
 
           if manifest["source_repository"] != PRODUCER:
-              sys.exit("Manifest source_repository mismatch")
+              reject("Manifest source_repository mismatch", "MANIFEST_IDENTITY_MISMATCH", "manifest-identity", expected=PRODUCER, received=manifest["source_repository"])
           if manifest["release_tag"] != TAG:
-              sys.exit("Manifest release_tag mismatch")
+              reject("Manifest release_tag mismatch", "MANIFEST_IDENTITY_MISMATCH", "manifest-identity", expected=TAG, received=manifest["release_tag"])
           if manifest["source_commit"] != COMMIT:
-              sys.exit("Manifest source_commit mismatch")
+              reject("Manifest source_commit mismatch", "TAG_COMMIT_MISMATCH", "manifest-identity", expected=COMMIT, received=manifest["source_commit"])
           if str(manifest["release_id"]) != RELEASE_ID:
-              sys.exit("Manifest release_id mismatch")
+              reject("Manifest release_id mismatch", "RELEASE_ID_MISMATCH", "manifest-identity", expected=RELEASE_ID, received=manifest["release_id"])
 
           workflow_path = producers[0]["trusted_signer_workflow"]
-          run_id = manifest["workflow_run"]
+          run_id = manifest_identity["workflow_run"]
+          if run_id is None:
+              reject("Manifest workflow_run is not a valid numeric run ID", "MANIFEST_IDENTITY_MISMATCH", "manifest-identity", expected="positive numeric workflow run ID", received=manifest.get("workflow_run"))
           run_data = gh_api(f"repos/{PRODUCER}/actions/runs/{run_id}")
 
           if run_data["head_repository"]["full_name"] != PRODUCER:
-              sys.exit("Workflow run repository mismatch")
+              reject("Workflow run repository mismatch", "PROVENANCE_MISMATCH", "provenance", expected=PRODUCER, received=run_data["head_repository"]["full_name"])
           if run_data["head_sha"] != COMMIT:
-              sys.exit("Workflow run commit mismatch")
+              reject("Workflow run commit mismatch", "PROVENANCE_MISMATCH", "provenance", expected=COMMIT, received=run_data["head_sha"])
           if run_data["conclusion"] != "success":
-              sys.exit("Workflow run not success")
+              reject("Workflow run not success", "PROVENANCE_MISMATCH", "provenance", expected="success", received=run_data["conclusion"])
 
           # gh attestation uses the repo prefix for workflow matching, so does our trusted_signer_workflow
           # The run_data["path"] from GitHub API is usually just '.github/workflows/something.yml'
           # We check if PRODUCER + "/" + run_data["path"] matches exactly
           actual_workflow_identity = f"{PRODUCER}/{run_data['path']}"
           if actual_workflow_identity != workflow_path:
-              sys.exit(f"Workflow identity mismatch: {actual_workflow_identity} vs {workflow_path}")
+              reject("Workflow identity mismatch", "PROVENANCE_MISMATCH", "provenance", expected=workflow_path, received=actual_workflow_identity, hint="Create the release only through the trusted producer workflow.")
 
           print("Manifest and workflow run identity matches.")
           with open("workflow.txt", "w") as f:
@@ -113,10 +148,36 @@ jobs:
           EOF
           python3 verify_identity.py
           dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
-          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt
+          tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt --report acceptance-report-v1.json --expected-repository "$PRODUCER" --expected-tag "$TAG" --expected-commit "$COMMIT" --expected-release-id "$RELEASE_ID"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: success()
         with:
           name: accepted-component-${{ github.run_id }}
           path: accepted/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Write acceptance job summary
+        if: always()
+        run: |
+          if [[ -f acceptance-report-v1.json ]]; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          report = json.load(open("acceptance-report-v1.json", encoding="utf-8"))
+          print(f"## Acceptance {report['result'].upper()}")
+          print(f"- Producer: `{report.get('producer_repository') or 'unavailable'}`")
+          print(f"- Tag: `{report.get('release_tag') or 'unavailable'}`")
+          print(f"- Failed check: `{report.get('failed_stage') or 'none'}`")
+          print(f"- Error code: `{report.get('error_code') or 'none'}`")
+          print(f"- Remediation: {report.get('remediation_hint') or 'none'}")
+          PY
+          else
+            printf '## Acceptance REJECTED\n- Report was not produced because setup failed before acceptance reporting.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload acceptance report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: acceptance-report-${{ github.run_id }}
+          path: acceptance-report-v1.json
           retention-days: 30
           if-no-files-found: error

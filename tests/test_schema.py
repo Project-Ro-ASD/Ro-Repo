@@ -54,5 +54,26 @@ class SchemaTests(unittest.TestCase):
         with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
             ro_repo.validate_schema(data, "promotion-manifest-v1")
 
+    def test_acceptance_report_additional_properties_rejected(self):
+        data = {
+            "schema_version": 1,
+            "result": "accepted",
+            "timestamp": "2026-09-20T00:00:00Z",
+            "producer_repository": "Project-Ro-ASD/ro-Control",
+            "release_tag": "v1.0",
+            "source_commit": "a" * 40,
+            "release_id": 10,
+            "workflow_run": 20,
+            "failed_stage": None,
+            "error_code": None,
+            "error_message": None,
+            "expected": None,
+            "received": None,
+            "remediation_hint": None,
+            "secret": "forbidden",
+        }
+        with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
+            ro_repo.validate_schema(data, "acceptance-report-v1")
+
 if __name__ == '__main__':
     unittest.main()
