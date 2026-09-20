@@ -597,6 +597,281 @@ def sign_accepted_component(accepted_path, output_dir, gnupghome, key_id, workfl
         stage.rename(output_dir)
     return signing_evidence
 
+
+def verify_signed_component_bundle(components_root, source_runs_path, rpm_key_id,
+                                   rpm_public_key=None,
+                                   test_only_allow_unattested=False):
+    """Revalidate exact signed-component artifacts before snapshot construction."""
+    components_root = pathlib.Path(components_root)
+    source_runs = load(source_runs_path)
+    validate_schema(source_runs, "snapshot-input-v1")
+    runs = source_runs["runs"]
+    run_ids = [run["run_id"] for run in runs]
+    if len(run_ids) != len(set(run_ids)):
+        raise ContractError("snapshot input contains duplicate signing run IDs")
+
+    public_key = pathlib.Path(rpm_public_key) if rpm_public_key else ROOT / "keys/production/ro-asd-rpm-signing-public.asc"
+    expected_rpm_fpr = str(rpm_key_id).upper()
+    with tempfile.TemporaryDirectory(prefix=".snapshot-rpm-key-") as tmp:
+        validate_role_public_key(public_key, expected_rpm_fpr, pathlib.Path(tmp))
+
+    verified_components = []
+    filenames = set()
+    for run_info in runs:
+        run_id = run_info["run_id"]
+        component_root = components_root / str(run_id)
+        accepted_root = component_root / "accepted"
+        signed_root = component_root / "signed"
+        accepted_object, acceptance, manifest, entries = verify_accepted_object(
+            accepted_root, test_only_allow_unattested=test_only_allow_unattested
+        )
+
+        evidence_path = signed_root / "rpm-signing-evidence-v1.json"
+        if evidence_path.is_symlink() or not evidence_path.is_file():
+            raise ContractError(f"RPM signing evidence missing for run {run_id}")
+        signing = load(evidence_path)
+        validate_schema(signing, "rpm-signing-evidence-v1")
+        if signing["workflow_run"] != run_id:
+            raise ContractError(f"RPM signing evidence workflow run mismatch for {run_id}")
+        if signing["acceptance_manifest_digest"] != acceptance["manifest_digest"]:
+            raise ContractError(f"RPM signing evidence acceptance digest mismatch for run {run_id}")
+        if signing["rpm_signing_fingerprint"] != expected_rpm_fpr:
+            raise ContractError(f"RPM signing fingerprint mismatch for run {run_id}")
+
+        signed_entries = {item["filename"]: item for item in signing["artifacts"]}
+        if set(signed_entries) != set(entries):
+            raise ContractError(f"signed RPM set mismatch for run {run_id}")
+
+        signed_paths = []
+        packages = []
+        for filename, item in sorted(entries.items()):
+            if filename in filenames:
+                raise ContractError(f"duplicate RPM filename across signed components: {filename}")
+            filenames.add(filename)
+            signed_path = signed_root / filename
+            if signed_path.is_symlink() or not signed_path.is_file():
+                raise ContractError(f"signed RPM is not a regular file: {filename}")
+            signed_item = signed_entries[filename]
+            expected_nevra = f"{item['name']}-{item['epoch']}:{item['version']}-{item['release']}.{item['architecture']}"
+            for field, expected in (
+                ("architecture", item["architecture"]),
+                ("nevra", expected_nevra),
+                ("producer_artifact_sha256", item["producer_artifact_sha256"]),
+            ):
+                if signed_item[field] != expected:
+                    raise ContractError(f"signing evidence mismatch for {filename}: {field}")
+            actual_signed_digest = digest(signed_path)
+            if signed_item["signed_artifact_sha256"] != actual_signed_digest:
+                raise ContractError(f"signed RPM digest mismatch: {filename}")
+            if actual_signed_digest == item["producer_artifact_sha256"]:
+                raise ContractError(f"signed RPM bytes equal producer bytes: {filename}")
+
+            header = rpm_header(signed_path)
+            for field in ("name", "epoch", "version", "release", "architecture", "source_rpm"):
+                if header[field] != item[field]:
+                    raise ContractError(f"signed RPM header mismatch for {filename}: {field}")
+            signed_paths.append(signed_path)
+            packages.append({
+                "path": signed_path,
+                "item": item,
+                "manifest_digest": acceptance["manifest_digest"],
+                "signed_digest": actual_signed_digest,
+                "nevra": header["nevra"],
+            })
+
+        verify_signed_rpms(signed_paths, public_key)
+        verified_components.append({
+            "signing_run": run_id,
+            "source_repository": manifest["source_repository"],
+            "source_commit": manifest["source_commit"],
+            "release_tag": manifest["release_tag"],
+            "release_id": manifest["release_id"],
+            "producer_workflow_run": manifest["workflow_run"],
+            "acceptance_manifest_digest": acceptance["manifest_digest"],
+            "packages": packages,
+        })
+
+    if not verified_components:
+        raise ContractError("snapshot input contains no signed components")
+    return source_runs, verified_components
+
+
+def _sign_file_exact(path, gnupghome, key_id, passphrase_file):
+    passphrase_path = _validate_passphrase_file(passphrase_file)
+    env = os.environ.copy()
+    env["GNUPGHOME"] = str(gnupghome)
+    run([
+        "gpg", "--batch", "--yes", "--armor",
+        "--pinentry-mode", "loopback", "--passphrase-file", str(passphrase_path),
+        "--local-user", f"{key_id}!", "--detach-sign",
+        "--output", str(path) + ".asc", str(path),
+    ], env)
+
+
+def build_production_snapshot(components_root, source_runs_path, output, snapshot_id,
+                              gnupghome, metadata_key_id, rpm_key_id, workflow_run,
+                              passphrase_file, parent=None,
+                              test_only_metadata_public_key=None,
+                              test_only_rpm_public_key=None,
+                              test_only_allow_unattested=False):
+    """Build an immutable production candidate snapshot from exact signing runs."""
+    if not re.fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}", snapshot_id):
+        raise ContractError("invalid snapshot ID")
+    if parent is not None and not re.fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}", parent):
+        raise ContractError("invalid parent snapshot ID")
+    build_run = _normalize_numeric_identity(workflow_run)
+    if build_run is None:
+        raise ContractError("snapshot workflow run must be a positive numeric identifier")
+
+    passphrase_path = _validate_passphrase_file(passphrase_file)
+    metadata_fpr = require_secret_signing_subkey(
+        gnupghome, metadata_key_id,
+        require_isolated=test_only_metadata_public_key is None,
+    )
+    metadata_public_key = (
+        pathlib.Path(test_only_metadata_public_key)
+        if test_only_metadata_public_key
+        else ROOT / "keys/production/ro-asd-metadata-signing-public.asc"
+    )
+    rpm_public_key = (
+        pathlib.Path(test_only_rpm_public_key)
+        if test_only_rpm_public_key
+        else ROOT / "keys/production/ro-asd-rpm-signing-public.asc"
+    )
+    validate_role_public_key(metadata_public_key, metadata_fpr, gnupghome)
+
+    source_runs, components = verify_signed_component_bundle(
+        components_root, source_runs_path, rpm_key_id,
+        rpm_public_key=rpm_public_key,
+        test_only_allow_unattested=test_only_allow_unattested,
+    )
+
+    output = pathlib.Path(output)
+    final = output / "snapshots/fedora/44" / snapshot_id
+    if final.exists():
+        raise ContractError("immutable snapshot already exists")
+    output.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix=".production-snapshot-", dir=output) as tmp:
+        stage = pathlib.Path(tmp) / snapshot_id
+        repos = {arch: stage / "rpm" / arch for arch in ("x86_64", "aarch64", "source")}
+        for repo in repos.values():
+            repo.mkdir(parents=True)
+
+        packages = []
+        nevras = {}
+        historical = {}
+        for old_manifest in (output / "snapshots/fedora/44").glob("*/repository-snapshot-v1.json"):
+            for old in load(old_manifest).get("packages", []):
+                historical[old["nevra"]] = old["producer_artifact_sha256"]
+
+        component_evidence = []
+        for component in components:
+            component_evidence.append({
+                "signing_run": component["signing_run"],
+                "source_repository": component["source_repository"],
+                "source_commit": component["source_commit"],
+                "release_tag": component["release_tag"],
+                "release_id": component["release_id"],
+                "producer_workflow_run": component["producer_workflow_run"],
+                "acceptance_manifest_digest": component["acceptance_manifest_digest"],
+            })
+            for package in component["packages"]:
+                item = package["item"]
+                rpm_path = package["path"]
+                nevra = package["nevra"]
+                if nevra in historical and historical[nevra] != item["producer_artifact_sha256"]:
+                    raise ContractError(f"historical NEVRA reuse with different content: {nevra}")
+                if nevra in nevras and nevras[nevra] != package["signed_digest"]:
+                    raise ContractError(f"same NEVRA has different content: {nevra}")
+                nevras[nevra] = package["signed_digest"]
+
+                arch = item["architecture"]
+                targets = (
+                    [repos["source"]] if arch in {"src", "nosrc"}
+                    else [repos["x86_64"], repos["aarch64"]] if arch == "noarch"
+                    else [repos[arch]]
+                )
+                for target in targets:
+                    destination = target / rpm_path.name
+                    if destination.exists():
+                        raise ContractError(f"duplicate RPM filename in snapshot: {rpm_path.name}")
+                    shutil.copy2(rpm_path, destination)
+
+                packages.append({
+                    "nevra": nevra,
+                    "architecture": arch,
+                    "filename": rpm_path.name,
+                    "producer_artifact_sha256": item["producer_artifact_sha256"],
+                    "published_signed_artifact_sha256": package["signed_digest"],
+                    "producer_manifest_digest": package["manifest_digest"],
+                })
+
+        repodata = {}
+        for arch, repo in repos.items():
+            run(["createrepo_c", "--unique-md-filenames", str(repo)])
+            repomd = repo / "repodata/repomd.xml"
+            _sign_file_exact(repomd, gnupghome, metadata_fpr, passphrase_path)
+            repodata[arch] = {
+                "repomd_sha256": digest(repomd),
+                "repomd_signature_sha256": digest(str(repomd) + ".asc"),
+            }
+
+        keys = stage / "keys"
+        keys.mkdir()
+        shutil.copy2(rpm_public_key, keys / "RPM-GPG-KEY-ro-asd")
+        shutil.copy2(metadata_public_key, keys / "REPODATA-GPG-KEY-ro-asd")
+
+        manifest = {
+            "schema_version": 1,
+            "snapshot_id": snapshot_id,
+            "created_at": timestamp(),
+            "fedora_release": 44,
+            "parent_snapshot": parent,
+            "packages": sorted(packages, key=lambda item: (item["filename"], item["architecture"])),
+            "repositories": repodata,
+            "rpm_signing_fingerprint": str(rpm_key_id).upper(),
+            "metadata_signing_fingerprint": metadata_fpr,
+            "creation_provenance": {"tool": "ro-repo-v2", "run": str(build_run)},
+        }
+        validate_schema(manifest, "repository-snapshot-v1")
+        manifest_path = stage / "repository-snapshot-v1.json"
+        save(manifest_path, manifest)
+        _sign_file_exact(manifest_path, gnupghome, metadata_fpr, passphrase_path)
+
+        build_evidence = {
+            "schema_version": 1,
+            "snapshot_id": snapshot_id,
+            "created_at": timestamp(),
+            "workflow_run": build_run,
+            "source_signing_runs": [run["run_id"] for run in source_runs["runs"]],
+            "repository_snapshot_sha256": digest(manifest_path),
+            "rpm_signing_fingerprint": str(rpm_key_id).upper(),
+            "metadata_signing_fingerprint": metadata_fpr,
+            "components": component_evidence,
+        }
+        validate_schema(build_evidence, "snapshot-build-evidence-v1")
+        build_evidence_path = stage / "snapshot-build-evidence-v1.json"
+        save(build_evidence_path, build_evidence)
+        _sign_file_exact(build_evidence_path, gnupghome, metadata_fpr, passphrase_path)
+
+        with tempfile.TemporaryDirectory(prefix=".snapshot-verify-") as verify_tmp:
+            verify_home = pathlib.Path(verify_tmp) / "gnupg"
+            verify_home.mkdir(mode=0o700)
+            verify_env = os.environ.copy()
+            verify_env["GNUPGHOME"] = str(verify_home)
+            run(["gpg", "--batch", "--import", str(metadata_public_key)], verify_env)
+            verify_snapshot(stage, verify_home)
+            verify_gpg_signature(
+                build_evidence_path, str(build_evidence_path) + ".asc",
+                metadata_fpr, verify_env,
+            )
+
+        final.parent.mkdir(parents=True, exist_ok=True)
+        os.rename(stage, final)
+    return build_evidence
+
+
 def sign_packages(input_dir, output_dir, gnupghome, key_id):
     output_dir=pathlib.Path(output_dir)
     if output_dir.exists(): raise ContractError(f"output exists: {output_dir}")
@@ -953,6 +1228,7 @@ def cli():
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
     x=s.add_parser("sign-accepted-component"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--test-only-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent"); x.add_argument("--test-only-allow-unattested-acceptance",action="store_true")
+    x=s.add_parser("build-production-snapshot"); x.add_argument("--components",type=pathlib.Path,required=True); x.add_argument("--source-runs",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--parent"); x.add_argument("--test-only-metadata-public-key",type=pathlib.Path); x.add_argument("--test-only-rpm-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
@@ -997,6 +1273,7 @@ def main():
         elif a.command=="sign-package": sign_packages(a.input,a.output,a.gnupghome,a.key_id)
         elif a.command=="sign-accepted-component": sign_accepted_component(a.accepted,a.output,a.gnupghome,a.key_id,a.workflow_run,a.passphrase_file,a.test_only_public_key,a.test_only_allow_unattested)
         elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent,a.test_only_allow_unattested_acceptance)
+        elif a.command=="build-production-snapshot": build_production_snapshot(a.components,a.source_runs,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.workflow_run,a.passphrase_file,a.parent,a.test_only_metadata_public_key,a.test_only_rpm_public_key,a.test_only_allow_unattested)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)
