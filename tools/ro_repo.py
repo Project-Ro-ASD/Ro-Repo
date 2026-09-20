@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ro-Repo V2 acceptance, signing, snapshot and local publication CLI."""
 from __future__ import annotations
-import argparse, datetime as dt, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tempfile, uuid
+import argparse, datetime as dt, hashlib, json, os, pathlib, re, shlex, shutil, stat, subprocess, sys, tempfile, uuid
 import jsonschema
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -385,6 +385,189 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
         raise
     return target
 
+
+def resolve_accepted_object(accepted_path):
+    accepted_path = pathlib.Path(accepted_path)
+    direct = accepted_path / "acceptance-evidence-v1.json"
+    if direct.is_file():
+        return accepted_path
+    candidates = sorted(accepted_path.rglob("acceptance-evidence-v1.json")) if accepted_path.is_dir() else []
+    if len(candidates) != 1:
+        raise ContractError(f"expected exactly one accepted object, found {len(candidates)}")
+    return candidates[0].parent
+
+
+def verify_accepted_object(accepted_path, test_only_allow_unattested=False):
+    """Revalidate immutable acceptance evidence and RPM bytes before signing."""
+    accepted_object = resolve_accepted_object(accepted_path)
+    evidence_path = accepted_object / "acceptance-evidence-v1.json"
+    manifest_path = accepted_object / "component-artifact-manifest-v1.json"
+    artifacts_dir = accepted_object / "artifacts"
+    if not evidence_path.is_file():
+        raise ContractError("acceptance evidence missing")
+    if not manifest_path.is_file():
+        raise ContractError("accepted component manifest missing")
+    evidence = load(evidence_path)
+    manifest = load(manifest_path)
+    if not isinstance(evidence, dict):
+        raise ContractError("acceptance evidence must be a JSON object")
+    validate_schema(manifest, "component-artifact-manifest-v1")
+    if not test_only_allow_unattested and evidence.get("verified_provenance") != "github_attestation_exact_match":
+        raise ContractError("unattested accepted object rejected in production")
+    manifest_digest = digest(manifest_path)
+    if evidence.get("manifest_digest") != manifest_digest:
+        raise ContractError("acceptance evidence manifest digest mismatch")
+    for field in ("source_repository", "source_commit", "release_tag", "release_id", "workflow_run"):
+        if evidence.get(field) != manifest.get(field):
+            raise ContractError(f"acceptance evidence identity mismatch for {field}")
+
+    entries = {}
+    for item in manifest["artifacts"]:
+        filename = item["filename"]
+        if pathlib.PurePath(filename).name != filename or filename in entries:
+            raise ContractError(f"unsafe or duplicate accepted RPM filename: {filename}")
+        entries[filename] = item
+    expected_paths = {pathlib.PurePosixPath("artifacts") / name for name in entries}
+    actual_paths = {
+        path.relative_to(accepted_object)
+        for path in accepted_object.rglob("*.rpm")
+        if path.is_file() or path.is_symlink()
+    }
+    if actual_paths != expected_paths:
+        raise ContractError(
+            f"accepted RPM set mismatch. Expected: {sorted(map(str, expected_paths))}. "
+            f"Found: {sorted(map(str, actual_paths))}."
+        )
+    for filename, item in entries.items():
+        rpm_path = artifacts_dir / filename
+        if rpm_path.is_symlink() or not rpm_path.is_file():
+            raise ContractError(f"accepted RPM is not a regular file: {filename}")
+        if digest(rpm_path) != item["producer_artifact_sha256"]:
+            raise ContractError(f"accepted RPM digest mismatch: {filename}")
+    return accepted_object, evidence, manifest, entries
+
+
+def validate_role_public_key(public_key_path, expected_fingerprint, gnupghome):
+    fpr = str(expected_fingerprint).upper()
+    if not re.fullmatch(r"[0-9A-F]{40}", fpr):
+        raise ContractError("signing subkey fingerprint must be exact 40-hex")
+    env = os.environ.copy(); env["GNUPGHOME"] = str(gnupghome)
+    records = gpg_fingerprint_records(run([
+        "gpg", "--batch", "--import-options", "show-only", "--with-colons",
+        "--import", str(public_key_path),
+    ], env).stdout)
+    primary = [record for record in records if record["type"] == "pub"]
+    subkeys = [record for record in records if record["type"] == "sub"]
+    if len(primary) != 1 or len(subkeys) != 1 or subkeys[0]["fingerprint"] != fpr:
+        raise ContractError(f"canonical RPM public key is not isolated for {fpr}")
+    if "s" not in subkeys[0]["capabilities"].lower():
+        raise ContractError("canonical RPM public subkey lacks signing capability")
+    return primary[0]["fingerprint"]
+
+
+def require_secret_signing_subkey(gnupghome, subkey_fingerprint, require_isolated=True):
+    fpr = require_signing_subkey(gnupghome, subkey_fingerprint)
+    env = os.environ.copy(); env["GNUPGHOME"] = str(gnupghome)
+    records = gpg_fingerprint_records(run([
+        "gpg", "--batch", "--with-colons", "--fingerprint", "--list-secret-keys"
+    ], env).stdout)
+    secret_subkeys = [record for record in records if record["type"] == "ssb" and record["secret_available"]]
+    matches = [record for record in secret_subkeys if record["fingerprint"] == fpr]
+    if len(matches) != 1:
+        raise ContractError(f"secret signing subkey not found: {fpr}")
+    if require_isolated:
+        primary_secrets = [record for record in records if record["type"] == "sec" and record["secret_available"]]
+        if primary_secrets:
+            raise ContractError("offline primary secret key is forbidden in production signing")
+        if [record["fingerprint"] for record in secret_subkeys] != [fpr]:
+            raise ContractError("production GNUPGHOME must contain only the expected RPM signing secret subkey")
+    return fpr
+
+
+def _validate_passphrase_file(passphrase_file):
+    path = pathlib.Path(passphrase_file)
+    if path.is_symlink() or not path.is_file():
+        raise ContractError("passphrase file must be a regular file")
+    if stat.S_IMODE(path.stat().st_mode) != 0o600:
+        raise ContractError("passphrase file mode must be 0600")
+    return path
+
+
+def _sign_rpm_exact(source, target, gnupghome, key_id, passphrase_file):
+    env = os.environ.copy(); env["GNUPGHOME"] = str(gnupghome)
+    signer = os.getenv("RO_RPMSIGN") or shutil.which("rpmsign") or "/usr/bin/rpmsign"
+    extra_args = "--batch --pinentry-mode loopback --passphrase-file " + shlex.quote(str(passphrase_file))
+    shutil.copy2(source, target)
+    run([
+        signer, "--addsign", "--key-id", key_id,
+        "--define", f"_gpg_sign_cmd_extra_args {extra_args}", str(target),
+    ], env)
+
+
+def verify_signed_rpms(rpm_paths, public_key_path):
+    with tempfile.TemporaryDirectory() as verify_dir:
+        rpmdb = pathlib.Path(verify_dir) / "rpmdb"
+        rpmdb.mkdir()
+        run(["rpmkeys", "--dbpath", str(rpmdb), "--import", str(public_key_path)])
+        for rpm_path in rpm_paths:
+            run(["rpmkeys", "--dbpath", str(rpmdb), "--checksig", str(rpm_path)])
+
+
+def sign_accepted_component(accepted_path, output_dir, gnupghome, key_id, workflow_run,
+                            passphrase_file, test_only_public_key=None,
+                            test_only_allow_unattested=False):
+    """Production RPM 6 signing path with accepted-object revalidation."""
+    accepted_object, acceptance, manifest, entries = verify_accepted_object(
+        accepted_path, test_only_allow_unattested=test_only_allow_unattested
+    )
+    run_id = _normalize_numeric_identity(workflow_run)
+    if run_id is None:
+        raise ContractError("workflow run must be a positive numeric identifier")
+    passphrase_path = _validate_passphrase_file(passphrase_file)
+    public_key = pathlib.Path(test_only_public_key) if test_only_public_key else ROOT / "keys/production/ro-asd-rpm-signing-public.asc"
+    key_fpr = require_secret_signing_subkey(
+        gnupghome, key_id, require_isolated=test_only_public_key is None
+    )
+    validate_role_public_key(public_key, key_fpr, gnupghome)
+
+    output_dir = pathlib.Path(output_dir)
+    if output_dir.exists():
+        raise ContractError(f"signing output exists: {output_dir}")
+    output_dir.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".rpm-signing-", dir=output_dir.parent) as tmp:
+        stage = pathlib.Path(tmp) / "signed"
+        stage.mkdir()
+        artifacts = []
+        signed_paths = []
+        for filename, item in sorted(entries.items()):
+            source = accepted_object / "artifacts" / filename
+            target = stage / filename
+            _sign_rpm_exact(source, target, gnupghome, key_fpr, passphrase_path)
+            signed_digest = digest(target)
+            if signed_digest == item["producer_artifact_sha256"]:
+                raise ContractError(f"RPM signature did not change artifact bytes: {filename}")
+            signed_paths.append(target)
+            artifacts.append({
+                "filename": filename,
+                "architecture": item["architecture"],
+                "nevra": f"{item['name']}-{item['epoch']}:{item['version']}-{item['release']}.{item['architecture']}",
+                "producer_artifact_sha256": item["producer_artifact_sha256"],
+                "signed_artifact_sha256": signed_digest,
+            })
+        verify_signed_rpms(signed_paths, public_key)
+        signing_evidence = {
+            "schema_version": 1,
+            "signed_at": timestamp(),
+            "workflow_run": run_id,
+            "acceptance_manifest_digest": acceptance["manifest_digest"],
+            "rpm_signing_fingerprint": key_fpr,
+            "artifacts": artifacts,
+        }
+        validate_schema(signing_evidence, "rpm-signing-evidence-v1")
+        save(stage / "rpm-signing-evidence-v1.json", signing_evidence)
+        stage.rename(output_dir)
+    return signing_evidence
+
 def sign_packages(input_dir, output_dir, gnupghome, key_id):
     output_dir=pathlib.Path(output_dir)
     if output_dir.exists(): raise ContractError(f"output exists: {output_dir}")
@@ -415,11 +598,16 @@ def gpg_fingerprint_records(text):
     for line in text.splitlines():
         parts=line.split(":")
         if not parts: continue
-        if parts[0] in {"pub","sub"}:
+        if parts[0] in {"pub","sub","sec","ssb"}:
             current=parts
         elif parts[0]=="fpr" and current and len(parts) > 9:
             capabilities=current[11] if len(current) > 11 else ""
-            records.append({"type":current[0],"fingerprint":parts[9].upper(),"capabilities":capabilities})
+            secret_marker=current[14] if len(current) > 14 else ""
+            records.append({
+                "type":current[0], "fingerprint":parts[9].upper(),
+                "capabilities":capabilities,
+                "secret_available":current[0] in {"sec","ssb"} and secret_marker == "+",
+            })
     return records
 
 def require_signing_subkey(gnupghome,subkey_fingerprint):
@@ -427,7 +615,9 @@ def require_signing_subkey(gnupghome,subkey_fingerprint):
     if not re.fullmatch(r"[0-9A-F]{40}",fpr):
         raise ContractError("signing subkey fingerprint must be exact 40-hex")
     env=os.environ.copy(); env["GNUPGHOME"]=str(gnupghome)
-    records=gpg_fingerprint_records(run(["gpg","--batch","--with-colons","--fingerprint",fpr],env).stdout)
+    # Listing the complete ephemeral keyring keeps a missing/wrong-role key in
+    # the contract-error path instead of exposing GnuPG's command failure.
+    records=gpg_fingerprint_records(run(["gpg","--batch","--with-colons","--fingerprint"],env).stdout)
     matches=[record for record in records if record["fingerprint"]==fpr]
     if len(matches)!=1: raise ContractError(f"GPG signing subkey not found: {fpr}")
     if matches[0]["type"]!="sub": raise ContractError("role key must be a signing subkey, not a primary key")
@@ -732,6 +922,7 @@ def cli():
         x=s.add_parser(name); x.add_argument("--manifest",type=pathlib.Path,required=True); x.add_argument("--artifacts",type=pathlib.Path,required=True); x.add_argument("--config",type=pathlib.Path,default=ROOT/"config/producers-v1.yaml"); x.add_argument("--fedora-names",type=pathlib.Path); return x
     component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true"); x.add_argument("--report",type=pathlib.Path,required=True); x.add_argument("--expected-repository"); x.add_argument("--expected-tag"); x.add_argument("--expected-commit"); x.add_argument("--expected-release-id")
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
+    x=s.add_parser("sign-accepted-component"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--test-only-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent"); x.add_argument("--test-only-allow-unattested-acceptance",action="store_true")
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
@@ -775,6 +966,7 @@ def main():
     try:
         if a.command=="verify-component": verify_component(a.manifest,a.artifacts,a.config,a.fedora_names)
         elif a.command=="sign-package": sign_packages(a.input,a.output,a.gnupghome,a.key_id)
+        elif a.command=="sign-accepted-component": sign_accepted_component(a.accepted,a.output,a.gnupghome,a.key_id,a.workflow_run,a.passphrase_file,a.test_only_public_key,a.test_only_allow_unattested)
         elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent,a.test_only_allow_unattested_acceptance)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)

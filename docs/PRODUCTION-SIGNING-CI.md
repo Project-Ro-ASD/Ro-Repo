@@ -190,6 +190,29 @@ Unit and Fedora 44 E2E coverage must include:
 Production secrets are never required for pull-request CI. Tests use ephemeral
 test-only keys.
 
+## Implemented command boundary
+
+The production workflow delegates validation, signing, verification, and
+evidence creation to:
+
+```text
+tools/ro-repo sign-accepted-component
+```
+
+This command is intentionally separate from the legacy `sign-package` helper
+used by local snapshot tests. The production command requires an exact
+40-character fingerprint and uses RPM 6 `--key-id`; it does not use the legacy
+`%_gpg_name` selector.
+
+The command accepts a passphrase **file path**, never a literal passphrase. The
+workflow creates that file with mode 0600 inside its temporary signing area and
+removes it through an exit trap. The only referenced secret names are
+`RO_REPO_RPM_SIGNING_SUBKEY_B64` and
+`RO_REPO_RPM_SIGNING_PASSPHRASE`; no secret values belong in this repository.
+
+The offline primary secret key remains forbidden in CI. Metadata signing is a
+later Phase 2 step, and GitHub Pages is outside this change.
+
 ## Manual provisioning after merge
 
 After the workflow code is merged and reviewed, the maintainer will provision

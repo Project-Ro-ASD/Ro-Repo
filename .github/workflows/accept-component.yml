@@ -21,6 +21,7 @@ name: Accept pinned producer component
 permissions:
   contents: read
   attestations: read
+  actions: read
 jobs:
   accept:
     runs-on: ubuntu-24.04
@@ -179,5 +180,73 @@ jobs:
         with:
           name: acceptance-report-${{ github.run_id }}
           path: acceptance-report-v1.json
+          retention-days: 30
+          if-no-files-found: error
+  sign:
+    needs: accept
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    environment:
+      name: repo-production-signing
+    concurrency:
+      group: ro-repo-production-rpm-signing
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install production RPM signing tools
+        run: dnf -y install gnupg2 python3 python3-jsonschema rpm rpm-sign
+      - name: Download accepted component from this workflow run
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: accepted-component-${{ github.run_id }}
+          path: accepted
+      - name: Sign accepted component with the isolated RPM subkey
+        env:
+          RO_REPO_RPM_SIGNING_SUBKEY_B64: ${{ secrets.RO_REPO_RPM_SIGNING_SUBKEY_B64 }}
+          RO_REPO_RPM_SIGNING_PASSPHRASE: ${{ secrets.RO_REPO_RPM_SIGNING_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          set +x
+          signing_tmp=""
+          signing_home=""
+          key_file=""
+          passphrase_file=""
+          cleanup() {
+            set +e
+            if [[ -n "$signing_home" ]]; then
+              GNUPGHOME="$signing_home" gpgconf --kill gpg-agent >/dev/null 2>&1
+            fi
+            if [[ -n "$key_file" ]]; then rm -f -- "$key_file"; fi
+            if [[ -n "$passphrase_file" ]]; then rm -f -- "$passphrase_file"; fi
+            if [[ -n "$signing_tmp" ]]; then rm -rf -- "$signing_tmp"; fi
+          }
+          trap cleanup EXIT
+
+          signing_tmp="$(mktemp -d)"
+          chmod 700 "$signing_tmp"
+          signing_home="$signing_tmp/gnupg"
+          key_file="$signing_tmp/rpm-signing-subkey.asc"
+          passphrase_file="$signing_tmp/passphrase"
+          mkdir -m 700 "$signing_home"
+          umask 077
+          printf '%s' "$RO_REPO_RPM_SIGNING_SUBKEY_B64" | base64 --decode > "$key_file"
+          printf '%s' "$RO_REPO_RPM_SIGNING_PASSPHRASE" > "$passphrase_file"
+          chmod 600 "$key_file" "$passphrase_file"
+          unset RO_REPO_RPM_SIGNING_SUBKEY_B64 RO_REPO_RPM_SIGNING_PASSPHRASE
+          GNUPGHOME="$signing_home" gpg --batch --import "$key_file"
+
+          expected_fingerprint="$(awk -F= '$1 == "RPM_SIGNING" {print $2}' keys/production/production-fingerprints.txt)"
+          tools/ro-repo sign-accepted-component \
+            --accepted accepted \
+            --output signed \
+            --gnupghome "$signing_home" \
+            --key-id "$expected_fingerprint" \
+            --workflow-run "$GITHUB_RUN_ID" \
+            --passphrase-file "$passphrase_file"
+      - name: Upload signed component and signing evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: signed-component-${{ github.run_id }}
+          path: signed/
           retention-days: 30
           if-no-files-found: error
