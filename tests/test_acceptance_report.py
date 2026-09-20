@@ -77,6 +77,21 @@ class AcceptanceReportTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, code)
         return caught.exception
 
+    def run_rejected_cli(self, expected_args=None):
+        accepted = self.root / "accepted"
+        argv = [
+            "ro-repo", "accept-package", "--manifest", str(self.manifest_path),
+            "--artifacts", str(self.artifacts), "--accepted", str(accepted),
+            "--fedora-names", str(self.fedora_names), "--report", str(self.report),
+            "--test-only-allow-unattested",
+        ]
+        argv.extend(expected_args or [])
+        with mock.patch.object(sys, "argv", argv):
+            result = ro_repo.main()
+        report = json.loads(self.report.read_text(encoding="utf-8"))
+        ro_repo.validate_schema(report, "acceptance-report-v1")
+        return result, report, accepted
+
     def test_successful_acceptance_report_and_schema(self):
         accepted = self.root / "accepted"
         (self.artifacts / "SHA256SUMS").write_text(
@@ -115,6 +130,65 @@ class AcceptanceReportTests(unittest.TestCase):
         data = json.loads(self.report.read_text(encoding="utf-8"))
         self.assertEqual(data["result"], "rejected")
         self.assertEqual(data["error_code"], "PRODUCER_NOT_ALLOWLISTED")
+        self.assertFalse(accepted.exists())
+
+    def test_invalid_source_commit_cli_reports_stable_code(self):
+        self.manifest["source_commit"] = "a" * 39
+        self.write_manifest()
+        result, report, accepted = self.run_rejected_cli()
+        self.assertNotEqual(result, 0)
+        self.assertEqual(report["result"], "rejected")
+        self.assertEqual(report["error_code"], "TAG_COMMIT_MISMATCH")
+        self.assertFalse(accepted.exists())
+
+    def test_non_exact_release_id_cli_reports_stable_code(self):
+        self.manifest["release_id"] = "not-a-number"
+        self.write_manifest()
+        result, report, accepted = self.run_rejected_cli()
+        self.assertNotEqual(result, 0)
+        self.assertEqual(report["result"], "rejected")
+        self.assertEqual(report["error_code"], "RELEASE_ID_MISMATCH")
+        self.assertFalse(accepted.exists())
+
+    def test_malformed_manifest_identity_type_still_writes_valid_report(self):
+        self.manifest["workflow_run"] = {}
+        self.write_manifest()
+        result, report, accepted = self.run_rejected_cli()
+        self.assertNotEqual(result, 0)
+        self.assertEqual(report["result"], "rejected")
+        self.assertEqual(report["error_code"], "MANIFEST_IDENTITY_MISMATCH")
+        self.assertIsNone(report["workflow_run"])
+        self.assertFalse(accepted.exists())
+
+    def test_caller_verified_identity_is_not_overwritten_by_manifest(self):
+        attempted = {
+            "source_repository": self.manifest["source_repository"],
+            "release_tag": self.manifest["release_tag"],
+            "source_commit": self.manifest["source_commit"],
+            "release_id": self.manifest["release_id"],
+        }
+        self.manifest.update({
+            "source_repository": "example/conflicting-producer",
+            "release_tag": "v9.9",
+            "source_commit": "b" * 40,
+            "release_id": 999,
+        })
+        self.write_manifest()
+        expected_args = [
+            "--expected-repository", attempted["source_repository"],
+            "--expected-tag", attempted["release_tag"],
+            "--expected-commit", attempted["source_commit"],
+            "--expected-release-id", str(attempted["release_id"]),
+        ]
+        result, report, accepted = self.run_rejected_cli(expected_args)
+        self.assertNotEqual(result, 0)
+        self.assertEqual(report["result"], "rejected")
+        self.assertEqual(report["producer_repository"], attempted["source_repository"])
+        self.assertEqual(report["release_tag"], attempted["release_tag"])
+        self.assertEqual(report["source_commit"], attempted["source_commit"])
+        self.assertEqual(report["release_id"], attempted["release_id"])
+        self.assertEqual(report["expected"], attempted["source_repository"])
+        self.assertEqual(report["received"], "example/conflicting-producer")
         self.assertFalse(accepted.exists())
 
     def test_digest_mismatch_code(self):

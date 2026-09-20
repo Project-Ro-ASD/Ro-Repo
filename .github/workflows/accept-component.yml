@@ -47,13 +47,13 @@ jobs:
           COMMIT = os.environ["COMMIT"]
           RELEASE_ID = os.environ["RELEASE_ID"]
 
-          identity = {
+          identity = ro_repo.normalize_acceptance_identity({
               "source_repository": PRODUCER,
               "release_tag": TAG,
               "source_commit": COMMIT,
-              "release_id": int(RELEASE_ID) if RELEASE_ID.isdigit() else RELEASE_ID,
+              "release_id": RELEASE_ID,
               "workflow_run": None,
-          }
+          })
 
           default_excepthook = sys.excepthook
           def report_unexpected(error_type, error, traceback):
@@ -110,7 +110,8 @@ jobs:
 
           with open("incoming/component-artifact-manifest-v1.json") as f:
               manifest = json.load(f)
-          identity.update({field: manifest.get(field) for field in ro_repo.REPORT_IDENTITY_FIELDS})
+          manifest_identity = ro_repo.normalize_acceptance_identity(manifest)
+          identity["workflow_run"] = manifest_identity["workflow_run"]
 
           if manifest["source_repository"] != PRODUCER:
               reject("Manifest source_repository mismatch", "MANIFEST_IDENTITY_MISMATCH", "manifest-identity", expected=PRODUCER, received=manifest["source_repository"])
@@ -122,7 +123,9 @@ jobs:
               reject("Manifest release_id mismatch", "RELEASE_ID_MISMATCH", "manifest-identity", expected=RELEASE_ID, received=manifest["release_id"])
 
           workflow_path = producers[0]["trusted_signer_workflow"]
-          run_id = manifest["workflow_run"]
+          run_id = manifest_identity["workflow_run"]
+          if run_id is None:
+              reject("Manifest workflow_run is not a valid numeric run ID", "MANIFEST_IDENTITY_MISMATCH", "manifest-identity", expected="positive numeric workflow run ID", received=manifest.get("workflow_run"))
           run_data = gh_api(f"repos/{PRODUCER}/actions/runs/{run_id}")
 
           if run_data["head_repository"]["full_name"] != PRODUCER:

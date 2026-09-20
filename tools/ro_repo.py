@@ -22,6 +22,30 @@ class ContractError(RuntimeError):
 REPORT_IDENTITY_FIELDS = (
     "source_repository", "release_tag", "source_commit", "release_id", "workflow_run"
 )
+CALLER_IDENTITY_FIELDS = (
+    "source_repository", "release_tag", "source_commit", "release_id"
+)
+
+
+def _normalize_numeric_identity(value):
+    if isinstance(value, int) and not isinstance(value, bool) and value > 0:
+        return value
+    if isinstance(value, str) and re.fullmatch(r"[1-9][0-9]*", value):
+        return int(value)
+    return None
+
+
+def normalize_acceptance_identity(values):
+    """Return schema-safe release identity values without trusting input types."""
+    if not isinstance(values, dict):
+        values = {}
+    identity = {
+        field: values.get(field) if isinstance(values.get(field), str) else None
+        for field in ("source_repository", "release_tag", "source_commit")
+    }
+    identity["release_id"] = _normalize_numeric_identity(values.get("release_id"))
+    identity["workflow_run"] = _normalize_numeric_identity(values.get("workflow_run"))
+    return identity
 
 
 def acceptance_identity(manifest_path):
@@ -30,18 +54,17 @@ def acceptance_identity(manifest_path):
         data = json.loads(pathlib.Path(manifest_path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {field: None for field in REPORT_IDENTITY_FIELDS}
-    if not isinstance(data, dict):
-        return {field: None for field in REPORT_IDENTITY_FIELDS}
-    identity = {
-        field: data.get(field) if isinstance(data.get(field), (str, int)) else None
-        for field in REPORT_IDENTITY_FIELDS
-    }
-    release_id = identity["release_id"]
-    identity["release_id"] = (
-        release_id if isinstance(release_id, int) and not isinstance(release_id, bool)
-        else int(release_id) if isinstance(release_id, str) and release_id.isdigit()
-        else None
-    )
+    return normalize_acceptance_identity(data)
+
+
+def acceptance_report_identity(manifest_path, expected=None):
+    """Prefer caller-verified release identity while safely reading workflow_run."""
+    identity = acceptance_identity(manifest_path)
+    normalized_expected = normalize_acceptance_identity(expected)
+    if isinstance(expected, dict):
+        for field in CALLER_IDENTITY_FIELDS:
+            if expected.get(field) is not None:
+                identity[field] = normalized_expected[field]
     return identity
 
 
@@ -59,6 +82,7 @@ def _redact_report_value(value):
 
 
 def write_acceptance_report(path, result, identity, error=None):
+    identity = normalize_acceptance_identity(identity)
     report = {
         "schema_version": 1,
         "result": result,
@@ -125,7 +149,11 @@ def file_conflict_check(rpm_paths):
         try:
             files = subprocess.check_output(["rpm", "-qpl", str(path)], text=True, stderr=subprocess.PIPE).strip().splitlines()
         except (OSError, subprocess.CalledProcessError) as exc:
-            raise ContractError(f"failed to query rpm contents for {path.name}: {exc}") from exc
+            raise ContractError(
+                f"failed to query rpm contents for {path.name}: {exc}",
+                code="RPM_HEADER_MISMATCH", stage="rpm-content", received=path.name,
+                hint="Publish a readable, valid RPM artifact.",
+            ) from exc
         for f in files:
             if f in file_owners and file_owners[f] != path.name:
                 conflicts.append(f"{f} owned by both {file_owners[f]} and {path.name}")
@@ -185,15 +213,45 @@ def verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow
 
 def rpm_header(path):
     query = "%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\t%{ARCH}\t%{SOURCERPM}\t%|SOURCEPACKAGE?{true}:{false}|"
-    values = run(["rpm", "-qp", "--qf", query, str(path)]).stdout.split("\t")
-    if len(values) != 7: raise ContractError(f"unexpected RPM header: {path}")
+    try:
+        values = run(["rpm", "-qp", "--qf", query, str(path)]).stdout.split("\t")
+    except ContractError as exc:
+        raise ContractError(
+            f"failed to read RPM header: {path}", code="RPM_HEADER_MISMATCH",
+            stage="rpm-header", received=pathlib.Path(path).name,
+            hint="Publish a readable RPM with headers matching the manifest.",
+        ) from exc
+    if len(values) != 7: raise ContractError(f"unexpected RPM header: {path}", code="RPM_HEADER_MISMATCH", stage="rpm-header", received=pathlib.Path(path).name, hint="Publish a valid RPM with complete headers.")
     name, epoch, version, release, arch, source_rpm, is_source = values
     arch = "src" if is_source == "true" else arch
     return {"name":name,"epoch":int(epoch or 0),"version":version,"release":release,"architecture":arch,
             "source_rpm":None if is_source == "true" else source_rpm,"nevra":f"{name}-{int(epoch or 0)}:{version}-{release}.{arch}"}
 
 def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_path=None, test_only_allow_empty_fedora=False, test_only_allow_missing_sha256sums=False):
-    manifest, config = load(manifest_path), load(config_path)
+    try:
+        manifest = load(manifest_path)
+    except ContractError as exc:
+        raise ContractError(
+            str(exc), code="MANIFEST_IDENTITY_MISMATCH", stage="manifest-schema",
+            hint="Publish valid JSON matching the versioned component manifest schema.",
+        ) from exc
+    config = load(config_path)
+    source_commit = manifest.get("source_commit") if isinstance(manifest, dict) else None
+    if not isinstance(source_commit, str) or not re.fullmatch(r"[0-9a-f]{40}", source_commit):
+        raise ContractError(
+            "source_commit must be an exact lowercase 40-character SHA",
+            code="TAG_COMMIT_MISMATCH", stage="tag-commit",
+            expected="exact lowercase 40-character commit SHA", received=source_commit,
+            hint="Publish the manifest with the exact commit referenced by the immutable release tag.",
+        )
+    release_id = manifest.get("release_id") if isinstance(manifest, dict) else None
+    if _normalize_numeric_identity(release_id) is None:
+        raise ContractError(
+            "exact positive numeric release_id is required; latest is forbidden",
+            code="RELEASE_ID_MISMATCH", stage="release-id",
+            expected="exact numeric GitHub release ID", received=release_id,
+            hint="Use the numeric ID of the exact immutable GitHub release.",
+        )
     if isinstance(manifest, dict) and manifest.get("fedora_release") != 44:
         raise ContractError(
             "only manifest v1 for Fedora 44 is accepted", code="FEDORA_RELEASE_MISMATCH",
@@ -207,9 +265,6 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
             str(exc), code="MANIFEST_IDENTITY_MISMATCH", stage="manifest-schema",
             hint="Regenerate the component manifest from the versioned v1 schema.",
         ) from exc
-    sha = manifest["source_commit"]
-    if len(sha) != 40 or any(c not in "0123456789abcdef" for c in sha): raise ContractError("source_commit must be an exact lowercase 40-character SHA")
-    if str(manifest["release_id"]).lower() in {"", "latest", "none", "null"}: raise ContractError("exact release_id is required; latest is forbidden")
     producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
     if len(producers) != 1:
         raise ContractError(
@@ -256,14 +311,14 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
 
     for item in manifest["artifacts"]:
         filename=item["filename"]
-        if pathlib.PurePath(filename).name != filename or filename in seen: raise ContractError(f"unsafe or duplicate filename: {filename}")
+        if pathlib.PurePath(filename).name != filename or filename in seen: raise ContractError(f"unsafe or duplicate filename: {filename}", code="ARTIFACT_SET_MISMATCH", stage="artifact-set", received=filename, hint="Publish unique, basename-only artifact filenames.")
         seen.add(filename); path=pathlib.Path(artifacts_dir)/filename
         actual_digest = digest(path) if path.is_file() else None
         if actual_digest != item["producer_artifact_sha256"]: raise ContractError(f"producer digest mismatch: {filename}", code="ARTIFACT_DIGEST_MISMATCH", stage="artifact-digest", expected=item["producer_artifact_sha256"], received=actual_digest, hint="Publish a new immutable release whose artifact bytes match the manifest.")
         header=rpm_header(path)
         for field in ("name","epoch","version","release","architecture","source_rpm"):
             if header[field] != item[field]: raise ContractError(f"RPM header mismatch for {filename}: {field}", code="RPM_HEADER_MISMATCH", stage="rpm-header", expected=item[field], received=header[field], hint="Regenerate the manifest from the final RPM headers.")
-        if item["name"] not in producer["allowed_package_names"]: raise ContractError(f"package name denied: {item['name']}")
+        if item["name"] not in producer["allowed_package_names"]: raise ContractError(f"package name denied: {item['name']}", code="PACKAGE_NAME_DENIED", stage="package-policy", expected=producer["allowed_package_names"], received=item["name"], hint="Publish only package names allowed by the producer registry.")
         if not item["release"].endswith(".fc44"): raise ContractError(f"not a Fedora 44 build: {filename}", code="FEDORA_RELEASE_MISMATCH", stage="fedora-release", expected="release suffix .fc44", received=item["release"], hint="Rebuild the RPM for Fedora 44.")
         if item["architecture"] not in {"src","nosrc"} and item["architecture"] not in producer["architectures"]: raise ContractError(f"architecture denied: {item['architecture']}", code="ARCHITECTURE_DENIED", stage="architecture", expected=producer["architectures"], received=item["architecture"], hint="Publish only an architecture allowed by the producer registry.")
         if item["architecture"] in {"src","nosrc"}: source_names.add(filename)
@@ -271,7 +326,7 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
     if producer.get("srpm_required"):
         for item in manifest["artifacts"]:
             if item["architecture"] not in {"src","nosrc"} and item["source_rpm"] not in source_names: raise ContractError(f"missing matching SRPM: {item['source_rpm']}", code="SRPM_MISSING", stage="srpm-parity", expected=item["source_rpm"], received=sorted(source_names), hint="Publish the matching source RPM in the same immutable release.")
-    if producer.get("sbom_required") and not manifest.get("sbom"): raise ContractError("SBOM required")
+    if producer.get("sbom_required") and not manifest.get("sbom"): raise ContractError("SBOM required", code="ARTIFACT_SET_MISMATCH", stage="artifact-set", expected="SBOM", hint="Publish the required SBOM with the immutable release.")
     names_path=pathlib.Path(fedora_names_path) if fedora_names_path else ROOT/config["fedora_package_names_file"]
     fedora=set(line.strip() for line in names_path.read_text().splitlines() if line.strip() and not line.startswith("#"))
     if not fedora and not test_only_allow_empty_fedora:
@@ -286,7 +341,7 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
         diagnostics["rpmlint"].append({"file": rpm_path.name, "ok": ok, "output": output})
     if len(binary_rpms) > 1:
         ok, conflicts = file_conflict_check(binary_rpms)
-        if not ok: raise ContractError(f"file conflicts between packages: {'; '.join(conflicts)}")
+        if not ok: raise ContractError(f"file conflicts between packages: {'; '.join(conflicts)}", code="ARTIFACT_SET_MISMATCH", stage="file-conflict", received=conflicts, hint="Resolve package file ownership conflicts and publish a new release.")
         diagnostics["file_conflicts"] = conflicts
     return manifest, headers, diagnostics
 
@@ -688,13 +743,13 @@ def cli():
 def main():
     a=cli()
     if a.command == "accept-package":
-        identity = acceptance_identity(a.manifest)
         expected = {
             "source_repository": a.expected_repository,
             "release_tag": a.expected_tag,
             "source_commit": a.expected_commit,
             "release_id": a.expected_release_id,
         }
+        identity = acceptance_report_identity(a.manifest, expected)
         accepted_target = None
         try:
             accepted_target = accept(a.manifest,a.artifacts,a.accepted,a.config,a.fedora_names,a.test_only_allow_unattested,expected_identity=expected)
