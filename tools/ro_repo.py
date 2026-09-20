@@ -125,6 +125,35 @@ def verify_expected_identity(manifest_path, expected):
                 hint="Verify the exact tag, commit, and numeric release ID, then publish a corrected immutable release.",
             )
 
+def write_snapshot_input(path, signing_runs):
+    """Write a schema-valid exact signing-run input without shell JSON assembly."""
+    if not isinstance(signing_runs, str):
+        raise ContractError("snapshot signing runs must be a comma-separated string")
+
+    run_ids = []
+    seen = set()
+    for raw in signing_runs.split(","):
+        token = raw.strip()
+        run_id = _normalize_numeric_identity(token)
+        if run_id is None:
+            raise ContractError(f"invalid signing workflow run ID: {token!r}")
+        if run_id in seen:
+            raise ContractError(f"duplicate signing workflow run ID: {run_id}")
+        seen.add(run_id)
+        run_ids.append(run_id)
+
+    if not run_ids:
+        raise ContractError("snapshot input contains no signing workflow runs")
+
+    data = {
+        "schema_version": 1,
+        "runs": [{"run_id": run_id} for run_id in run_ids],
+    }
+    validate_schema(data, "snapshot-input-v1")
+    save(path, data)
+    return data
+
+
 def validate_schema(data, schema_name):
     schema_path = ROOT / "schemas" / f"{schema_name}.schema.json"
     schema = load(schema_path)
@@ -1227,6 +1256,7 @@ def cli():
     component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true"); x.add_argument("--report",type=pathlib.Path,required=True); x.add_argument("--expected-repository"); x.add_argument("--expected-tag"); x.add_argument("--expected-commit"); x.add_argument("--expected-release-id")
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
     x=s.add_parser("sign-accepted-component"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--test-only-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
+    x=s.add_parser("write-snapshot-input"); x.add_argument("--runs",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
     x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent"); x.add_argument("--test-only-allow-unattested-acceptance",action="store_true")
     x=s.add_parser("build-production-snapshot"); x.add_argument("--components",type=pathlib.Path,required=True); x.add_argument("--source-runs",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--parent"); x.add_argument("--test-only-metadata-public-key",type=pathlib.Path); x.add_argument("--test-only-rpm-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
@@ -1272,6 +1302,7 @@ def main():
         if a.command=="verify-component": verify_component(a.manifest,a.artifacts,a.config,a.fedora_names)
         elif a.command=="sign-package": sign_packages(a.input,a.output,a.gnupghome,a.key_id)
         elif a.command=="sign-accepted-component": sign_accepted_component(a.accepted,a.output,a.gnupghome,a.key_id,a.workflow_run,a.passphrase_file,a.test_only_public_key,a.test_only_allow_unattested)
+        elif a.command=="write-snapshot-input": write_snapshot_input(a.output,a.runs)
         elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent,a.test_only_allow_unattested_acceptance)
         elif a.command=="build-production-snapshot": build_production_snapshot(a.components,a.source_runs,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.workflow_run,a.passphrase_file,a.parent,a.test_only_metadata_public_key,a.test_only_rpm_public_key,a.test_only_allow_unattested)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
