@@ -162,7 +162,7 @@ class ProductionSnapshotTests(unittest.TestCase):
     def test_snapshot_workflow_uses_metadata_secrets_only(self):
         workflow = (
             pathlib.Path(__file__).parents[1]
-            / ".github/workflows/build-production-snapshot.yml"
+            / ".github/workflows/build-candidate-snapshot.yml"
         ).read_text(encoding="utf-8")
         self.assertIn("RO_REPO_METADATA_SIGNING_SUBKEY_B64", workflow)
         self.assertIn("RO_REPO_METADATA_SIGNING_PASSPHRASE", workflow)
