@@ -1,0 +1,117 @@
+name: Verify repo.ro-asd.org Pages binding
+
+"on":
+  workflow_dispatch:
+    inputs:
+      snapshot_id:
+        description: Exact immutable snapshot ID to verify remotely
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify-domain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      CUSTOM_DOMAIN: repo.ro-asd.org
+      EXPECTED_CNAME: project-ro-asd.github.io.
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout exact Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dnsutils curl gnupg
+
+      - name: Verify branch custom-domain binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SNAPSHOT_ID" =~ ^repo-f44-[0-9]{8}-[0-9]{3}$ ]]
+          [[ -f pages-site/CNAME && ! -L pages-site/CNAME ]]
+          [[ "$(tr -d '\r\n' < pages-site/CNAME)" == "$CUSTOM_DOMAIN" ]]
+          [[ -d "pages-site/snapshots/fedora/44/$SNAPSHOT_ID" ]]
+
+      - name: Verify public DNS CNAME
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t cnames < <(dig +short CNAME "$CUSTOM_DOMAIN")
+          [[ "${#cnames[@]}" -eq 1 ]]
+          [[ "${cnames[0],,}" == "${EXPECTED_CNAME,,}" ]]
+
+      - name: Verify HTTPS and complete immutable snapshot bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          local_root="pages-site/snapshots/fedora/44/$SNAPSHOT_ID"
+          remote_root="https://$CUSTOM_DOMAIN/snapshots/fedora/44/$SNAPSHOT_ID"
+          remote_tmp="$RUNNER_TEMP/remote-snapshot"
+          mkdir -p "$remote_tmp"
+
+          while IFS= read -r -d '' path; do
+            rel="${path#"$local_root/"}"
+            mkdir -p "$remote_tmp/$(dirname "$rel")"
+            curl \
+              --proto '=https' \
+              --tlsv1.2 \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              "$remote_root/$rel" \
+              --output "$remote_tmp/$rel"
+            cmp --silent "$path" "$remote_tmp/$rel"
+          done < <(find "$local_root" -type f -print0 | sort -z)
+
+          local_count="$(find "$local_root" -type f | wc -l)"
+          remote_count="$(find "$remote_tmp" -type f | wc -l)"
+          [[ "$local_count" -gt 0 ]]
+          [[ "$remote_count" -eq "$local_count" ]]
+
+      - name: Verify remote signed manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify_home="$RUNNER_TEMP/domain-verify-gnupg"
+          mkdir -m 700 "$verify_home"
+
+          key="source/keys/production/ro-asd-metadata-signing-public.asc"
+          manifest="$RUNNER_TEMP/remote-snapshot/repository-snapshot-v1.json"
+          signature="$RUNNER_TEMP/remote-snapshot/repository-snapshot-v1.json.asc"
+
+          GNUPGHOME="$verify_home" gpg --batch --import "$key"
+          GNUPGHOME="$verify_home" gpg --batch --verify "$signature" "$manifest"
+
+          actual_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$manifest")"
+          [[ "$actual_snapshot" == "$SNAPSHOT_ID" ]]
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+
+      - name: Domain verification summary
+        shell: bash
+        run: |
+          {
+            echo "## repo.ro-asd.org verification"
+            echo
+            echo "- DNS CNAME: `$EXPECTED_CNAME`"
+            echo "- HTTPS: verified"
+            echo "- snapshot: `$SNAPSHOT_ID`"
+            echo "- remote snapshot tree: byte-for-byte equal to pages-storage"
+            echo "- signed repository manifest: verified"
+          } >> "$GITHUB_STEP_SUMMARY"
