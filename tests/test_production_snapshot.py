@@ -155,6 +155,28 @@ class ProductionSnapshotTests(unittest.TestCase):
         with self.assertRaisesRegex(ro_repo.ContractError, "fingerprint mismatch"):
             self.verify_bundle()
 
+    def test_write_snapshot_input_produces_valid_json(self):
+        output = self.root / "generated-snapshot-input-v1.json"
+        data = ro_repo.write_snapshot_input(output, "35518631417, 35518631418")
+        self.assertEqual(
+            data,
+            {
+                "schema_version": 1,
+                "runs": [{"run_id": 35518631417}, {"run_id": 35518631418}],
+            },
+        )
+        self.assertEqual(json.loads(output.read_text(encoding="utf-8")), data)
+
+    def test_write_snapshot_input_rejects_duplicate_runs(self):
+        output = self.root / "generated-snapshot-input-v1.json"
+        with self.assertRaisesRegex(ro_repo.ContractError, "duplicate signing workflow run ID"):
+            ro_repo.write_snapshot_input(output, "35518631417,35518631417")
+
+    def test_write_snapshot_input_rejects_invalid_run(self):
+        output = self.root / "generated-snapshot-input-v1.json"
+        with self.assertRaisesRegex(ro_repo.ContractError, "invalid signing workflow run ID"):
+            ro_repo.write_snapshot_input(output, "35518631417,latest")
+
     def test_duplicate_source_run_rejected_by_schema(self):
         data = {"schema_version": 1, "runs": [{"run_id": 1}, {"run_id": 1}]}
         with self.assertRaisesRegex(ro_repo.ContractError, "schema validation failed"):
