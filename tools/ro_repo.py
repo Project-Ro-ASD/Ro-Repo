@@ -1205,6 +1205,188 @@ def stage_pages_snapshot(snapshot, site_root):
     }
 
 
+
+def build_signed_remote_publication(snapshot, channel, output, publication_run,
+                                    gnupghome, metadata_key_id, passphrase_file):
+    """Create a signed remote channel manifest without rebuilding repository bytes."""
+    if channel not in {"beta", "stable"}:
+        raise ContractError("only beta/stable channels exist")
+    run_id = _normalize_numeric_identity(publication_run)
+    if run_id is None:
+        raise ContractError("publication workflow run must be a positive numeric identifier")
+
+    snapshot = pathlib.Path(snapshot)
+    output = pathlib.Path(output)
+    manifest = load(snapshot / "repository-snapshot-v1.json")
+    validate_schema(manifest, "repository-snapshot-v1")
+    if snapshot.name != manifest["snapshot_id"]:
+        raise ContractError("snapshot identity mismatch for remote publication")
+
+    metadata_fpr = require_secret_signing_subkey(
+        gnupghome, metadata_key_id, require_isolated=True
+    )
+    if metadata_fpr != manifest["metadata_signing_fingerprint"]:
+        raise ContractError("remote publication metadata signing fingerprint mismatch")
+
+    passphrase_path = _validate_passphrase_file(passphrase_file)
+    target = output / channel
+    if target.exists():
+        raise ContractError("signed publication output already exists")
+    target.mkdir(parents=True)
+
+    publication = {
+        "schema_version": 1,
+        "channel": channel,
+        "snapshot_id": manifest["snapshot_id"],
+        "published_at": timestamp(),
+        "publication_run": str(run_id),
+    }
+    validate_schema(publication, "publication-v1")
+    publication_path = target / "publication-v1.json"
+    save(publication_path, publication)
+    _sign_file_exact(
+        publication_path, gnupghome, metadata_fpr, passphrase_path
+    )
+    return publication
+
+
+def verify_signed_remote_publication(publication_dir, snapshot, channel, gnupghome):
+    """Verify a signed channel manifest against one immutable snapshot."""
+    publication_dir = pathlib.Path(publication_dir)
+    snapshot = pathlib.Path(snapshot)
+    if channel not in {"beta", "stable"}:
+        raise ContractError("only beta/stable channels exist")
+
+    manifest = load(snapshot / "repository-snapshot-v1.json")
+    validate_schema(manifest, "repository-snapshot-v1")
+    publication_path = publication_dir / "publication-v1.json"
+    signature_path = pathlib.Path(str(publication_path) + ".asc")
+    if publication_path.is_symlink() or not publication_path.is_file():
+        raise ContractError("remote publication manifest missing")
+    if signature_path.is_symlink() or not signature_path.is_file():
+        raise ContractError("remote publication signature missing")
+
+    publication = load(publication_path)
+    validate_schema(publication, "publication-v1")
+    if publication["channel"] != channel:
+        raise ContractError("remote publication channel mismatch")
+    if publication["snapshot_id"] != manifest["snapshot_id"]:
+        raise ContractError("remote publication snapshot mismatch")
+    if _normalize_numeric_identity(publication["publication_run"]) is None:
+        raise ContractError("remote publication run is not an exact numeric identity")
+
+    env = os.environ.copy()
+    env["GNUPGHOME"] = str(gnupghome)
+    verify_gpg_signature(
+        publication_path,
+        signature_path,
+        manifest["metadata_signing_fingerprint"],
+        env,
+    )
+    return publication
+
+
+def stage_remote_channel(publication_dir, site_root, channel, gnupghome):
+    """Materialize a mutable remote channel from immutable snapshot bytes."""
+    if channel not in {"beta", "stable"}:
+        raise ContractError("only beta/stable channels exist")
+    publication_dir = pathlib.Path(publication_dir)
+    site_root = pathlib.Path(site_root)
+    publication = load(publication_dir / "publication-v1.json")
+    validate_schema(publication, "publication-v1")
+    snapshot_id = publication["snapshot_id"]
+
+    snapshot = site_root / "snapshots" / "fedora" / "44" / snapshot_id
+    if not snapshot.is_dir() or snapshot.is_symlink():
+        raise ContractError("referenced immutable snapshot is missing from Pages storage")
+    verify_signed_remote_publication(
+        publication_dir, snapshot, channel, gnupghome
+    )
+
+    base = site_root / "rpm" / "fedora" / "44"
+    target = base / channel
+    history = site_root / "publications" / "fedora" / "44" / channel
+    run_id = publication["publication_run"]
+    history_entry = history / run_id
+    history.mkdir(parents=True, exist_ok=True)
+
+    if history_entry.exists():
+        if not history_entry.is_dir() or history_entry.is_symlink():
+            raise ContractError("publication history entry is not a regular directory")
+        expected = directory_tree_digest(publication_dir)
+        if directory_tree_digest(history_entry) != expected:
+            raise ContractError("publication history run already exists with different bytes")
+    else:
+        shutil.copytree(publication_dir, history_entry, symlinks=False)
+
+    stage_parent = base
+    stage_parent.mkdir(parents=True, exist_ok=True)
+    stage = pathlib.Path(tempfile.mkdtemp(prefix=f".{channel}-", dir=stage_parent))
+    new_tree = stage / channel
+    new_tree.mkdir()
+
+    try:
+        for arch in ("x86_64", "aarch64", "source"):
+            source = snapshot / "rpm" / arch
+            if not source.is_dir() or source.is_symlink():
+                raise ContractError(f"snapshot repository missing: {arch}")
+            shutil.copytree(source, new_tree / arch, symlinks=False)
+            if directory_tree_digest(source) != directory_tree_digest(new_tree / arch):
+                raise ContractError(f"remote channel copy mismatch: {arch}")
+
+        shutil.copy2(
+            publication_dir / "publication-v1.json",
+            new_tree / "publication-v1.json",
+        )
+        shutil.copy2(
+            publication_dir / "publication-v1.json.asc",
+            new_tree / "publication-v1.json.asc",
+        )
+
+        previous_snapshot = None
+        previous_run = None
+        if target.exists():
+            if not target.is_dir() or target.is_symlink():
+                raise ContractError("remote channel target is not a regular directory")
+            previous_manifest = load(target / "publication-v1.json")
+            validate_schema(previous_manifest, "publication-v1")
+            previous_snapshot = previous_manifest["snapshot_id"]
+            previous_run = previous_manifest["publication_run"]
+
+            if directory_tree_digest(target) == directory_tree_digest(new_tree):
+                shutil.rmtree(stage, ignore_errors=True)
+                return {
+                    "channel": channel,
+                    "snapshot_id": snapshot_id,
+                    "publication_run": run_id,
+                    "previous_snapshot_id": previous_snapshot,
+                    "previous_publication_run": previous_run,
+                    "changed": False,
+                }
+
+            backup = base / f".{channel}-replace-{uuid.uuid4().hex}"
+            os.rename(target, backup)
+            try:
+                os.rename(new_tree, target)
+            except Exception:
+                os.rename(backup, target)
+                raise
+            shutil.rmtree(backup)
+        else:
+            os.rename(new_tree, target)
+
+        return {
+            "channel": channel,
+            "snapshot_id": snapshot_id,
+            "publication_run": run_id,
+            "previous_snapshot_id": previous_snapshot,
+            "previous_publication_run": previous_run,
+            "changed": True,
+        }
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
+
+
 def publish(output,snapshot_id,channel,run_id="local",gnupghome=None):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID schema")
@@ -1372,6 +1554,8 @@ def cli():
     x=s.add_parser("verify-production-candidate"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--candidate-run",required=True)
     x=s.add_parser("stage-pages-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True)
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
+    x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True)
+    x=s.add_parser("stage-remote-channel"); x.add_argument("--publication",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("rollback-publication"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True)
@@ -1420,6 +1604,8 @@ def main():
         elif a.command=="verify-production-candidate": verify_production_candidate(a.snapshot,a.gnupghome,a.candidate_run)
         elif a.command=="stage-pages-snapshot": print(json.dumps(stage_pages_snapshot(a.snapshot,a.site_root),sort_keys=True))
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
+        elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file)
+        elif a.command=="stage-remote-channel": print(json.dumps(stage_remote_channel(a.publication,a.site_root,a.channel,a.gnupghome),sort_keys=True))
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)
         elif a.command=="rollback-publication": print(f"rolled back to: {rollback(a.output,a.channel)}")
