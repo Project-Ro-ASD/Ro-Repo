@@ -142,7 +142,7 @@ def rpmlint_check(path):
         return (True, "rpmlint not available")
 
 def file_conflict_check(rpm_paths):
-    """Check for file path conflicts across non-src RPMs in the same manifest."""
+    """Check for file path conflicts among RPMs that can coexist in one repo."""
     file_owners = {}
     conflicts = []
     for path in rpm_paths:
@@ -158,6 +158,31 @@ def file_conflict_check(rpm_paths):
             if f in file_owners and file_owners[f] != path.name:
                 conflicts.append(f"{f} owned by both {file_owners[f]} and {path.name}")
             file_owners[f] = path.name
+    return (len(conflicts) == 0, conflicts)
+
+
+def repository_file_conflict_check(rpm_entries):
+    """Check only RPM combinations that can coexist in the same binary repository.
+
+    x86_64 and aarch64 packages are published to separate repositories, while
+    noarch packages are copied into both. Cross-architecture variants therefore
+    must not be treated as conflicting with one another.
+    """
+    repo_rpms = {"x86_64": [], "aarch64": []}
+    for path, architecture in rpm_entries:
+        if architecture == "noarch":
+            for paths in repo_rpms.values():
+                paths.append(path)
+        elif architecture in repo_rpms:
+            repo_rpms[architecture].append(path)
+
+    conflicts = []
+    for architecture, paths in sorted(repo_rpms.items()):
+        if len(paths) < 2:
+            continue
+        ok, repo_conflicts = file_conflict_check(paths)
+        if not ok:
+            conflicts.extend(f"{architecture}: {conflict}" for conflict in repo_conflicts)
     return (len(conflicts) == 0, conflicts)
 
 
@@ -335,12 +360,16 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
     if collision and not producer.get("allow_fedora_override"): raise ContractError(f"Fedora package collision denied: {', '.join(sorted(collision))}", code="FEDORA_PACKAGE_COLLISION", stage="fedora-collision", received=sorted(collision), hint="Rename the package or obtain an explicitly reviewed Fedora override policy.")
     # --- advisory diagnostics ---
     diagnostics = {"rpmlint": [], "file_conflicts": []}
-    binary_rpms = [pathlib.Path(artifacts_dir)/item["filename"] for item in manifest["artifacts"] if item["architecture"] not in {"src","nosrc"}]
-    for rpm_path in binary_rpms:
+    binary_entries = [
+        (pathlib.Path(artifacts_dir)/item["filename"], item["architecture"])
+        for item in manifest["artifacts"]
+        if item["architecture"] not in {"src","nosrc"}
+    ]
+    for rpm_path, _architecture in binary_entries:
         ok, output = rpmlint_check(rpm_path)
         diagnostics["rpmlint"].append({"file": rpm_path.name, "ok": ok, "output": output})
-    if len(binary_rpms) > 1:
-        ok, conflicts = file_conflict_check(binary_rpms)
+    if len(binary_entries) > 1:
+        ok, conflicts = repository_file_conflict_check(binary_entries)
         if not ok: raise ContractError(f"file conflicts between packages: {'; '.join(conflicts)}", code="ARTIFACT_SET_MISMATCH", stage="file-conflict", received=conflicts, hint="Resolve package file ownership conflicts and publish a new release.")
         diagnostics["file_conflicts"] = conflicts
     return manifest, headers, diagnostics
