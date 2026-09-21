@@ -68,6 +68,10 @@ for repo_file in /etc/yum.repos.d/*.repo; do
   cp "$repo_file" "$reposdir/"
 done
 
+# Trust bootstrap: CI is non-interactive. Accept only the exact public keys
+# pinned in the immutable snapshot, then verify signed repository metadata.
+dnf -y "${common[@]}" --refresh --repo=ro-beta makecache
+
 # Preflight: prove DNF5 loads primary metadata from the exact remote beta repo
 # before any transaction test.
 repoquery_output="$(dnf "${common[@]}" --refresh --repo=ro-beta repoquery ro-assist \
