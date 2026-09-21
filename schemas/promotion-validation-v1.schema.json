@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "snapshot_id",
+    "validation_run",
+    "beta_publication_run",
+    "beta_started_at",
+    "tested_at",
+    "architecture",
+    "remote_base",
+    "result",
+    "tests",
+    "baseline"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "scope": { "const": "remote-beta-promotion" },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+    },
+    "validation_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "beta_publication_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "beta_started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "architecture": { "const": "x86_64" },
+    "remote_base": {
+      "type": "string",
+      "pattern": "^https://repo\\.ro-asd\\.org/rpm/fedora/44/beta/x86_64/?$"
+    },
+    "result": { "const": "pass" },
+    "tests": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "result"],
+        "properties": {
+          "name": {
+            "enum": [
+              "dependency-solve",
+              "clean-install",
+              "upgrade",
+              "file-conflict",
+              "rpmlint",
+              "smoke"
+            ]
+          },
+          "result": { "const": "pass" }
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "release_tag",
+        "filename",
+        "sha256"
+      ],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "release_tag": { "type": "string", "minLength": 1 },
+        "filename": { "type": "string", "minLength": 1 },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}
