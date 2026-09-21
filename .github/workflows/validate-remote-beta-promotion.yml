@@ -1,0 +1,92 @@
+name: Validate remote beta for stable promotion
+
+"on":
+  workflow_dispatch:
+    inputs:
+      snapshot_id:
+        description: Exact current beta snapshot ID
+        required: true
+        type: string
+      beta_publication_run:
+        description: Exact current beta publication run ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ro-repo-promotion-validation-${{ inputs.snapshot_id }}
+  cancel-in-progress: false
+
+jobs:
+  validate-remote-beta:
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    timeout-minutes: 30
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      BETA_PUBLICATION_RUN: ${{ inputs.beta_publication_run }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout exact Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install Fedora 44 validation tools
+        run: |
+          dnf -y install             python3 python3-jsonschema             rpm dnf-plugins-core             curl gnupg2 rpmlint
+
+      - name: Bind validation to exact current beta identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SNAPSHOT_ID" =~ ^repo-f44-[0-9]{8}-[0-9]{3}$ ]]
+          [[ "$BETA_PUBLICATION_RUN" =~ ^[1-9][0-9]*$ ]]
+
+          publication="pages-site/rpm/fedora/44/beta/publication-v1.json"
+          test -f "$publication"
+
+          actual_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$publication")"
+          actual_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$publication")"
+
+          test "$actual_snapshot" = "$SNAPSHOT_ID"
+          test "$actual_run" = "$BETA_PUBLICATION_RUN"
+
+      - name: Run real remote Fedora 44 promotion validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x source/tests/remote-promotion-validation.sh
+          source/tests/remote-promotion-validation.sh             pages-site             promotion-evidence/promotion-validation-v1.json
+
+      - name: Upload exact promotion evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: promotion-validation-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: promotion-evidence/promotion-validation-v1.json
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Validation summary
+        shell: bash
+        run: |
+          {
+            echo "## Remote beta promotion validation"
+            echo
+            echo "- snapshot: `$SNAPSHOT_ID`"
+            echo "- beta publication run: `$BETA_PUBLICATION_RUN`"
+            echo "- validation run: `$GITHUB_RUN_ID`"
+            echo "- architecture: `x86_64`"
+            echo "- result: `pass`"
+            echo
+            echo "This workflow is read-only and does not publish stable."
+          } >> "$GITHUB_STEP_SUMMARY"
