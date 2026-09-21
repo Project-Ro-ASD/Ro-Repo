@@ -21,6 +21,25 @@ test -f "$manifest"
 expected_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$manifest")"
 test "$expected_snapshot" = "$snapshot_id"
 
+target_rpm_rel="$(python3 - "$manifest" <<'PY'
+import json, sys
+data=json.load(open(sys.argv[1]))
+matches=[p for p in data["packages"] if p["architecture"]=="x86_64" and p["nevra"].startswith("ro-assist-")]
+if len(matches)!=1:
+    raise SystemExit(f"expected exactly one ro-assist x86_64 package, got {len(matches)}")
+print("rpm/x86_64/" + matches[0]["filename"])
+PY
+)"
+target_rpm="$snapshot/$target_rpm_rel"
+test -f "$target_rpm"
+target_name="$(rpm -qp --qf '%{NAME}' "$target_rpm")"
+target_version="$(rpm -qp --qf '%{VERSION}' "$target_rpm")"
+target_release="$(rpm -qp --qf '%{RELEASE}' "$target_rpm")"
+target_arch="$(rpm -qp --qf '%{ARCH}' "$target_rpm")"
+test "$target_name" = "ro-assist"
+test "$target_arch" = "x86_64"
+target_nvr="$target_name $target_version-$target_release"
+
 remote_base="https://repo.ro-asd.org/rpm/fedora/44/beta/x86_64"
 rpm_key="$(realpath "$snapshot/keys/RPM-GPG-KEY-ro-asd")"
 metadata_key="$(realpath "$snapshot/keys/REPODATA-GPG-KEY-ro-asd")"
@@ -77,7 +96,7 @@ dnf -y "${common[@]}" --refresh --repo=ro-beta makecache
 repoquery_output="$(dnf "${common[@]}" --refresh --repo=ro-beta repoquery ro-assist \
   --qf '%{name} %{version}-%{release} %{arch}')"
 printf '%s\n' "$repoquery_output"
-grep -Fx 'ro-assist 0.2.4-1.fc44 x86_64' <<<"$repoquery_output" >/dev/null
+grep -Fx "$target_nvr $target_arch" <<<"$repoquery_output" >/dev/null
 
 # 1) dependency-solve
 set +e
@@ -111,7 +130,7 @@ if ! grep -Eq 'Operation aborted|Transaction Summary' <<<"$upgrade_output"; then
   printf '%s\n' "$upgrade_output" >&2
   exit "${upgrade_status:-1}"
 fi
-grep -F '0.2.4' <<<"$upgrade_output" >/dev/null
+grep -F "$target_version" <<<"$upgrade_output" >/dev/null
 
 # Local exact snapshot bytes are already bound to the remote beta by publication-v1.
 rpm_files=("$snapshot/rpm/x86_64"/*.rpm)
@@ -152,7 +171,7 @@ HOME="$rpmlint_home" PATH="$rpmlint_bin:$PATH"   rpmlint -c "$root/tests/rpmlint
 
 # 6) smoke: clean install contains exact expected package version and payload.
 installed="$(rpm --root "$clean_root" -q --qf '%{NAME} %{VERSION}-%{RELEASE}\n' ro-assist)"
-grep -Fx 'ro-assist 0.2.4-1.fc44' <<<"$installed" >/dev/null
+grep -Fx "$target_nvr" <<<"$installed" >/dev/null
 rpm --root "$clean_root" -ql ro-assist | grep -Eq '/usr/(bin|libexec)/|/usr/share/applications/' 
 
 python3 - "$evidence_out" "$snapshot_id" "$validation_run" "$beta_run" "$beta_started_at" \
