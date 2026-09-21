@@ -1,0 +1,13 @@
+{
+  "channel": "beta",
+  "from_publication_run": "35587617947",
+  "from_publication_sha256": "072a26d9fd72b4d2df084c94e229e25a3a7aa3b4e8daa421fb38a21fb30f1c2c",
+  "from_snapshot_id": "repo-f44-20260920-001",
+  "reason": "Step 7 post-fix rollback evidence canary",
+  "rollback_run": "35587895269",
+  "rolled_back_at": "2026-09-21T10:17:44Z",
+  "schema_version": 1,
+  "to_publication_run": "35530066972",
+  "to_publication_sha256": "3e83a30341c7c73b4d51b41afdaf30def5b0601e1772c7e2d9bf00ac189a1de0",
+  "to_snapshot_id": "repo-f44-20260920-001"
+}
