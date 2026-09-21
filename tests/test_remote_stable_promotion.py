@@ -215,7 +215,7 @@ class RemoteStablePromotionTests(unittest.TestCase):
 
         with self.assertRaisesRegex(
             ro_repo.ContractError,
-            "promotion validation evidence missing: smoke",
+            "schema validation failed \(promotion-validation-v1\)",
         ):
             ro_repo.prepare_remote_stable_promotion(
                 self.site,
