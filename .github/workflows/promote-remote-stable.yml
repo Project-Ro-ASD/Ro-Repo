@@ -318,7 +318,7 @@ jobs:
       - name: Install remote verification tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl gnupg
+          sudo apt-get install -y curl gnupg python3-jsonschema
 
       - name: Verify stable is the exact immutable snapshot locally
         shell: bash
