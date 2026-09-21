@@ -41,27 +41,44 @@ baseline_url="https://github.com/$baseline_repo/releases/download/$baseline_tag/
 curl --proto '=https' --tlsv1.2 --fail --location --silent --show-error   "$baseline_url" -o "$work/$baseline_file"
 printf '%s  %s\n' "$baseline_sha" "$work/$baseline_file" | sha256sum --check --strict
 
-repo_args=(
-  --repofrompath "ro-beta,$remote_base"
-  --setopt=ro-beta.gpgcheck=1
-  --setopt=ro-beta.repo_gpgcheck=1
-  --setopt="ro-beta.gpgkey=file://$metadata_key file://$rpm_key"
+reposdir="$work/repos"
+mkdir -p "$reposdir"
+cat > "$reposdir/ro-beta.repo" <<EOF
+[ro-beta]
+name=Ro-ASD remote beta promotion validation
+baseurl=$remote_base
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=file://$metadata_key
+       file://$rpm_key
+metadata_expire=0
+skip_if_unavailable=0
+EOF
+
+common=(
+  --setopt="reposdir=$reposdir"
   --setopt="cachedir=$work/dnf-cache"
   --setopt="persistdir=$work/dnf-persist"
+  --releasever=44
 )
-selected_repos=(--repo=ro-beta,fedora,updates)
+# Copy host Fedora repositories into the isolated reposdir while keeping
+# ro-beta as a normal repo file. This models the client-side configuration.
+for repo_file in /etc/yum.repos.d/*.repo; do
+  cp "$repo_file" "$reposdir/"
+done
 
 # Preflight: prove DNF5 loads primary metadata from the exact remote beta repo
 # before any transaction test.
-repoquery_output="$(dnf "${repo_args[@]}" --refresh --releasever=44 --use-host-config \
-  --repo=ro-beta repoquery ro-assist \
+repoquery_output="$(dnf "${common[@]}" --refresh --repo=ro-beta repoquery ro-assist \
   --qf '%{name} %{version}-%{release} %{arch}')"
+printf '%s\n' "$repoquery_output"
 grep -Fx 'ro-assist 0.2.4-1.fc44 x86_64' <<<"$repoquery_output" >/dev/null
 
 # 1) dependency-solve
 set +e
-solve_output="$(dnf "${repo_args[@]}" --refresh --assumeno --releasever=44 --use-host-config \
-  "${selected_repos[@]}" install ro-assist 2>&1)"
+solve_output="$(dnf "${common[@]}" --refresh --assumeno \
+  --repo=ro-beta --repo=fedora --repo=updates install ro-assist 2>&1)"
 solve_status=$?
 set -e
 if ! grep -Eq 'Operation aborted|Transaction Summary' <<<"$solve_output"; then
@@ -71,8 +88,8 @@ fi
 
 # 2) clean-install
 clean_root="$work/clean-root"
-dnf -y "${repo_args[@]}" --refresh --installroot "$clean_root" --releasever=44 --use-host-config \
-  "${selected_repos[@]}" install ro-assist
+dnf -y "${common[@]}" --refresh --installroot "$clean_root" \
+  --repo=ro-beta --repo=fedora --repo=updates install ro-assist
 rpm --root "$clean_root" -q ro-assist >/dev/null
 
 # 3) upgrade from pinned earlier release
@@ -82,8 +99,8 @@ mkdir -p "$rpmdb"
 rpm --dbpath "$rpmdb" --initdb
 rpm --dbpath "$rpmdb" --justdb --nodeps -Uvh "$work/$baseline_file"
 set +e
-upgrade_output="$(dnf "${repo_args[@]}" --refresh --assumeno --installroot "$upgrade_root" \
-  --releasever=44 --use-host-config "${selected_repos[@]}" upgrade ro-assist 2>&1)"
+upgrade_output="$(dnf "${common[@]}" --refresh --assumeno --installroot "$upgrade_root" \
+  --repo=ro-beta --repo=fedora --repo=updates upgrade ro-assist 2>&1)"
 upgrade_status=$?
 set -e
 if ! grep -Eq 'Operation aborted|Transaction Summary' <<<"$upgrade_output"; then
