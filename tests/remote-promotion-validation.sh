@@ -41,28 +41,24 @@ baseline_url="https://github.com/$baseline_repo/releases/download/$baseline_tag/
 curl --proto '=https' --tlsv1.2 --fail --location --silent --show-error   "$baseline_url" -o "$work/$baseline_file"
 printf '%s  %s\n' "$baseline_sha" "$work/$baseline_file" | sha256sum --check --strict
 
-repos="$work/repos"
-mkdir -p "$repos"
-cat > "$repos/ro-beta.repo" <<EOF
-[ro-beta]
-name=Ro-ASD remote beta promotion validation
-baseurl=$remote_base
-enabled=1
-gpgcheck=1
-repo_gpgcheck=1
-gpgkey=file://$metadata_key file://$rpm_key
-EOF
-
-common=(
-  --setopt="reposdir=$repos"
+repo_args=(
+  --repofrompath "ro-beta,$remote_base"
+  --setopt=ro-beta.gpgcheck=1
+  --setopt=ro-beta.repo_gpgcheck=1
+  --setopt="ro-beta.gpgkey=file://$metadata_key file://$rpm_key"
   --setopt="cachedir=$work/dnf-cache"
   --setopt="persistdir=$work/dnf-persist"
-  --releasever=44
+)
+solve_repos=(
+  --disablerepo="*"
+  --enablerepo="fedora"
+  --enablerepo="updates"
+  --enablerepo="ro-beta"
 )
 
 # 1) dependency-solve
 set +e
-solve_output="$(dnf "${common[@]}" --assumeno --enablerepo=fedora --enablerepo=updates --enablerepo=ro-beta install ro-assist 2>&1)"
+solve_output="$(dnf "${repo_args[@]}" --assumeno --releasever=44 --use-host-config "${solve_repos[@]}" install ro-assist 2>&1)"
 solve_status=$?
 set -e
 if ! grep -Eq 'Operation aborted|Transaction Summary' <<<"$solve_output"; then
@@ -112,8 +108,21 @@ if conflicts:
     raise SystemExit("file conflicts detected:\n" + "\n".join(conflicts))
 PY
 
-# 5) rpmlint
-rpmlint -c "$root/tests/rpmlint-tests.toml" "${rpm_files[@]}"
+# 5) rpmlint with the production RPM public key trusted only in a temporary rpmdb.
+rpmlint_rpmdb="$work/rpmlint-rpmdb"
+rpmlint_keyring="$rpmlint_rpmdb/pubkeys"
+rpmlint_home="$work/rpmlint-home"
+rpmlint_bin="$work/rpmlint-bin"
+mkdir -p "$rpmlint_rpmdb" "$rpmlint_keyring" "$rpmlint_home/.config/rpm" "$rpmlint_bin"
+rpm --dbpath "$rpmlint_rpmdb" --initdb
+rpmkeys --dbpath "$rpmlint_rpmdb" --import "$rpm_key"
+{
+  printf '%%_dbpath %s\n' "$rpmlint_rpmdb"
+  printf '%%_keyringpath %s\n' "$rpmlint_keyring"
+} > "$rpmlint_home/.config/rpm/macros"
+printf '#!/usr/bin/env bash\nexec /usr/bin/rpm --define %q --define %q "$@"\n'   "_dbpath $rpmlint_rpmdb" "_keyringpath $rpmlint_keyring" > "$rpmlint_bin/rpm"
+chmod +x "$rpmlint_bin/rpm"
+HOME="$rpmlint_home" PATH="$rpmlint_bin:$PATH"   rpmlint -c "$root/tests/rpmlint-tests.toml" "${rpm_files[@]}"
 
 # 6) smoke: clean install contains exact expected package version and payload.
 installed="$(rpm --root "$clean_root" -q --qf '%{NAME} %{VERSION}-%{RELEASE}\n' ro-assist)"
