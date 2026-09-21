@@ -1472,6 +1472,145 @@ def rollback_remote_channel(site_root, channel, target_publication_run, rollback
     return evidence
 
 
+
+def prepare_remote_stable_promotion(site_root, validation_path, snapshot_id,
+                                    validation_run, approved_by, output_path):
+    """Build a policy-checked beta->stable promotion manifest for remote publication."""
+    site_root = pathlib.Path(site_root)
+    validation_path = pathlib.Path(validation_path)
+    output_path = pathlib.Path(output_path)
+
+    if not re.fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}", snapshot_id):
+        raise ContractError("invalid snapshot ID schema")
+    normalized_validation_run = _normalize_numeric_identity(validation_run)
+    if normalized_validation_run is None:
+        raise ContractError("validation run must be a positive numeric identifier")
+    if not isinstance(approved_by, str) or not approved_by.strip():
+        raise ContractError("approved_by must be non-empty")
+
+    beta_path = site_root / "rpm" / "fedora" / "44" / "beta" / "publication-v1.json"
+    if not beta_path.is_file() or beta_path.is_symlink():
+        raise ContractError("current remote beta publication is missing")
+    beta = load(beta_path)
+    validate_schema(beta, "publication-v1")
+    if beta["channel"] != "beta":
+        raise ContractError("current remote publication is not beta")
+    if beta["snapshot_id"] != snapshot_id:
+        raise ContractError("requested snapshot is not the current beta snapshot")
+
+    snapshot_dir = site_root / "snapshots" / "fedora" / "44" / snapshot_id
+    snapshot_path = snapshot_dir / "repository-snapshot-v1.json"
+    if not snapshot_path.is_file() or snapshot_path.is_symlink():
+        raise ContractError("promotion snapshot is missing from immutable Pages storage")
+    snapshot = load(snapshot_path)
+    validate_schema(snapshot, "repository-snapshot-v1")
+    if snapshot["snapshot_id"] != snapshot_id:
+        raise ContractError("promotion snapshot identity mismatch")
+
+    evidence = load(validation_path)
+    validate_schema(evidence, "promotion-validation-v1")
+    if evidence["validation_run"] != str(normalized_validation_run):
+        raise ContractError("promotion validation run identity mismatch")
+    if evidence["snapshot_id"] != snapshot_id:
+        raise ContractError("promotion validation snapshot mismatch")
+    if evidence["beta_publication_run"] != beta["publication_run"]:
+        raise ContractError("promotion validation is not for the current beta publication")
+    if evidence["beta_started_at"] != beta["published_at"]:
+        raise ContractError("promotion validation beta start time mismatch")
+    if evidence["result"] != "pass":
+        raise ContractError("promotion validation did not pass")
+
+    config = load(ROOT / "config" / "producers-v1.yaml")
+    risk_rank = {"normal-app": 0, "critical-desktop": 1, "critical-system": 2}
+    highest_risk = "normal-app"
+    expected_groups = set()
+    expected_tests = set()
+
+    package_names = set()
+    for item in snapshot["packages"]:
+        if item["architecture"] in {"src", "nosrc"}:
+            continue
+        name = item["nevra"].rsplit("-", 2)[0]
+        package_names.add(name)
+
+    for name in sorted(package_names):
+        matches = [
+            producer for producer in config["producers"]
+            if name in producer.get("allowed_package_names", [])
+        ]
+        if len(matches) != 1:
+            raise ContractError(f"promotion package policy missing or ambiguous: {name}")
+        producer = matches[0]
+        risk = producer["risk_class"]
+        if risk_rank[risk] > risk_rank[highest_risk]:
+            highest_risk = risk
+        group = producer.get("promotion_group")
+        if not group:
+            raise ContractError(f"promotion_group missing for package: {name}")
+        expected_groups.add(group)
+        expected_tests.update(producer.get("required_tests", []))
+
+    provided_tests = {
+        item.get("name")
+        for item in evidence.get("tests", [])
+        if isinstance(item, dict) and item.get("result") == "pass"
+    }
+    missing_tests = expected_tests - provided_tests
+    if missing_tests:
+        raise ContractError(
+            f"promotion validation evidence missing: {', '.join(sorted(missing_tests))}"
+        )
+
+    beta_started = dt.datetime.fromisoformat(beta["published_at"].replace("Z", "+00:00"))
+    age = dt.datetime.now(dt.timezone.utc) - beta_started
+    minimum_days = 14 if highest_risk == "critical-system" else 7
+    if age < dt.timedelta(days=minimum_days):
+        earliest = beta_started + dt.timedelta(days=minimum_days)
+        raise ContractError(
+            "minimum beta duration not reached",
+            code="BETA_DWELL_NOT_MET",
+            stage="promotion-dwell",
+            expected=earliest.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            received=timestamp(),
+            hint=f"Retry after the exact beta snapshot has completed {minimum_days} days in beta.",
+        )
+
+    validation_digest = digest(validation_path)
+    evidence_reference = (
+        f"evidence/promotions/{snapshot_id}/{normalized_validation_run}/"
+        "promotion-validation-v1.json"
+    )
+    promotion_evidence = [
+        {
+            "name": name,
+            "result": "pass",
+            "snapshot_id": snapshot_id,
+            "timestamp": evidence["tested_at"],
+            "reference": evidence_reference,
+            "digest": validation_digest,
+        }
+        for name in sorted(expected_tests)
+    ]
+
+    promotion = {
+        "schema_version": 1,
+        "snapshot_id": snapshot_id,
+        "from": "beta",
+        "to": "stable",
+        "risk_class": highest_risk,
+        "promotion_groups": sorted(expected_groups),
+        "beta_started_at": beta["published_at"],
+        "evidence": promotion_evidence,
+        "approved_by": approved_by.strip(),
+        "approved_at": timestamp(),
+        "emergency": False,
+        "reason": "",
+    }
+    validate_schema(promotion, "promotion-manifest-v1")
+    save(output_path, promotion)
+    return promotion
+
+
 def publish(output,snapshot_id,channel,run_id="local",gnupghome=None):
     if channel not in {"beta","stable"}: raise ContractError("only beta/stable channels exist")
     if not __import__("re").fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}",snapshot_id): raise ContractError("invalid snapshot ID schema")
@@ -1643,6 +1782,7 @@ def cli():
     x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True)
     x=s.add_parser("stage-remote-channel"); x.add_argument("--publication",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("rollback-remote-channel"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta"],required=True); x.add_argument("--target-publication-run",required=True); x.add_argument("--rollback-run",required=True); x.add_argument("--reason",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
+    x=s.add_parser("prepare-remote-stable-promotion"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--validation",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--validation-run",required=True); x.add_argument("--approved-by",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("rollback-publication"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True)
@@ -1695,6 +1835,7 @@ def main():
         elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file)
         elif a.command=="stage-remote-channel": print(json.dumps(stage_remote_channel(a.publication,a.site_root,a.channel,a.gnupghome),sort_keys=True))
         elif a.command=="rollback-remote-channel": print(json.dumps(rollback_remote_channel(a.site_root,a.channel,a.target_publication_run,a.rollback_run,a.reason,a.gnupghome),sort_keys=True))
+        elif a.command=="prepare-remote-stable-promotion": print(json.dumps(prepare_remote_stable_promotion(a.site_root,a.validation,a.snapshot_id,a.validation_run,a.approved_by,a.output),sort_keys=True))
         elif a.command=="publish-local": publish(a.output,a.snapshot_id,a.channel,a.publication_run,a.gnupghome)
         elif a.command=="promote-snapshot": promote(a.output,a.promotion,a.publication_run,a.gnupghome)
         elif a.command=="rollback-publication": print(f"rolled back to: {rollback(a.output,a.channel)}")
