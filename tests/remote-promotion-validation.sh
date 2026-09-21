@@ -22,8 +22,8 @@ expected_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[
 test "$expected_snapshot" = "$snapshot_id"
 
 remote_base="https://repo.ro-asd.org/rpm/fedora/44/beta/x86_64"
-rpm_key="$snapshot/keys/RPM-GPG-KEY-ro-asd"
-metadata_key="$snapshot/keys/REPODATA-GPG-KEY-ro-asd"
+rpm_key="$(realpath "$snapshot/keys/RPM-GPG-KEY-ro-asd")"
+metadata_key="$(realpath "$snapshot/keys/REPODATA-GPG-KEY-ro-asd")"
 test -f "$rpm_key"
 test -f "$metadata_key"
 

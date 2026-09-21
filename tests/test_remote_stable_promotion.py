@@ -237,6 +237,8 @@ class RemoteStablePromotionTests(unittest.TestCase):
         self.assertIn("baseurl=$remote_base", text)
         self.assertIn("gpgcheck=1", text)
         self.assertIn("repo_gpgcheck=1", text)
+        self.assertIn('metadata_key="$(realpath "$snapshot/keys/REPODATA-GPG-KEY-ro-asd")"', text)
+        self.assertIn('rpm_key="$(realpath "$snapshot/keys/RPM-GPG-KEY-ro-asd")"', text)
         self.assertIn("file://$metadata_key", text)
         self.assertIn("file://$rpm_key", text)
         self.assertIn('--setopt="reposdir=$reposdir"', text)
