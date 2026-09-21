@@ -1,0 +1,382 @@
+name: Promote exact remote beta snapshot to stable
+
+"on":
+  workflow_dispatch:
+    inputs:
+      snapshot_id:
+        description: Exact immutable snapshot currently published in beta
+        required: true
+        type: string
+      validation_run:
+        description: Exact successful remote beta promotion validation run ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ro-repo-remote-stable
+  cancel-in-progress: false
+
+jobs:
+  verify-promotion-policy:
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    timeout-minutes: 15
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      VALIDATION_RUN: ${{ inputs.validation_run }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout exact Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Download exact validation evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: promotion-validation-${{ inputs.snapshot_id }}-${{ inputs.validation_run }}
+          path: validation
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.validation_run }}
+
+      - name: Install policy tools
+        run: |
+          dnf -y install python3 python3-jsonschema
+
+      - name: Enforce exact beta identity, evidence and dwell
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$SNAPSHOT_ID" =~ ^repo-f44-[0-9]{8}-[0-9]{3}$ ]]
+          [[ "$VALIDATION_RUN" =~ ^[1-9][0-9]*$ ]]
+
+          mkdir -p promotion-bundle
+          cp validation/promotion-validation-v1.json             promotion-bundle/promotion-validation-v1.json
+
+          source/tools/ro-repo prepare-remote-stable-promotion             --site-root pages-site             --validation promotion-bundle/promotion-validation-v1.json             --snapshot-id "$SNAPSHOT_ID"             --validation-run "$VALIDATION_RUN"             --approved-by "$GITHUB_ACTOR"             --output promotion-bundle/promotion-manifest-v1.json
+
+      - name: Upload exact promotion bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: stable-promotion-bundle-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: promotion-bundle/
+          retention-days: 90
+          if-no-files-found: error
+
+  sign-stable-publication:
+    needs: verify-promotion-policy
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    environment:
+      name: repo-production-signing
+    timeout-minutes: 20
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      VALIDATION_RUN: ${{ inputs.validation_run }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout exact Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Download exact promotion bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: stable-promotion-bundle-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: promotion-bundle
+
+      - name: Install signing tools
+        run: |
+          dnf -y install python3 python3-jsonschema rpm gnupg2
+
+      - name: Rebind promotion bundle to current beta
+        shell: bash
+        run: |
+          set -euo pipefail
+          source/tools/ro-repo validate-json             --schema promotion-validation-v1             --input promotion-bundle/promotion-validation-v1.json
+          source/tools/ro-repo validate-json             --schema promotion-manifest-v1             --input promotion-bundle/promotion-manifest-v1.json
+
+          beta="pages-site/rpm/fedora/44/beta/publication-v1.json"
+          actual_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$beta")"
+          actual_beta_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$beta")"
+          evidence_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' promotion-bundle/promotion-validation-v1.json)"
+          evidence_beta_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["beta_publication_run"])' promotion-bundle/promotion-validation-v1.json)"
+
+          test "$actual_snapshot" = "$SNAPSHOT_ID"
+          test "$actual_snapshot" = "$evidence_snapshot"
+          test "$actual_beta_run" = "$evidence_beta_run"
+
+      - name: Sign stable publication manifest only
+        env:
+          RO_REPO_METADATA_SIGNING_SUBKEY_B64: ${{ secrets.RO_REPO_METADATA_SIGNING_SUBKEY_B64 }}
+          RO_REPO_METADATA_SIGNING_PASSPHRASE: ${{ secrets.RO_REPO_METADATA_SIGNING_PASSPHRASE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+
+          signing_tmp=""
+          signing_home=""
+          key_file=""
+          passphrase_file=""
+          cleanup() {
+            set +e
+            if [[ -n "$signing_home" ]]; then
+              GNUPGHOME="$signing_home" gpgconf --kill gpg-agent >/dev/null 2>&1
+            fi
+            [[ -n "$key_file" ]] && rm -f -- "$key_file"
+            [[ -n "$passphrase_file" ]] && rm -f -- "$passphrase_file"
+            [[ -n "$signing_tmp" ]] && rm -rf -- "$signing_tmp"
+          }
+          trap cleanup EXIT
+
+          signing_tmp="$(mktemp -d)"
+          chmod 700 "$signing_tmp"
+          signing_home="$signing_tmp/gnupg"
+          key_file="$signing_tmp/metadata-signing-subkey.asc"
+          passphrase_file="$signing_tmp/passphrase"
+          mkdir -m 700 "$signing_home"
+          umask 077
+
+          printf '%s' "$RO_REPO_METADATA_SIGNING_SUBKEY_B64" | base64 --decode > "$key_file"
+          printf '%s' "$RO_REPO_METADATA_SIGNING_PASSPHRASE" > "$passphrase_file"
+          chmod 600 "$key_file" "$passphrase_file"
+          unset RO_REPO_METADATA_SIGNING_SUBKEY_B64 RO_REPO_METADATA_SIGNING_PASSPHRASE
+
+          GNUPGHOME="$signing_home" gpg --batch --import "$key_file"
+          metadata_fingerprint="$(awk -F= '$1 == "METADATA_SIGNING" {print $2}' source/keys/production/production-fingerprints.txt)"
+          snapshot="pages-site/snapshots/fedora/44/$SNAPSHOT_ID"
+
+          source/tools/ro-repo verify-snapshot             --snapshot "$snapshot"             --gnupghome "$signing_home"
+
+          source/tools/ro-repo build-signed-remote-publication             --snapshot "$snapshot"             --channel stable             --output signed-stable-publication             --publication-run "$GITHUB_RUN_ID"             --gnupghome "$signing_home"             --metadata-key-id "$metadata_fingerprint"             --passphrase-file "$passphrase_file"
+
+      - name: Upload signed stable publication
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: signed-stable-publication-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: signed-stable-publication/stable/
+          retention-days: 90
+          if-no-files-found: error
+
+  publish-stable:
+    needs: sign-stable-publication
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:44
+    environment:
+      name: repo-stable
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      VALIDATION_RUN: ${{ inputs.validation_run }}
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Install Git before writable Pages checkout
+        run: |
+          dnf -y install git
+
+      - name: Checkout persistent Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Download exact promotion bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: stable-promotion-bundle-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: promotion-bundle
+
+      - name: Download exact signed stable publication
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: signed-stable-publication-${{ inputs.snapshot_id }}-${{ github.run_id }}
+          path: signed-stable-publication
+
+      - name: Install publication verification tools
+        run: |
+          dnf -y install python3 python3-jsonschema rpm gnupg2
+
+      - name: Reverify beta identity and stage exact stable view
+        shell: bash
+        run: |
+          set -euo pipefail
+          beta="pages-site/rpm/fedora/44/beta/publication-v1.json"
+          beta_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$beta")"
+          beta_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$beta")"
+          evidence_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' promotion-bundle/promotion-validation-v1.json)"
+          evidence_beta_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["beta_publication_run"])' promotion-bundle/promotion-validation-v1.json)"
+
+          test "$beta_snapshot" = "$SNAPSHOT_ID"
+          test "$beta_snapshot" = "$evidence_snapshot"
+          test "$beta_run" = "$evidence_beta_run"
+
+          verify_home="$RUNNER_TEMP/stable-verify-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
+
+          snapshot="pages-site/snapshots/fedora/44/$SNAPSHOT_ID"
+          source/tools/ro-repo verify-snapshot             --snapshot "$snapshot"             --gnupghome "$verify_home"
+
+          source/tools/ro-repo stage-remote-channel             --publication signed-stable-publication             --site-root pages-site             --channel stable             --gnupghome "$verify_home"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+
+      - name: Persist exact promotion audit evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence_dir="pages-site/evidence/promotions/$SNAPSHOT_ID/$VALIDATION_RUN"
+          promotion_dir="pages-site/promotions/fedora/44/$SNAPSHOT_ID/$GITHUB_RUN_ID"
+          mkdir -p "$evidence_dir" "$promotion_dir"
+
+          test ! -e "$evidence_dir/promotion-validation-v1.json"
+          test ! -e "$promotion_dir/promotion-manifest-v1.json"
+
+          cp promotion-bundle/promotion-validation-v1.json             "$evidence_dir/promotion-validation-v1.json"
+          cp promotion-bundle/promotion-manifest-v1.json             "$promotion_dir/promotion-manifest-v1.json"
+
+      - name: Commit exact stable publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C pages-site config user.name "Ro-Repo Stable Publisher"
+          git -C pages-site config user.email "actions@users.noreply.github.com"
+
+          git -C pages-site add             "rpm/fedora/44/stable"             "publications/fedora/44/stable/$GITHUB_RUN_ID"             "evidence/promotions/$SNAPSHOT_ID/$VALIDATION_RUN"             "promotions/fedora/44/$SNAPSHOT_ID/$GITHUB_RUN_ID"
+
+          git -C pages-site commit             -m "stable: promote $SNAPSHOT_ID from beta via run $GITHUB_RUN_ID"
+          git -C pages-site push origin HEAD:pages-storage
+
+      - name: Stable publication summary
+        shell: bash
+        run: |
+          {
+            echo "## Remote stable promotion"
+            echo
+            echo "- snapshot: `$SNAPSHOT_ID`"
+            echo "- validation run: `$VALIDATION_RUN`"
+            echo "- stable publication run: `$GITHUB_RUN_ID`"
+            echo
+            echo "RPM and repository metadata bytes were reused from the exact immutable beta snapshot."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  verify-remote-stable:
+    needs: publish-stable
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      SNAPSHOT_ID: ${{ inputs.snapshot_id }}
+      VALIDATION_RUN: ${{ inputs.validation_run }}
+      REMOTE_BASE: https://repo.ro-asd.org/rpm/fedora/44/stable
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout published Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install remote verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl gnupg
+
+      - name: Verify stable is the exact immutable snapshot locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          for arch in x86_64 aarch64 source; do
+            diff -qr               "pages-site/snapshots/fedora/44/$SNAPSHOT_ID/rpm/$arch"               "pages-site/rpm/fedora/44/stable/$arch"
+          done
+
+      - name: Wait for exact stable publication to reach Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          found=0
+          for attempt in $(seq 1 30); do
+            if curl --proto '=https' --tlsv1.2 --fail --silent --show-error                 "$REMOTE_BASE/publication-v1.json?run=$GITHUB_RUN_ID-$attempt"                 -o "$RUNNER_TEMP/publication-v1.json"; then
+              remote_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              remote_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              if [[ "$remote_run" == "$GITHUB_RUN_ID" && "$remote_snapshot" == "$SNAPSHOT_ID" ]]; then
+                found=1
+                break
+              fi
+            fi
+            sleep 10
+          done
+          [[ "$found" -eq 1 ]]
+
+      - name: Verify complete remote stable tree byte-for-byte
+        shell: bash
+        run: |
+          set -euo pipefail
+          local_root="pages-site/rpm/fedora/44/stable"
+          remote_tmp="$RUNNER_TEMP/remote-stable"
+          mkdir -p "$remote_tmp"
+
+          while IFS= read -r -d '' path; do
+            rel="${path#"$local_root/"}"
+            mkdir -p "$remote_tmp/$(dirname "$rel")"
+            curl               --proto '=https'               --tlsv1.2               --fail               --silent               --show-error               "$REMOTE_BASE/$rel?run=$GITHUB_RUN_ID"               --output "$remote_tmp/$rel"
+            cmp --silent "$path" "$remote_tmp/$rel"
+          done < <(find "$local_root" -type f -print0 | sort -z)
+
+      - name: Verify remote stable publication signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify_home="$RUNNER_TEMP/remote-stable-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import             "pages-site/snapshots/fedora/44/$SNAPSHOT_ID/keys/REPODATA-GPG-KEY-ro-asd"
+
+          GNUPGHOME="$verify_home" gpg --batch --verify             "$RUNNER_TEMP/remote-stable/publication-v1.json.asc"             "$RUNNER_TEMP/remote-stable/publication-v1.json"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+
+      - name: Verify persisted promotion evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          source/tools/ro-repo validate-json             --schema promotion-validation-v1             --input "pages-site/evidence/promotions/$SNAPSHOT_ID/$VALIDATION_RUN/promotion-validation-v1.json"
+          source/tools/ro-repo validate-json             --schema promotion-manifest-v1             --input "pages-site/promotions/fedora/44/$SNAPSHOT_ID/$GITHUB_RUN_ID/promotion-manifest-v1.json"
