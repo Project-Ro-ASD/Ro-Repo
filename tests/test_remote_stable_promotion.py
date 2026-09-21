@@ -226,6 +226,22 @@ class RemoteStablePromotionTests(unittest.TestCase):
                 self.output,
             )
 
+    def test_remote_validation_script_uses_explicit_dnf5_repo_selection(self):
+        path = (
+            pathlib.Path(__file__).parents[1]
+            / "tests/remote-promotion-validation.sh"
+        )
+        text = path.read_text(encoding="utf-8")
+
+        self.assertIn("--repo=ro-beta,fedora,updates", text)
+        self.assertIn("--repo=ro-beta repoquery ro-assist", text)
+        self.assertIn("--refresh", text)
+        self.assertNotIn('"${common[@]}"', text)
+        self.assertIn(
+            'python3 - "$evidence_out" "$snapshot_id" "$validation_run" "$beta_run"',
+            text,
+        )
+
     def test_validation_workflow_is_read_only_and_secret_free(self):
         path = (
             pathlib.Path(__file__).parents[1]

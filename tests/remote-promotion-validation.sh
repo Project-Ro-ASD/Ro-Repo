@@ -49,16 +49,19 @@ repo_args=(
   --setopt="cachedir=$work/dnf-cache"
   --setopt="persistdir=$work/dnf-persist"
 )
-solve_repos=(
-  --disablerepo="*"
-  --enablerepo="fedora"
-  --enablerepo="updates"
-  --enablerepo="ro-beta"
-)
+selected_repos=(--repo=ro-beta,fedora,updates)
+
+# Preflight: prove DNF5 loads primary metadata from the exact remote beta repo
+# before any transaction test.
+repoquery_output="$(dnf "${repo_args[@]}" --refresh --releasever=44 --use-host-config \
+  --repo=ro-beta repoquery ro-assist \
+  --qf '%{name} %{version}-%{release} %{arch}')"
+grep -Fx 'ro-assist 0.2.4-1.fc44 x86_64' <<<"$repoquery_output" >/dev/null
 
 # 1) dependency-solve
 set +e
-solve_output="$(dnf "${repo_args[@]}" --assumeno --releasever=44 --use-host-config "${solve_repos[@]}" install ro-assist 2>&1)"
+solve_output="$(dnf "${repo_args[@]}" --refresh --assumeno --releasever=44 --use-host-config \
+  "${selected_repos[@]}" install ro-assist 2>&1)"
 solve_status=$?
 set -e
 if ! grep -Eq 'Operation aborted|Transaction Summary' <<<"$solve_output"; then
@@ -68,7 +71,8 @@ fi
 
 # 2) clean-install
 clean_root="$work/clean-root"
-dnf -y "${common[@]}" --installroot "$clean_root"   --enablerepo=fedora --enablerepo=updates --enablerepo=ro-beta install ro-assist
+dnf -y "${repo_args[@]}" --refresh --installroot "$clean_root" --releasever=44 --use-host-config \
+  "${selected_repos[@]}" install ro-assist
 rpm --root "$clean_root" -q ro-assist >/dev/null
 
 # 3) upgrade from pinned earlier release
@@ -78,7 +82,8 @@ mkdir -p "$rpmdb"
 rpm --dbpath "$rpmdb" --initdb
 rpm --dbpath "$rpmdb" --justdb --nodeps -Uvh "$work/$baseline_file"
 set +e
-upgrade_output="$(dnf "${common[@]}" --assumeno --installroot "$upgrade_root"   --enablerepo=fedora --enablerepo=updates --enablerepo=ro-beta upgrade ro-assist 2>&1)"
+upgrade_output="$(dnf "${repo_args[@]}" --refresh --assumeno --installroot "$upgrade_root" \
+  --releasever=44 --use-host-config "${selected_repos[@]}" upgrade ro-assist 2>&1)"
 upgrade_status=$?
 set -e
 if ! grep -Eq 'Operation aborted|Transaction Summary' <<<"$upgrade_output"; then
@@ -129,7 +134,8 @@ installed="$(rpm --root "$clean_root" -q --qf '%{NAME} %{VERSION}-%{RELEASE}\n' 
 grep -Fx 'ro-assist 0.2.4-1.fc44' <<<"$installed" >/dev/null
 rpm --root "$clean_root" -ql ro-assist | grep -Eq '/usr/(bin|libexec)/|/usr/share/applications/' 
 
-python3 - "$evidence_out" "$snapshot_id" "$beta_run" "$beta_started_at"   "$remote_base" "$baseline_repo" "$baseline_tag" "$baseline_file" "$baseline_sha" <<'PY'
+python3 - "$evidence_out" "$snapshot_id" "$validation_run" "$beta_run" "$beta_started_at" \
+  "$remote_base" "$baseline_repo" "$baseline_tag" "$baseline_file" "$baseline_sha" <<'PY'
 import datetime as dt
 import json
 import os
