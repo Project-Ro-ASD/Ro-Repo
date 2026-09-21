@@ -12,6 +12,7 @@ test -f "$publication"
 snapshot_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$publication")"
 beta_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$publication")"
 beta_started_at="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["published_at"])' "$publication")"
+validation_run="${GITHUB_RUN_ID:?GITHUB_RUN_ID is required for exact evidence binding}"
 
 snapshot="$site_root/snapshots/fedora/44/$snapshot_id"
 manifest="$snapshot/repository-snapshot-v1.json"
@@ -127,12 +128,13 @@ import pathlib
 import sys
 
 out = pathlib.Path(sys.argv[1])
-snapshot_id, beta_run, beta_started_at, remote_base = sys.argv[2:6]
-baseline_repo, baseline_tag, baseline_file, baseline_sha = sys.argv[6:10]
+snapshot_id, validation_run, beta_run, beta_started_at, remote_base = sys.argv[2:7]
+baseline_repo, baseline_tag, baseline_file, baseline_sha = sys.argv[7:11]
 payload = {
     "schema_version": 1,
     "scope": "remote-beta-promotion",
     "snapshot_id": snapshot_id,
+    "validation_run": validation_run,
     "beta_publication_run": beta_run,
     "beta_started_at": beta_started_at,
     "tested_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
