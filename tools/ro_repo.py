@@ -1412,6 +1412,7 @@ def rollback_remote_channel(site_root, channel, target_publication_run, rollback
     current_publication_path = current / "publication-v1.json"
     current_publication = load(current_publication_path)
     validate_schema(current_publication, "publication-v1")
+    current_publication_sha256 = digest(current_publication_path)
     if current_publication["channel"] != channel:
         raise ContractError("current remote beta channel mismatch")
 
@@ -1423,6 +1424,7 @@ def rollback_remote_channel(site_root, channel, target_publication_run, rollback
     target_publication_path = target_publication_dir / "publication-v1.json"
     target_publication = load(target_publication_path)
     validate_schema(target_publication, "publication-v1")
+    target_publication_sha256 = digest(target_publication_path)
     if target_publication["channel"] != channel:
         raise ContractError("target publication history channel mismatch")
     if target_publication["publication_run"] != str(target_run):
@@ -1460,10 +1462,10 @@ def rollback_remote_channel(site_root, channel, target_publication_run, rollback
         "reason": reason.strip(),
         "from_publication_run": current_publication["publication_run"],
         "from_snapshot_id": current_publication["snapshot_id"],
-        "from_publication_sha256": digest(current_publication_path),
+        "from_publication_sha256": current_publication_sha256,
         "to_publication_run": target_publication["publication_run"],
         "to_snapshot_id": target_publication["snapshot_id"],
-        "to_publication_sha256": digest(target_publication_path),
+        "to_publication_sha256": target_publication_sha256,
     }
     validate_schema(evidence, "rollback-evidence-v1")
     save(evidence_path, evidence)

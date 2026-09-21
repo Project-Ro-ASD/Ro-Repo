@@ -112,6 +112,37 @@ class RemoteBetaRollbackTests(unittest.TestCase):
         evidence_path = self.site / "rollbacks/fedora/44/beta/300.json"
         self.assertEqual(ro_repo.load(evidence_path), evidence)
 
+    def test_rollback_evidence_keeps_distinct_from_and_to_manifest_digests(self):
+        with mock.patch.object(
+            ro_repo, "verify_signed_remote_publication",
+            side_effect=lambda pub, snap, channel, home: ro_repo.load(
+                pathlib.Path(pub) / "publication-v1.json"
+            ),
+        ):
+            before = ro_repo.digest(
+                self.site / "rpm/fedora/44/beta/publication-v1.json"
+            )
+            target = ro_repo.digest(
+                self.history / "100/publication-v1.json"
+            )
+            self.assertNotEqual(before, target)
+
+            evidence = ro_repo.rollback_remote_channel(
+                self.site,
+                "beta",
+                "100",
+                "301",
+                "digest audit canary",
+                self.root / "gnupg",
+            )
+
+        self.assertEqual(evidence["from_publication_sha256"], before)
+        self.assertEqual(evidence["to_publication_sha256"], target)
+        self.assertNotEqual(
+            evidence["from_publication_sha256"],
+            evidence["to_publication_sha256"],
+        )
+
     def test_rollback_rejects_current_publication_as_target(self):
         with self.assertRaisesRegex(
             ro_repo.ContractError, "already the current beta"
