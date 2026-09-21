@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "fedora_release": 44,
+  "baselines": {
+    "ro-assist": {
+      "x86_64": {
+        "repository": "Project-Ro-ASD/ro-Assist",
+        "release_tag": "v0.2.1",
+        "filename": "ro-assist-0.2.1.x86_64.rpm",
+        "sha256": "4ec9a878fa112de2465b8fdcbf4682d8e699ada0d6a1af76f639bdcf68eddca1"
+      }
+    }
+  }
+}
