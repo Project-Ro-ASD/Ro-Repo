@@ -1,0 +1,23 @@
+{
+  "components": [
+    {
+      "acceptance_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+      "producer_workflow_run": 35597720775,
+      "release_id": 392928847,
+      "release_tag": "v0.2.5",
+      "signing_run": 35598114906,
+      "source_commit": "b89e3524deb790ec6ac4dfeb6699508e58e08ad5",
+      "source_repository": "Project-Ro-ASD/ro-Assist"
+    }
+  ],
+  "created_at": "2026-09-21T12:17:55Z",
+  "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+  "repository_snapshot_sha256": "20889abf076cd9fd30cefe825746cbc39b70e0022afa7159fed52ca16691fa13",
+  "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+  "schema_version": 1,
+  "snapshot_id": "repo-f44-20260921-001",
+  "source_signing_runs": [
+    35598114906
+  ],
+  "workflow_run": 35598643758
+}
