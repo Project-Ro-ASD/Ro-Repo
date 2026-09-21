@@ -242,6 +242,7 @@ class RemoteStablePromotionTests(unittest.TestCase):
         self.assertIn("file://$metadata_key", text)
         self.assertIn("file://$rpm_key", text)
         self.assertIn('--setopt="reposdir=$reposdir"', text)
+        self.assertIn('dnf -y "${common[@]}" --refresh --repo=ro-beta makecache', text)
         self.assertIn("--repo=ro-beta repoquery ro-assist", text)
         self.assertIn("--refresh", text)
         self.assertNotIn("--repofrompath \"ro-beta,", text)
