@@ -6,6 +6,7 @@
     "schema_version",
     "scope",
     "snapshot_id",
+    "validation_run",
     "beta_publication_run",
     "beta_started_at",
     "tested_at",
@@ -21,6 +22,10 @@
     "snapshot_id": {
       "type": "string",
       "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+    },
+    "validation_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
     },
     "beta_publication_run": {
       "type": "string",
