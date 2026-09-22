@@ -17,20 +17,31 @@ jobs:
         run: |
           echo "Fetching available Fedora 44 package names..."
           dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
-          echo "Checking for collisions with allowed Ro-ASD producers..."
-          python3 -c '
-          import yaml, sys
-          fedora = set(line.strip() for line in open("fedora-44-package-names.txt") if line.strip())
-          config = yaml.safe_load(open("config/producers-v1.yaml"))
+          echo "Checking for collisions with allowed Ro-ASD components..."
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0, "tools")
+          import ro_repo
+
+          fedora = {
+              line.strip()
+              for line in open("fedora-44-package-names.txt", encoding="utf-8")
+              if line.strip()
+          }
+          config = ro_repo.load_producer_registry("config/producers-v2.json")
           has_error = False
-          for p in config.get("producers", []):
-              allowed = set(p.get("allowed_package_names", []))
-              collision = allowed.intersection(fedora)
-              if collision and not p.get("allow_fedora_override"):
-                  print(f"ERROR: Collision detected for {p[\"repository\"]}: {collision}")
+          for policy in ro_repo.component_policies(config):
+              collision = set(policy["package_names"]).intersection(fedora)
+              if collision and not policy["allow_fedora_override"]:
+                  print(
+                      "ERROR: Collision detected for "
+                      f"{policy['repository']} / {policy['component']}: "
+                      f"{sorted(collision)}"
+                  )
                   has_error = True
-          if has_error: sys.exit(1)
-          '
+          if has_error:
+              raise SystemExit(1)
+          PY
       - name: Validate snapshot compatibility
         run: |
           # Faz 1 remote stable backend sunmaz; bu job yalniz deterministic local
