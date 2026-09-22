@@ -116,7 +116,7 @@ class ContractTests(unittest.TestCase):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), self.assertRaisesRegex(ro_repo.ContractError, "exact lowercase 40-character SHA") as caught: ro_repo.verify_component(self.mp,self.artifacts,self.config,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True)
         self.assertEqual(caught.exception.code, "TAG_COMMIT_MISMATCH")
     def test_package_name_denied(self):
-        self.manifest["component"]="evil-pkg"; self.manifest["artifacts"][0]["name"]="evil-pkg"; self.mp.write_text(json.dumps(self.manifest))
+        self.manifest["artifacts"][0]["name"]="evil-pkg"; self.mp.write_text(json.dumps(self.manifest))
         def mock_headers(path): h=self.headers(path); h["name"]="evil-pkg"; return h
         with mock.patch.object(ro_repo,"rpm_header",side_effect=mock_headers), self.assertRaisesRegex(ro_repo.ContractError,"package name denied"): ro_repo.verify_component(self.mp,self.artifacts,self.config,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True)
     def test_rollback_no_previous_raises(self):
