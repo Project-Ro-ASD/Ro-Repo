@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "fedora_release", "fedora_package_names_file", "producers"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "fedora_release": {"const": 44},
+    "fedora_package_names_file": {"type": "string", "minLength": 1},
+    "producers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/producer"}
+    }
+  },
+  "$defs": {
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "owner", "components"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "owner": {"type": "string", "minLength": 1},
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/component"}
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "package_names",
+        "architectures",
+        "risk_class",
+        "promotion_group",
+        "required_tests",
+        "srpm_required",
+        "sbom_required",
+        "allow_fedora_override",
+        "trusted_signer_workflow"
+      ],
+      "properties": {
+        "component": {"type": "string", "minLength": 1},
+        "package_names": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "architectures": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["x86_64", "aarch64", "noarch"]}
+        },
+        "risk_class": {
+          "enum": ["normal-app", "critical-desktop", "critical-system"]
+        },
+        "promotion_group": {"type": "string", "minLength": 1},
+        "required_tests": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "srpm_required": {"type": "boolean"},
+        "sbom_required": {"type": "boolean"},
+        "allow_fedora_override": {"type": "boolean"},
+        "trusted_signer_workflow": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
