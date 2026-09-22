@@ -63,6 +63,17 @@ class ProducerRegistryV2Tests(unittest.TestCase):
         self.assertEqual(policy["repository"], "Project-Ro-ASD/Ro-ASD-release")
         self.assertEqual(policy["component"], "ro-asd-release")
 
+    def test_v2_collision_policy_exposes_normalized_package_names(self):
+        policy = ro_repo.resolve_component_policy(
+            self.v2,
+            "Project-Ro-ASD/Ro-ASD-release",
+            "ro-asd-release",
+        )
+        fedora_names = {"bash", "ro-asd-release"}
+        collision = set(policy["package_names"]) & fedora_names
+        self.assertEqual(collision, {"ro-asd-release"})
+        self.assertFalse(policy["allow_fedora_override"])
+
     def test_v1_remains_readable_during_migration(self):
         policy = ro_repo.resolve_component_policy(
             self.v1, "Project-Ro-ASD/ro-Control", "ro-control"
