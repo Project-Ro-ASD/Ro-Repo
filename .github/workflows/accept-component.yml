@@ -78,11 +78,12 @@ jobs:
               raise error
 
           print("Verifying allowlist before API requests...")
-          with open("config/producers-v1.yaml") as f:
-              config = yaml.safe_load(f)
-
-          producers = [p for p in config.get("producers", []) if p["repository"] == PRODUCER]
-          if not producers:
+          config = ro_repo.load_producer_registry("config/producers-v2.json")
+          repositories = {
+              producer.get("repository")
+              for producer in config.get("producers", [])
+          }
+          if PRODUCER not in repositories:
               reject(f"Producer {PRODUCER} is not allowlisted.", "PRODUCER_NOT_ALLOWLISTED", "allowlist", received=PRODUCER, hint="Add the producer through the reviewed producer-registry process before retrying.")
 
           if len(COMMIT) != 40:
@@ -123,7 +124,21 @@ jobs:
           if str(manifest["release_id"]) != RELEASE_ID:
               reject("Manifest release_id mismatch", "RELEASE_ID_MISMATCH", "manifest-identity", expected=RELEASE_ID, received=manifest["release_id"])
 
-          workflow_path = producers[0]["trusted_signer_workflow"]
+          try:
+              component_policy = ro_repo.resolve_component_policy(
+                  config, PRODUCER, manifest.get("component")
+              )
+          except ro_repo.ContractError as error:
+              reject(
+                  str(error),
+                  error.code,
+                  error.stage,
+                  expected=error.expected,
+                  received=error.received,
+                  hint=error.hint,
+              )
+
+          workflow_path = component_policy["trusted_signer_workflow"]
           run_id = manifest_identity["workflow_run"]
           if run_id is None:
               reject("Manifest workflow_run is not a valid numeric run ID", "MANIFEST_IDENTITY_MISMATCH", "manifest-identity", expected="positive numeric workflow run ID", received=manifest.get("workflow_run"))
