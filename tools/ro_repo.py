@@ -303,7 +303,7 @@ def resolve_component_policy(config, repository, component):
             code="PRODUCER_NOT_ALLOWLISTED",
             stage="allowlist",
             expected="exactly one repository/component policy",
-            received={"repository": repository, "component": component},
+            received=[repository, component],
             hint="Register the component through the reviewed producer-registry process.",
         )
     return matches[0]
