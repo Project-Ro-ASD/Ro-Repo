@@ -1606,7 +1606,7 @@ def prepare_remote_stable_promotion(site_root, validation_path, snapshot_id,
     if evidence["result"] != "pass":
         raise ContractError("promotion validation did not pass")
 
-    config = load(ROOT / "config" / "producers-v1.yaml")
+    config = load_producer_registry(ROOT / "config" / "producers-v2.json")
     risk_rank = {"normal-app": 0, "critical-desktop": 1, "critical-system": 2}
     highest_risk = "normal-app"
     expected_groups = set()
@@ -1620,13 +1620,7 @@ def prepare_remote_stable_promotion(site_root, validation_path, snapshot_id,
         package_names.add(name)
 
     for name in sorted(package_names):
-        matches = [
-            producer for producer in config["producers"]
-            if name in producer.get("allowed_package_names", [])
-        ]
-        if len(matches) != 1:
-            raise ContractError(f"promotion package policy missing or ambiguous: {name}")
-        producer = matches[0]
+        producer = resolve_package_policy(config, name)
         risk = producer["risk_class"]
         if risk_rank[risk] > risk_rank[highest_risk]:
             highest_risk = risk
@@ -1746,15 +1740,15 @@ def promote(output,promotion_path,run_id,gnupghome=None):
         verify_gpg_signature(beta_path, str(beta_path)+".asc", snapshot_manifest["metadata_signing_fingerprint"], env)
 
     age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(beta["published_at"].replace("Z", "+00:00"))
-    config = load(ROOT / "config/producers-v1.yaml")
+    config = load_producer_registry(ROOT / "config/producers-v2.json")
 
     risk_map = {}
     group_map = {}
-    for prod in config["producers"]:
-        for pkg in prod["allowed_package_names"]:
-            risk_map[pkg] = prod["risk_class"]
-            if "promotion_group" in prod:
-                group_map[pkg] = prod["promotion_group"]
+    for policy in component_policies(config):
+        for pkg in policy["package_names"]:
+            risk_map[pkg] = policy["risk_class"]
+            if policy.get("promotion_group"):
+                group_map[pkg] = policy["promotion_group"]
 
     highest_risk = "normal-app"
     expected_groups = set()
