@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "fedora_release": 44,
+  "fedora_package_names_file": "config/fedora-44-package-names.txt",
+  "producers": [
+    {
+      "repository": "Project-Ro-ASD/ro-Control",
+      "owner": "Project-Ro-ASD/ro-Control maintainers",
+      "components": [
+        {
+          "component": "ro-control",
+          "package_names": [
+            "ro-control"
+          ],
+          "architectures": [
+            "x86_64",
+            "aarch64"
+          ],
+          "risk_class": "normal-app",
+          "promotion_group": "ro-control",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/ro-Control/.github/workflows/release.yml"
+        }
+      ]
+    },
+    {
+      "repository": "Project-Ro-ASD/ro-Assist",
+      "owner": "Project-Ro-ASD/ro-Assist maintainers",
+      "components": [
+        {
+          "component": "ro-assist",
+          "package_names": [
+            "ro-assist"
+          ],
+          "architectures": [
+            "x86_64",
+            "aarch64"
+          ],
+          "risk_class": "normal-app",
+          "promotion_group": "ro-assist",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/ro-Assist/.github/workflows/release.yml"
+        }
+      ]
+    },
+    {
+      "repository": "Project-Ro-ASD/Ro-Theme",
+      "owner": "Project-Ro-ASD/Ro-Theme maintainers",
+      "components": [
+        {
+          "component": "ro-theme",
+          "package_names": [
+            "ro-theme"
+          ],
+          "architectures": [
+            "noarch"
+          ],
+          "risk_class": "critical-desktop",
+          "promotion_group": "desktop-theme",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke",
+            "plasma-integration",
+            "login-session"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/Ro-Theme/.github/workflows/release.yml"
+        }
+      ]
+    },
+    {
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "owner": "Project-Ro-ASD/Ro-ASD-release maintainers",
+      "components": [
+        {
+          "component": "ro-asd-release",
+          "package_names": [
+            "ro-asd-release"
+          ],
+          "architectures": [
+            "noarch"
+          ],
+          "risk_class": "critical-system",
+          "promotion_group": "ro-asd-release",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release.yml"
+        }
+      ]
+    }
+  ]
+}
