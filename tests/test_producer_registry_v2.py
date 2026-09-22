@@ -52,6 +52,21 @@ class ProducerRegistryV2Tests(unittest.TestCase):
         self.assertEqual(branding["risk_class"], "critical-desktop")
         self.assertNotEqual(release["promotion_group"], branding["promotion_group"])
 
+    def test_v2_keyring_component_resolves_independent_policy(self):
+        policy = ro_repo.resolve_component_policy(
+            self.v2,
+            "Project-Ro-ASD/Ro-ASD-release",
+            "ro-asd-keyring",
+        )
+        self.assertEqual(policy["package_names"], ["ro-asd-keyring"])
+        self.assertEqual(policy["architectures"], ["noarch"])
+        self.assertEqual(policy["risk_class"], "critical-system")
+        self.assertEqual(policy["promotion_group"], "ro-asd-keyring")
+        self.assertEqual(
+            policy["trusted_signer_workflow"],
+            "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-keyring.yml",
+        )
+
     def test_v2_wrong_component_is_fail_closed(self):
         with self.assertRaisesRegex(ro_repo.ContractError, "component policy missing"):
             ro_repo.resolve_component_policy(
