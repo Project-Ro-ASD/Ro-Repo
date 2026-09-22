@@ -231,6 +231,95 @@ def save(path, value):
     path = pathlib.Path(path); path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
+def load_producer_registry(path):
+    """Load producer registry v1 or v2 and validate v2 when selected."""
+    config = load(path)
+    version = config.get("schema_version")
+    if version == 2:
+        validate_schema(config, "producers-v2")
+    elif version != 1:
+        raise ContractError(
+            f"unsupported producer registry schema: {version!r}",
+            code="PRODUCER_NOT_ALLOWLISTED",
+            stage="allowlist",
+            received=version,
+            hint="Use producer registry schema version 1 or 2.",
+        )
+    return config
+
+
+def component_policies(config):
+    """Yield normalized component policies from registry v1 or v2."""
+    version = config.get("schema_version", 1)
+    if version == 2:
+        for producer in config.get("producers", []):
+            repository = producer.get("repository")
+            owner = producer.get("owner")
+            for component in producer.get("components", []):
+                yield {
+                    "repository": repository,
+                    "owner": owner,
+                    "component": component.get("component"),
+                    "package_names": list(component.get("package_names", [])),
+                    "architectures": list(component.get("architectures", [])),
+                    "risk_class": component.get("risk_class"),
+                    "promotion_group": component.get("promotion_group"),
+                    "required_tests": list(component.get("required_tests", [])),
+                    "srpm_required": bool(component.get("srpm_required")),
+                    "sbom_required": bool(component.get("sbom_required")),
+                    "allow_fedora_override": bool(component.get("allow_fedora_override")),
+                    "trusted_signer_workflow": component.get("trusted_signer_workflow"),
+                }
+        return
+
+    for producer in config.get("producers", []):
+        allowed = list(producer.get("allowed_package_names", []))
+        for package_name in allowed:
+            yield {
+                "repository": producer.get("repository"),
+                "owner": producer.get("owner"),
+                "component": package_name,
+                "package_names": allowed,
+                "architectures": list(producer.get("architectures", [])),
+                "risk_class": producer.get("risk_class"),
+                "promotion_group": producer.get("promotion_group"),
+                "required_tests": list(producer.get("required_tests", [])),
+                "srpm_required": bool(producer.get("srpm_required")),
+                "sbom_required": bool(producer.get("sbom_required")),
+                "allow_fedora_override": bool(producer.get("allow_fedora_override")),
+                "trusted_signer_workflow": producer.get("trusted_signer_workflow"),
+            }
+
+
+def resolve_component_policy(config, repository, component):
+    """Resolve exactly one component policy for a producer release."""
+    matches = [
+        policy for policy in component_policies(config)
+        if policy["repository"] == repository and policy["component"] == component
+    ]
+    if len(matches) != 1:
+        raise ContractError(
+            f"component policy missing or ambiguous: {repository} / {component}",
+            code="PRODUCER_NOT_ALLOWLISTED",
+            stage="allowlist",
+            expected="exactly one repository/component policy",
+            received={"repository": repository, "component": component},
+            hint="Register the component through the reviewed producer-registry process.",
+        )
+    return matches[0]
+
+
+def resolve_package_policy(config, package_name):
+    """Resolve exactly one component policy owning a package name."""
+    matches = [
+        policy for policy in component_policies(config)
+        if package_name in policy["package_names"]
+    ]
+    if len(matches) != 1:
+        raise ContractError(f"promotion package policy missing or ambiguous: {package_name}")
+    return matches[0]
+
+
 def run(argv, env=None):
     try: return subprocess.run(argv, check=True, text=True, capture_output=True, env=env)
     except (OSError, subprocess.CalledProcessError) as exc:
@@ -289,7 +378,7 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
             str(exc), code="MANIFEST_IDENTITY_MISMATCH", stage="manifest-schema",
             hint="Publish valid JSON matching the versioned component manifest schema.",
         ) from exc
-    config = load(config_path)
+    config = load_producer_registry(config_path)
     source_commit = manifest.get("source_commit") if isinstance(manifest, dict) else None
     if not isinstance(source_commit, str) or not re.fullmatch(r"[0-9a-f]{40}", source_commit):
         raise ContractError(
@@ -319,15 +408,10 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
             str(exc), code="MANIFEST_IDENTITY_MISMATCH", stage="manifest-schema",
             hint="Regenerate the component manifest from the versioned v1 schema.",
         ) from exc
-    producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
-    if len(producers) != 1:
-        raise ContractError(
-            f"producer is not allowlisted: {manifest['source_repository']}",
-            code="PRODUCER_NOT_ALLOWLISTED", stage="allowlist",
-            received=manifest["source_repository"],
-            hint="Add the producer through the reviewed producer-registry process before retrying.",
-        )
-    producer = producers[0]; source_names=set(); headers=[]; seen=set()
+    producer = resolve_component_policy(
+        config, manifest["source_repository"], manifest["component"]
+    )
+    source_names=set(); headers=[]; seen=set()
     
     manifest_rpms = {item["filename"] for item in manifest["artifacts"]}
     actual_rpms = {path.name for path in pathlib.Path(artifacts_dir).glob("*.rpm")}
@@ -372,7 +456,7 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
         header=rpm_header(path)
         for field in ("name","epoch","version","release","architecture","source_rpm"):
             if header[field] != item[field]: raise ContractError(f"RPM header mismatch for {filename}: {field}", code="RPM_HEADER_MISMATCH", stage="rpm-header", expected=item[field], received=header[field], hint="Regenerate the manifest from the final RPM headers.")
-        if item["name"] not in producer["allowed_package_names"]: raise ContractError(f"package name denied: {item['name']}", code="PACKAGE_NAME_DENIED", stage="package-policy", expected=producer["allowed_package_names"], received=item["name"], hint="Publish only package names allowed by the producer registry.")
+        if item["name"] not in producer["package_names"]: raise ContractError(f"package name denied: {item['name']}", code="PACKAGE_NAME_DENIED", stage="package-policy", expected=producer["package_names"], received=item["name"], hint="Publish only package names allowed by the producer registry.")
         if not item["release"].endswith(".fc44"): raise ContractError(f"not a Fedora 44 build: {filename}", code="FEDORA_RELEASE_MISMATCH", stage="fedora-release", expected="release suffix .fc44", received=item["release"], hint="Rebuild the RPM for Fedora 44.")
         if item["architecture"] not in {"src","nosrc"} and item["architecture"] not in producer["architectures"]: raise ContractError(f"architecture denied: {item['architecture']}", code="ARCHITECTURE_DENIED", stage="architecture", expected=producer["architectures"], received=item["architecture"], hint="Publish only an architecture allowed by the producer registry.")
         if item["architecture"] in {"src","nosrc"}: source_names.add(filename)
@@ -410,10 +494,12 @@ def accept(manifest_path, artifacts_dir, accepted_dir, config_path, fedora_names
     
     verified_attestation = {}
     if not test_only_allow_unattested:
-        config = load(config_path)
-        producers = [p for p in config["producers"] if p["repository"] == manifest["source_repository"]]
-        trusted_workflow = producers[0].get("trusted_signer_workflow")
-        if not trusted_workflow: raise ContractError("producer missing trusted_signer_workflow")
+        config = load_producer_registry(config_path)
+        producer = resolve_component_policy(
+            config, manifest["source_repository"], manifest["component"]
+        )
+        trusted_workflow = producer.get("trusted_signer_workflow")
+        if not trusted_workflow: raise ContractError("producer component missing trusted_signer_workflow")
         verified_attestation = verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow)
         
     accepted_root = pathlib.Path(accepted_dir)
@@ -1768,7 +1854,7 @@ def catalog(snapshot,editorial,out,gnupghome):
 def cli():
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True)
     def component(name):
-        x=s.add_parser(name); x.add_argument("--manifest",type=pathlib.Path,required=True); x.add_argument("--artifacts",type=pathlib.Path,required=True); x.add_argument("--config",type=pathlib.Path,default=ROOT/"config/producers-v1.yaml"); x.add_argument("--fedora-names",type=pathlib.Path); return x
+        x=s.add_parser(name); x.add_argument("--manifest",type=pathlib.Path,required=True); x.add_argument("--artifacts",type=pathlib.Path,required=True); x.add_argument("--config",type=pathlib.Path,default=ROOT/"config/producers-v2.json"); x.add_argument("--fedora-names",type=pathlib.Path); return x
     component("verify-component"); x=component("accept-package"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--attestations",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true"); x.add_argument("--report",type=pathlib.Path,required=True); x.add_argument("--expected-repository"); x.add_argument("--expected-tag"); x.add_argument("--expected-commit"); x.add_argument("--expected-release-id")
     x=s.add_parser("sign-package"); x.add_argument("--input",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True)
     x=s.add_parser("sign-accepted-component"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--test-only-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
