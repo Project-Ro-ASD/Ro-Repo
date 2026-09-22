@@ -469,7 +469,7 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
     fedora=set(line.strip() for line in names_path.read_text().splitlines() if line.strip() and not line.startswith("#"))
     if not fedora and not test_only_allow_empty_fedora:
         raise ContractError("empty Fedora package list is not allowed in production")
-    collision=set(producer["allowed_package_names"]) & fedora
+    collision=set(producer["package_names"]) & fedora
     if collision and not producer.get("allow_fedora_override"): raise ContractError(f"Fedora package collision denied: {', '.join(sorted(collision))}", code="FEDORA_PACKAGE_COLLISION", stage="fedora-collision", received=sorted(collision), hint="Rename the package or obtain an explicitly reviewed Fedora override policy.")
     # --- advisory diagnostics ---
     diagnostics = {"rpmlint": [], "file_conflicts": []}
