@@ -189,6 +189,29 @@
           "sbom_required": false,
           "allow_fedora_override": false,
           "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-defaults.yml"
+        },
+        {
+          "component": "ro-asd-branding",
+          "package_names": [
+            "ro-asd-branding"
+          ],
+          "architectures": [
+            "noarch"
+          ],
+          "risk_class": "critical-desktop",
+          "promotion_group": "ro-asd-branding",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-branding.yml"
         }
       ]
     }
