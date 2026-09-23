@@ -31,11 +31,11 @@ class ProducerRegistryV2Tests(unittest.TestCase):
             if item["repository"] == "Project-Ro-ASD/Ro-ASD-release"
         )
         producer["components"].append({
-            "component": "ro-asd-branding",
-            "package_names": ["ro-asd-branding"],
+            "component": "ro-asd-desktop-standard",
+            "package_names": ["ro-asd-desktop-standard"],
             "architectures": ["noarch"],
             "risk_class": "critical-desktop",
-            "promotion_group": "ro-asd-branding",
+            "promotion_group": "ro-asd-desktop-standard",
             "required_tests": ["dependency-solve", "smoke"],
             "srpm_required": True,
             "sbom_required": False,
@@ -45,12 +45,12 @@ class ProducerRegistryV2Tests(unittest.TestCase):
         release = ro_repo.resolve_component_policy(
             config, "Project-Ro-ASD/Ro-ASD-release", "ro-asd-release"
         )
-        branding = ro_repo.resolve_component_policy(
-            config, "Project-Ro-ASD/Ro-ASD-release", "ro-asd-branding"
+        desktop = ro_repo.resolve_component_policy(
+            config, "Project-Ro-ASD/Ro-ASD-release", "ro-asd-desktop-standard"
         )
         self.assertEqual(release["risk_class"], "critical-system")
-        self.assertEqual(branding["risk_class"], "critical-desktop")
-        self.assertNotEqual(release["promotion_group"], branding["promotion_group"])
+        self.assertEqual(desktop["risk_class"], "critical-desktop")
+        self.assertNotEqual(release["promotion_group"], desktop["promotion_group"])
 
     def test_v2_keyring_component_resolves_independent_policy(self):
         policy = ro_repo.resolve_component_policy(
@@ -95,6 +95,21 @@ class ProducerRegistryV2Tests(unittest.TestCase):
         self.assertEqual(
             policy["trusted_signer_workflow"],
             "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-defaults.yml",
+        )
+
+    def test_v2_branding_component_resolves_independent_policy(self):
+        policy = ro_repo.resolve_component_policy(
+            self.v2,
+            "Project-Ro-ASD/Ro-ASD-release",
+            "ro-asd-branding",
+        )
+        self.assertEqual(policy["package_names"], ["ro-asd-branding"])
+        self.assertEqual(policy["architectures"], ["noarch"])
+        self.assertEqual(policy["risk_class"], "critical-desktop")
+        self.assertEqual(policy["promotion_group"], "ro-asd-branding")
+        self.assertEqual(
+            policy["trusted_signer_workflow"],
+            "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-branding.yml",
         )
 
     def test_v2_wrong_component_is_fail_closed(self):
