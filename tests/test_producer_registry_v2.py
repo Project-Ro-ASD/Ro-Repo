@@ -67,6 +67,21 @@ class ProducerRegistryV2Tests(unittest.TestCase):
             "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-keyring.yml",
         )
 
+    def test_v2_repos_component_resolves_independent_policy(self):
+        policy = ro_repo.resolve_component_policy(
+            self.v2,
+            "Project-Ro-ASD/Ro-ASD-release",
+            "ro-asd-repos",
+        )
+        self.assertEqual(policy["package_names"], ["ro-asd-repos"])
+        self.assertEqual(policy["architectures"], ["noarch"])
+        self.assertEqual(policy["risk_class"], "critical-system")
+        self.assertEqual(policy["promotion_group"], "ro-asd-repos")
+        self.assertEqual(
+            policy["trusted_signer_workflow"],
+            "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-repos.yml",
+        )
+
     def test_v2_wrong_component_is_fail_closed(self):
         with self.assertRaisesRegex(ro_repo.ContractError, "component policy missing"):
             ro_repo.resolve_component_policy(
