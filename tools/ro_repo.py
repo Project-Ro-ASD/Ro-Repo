@@ -1388,6 +1388,12 @@ def build_signed_remote_publication(snapshot, channel, output, publication_run,
         )
 
         icons_source = ROOT / "store" / "icons"
+
+        if icons_source.is_symlink():
+            raise ContractError(
+                "symlink forbidden for Ro-Store icons directory"
+            )
+
         if icons_source.is_dir():
             for asset in icons_source.rglob("*"):
                 if asset.is_symlink():
@@ -1548,7 +1554,7 @@ def verify_signed_remote_publication(publication_dir, snapshot, channel, gnupgho
                         f"Ro-Store icon digest mismatch for {package_name}"
                     )
 
-    elif store_dir.exists():
+    elif store_dir.exists() or store_dir.is_symlink():
         # Legacy signed publications did not contain Ro-Store data.
         # Never accept an unsigned/unbound store tree attached to one.
         raise ContractError(
@@ -2068,15 +2074,29 @@ def _safe_store_asset(root, relative):
     if rel.is_absolute() or ".." in rel.parts:
         raise ContractError(f"unsafe store asset path: {relative}")
 
-    root = pathlib.Path(root).resolve()
-    target = (root / pathlib.Path(*rel.parts)).resolve()
+    root = pathlib.Path(root)
+
+    if root.is_symlink() or not root.is_dir():
+        raise ContractError("store asset root is missing or unsafe")
+
+    root_resolved = root.resolve()
+    target = root
+
+    # Reject symlinks before resolve() can hide them, including
+    # intermediate directories and the final asset itself.
+    for part in rel.parts:
+        target = target / part
+        if target.is_symlink():
+            raise ContractError(f"symlink forbidden in store asset path: {relative}")
+
+    resolved_target = target.resolve()
 
     try:
-        target.relative_to(root)
+        resolved_target.relative_to(root_resolved)
     except ValueError as exc:
         raise ContractError(f"store asset escapes metadata root: {relative}") from exc
 
-    if not target.is_file() or target.is_symlink():
+    if not target.is_file():
         raise ContractError(f"store asset missing or unsafe: {relative}")
 
     return target

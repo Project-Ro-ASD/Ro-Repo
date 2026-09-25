@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 import sys
 import tempfile
 import unittest
@@ -150,6 +151,31 @@ class StoreCatalogTests(unittest.TestCase):
                     self.root / "bad-catalog.json",
                     self.root / "gnupg",
                 )
+
+
+    def test_catalog_rejects_symlinked_icon_asset(self):
+        outside = self.root / "outside-icon.svg"
+        outside.write_text("<svg>outside</svg>", encoding="utf-8")
+
+        self.icon.unlink()
+        self.icon.symlink_to(outside)
+
+        with mock.patch.object(
+            ro_repo,
+            "verify_snapshot",
+            return_value=self.manifest,
+        ):
+            with self.assertRaisesRegex(
+                ro_repo.ContractError,
+                "symlink forbidden in store asset path",
+            ):
+                ro_repo.catalog(
+                    self.snapshot,
+                    self.editorial,
+                    self.root / "symlink-catalog.json",
+                    self.root / "gnupg",
+                )
+
 
 
 class SignedStorePublicationTests(unittest.TestCase):
@@ -337,6 +363,48 @@ class SignedStorePublicationTests(unittest.TestCase):
                 / "publications/fedora/44/beta/400/store/catalog.json"
             ).is_file()
         )
+
+
+    def test_legacy_publication_rejects_dangling_store_symlink(self):
+        legacy = self.root / "legacy-publication"
+        legacy.mkdir()
+
+        ro_repo.save(
+            legacy / "publication-v1.json",
+            {
+                "schema_version": 1,
+                "channel": "beta",
+                "snapshot_id": self.snapshot_id,
+                "published_at": "2026-09-21T12:23:47Z",
+                "publication_run": "401",
+            },
+        )
+
+        (legacy / "publication-v1.json.asc").write_text(
+            "signed-publication",
+            encoding="utf-8",
+        )
+
+        (legacy / "store").symlink_to(
+            legacy / "missing-store",
+            target_is_directory=True,
+        )
+
+        with mock.patch.object(
+            ro_repo,
+            "verify_gpg_signature",
+        ):
+            with self.assertRaisesRegex(
+                ro_repo.ContractError,
+                "legacy publication contains unbound Ro-Store metadata",
+            ):
+                ro_repo.verify_signed_remote_publication(
+                    legacy,
+                    self.snapshot,
+                    "beta",
+                    self.root / "gnupg",
+                )
+
 
 
 class StorePublicationBuilderTests(unittest.TestCase):
@@ -575,6 +643,84 @@ class StorePublicationBuilderTests(unittest.TestCase):
                 "B" * 40,
                 self.passphrase,
             )
+
+
+    def test_beta_builder_rejects_symlinked_icons_directory(self):
+        fake_root = self.root / "fake-root"
+        store_root = fake_root / "store"
+        store_root.mkdir(parents=True)
+
+        # build_signed_remote_publication() validates JSON schemas via ROOT.
+        # Keep the real schemas available while replacing only the test store tree.
+        shutil.copytree(
+            ro_repo.ROOT / "schemas",
+            fake_root / "schemas",
+        )
+
+        ro_repo.save(
+            store_root / "editorial.json",
+            {
+                "schemaVersion": 1,
+                "apps": {
+                    "ro-assist": {
+                        "name": "Ro Assist",
+                        "visible": True,
+                    }
+                },
+            },
+        )
+
+        outside_icons = self.root / "outside-icons"
+        outside_icons.mkdir()
+        (outside_icons / "unexpected.svg").write_text(
+            "<svg>outside</svg>",
+            encoding="utf-8",
+        )
+
+        (store_root / "icons").symlink_to(
+            outside_icons,
+            target_is_directory=True,
+        )
+
+        output = self.root / "symlink-icons-output"
+
+        with (
+            mock.patch.object(ro_repo, "ROOT", fake_root),
+            mock.patch.object(
+                ro_repo,
+                "require_secret_signing_subkey",
+                return_value="B" * 40,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_validate_passphrase_file",
+                return_value=self.passphrase,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_sign_file_exact",
+                side_effect=self.fake_sign,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "verify_snapshot",
+                return_value=self.manifest,
+            ),
+        ):
+            with self.assertRaisesRegex(
+                ro_repo.ContractError,
+                "symlink forbidden for Ro-Store icons directory",
+            ):
+                ro_repo.build_signed_remote_publication(
+                    self.snapshot,
+                    "beta",
+                    output,
+                    "700",
+                    self.root / "gnupg",
+                    "B" * 40,
+                    self.passphrase,
+                )
+
 
 
 if __name__ == "__main__":
