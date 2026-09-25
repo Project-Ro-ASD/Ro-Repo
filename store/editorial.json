@@ -1,1 +1,40 @@
-{"apps":{"ro-control":{"name":"Ro Control","icon":"icons/ro-control.svg"},"ro-assist":{"name":"Ro Assist","icon":"icons/ro-assist.svg"},"ro-theme":{"name":"Ro Theme"}}}
+{
+  "schemaVersion": 1,
+  "apps": {
+    "ro-control": {
+      "name": "Ro Control",
+      "summary": "Ro sistem ayarlarını kolayca yönetin.",
+      "description": "Ro Control, Ro dağıtımına özel sistem ayarlarını ve temel yapılandırmaları tek yerden yönetmek için geliştirilen resmi uygulamadır.",
+      "category": "Sistem",
+      "developer": "Project Ro",
+      "source": "Ro-Repo",
+      "featured": true,
+      "priority": 1,
+      "visible": true,
+      "icon": "icons/ro-control.svg"
+    },
+    "ro-assist": {
+      "name": "Ro Assist",
+      "summary": "Ro için yardımcı araçlar ve rehberler.",
+      "description": "Ro Assist, Ro kullanıcılarına sistem kullanımı, temel işlemler ve yardımcı araçlar konusunda sade bir deneyim sunmak için geliştirilen resmi yardımcı uygulamadır.",
+      "category": "Yardımcı Araçlar",
+      "developer": "Project Ro",
+      "source": "Ro-Repo",
+      "featured": true,
+      "priority": 2,
+      "visible": true,
+      "icon": "icons/ro-assist.svg"
+    },
+    "ro-theme": {
+      "name": "Ro Theme",
+      "summary": "Ro masaüstü görünüm bileşenleri.",
+      "description": "Ro dağıtımının görünüm ve tema bileşenlerini sağlar.",
+      "category": "Kişiselleştirme",
+      "developer": "Project Ro",
+      "source": "Ro-Repo",
+      "featured": false,
+      "priority": 3,
+      "visible": false
+    }
+  }
+}
