@@ -1,0 +1,29 @@
+{
+  "apps": [
+    {
+      "architectures": [
+        "aarch64",
+        "x86_64"
+      ],
+      "category": "Yard\u0131mc\u0131 Ara\u00e7lar",
+      "description": "Ro Assist, Ro kullan\u0131c\u0131lar\u0131na sistem kullan\u0131m\u0131, temel i\u015flemler ve yard\u0131mc\u0131 ara\u00e7lar konusunda sade bir deneyim sunmak i\u00e7in geli\u015ftirilen resmi yard\u0131mc\u0131 uygulamad\u0131r.",
+      "developer": "Project Ro",
+      "epoch": 0,
+      "featured": true,
+      "icon": "icons/ro-assist.svg",
+      "iconSha256": "55d28577ef4bfa1f48f32e1e75843072d69d6cbc814e072365458ebff49f6d7c",
+      "id": "ro-assist",
+      "installPackage": "ro-assist",
+      "latestRelease": "1.fc44",
+      "latestVersion": "0.2.5",
+      "name": "Ro Assist",
+      "packageName": "ro-assist",
+      "packageType": "rpm",
+      "priority": 2,
+      "source": "Ro-Repo",
+      "summary": "Ro i\u00e7in yard\u0131mc\u0131 ara\u00e7lar ve rehberler."
+    }
+  ],
+  "schemaVersion": 2,
+  "snapshotId": "repo-f44-20260921-001"
+}
