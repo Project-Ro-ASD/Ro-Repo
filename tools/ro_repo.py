@@ -1320,19 +1320,60 @@ def build_signed_remote_publication(snapshot, channel, output, publication_run,
         raise ContractError("signed publication output already exists")
     target.mkdir(parents=True)
 
+    store_dir = target / "store"
+    store_dir.mkdir()
+
+    catalog_path = store_dir / "catalog.json"
+    catalog(
+        snapshot,
+        ROOT / "store" / "editorial.json",
+        catalog_path,
+        gnupghome,
+    )
+
+    _sign_file_exact(
+        catalog_path,
+        gnupghome,
+        metadata_fpr,
+        passphrase_path,
+    )
+
+    icons_source = ROOT / "store" / "icons"
+    if icons_source.is_dir():
+        for asset in icons_source.rglob("*"):
+            if asset.is_symlink():
+                raise ContractError(
+                    f"symlink forbidden in Ro-Store assets: {asset}"
+                )
+
+        shutil.copytree(
+            icons_source,
+            store_dir / "icons",
+            symlinks=False,
+        )
+
+    store_tree_sha256 = directory_tree_digest(store_dir)
+
     publication = {
         "schema_version": 1,
         "channel": channel,
         "snapshot_id": manifest["snapshot_id"],
         "published_at": timestamp(),
         "publication_run": str(run_id),
+        "store_tree_sha256": store_tree_sha256,
     }
     validate_schema(publication, "publication-v1")
+
     publication_path = target / "publication-v1.json"
     save(publication_path, publication)
+
     _sign_file_exact(
-        publication_path, gnupghome, metadata_fpr, passphrase_path
+        publication_path,
+        gnupghome,
+        metadata_fpr,
+        passphrase_path,
     )
+
     return publication
 
 
@@ -1369,6 +1410,102 @@ def verify_signed_remote_publication(publication_dir, snapshot, channel, gnupgho
         manifest["metadata_signing_fingerprint"],
         env,
     )
+
+    store_dir = publication_dir / "store"
+    expected_store_digest = publication.get("store_tree_sha256")
+
+    if expected_store_digest is not None:
+        if not store_dir.is_dir() or store_dir.is_symlink():
+            raise ContractError("signed Ro-Store publication is missing")
+
+        actual_store_digest = directory_tree_digest(store_dir)
+        if actual_store_digest != expected_store_digest:
+            raise ContractError("Ro-Store publication tree digest mismatch")
+
+        catalog_path = store_dir / "catalog.json"
+        catalog_signature = pathlib.Path(str(catalog_path) + ".asc")
+
+        if not catalog_path.is_file() or catalog_path.is_symlink():
+            raise ContractError("Ro-Store catalog is missing")
+
+        if not catalog_signature.is_file() or catalog_signature.is_symlink():
+            raise ContractError("Ro-Store catalog signature is missing")
+
+        verify_gpg_signature(
+            catalog_path,
+            catalog_signature,
+            manifest["metadata_signing_fingerprint"],
+            env,
+        )
+
+        store_catalog = load(catalog_path)
+
+        if store_catalog.get("schemaVersion") != 2:
+            raise ContractError("unsupported Ro-Store catalog schema")
+
+        if store_catalog.get("snapshotId") != manifest["snapshot_id"]:
+            raise ContractError("Ro-Store catalog snapshot mismatch")
+
+        apps = store_catalog.get("apps")
+        if not isinstance(apps, list):
+            raise ContractError("Ro-Store catalog apps must be an array")
+
+        snapshot_packages = set()
+        for item in manifest["packages"]:
+            if item["architecture"] in {"src", "nosrc"}:
+                continue
+
+            package_name, _, _, _, _ = _parse_snapshot_nevra(item["nevra"])
+            snapshot_packages.add(package_name)
+
+        seen_packages = set()
+
+        for app in apps:
+            if not isinstance(app, dict):
+                raise ContractError("invalid Ro-Store catalog application entry")
+
+            package_name = app.get("packageName")
+            if (
+                not isinstance(package_name, str)
+                or not package_name
+                or package_name not in snapshot_packages
+            ):
+                raise ContractError(
+                    f"Ro-Store catalog contains unknown package: {package_name}"
+                )
+
+            if package_name in seen_packages:
+                raise ContractError(
+                    f"duplicate Ro-Store catalog package: {package_name}"
+                )
+
+            seen_packages.add(package_name)
+
+            icon = app.get("icon")
+            if icon:
+                expected_icon_digest = app.get("iconSha256")
+                if (
+                    not isinstance(expected_icon_digest, str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", expected_icon_digest)
+                ):
+                    raise ContractError(
+                        f"Ro-Store icon digest missing for {package_name}"
+                    )
+
+                icon_path = _safe_store_asset(store_dir, icon)
+
+                if digest(icon_path) != expected_icon_digest:
+                    raise ContractError(
+                        f"Ro-Store icon digest mismatch for {package_name}"
+                    )
+
+    elif store_dir.exists():
+        # Legacy signed publications did not contain Ro-Store data.
+        # Never accept an unsigned/unbound store tree attached to one.
+        raise ContractError(
+            "legacy publication contains unbound Ro-Store metadata"
+        )
+
     return publication
 
 
@@ -1428,6 +1565,23 @@ def stage_remote_channel(publication_dir, site_root, channel, gnupghome):
             publication_dir / "publication-v1.json.asc",
             new_tree / "publication-v1.json.asc",
         )
+
+        expected_store_digest = publication.get("store_tree_sha256")
+        if expected_store_digest is not None:
+            store_source = publication_dir / "store"
+            store_target = new_tree / "store"
+
+            if not store_source.is_dir() or store_source.is_symlink():
+                raise ContractError("signed Ro-Store publication is missing")
+
+            shutil.copytree(
+                store_source,
+                store_target,
+                symlinks=False,
+            )
+
+            if directory_tree_digest(store_target) != expected_store_digest:
+                raise ContractError("remote Ro-Store channel copy mismatch")
 
         previous_snapshot = None
         previous_run = None
@@ -1836,14 +1990,147 @@ def rollback(output,channel):
     
     return load(target/"publication-v1.json")["snapshot_id"]
 
-def catalog(snapshot,editorial,out,gnupghome):
-    manifest=verify_snapshot(snapshot,gnupghome); metadata=load(editorial) if editorial else {"apps":{}}; grouped={}
+def _parse_snapshot_nevra(nevra):
+    """Return (name, epoch, version, release, arch) from snapshot NEVRA."""
+    if not isinstance(nevra, str) or not nevra:
+        raise ContractError("invalid snapshot NEVRA")
+
+    try:
+        without_arch, arch = nevra.rsplit(".", 1)
+        name_epoch_version, release = without_arch.rsplit("-", 1)
+        name_epoch, version = name_epoch_version.rsplit(":", 1)
+        name, epoch = name_epoch.rsplit("-", 1)
+    except ValueError as exc:
+        raise ContractError(f"invalid snapshot NEVRA: {nevra}") from exc
+
+    if not name or not epoch.isdigit() or not version or not release or not arch:
+        raise ContractError(f"invalid snapshot NEVRA: {nevra}")
+
+    return name, epoch, version, release, arch
+
+
+def _safe_store_asset(root, relative):
+    """Resolve one editorial asset without allowing traversal or symlinks."""
+    if not isinstance(relative, str) or not relative.strip():
+        raise ContractError("store asset path must be non-empty")
+
+    rel = pathlib.PurePosixPath(relative)
+
+    if rel.is_absolute() or ".." in rel.parts:
+        raise ContractError(f"unsafe store asset path: {relative}")
+
+    root = pathlib.Path(root).resolve()
+    target = (root / pathlib.Path(*rel.parts)).resolve()
+
+    try:
+        target.relative_to(root)
+    except ValueError as exc:
+        raise ContractError(f"store asset escapes metadata root: {relative}") from exc
+
+    if not target.is_file() or target.is_symlink():
+        raise ContractError(f"store asset missing or unsafe: {relative}")
+
+    return target
+
+
+def catalog(snapshot, editorial, out, gnupghome):
+    """Generate the Ro-Store catalog from a verified immutable snapshot."""
+    manifest = verify_snapshot(snapshot, gnupghome)
+
+    editorial_path = pathlib.Path(editorial) if editorial else None
+    metadata = load(editorial_path) if editorial_path else {"apps": {}}
+
+    if metadata.get("schemaVersion") not in {None, 1}:
+        raise ContractError("unsupported editorial schema version")
+
+    editorial_apps = metadata.get("apps", {})
+    if not isinstance(editorial_apps, dict):
+        raise ContractError("editorial apps must be an object")
+
+    grouped = {}
+
     for item in manifest["packages"]:
-        if item["architecture"]!="src": grouped.setdefault(item["nevra"].split("-0:",1)[0],[]).append(item)
-    apps=[]
-    for name,items in sorted(grouped.items()):
-        value=dict(metadata.get("apps",{}).get(name,{})); nevra=items[0]["nevra"]; value.update({"packageName":name,"latestVersion":nevra.split(":",1)[1].rsplit("-",1)[0],"architectures":sorted({x["architecture"] for x in items})}); apps.append(value)
-    save(out,{"schemaVersion":2,"snapshotId":manifest["snapshot_id"],"apps":apps})
+        if item["architecture"] in {"src", "nosrc"}:
+            continue
+
+        name, epoch, version, release, parsed_arch = _parse_snapshot_nevra(
+            item["nevra"]
+        )
+
+        if parsed_arch != item["architecture"]:
+            raise ContractError(
+                f"snapshot NEVRA architecture mismatch for {item['nevra']}"
+            )
+
+        grouped.setdefault(name, []).append(
+            {
+                "item": item,
+                "epoch": epoch,
+                "version": version,
+                "release": release,
+            }
+        )
+
+    apps = []
+    assets_root = editorial_path.parent if editorial_path else None
+
+    for name, items in sorted(grouped.items()):
+        # Ro-Repo may contain system packages. Only explicitly curated
+        # applications are exposed to Ro-Store.
+        if name not in editorial_apps:
+            continue
+
+        value = dict(editorial_apps[name])
+
+        visible = value.pop("visible", True)
+        if not visible:
+            continue
+
+        versions = {entry["version"] for entry in items}
+        releases = {entry["release"] for entry in items}
+        epochs = {entry["epoch"] for entry in items}
+
+        if len(versions) != 1 or len(releases) != 1 or len(epochs) != 1:
+            raise ContractError(
+                f"cross-architecture package version mismatch for {name}"
+            )
+
+        value.update(
+            {
+                "id": value.get("id", name),
+                "packageName": name,
+                "installPackage": name,
+                "source": value.get("source", "Ro-Repo"),
+                "packageType": "rpm",
+                "latestVersion": next(iter(versions)),
+                "latestRelease": next(iter(releases)),
+                "epoch": int(next(iter(epochs))),
+                "architectures": sorted(
+                    {entry["item"]["architecture"] for entry in items}
+                ),
+            }
+        )
+
+        icon = value.get("icon")
+        if icon:
+            if assets_root is None:
+                raise ContractError(
+                    f"editorial asset root unavailable for {name}"
+                )
+
+            icon_path = _safe_store_asset(assets_root, icon)
+            value["iconSha256"] = digest(icon_path)
+
+        apps.append(value)
+
+    result = {
+        "schemaVersion": 2,
+        "snapshotId": manifest["snapshot_id"],
+        "apps": apps,
+    }
+
+    save(out, result)
+    return result
 
 def cli():
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True)
