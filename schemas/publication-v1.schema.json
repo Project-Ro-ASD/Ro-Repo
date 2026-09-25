@@ -30,6 +30,10 @@
     "publication_run": {
       "type": "string",
       "minLength": 1
+    },
+    "store_tree_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     }
   }
 }

@@ -1293,10 +1293,22 @@ def stage_pages_snapshot(snapshot, site_root):
 
 
 def build_signed_remote_publication(snapshot, channel, output, publication_run,
-                                    gnupghome, metadata_key_id, passphrase_file):
+                                    gnupghome, metadata_key_id, passphrase_file,
+                                    reuse_store_from=None):
     """Create a signed remote channel manifest without rebuilding repository bytes."""
     if channel not in {"beta", "stable"}:
         raise ContractError("only beta/stable channels exist")
+
+    if channel == "stable" and reuse_store_from is None:
+        raise ContractError(
+            "stable publication requires exact beta Ro-Store reuse"
+        )
+
+    if channel == "beta" and reuse_store_from is not None:
+        raise ContractError(
+            "beta publication cannot reuse another Ro-Store publication"
+        )
+
     run_id = _normalize_numeric_identity(publication_run)
     if run_id is None:
         raise ContractError("publication workflow run must be a positive numeric identifier")
@@ -1320,19 +1332,103 @@ def build_signed_remote_publication(snapshot, channel, output, publication_run,
         raise ContractError("signed publication output already exists")
     target.mkdir(parents=True)
 
+    store_dir = target / "store"
+
+    if reuse_store_from is not None:
+        reuse_store_from = pathlib.Path(reuse_store_from)
+
+        # Stable must promote the exact Ro-Store metadata that was already
+        # published and tested in beta. Never regenerate it from current main.
+        beta_publication = verify_signed_remote_publication(
+            reuse_store_from,
+            snapshot,
+            "beta",
+            gnupghome,
+        )
+
+        beta_store_digest = beta_publication.get("store_tree_sha256")
+        if beta_store_digest is None:
+            raise ContractError(
+                "beta publication has no signed Ro-Store metadata"
+            )
+
+        beta_store = reuse_store_from / "store"
+        if not beta_store.is_dir() or beta_store.is_symlink():
+            raise ContractError("beta Ro-Store publication is missing")
+
+        shutil.copytree(
+            beta_store,
+            store_dir,
+            symlinks=False,
+        )
+
+        if directory_tree_digest(store_dir) != beta_store_digest:
+            raise ContractError(
+                "stable Ro-Store copy differs from exact beta publication"
+            )
+
+        store_tree_sha256 = beta_store_digest
+
+    else:
+        store_dir.mkdir()
+
+        catalog_path = store_dir / "catalog.json"
+        catalog(
+            snapshot,
+            ROOT / "store" / "editorial.json",
+            catalog_path,
+            gnupghome,
+        )
+
+        _sign_file_exact(
+            catalog_path,
+            gnupghome,
+            metadata_fpr,
+            passphrase_path,
+        )
+
+        icons_source = ROOT / "store" / "icons"
+
+        if icons_source.is_symlink():
+            raise ContractError(
+                "symlink forbidden for Ro-Store icons directory"
+            )
+
+        if icons_source.is_dir():
+            for asset in icons_source.rglob("*"):
+                if asset.is_symlink():
+                    raise ContractError(
+                        f"symlink forbidden in Ro-Store assets: {asset}"
+                    )
+
+            shutil.copytree(
+                icons_source,
+                store_dir / "icons",
+                symlinks=False,
+            )
+
+        store_tree_sha256 = directory_tree_digest(store_dir)
+
     publication = {
         "schema_version": 1,
         "channel": channel,
         "snapshot_id": manifest["snapshot_id"],
         "published_at": timestamp(),
         "publication_run": str(run_id),
+        "store_tree_sha256": store_tree_sha256,
     }
     validate_schema(publication, "publication-v1")
+
     publication_path = target / "publication-v1.json"
     save(publication_path, publication)
+
     _sign_file_exact(
-        publication_path, gnupghome, metadata_fpr, passphrase_path
+        publication_path,
+        gnupghome,
+        metadata_fpr,
+        passphrase_path,
     )
+
     return publication
 
 
@@ -1369,6 +1465,102 @@ def verify_signed_remote_publication(publication_dir, snapshot, channel, gnupgho
         manifest["metadata_signing_fingerprint"],
         env,
     )
+
+    store_dir = publication_dir / "store"
+    expected_store_digest = publication.get("store_tree_sha256")
+
+    if expected_store_digest is not None:
+        if not store_dir.is_dir() or store_dir.is_symlink():
+            raise ContractError("signed Ro-Store publication is missing")
+
+        actual_store_digest = directory_tree_digest(store_dir)
+        if actual_store_digest != expected_store_digest:
+            raise ContractError("Ro-Store publication tree digest mismatch")
+
+        catalog_path = store_dir / "catalog.json"
+        catalog_signature = pathlib.Path(str(catalog_path) + ".asc")
+
+        if not catalog_path.is_file() or catalog_path.is_symlink():
+            raise ContractError("Ro-Store catalog is missing")
+
+        if not catalog_signature.is_file() or catalog_signature.is_symlink():
+            raise ContractError("Ro-Store catalog signature is missing")
+
+        verify_gpg_signature(
+            catalog_path,
+            catalog_signature,
+            manifest["metadata_signing_fingerprint"],
+            env,
+        )
+
+        store_catalog = load(catalog_path)
+
+        if store_catalog.get("schemaVersion") != 2:
+            raise ContractError("unsupported Ro-Store catalog schema")
+
+        if store_catalog.get("snapshotId") != manifest["snapshot_id"]:
+            raise ContractError("Ro-Store catalog snapshot mismatch")
+
+        apps = store_catalog.get("apps")
+        if not isinstance(apps, list):
+            raise ContractError("Ro-Store catalog apps must be an array")
+
+        snapshot_packages = set()
+        for item in manifest["packages"]:
+            if item["architecture"] in {"src", "nosrc"}:
+                continue
+
+            package_name, _, _, _, _ = _parse_snapshot_nevra(item["nevra"])
+            snapshot_packages.add(package_name)
+
+        seen_packages = set()
+
+        for app in apps:
+            if not isinstance(app, dict):
+                raise ContractError("invalid Ro-Store catalog application entry")
+
+            package_name = app.get("packageName")
+            if (
+                not isinstance(package_name, str)
+                or not package_name
+                or package_name not in snapshot_packages
+            ):
+                raise ContractError(
+                    f"Ro-Store catalog contains unknown package: {package_name}"
+                )
+
+            if package_name in seen_packages:
+                raise ContractError(
+                    f"duplicate Ro-Store catalog package: {package_name}"
+                )
+
+            seen_packages.add(package_name)
+
+            icon = app.get("icon")
+            if icon:
+                expected_icon_digest = app.get("iconSha256")
+                if (
+                    not isinstance(expected_icon_digest, str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", expected_icon_digest)
+                ):
+                    raise ContractError(
+                        f"Ro-Store icon digest missing for {package_name}"
+                    )
+
+                icon_path = _safe_store_asset(store_dir, icon)
+
+                if digest(icon_path) != expected_icon_digest:
+                    raise ContractError(
+                        f"Ro-Store icon digest mismatch for {package_name}"
+                    )
+
+    elif store_dir.exists() or store_dir.is_symlink():
+        # Legacy signed publications did not contain Ro-Store data.
+        # Never accept an unsigned/unbound store tree attached to one.
+        raise ContractError(
+            "legacy publication contains unbound Ro-Store metadata"
+        )
+
     return publication
 
 
@@ -1428,6 +1620,23 @@ def stage_remote_channel(publication_dir, site_root, channel, gnupghome):
             publication_dir / "publication-v1.json.asc",
             new_tree / "publication-v1.json.asc",
         )
+
+        expected_store_digest = publication.get("store_tree_sha256")
+        if expected_store_digest is not None:
+            store_source = publication_dir / "store"
+            store_target = new_tree / "store"
+
+            if not store_source.is_dir() or store_source.is_symlink():
+                raise ContractError("signed Ro-Store publication is missing")
+
+            shutil.copytree(
+                store_source,
+                store_target,
+                symlinks=False,
+            )
+
+            if directory_tree_digest(store_target) != expected_store_digest:
+                raise ContractError("remote Ro-Store channel copy mismatch")
 
         previous_snapshot = None
         previous_run = None
@@ -1836,14 +2045,161 @@ def rollback(output,channel):
     
     return load(target/"publication-v1.json")["snapshot_id"]
 
-def catalog(snapshot,editorial,out,gnupghome):
-    manifest=verify_snapshot(snapshot,gnupghome); metadata=load(editorial) if editorial else {"apps":{}}; grouped={}
+def _parse_snapshot_nevra(nevra):
+    """Return (name, epoch, version, release, arch) from snapshot NEVRA."""
+    if not isinstance(nevra, str) or not nevra:
+        raise ContractError("invalid snapshot NEVRA")
+
+    try:
+        without_arch, arch = nevra.rsplit(".", 1)
+        name_epoch_version, release = without_arch.rsplit("-", 1)
+        name_epoch, version = name_epoch_version.rsplit(":", 1)
+        name, epoch = name_epoch.rsplit("-", 1)
+    except ValueError as exc:
+        raise ContractError(f"invalid snapshot NEVRA: {nevra}") from exc
+
+    if not name or not epoch.isdigit() or not version or not release or not arch:
+        raise ContractError(f"invalid snapshot NEVRA: {nevra}")
+
+    return name, epoch, version, release, arch
+
+
+def _safe_store_asset(root, relative):
+    """Resolve one editorial asset without allowing traversal or symlinks."""
+    if not isinstance(relative, str) or not relative.strip():
+        raise ContractError("store asset path must be non-empty")
+
+    rel = pathlib.PurePosixPath(relative)
+
+    if rel.is_absolute() or ".." in rel.parts:
+        raise ContractError(f"unsafe store asset path: {relative}")
+
+    root = pathlib.Path(root)
+
+    if root.is_symlink() or not root.is_dir():
+        raise ContractError("store asset root is missing or unsafe")
+
+    root_resolved = root.resolve()
+    target = root
+
+    # Reject symlinks before resolve() can hide them, including
+    # intermediate directories and the final asset itself.
+    for part in rel.parts:
+        target = target / part
+        if target.is_symlink():
+            raise ContractError(f"symlink forbidden in store asset path: {relative}")
+
+    resolved_target = target.resolve()
+
+    try:
+        resolved_target.relative_to(root_resolved)
+    except ValueError as exc:
+        raise ContractError(f"store asset escapes metadata root: {relative}") from exc
+
+    if not target.is_file():
+        raise ContractError(f"store asset missing or unsafe: {relative}")
+
+    return target
+
+
+def catalog(snapshot, editorial, out, gnupghome):
+    """Generate the Ro-Store catalog from a verified immutable snapshot."""
+    manifest = verify_snapshot(snapshot, gnupghome)
+
+    editorial_path = pathlib.Path(editorial) if editorial else None
+    metadata = load(editorial_path) if editorial_path else {"apps": {}}
+
+    if metadata.get("schemaVersion") not in {None, 1}:
+        raise ContractError("unsupported editorial schema version")
+
+    editorial_apps = metadata.get("apps", {})
+    if not isinstance(editorial_apps, dict):
+        raise ContractError("editorial apps must be an object")
+
+    grouped = {}
+
     for item in manifest["packages"]:
-        if item["architecture"]!="src": grouped.setdefault(item["nevra"].split("-0:",1)[0],[]).append(item)
-    apps=[]
-    for name,items in sorted(grouped.items()):
-        value=dict(metadata.get("apps",{}).get(name,{})); nevra=items[0]["nevra"]; value.update({"packageName":name,"latestVersion":nevra.split(":",1)[1].rsplit("-",1)[0],"architectures":sorted({x["architecture"] for x in items})}); apps.append(value)
-    save(out,{"schemaVersion":2,"snapshotId":manifest["snapshot_id"],"apps":apps})
+        if item["architecture"] in {"src", "nosrc"}:
+            continue
+
+        name, epoch, version, release, parsed_arch = _parse_snapshot_nevra(
+            item["nevra"]
+        )
+
+        if parsed_arch != item["architecture"]:
+            raise ContractError(
+                f"snapshot NEVRA architecture mismatch for {item['nevra']}"
+            )
+
+        grouped.setdefault(name, []).append(
+            {
+                "item": item,
+                "epoch": epoch,
+                "version": version,
+                "release": release,
+            }
+        )
+
+    apps = []
+    assets_root = editorial_path.parent if editorial_path else None
+
+    for name, items in sorted(grouped.items()):
+        # Ro-Repo may contain system packages. Only explicitly curated
+        # applications are exposed to Ro-Store.
+        if name not in editorial_apps:
+            continue
+
+        value = dict(editorial_apps[name])
+
+        visible = value.pop("visible", True)
+        if not visible:
+            continue
+
+        versions = {entry["version"] for entry in items}
+        releases = {entry["release"] for entry in items}
+        epochs = {entry["epoch"] for entry in items}
+
+        if len(versions) != 1 or len(releases) != 1 or len(epochs) != 1:
+            raise ContractError(
+                f"cross-architecture package version mismatch for {name}"
+            )
+
+        value.update(
+            {
+                "id": value.get("id", name),
+                "packageName": name,
+                "installPackage": name,
+                "source": value.get("source", "Ro-Repo"),
+                "packageType": "rpm",
+                "latestVersion": next(iter(versions)),
+                "latestRelease": next(iter(releases)),
+                "epoch": int(next(iter(epochs))),
+                "architectures": sorted(
+                    {entry["item"]["architecture"] for entry in items}
+                ),
+            }
+        )
+
+        icon = value.get("icon")
+        if icon:
+            if assets_root is None:
+                raise ContractError(
+                    f"editorial asset root unavailable for {name}"
+                )
+
+            icon_path = _safe_store_asset(assets_root, icon)
+            value["iconSha256"] = digest(icon_path)
+
+        apps.append(value)
+
+    result = {
+        "schemaVersion": 2,
+        "snapshotId": manifest["snapshot_id"],
+        "apps": apps,
+    }
+
+    save(out, result)
+    return result
 
 def cli():
     p=argparse.ArgumentParser(); s=p.add_subparsers(dest="command",required=True)
@@ -1859,7 +2215,7 @@ def cli():
     x=s.add_parser("stage-pages-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True)
     x=s.add_parser("validate-json"); x.add_argument("--schema",required=True); x.add_argument("--input",type=pathlib.Path,required=True)
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
-    x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True)
+    x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--reuse-store-from",type=pathlib.Path)
     x=s.add_parser("stage-remote-channel"); x.add_argument("--publication",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("rollback-remote-channel"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta"],required=True); x.add_argument("--target-publication-run",required=True); x.add_argument("--rollback-run",required=True); x.add_argument("--reason",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("prepare-remote-stable-promotion"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--validation",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--validation-run",required=True); x.add_argument("--approved-by",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
@@ -1912,7 +2268,7 @@ def main():
         elif a.command=="stage-pages-snapshot": print(json.dumps(stage_pages_snapshot(a.snapshot,a.site_root),sort_keys=True))
         elif a.command=="validate-json": validate_schema(load(a.input),a.schema)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
-        elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file)
+        elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file,a.reuse_store_from)
         elif a.command=="stage-remote-channel": print(json.dumps(stage_remote_channel(a.publication,a.site_root,a.channel,a.gnupghome),sort_keys=True))
         elif a.command=="rollback-remote-channel": print(json.dumps(rollback_remote_channel(a.site_root,a.channel,a.target_publication_run,a.rollback_run,a.reason,a.gnupghome),sort_keys=True))
         elif a.command=="prepare-remote-stable-promotion": print(json.dumps(prepare_remote_stable_promotion(a.site_root,a.validation,a.snapshot_id,a.validation_run,a.approved_by,a.output),sort_keys=True))

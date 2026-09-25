@@ -299,6 +299,10 @@ class RemoteStablePromotionTests(unittest.TestCase):
         self.assertNotIn("RO_REPO_METADATA_SIGNING_SUBKEY_B64", publisher)
         self.assertNotIn("RO_REPO_METADATA_SIGNING_PASSPHRASE", publisher)
         self.assertIn("verify-remote-stable", jobs)
+        self.assertIn(
+            "--reuse-store-from pages-site/rpm/fedora/44/beta",
+            text,
+        )
         self.assertNotIn("emergency", text.lower())
 
 
