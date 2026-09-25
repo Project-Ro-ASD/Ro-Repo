@@ -1293,10 +1293,22 @@ def stage_pages_snapshot(snapshot, site_root):
 
 
 def build_signed_remote_publication(snapshot, channel, output, publication_run,
-                                    gnupghome, metadata_key_id, passphrase_file):
+                                    gnupghome, metadata_key_id, passphrase_file,
+                                    reuse_store_from=None):
     """Create a signed remote channel manifest without rebuilding repository bytes."""
     if channel not in {"beta", "stable"}:
         raise ContractError("only beta/stable channels exist")
+
+    if channel == "stable" and reuse_store_from is None:
+        raise ContractError(
+            "stable publication requires exact beta Ro-Store reuse"
+        )
+
+    if channel == "beta" and reuse_store_from is not None:
+        raise ContractError(
+            "beta publication cannot reuse another Ro-Store publication"
+        )
+
     run_id = _normalize_numeric_identity(publication_run)
     if run_id is None:
         raise ContractError("publication workflow run must be a positive numeric identifier")
@@ -1321,38 +1333,75 @@ def build_signed_remote_publication(snapshot, channel, output, publication_run,
     target.mkdir(parents=True)
 
     store_dir = target / "store"
-    store_dir.mkdir()
 
-    catalog_path = store_dir / "catalog.json"
-    catalog(
-        snapshot,
-        ROOT / "store" / "editorial.json",
-        catalog_path,
-        gnupghome,
-    )
+    if reuse_store_from is not None:
+        reuse_store_from = pathlib.Path(reuse_store_from)
 
-    _sign_file_exact(
-        catalog_path,
-        gnupghome,
-        metadata_fpr,
-        passphrase_path,
-    )
+        # Stable must promote the exact Ro-Store metadata that was already
+        # published and tested in beta. Never regenerate it from current main.
+        beta_publication = verify_signed_remote_publication(
+            reuse_store_from,
+            snapshot,
+            "beta",
+            gnupghome,
+        )
 
-    icons_source = ROOT / "store" / "icons"
-    if icons_source.is_dir():
-        for asset in icons_source.rglob("*"):
-            if asset.is_symlink():
-                raise ContractError(
-                    f"symlink forbidden in Ro-Store assets: {asset}"
-                )
+        beta_store_digest = beta_publication.get("store_tree_sha256")
+        if beta_store_digest is None:
+            raise ContractError(
+                "beta publication has no signed Ro-Store metadata"
+            )
+
+        beta_store = reuse_store_from / "store"
+        if not beta_store.is_dir() or beta_store.is_symlink():
+            raise ContractError("beta Ro-Store publication is missing")
 
         shutil.copytree(
-            icons_source,
-            store_dir / "icons",
+            beta_store,
+            store_dir,
             symlinks=False,
         )
 
-    store_tree_sha256 = directory_tree_digest(store_dir)
+        if directory_tree_digest(store_dir) != beta_store_digest:
+            raise ContractError(
+                "stable Ro-Store copy differs from exact beta publication"
+            )
+
+        store_tree_sha256 = beta_store_digest
+
+    else:
+        store_dir.mkdir()
+
+        catalog_path = store_dir / "catalog.json"
+        catalog(
+            snapshot,
+            ROOT / "store" / "editorial.json",
+            catalog_path,
+            gnupghome,
+        )
+
+        _sign_file_exact(
+            catalog_path,
+            gnupghome,
+            metadata_fpr,
+            passphrase_path,
+        )
+
+        icons_source = ROOT / "store" / "icons"
+        if icons_source.is_dir():
+            for asset in icons_source.rglob("*"):
+                if asset.is_symlink():
+                    raise ContractError(
+                        f"symlink forbidden in Ro-Store assets: {asset}"
+                    )
+
+            shutil.copytree(
+                icons_source,
+                store_dir / "icons",
+                symlinks=False,
+            )
+
+        store_tree_sha256 = directory_tree_digest(store_dir)
 
     publication = {
         "schema_version": 1,
@@ -2146,7 +2195,7 @@ def cli():
     x=s.add_parser("stage-pages-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True)
     x=s.add_parser("validate-json"); x.add_argument("--schema",required=True); x.add_argument("--input",type=pathlib.Path,required=True)
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
-    x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True)
+    x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--reuse-store-from",type=pathlib.Path)
     x=s.add_parser("stage-remote-channel"); x.add_argument("--publication",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("rollback-remote-channel"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta"],required=True); x.add_argument("--target-publication-run",required=True); x.add_argument("--rollback-run",required=True); x.add_argument("--reason",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("prepare-remote-stable-promotion"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--validation",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--validation-run",required=True); x.add_argument("--approved-by",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
@@ -2199,7 +2248,7 @@ def main():
         elif a.command=="stage-pages-snapshot": print(json.dumps(stage_pages_snapshot(a.snapshot,a.site_root),sort_keys=True))
         elif a.command=="validate-json": validate_schema(load(a.input),a.schema)
         elif a.command=="verify-snapshot": verify_snapshot(a.snapshot,a.gnupghome)
-        elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file)
+        elif a.command=="build-signed-remote-publication": build_signed_remote_publication(a.snapshot,a.channel,a.output,a.publication_run,a.gnupghome,a.metadata_key_id,a.passphrase_file,a.reuse_store_from)
         elif a.command=="stage-remote-channel": print(json.dumps(stage_remote_channel(a.publication,a.site_root,a.channel,a.gnupghome),sort_keys=True))
         elif a.command=="rollback-remote-channel": print(json.dumps(rollback_remote_channel(a.site_root,a.channel,a.target_publication_run,a.rollback_run,a.reason,a.gnupghome),sort_keys=True))
         elif a.command=="prepare-remote-stable-promotion": print(json.dumps(prepare_remote_stable_promotion(a.site_root,a.validation,a.snapshot_id,a.validation_run,a.approved_by,a.output),sort_keys=True))

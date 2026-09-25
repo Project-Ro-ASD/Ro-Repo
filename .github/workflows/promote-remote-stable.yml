@@ -169,7 +169,7 @@ jobs:
 
           source/tools/ro-repo verify-snapshot             --snapshot "$snapshot"             --gnupghome "$signing_home"
 
-          source/tools/ro-repo build-signed-remote-publication             --snapshot "$snapshot"             --channel stable             --output signed-stable-publication             --publication-run "$GITHUB_RUN_ID"             --gnupghome "$signing_home"             --metadata-key-id "$metadata_fingerprint"             --passphrase-file "$passphrase_file"
+          source/tools/ro-repo build-signed-remote-publication             --snapshot "$snapshot"             --channel stable             --output signed-stable-publication             --publication-run "$GITHUB_RUN_ID"             --gnupghome "$signing_home"             --metadata-key-id "$metadata_fingerprint"             --passphrase-file "$passphrase_file"             --reuse-store-from pages-site/rpm/fedora/44/beta
 
       - name: Upload signed stable publication
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

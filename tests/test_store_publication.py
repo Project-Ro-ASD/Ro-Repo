@@ -339,5 +339,243 @@ class SignedStorePublicationTests(unittest.TestCase):
         )
 
 
+class StorePublicationBuilderTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = pathlib.Path(self.tmp.name)
+
+        self.snapshot_id = "repo-f44-20260921-001"
+        self.snapshot = self.root / self.snapshot_id
+        self.snapshot.mkdir()
+
+        sha = "a" * 64
+
+        self.manifest = {
+            "schema_version": 1,
+            "snapshot_id": self.snapshot_id,
+            "created_at": "2026-09-21T12:17:55Z",
+            "fedora_release": 44,
+            "parent_snapshot": None,
+            "packages": [
+                {
+                    "nevra": "ro-assist-0:0.2.5-1.fc44.x86_64",
+                    "architecture": "x86_64",
+                    "filename": "ro-assist-0.2.5-1.fc44.x86_64.rpm",
+                    "producer_artifact_sha256": sha,
+                    "published_signed_artifact_sha256": sha,
+                    "producer_manifest_digest": sha,
+                },
+                {
+                    "nevra": "ro-assist-0:0.2.5-1.fc44.aarch64",
+                    "architecture": "aarch64",
+                    "filename": "ro-assist-0.2.5-1.fc44.aarch64.rpm",
+                    "producer_artifact_sha256": sha,
+                    "published_signed_artifact_sha256": sha,
+                    "producer_manifest_digest": sha,
+                },
+            ],
+            "repositories": {
+                arch: {
+                    "repomd_sha256": sha,
+                    "repomd_signature_sha256": sha,
+                }
+                for arch in ("x86_64", "aarch64", "source")
+            },
+            "rpm_signing_fingerprint": "A" * 40,
+            "metadata_signing_fingerprint": "B" * 40,
+            "creation_provenance": {
+                "tool": "ro-repo-v2",
+                "run": "35598643758",
+            },
+        }
+
+        ro_repo.save(
+            self.snapshot / "repository-snapshot-v1.json",
+            self.manifest,
+        )
+
+        self.passphrase = self.root / "passphrase"
+        self.passphrase.write_text("", encoding="utf-8")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    @staticmethod
+    def fake_sign(path, gnupghome, key_id, passphrase_file):
+        pathlib.Path(str(path) + ".asc").write_text(
+            "test-signature",
+            encoding="utf-8",
+        )
+
+    def test_beta_builder_generates_signed_store_publication(self):
+        output = self.root / "beta-output"
+
+        with (
+            mock.patch.object(
+                ro_repo,
+                "require_secret_signing_subkey",
+                return_value="B" * 40,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_validate_passphrase_file",
+                return_value=self.passphrase,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_sign_file_exact",
+                side_effect=self.fake_sign,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "verify_snapshot",
+                return_value=self.manifest,
+            ),
+        ):
+            result = ro_repo.build_signed_remote_publication(
+                self.snapshot,
+                "beta",
+                output,
+                "500",
+                self.root / "gnupg",
+                "B" * 40,
+                self.passphrase,
+            )
+
+        publication = output / "beta"
+        store = publication / "store"
+
+        self.assertTrue((store / "catalog.json").is_file())
+        self.assertTrue((store / "catalog.json.asc").is_file())
+        self.assertTrue((store / "icons/ro-assist.svg").is_file())
+
+        catalog = ro_repo.load(store / "catalog.json")
+
+        self.assertEqual(catalog["snapshotId"], self.snapshot_id)
+        self.assertEqual(len(catalog["apps"]), 1)
+        self.assertEqual(
+            catalog["apps"][0]["packageName"],
+            "ro-assist",
+        )
+        self.assertEqual(
+            catalog["apps"][0]["latestVersion"],
+            "0.2.5",
+        )
+
+        self.assertEqual(
+            result["store_tree_sha256"],
+            ro_repo.directory_tree_digest(store),
+        )
+
+    def test_stable_builder_reuses_exact_beta_store(self):
+        beta_output = self.root / "beta-output"
+
+        common_patches = (
+            mock.patch.object(
+                ro_repo,
+                "require_secret_signing_subkey",
+                return_value="B" * 40,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_validate_passphrase_file",
+                return_value=self.passphrase,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_sign_file_exact",
+                side_effect=self.fake_sign,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "verify_snapshot",
+                return_value=self.manifest,
+            ),
+        )
+
+        with common_patches[0], common_patches[1], common_patches[2], common_patches[3]:
+            ro_repo.build_signed_remote_publication(
+                self.snapshot,
+                "beta",
+                beta_output,
+                "500",
+                self.root / "gnupg",
+                "B" * 40,
+                self.passphrase,
+            )
+
+        beta_publication = beta_output / "beta"
+        beta_manifest = ro_repo.load(
+            beta_publication / "publication-v1.json"
+        )
+
+        stable_output = self.root / "stable-output"
+
+        with (
+            mock.patch.object(
+                ro_repo,
+                "require_secret_signing_subkey",
+                return_value="B" * 40,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_validate_passphrase_file",
+                return_value=self.passphrase,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "_sign_file_exact",
+                side_effect=self.fake_sign,
+            ),
+            mock.patch.object(
+                ro_repo,
+                "verify_signed_remote_publication",
+                return_value=beta_manifest,
+            ) as verify_beta,
+            mock.patch.object(ro_repo, "catalog") as regenerate_catalog,
+        ):
+            result = ro_repo.build_signed_remote_publication(
+                self.snapshot,
+                "stable",
+                stable_output,
+                "600",
+                self.root / "gnupg",
+                "B" * 40,
+                self.passphrase,
+                reuse_store_from=beta_publication,
+            )
+
+        verify_beta.assert_called_once()
+        regenerate_catalog.assert_not_called()
+
+        beta_store = beta_publication / "store"
+        stable_store = stable_output / "stable/store"
+
+        self.assertEqual(
+            ro_repo.directory_tree_digest(beta_store),
+            ro_repo.directory_tree_digest(stable_store),
+        )
+
+        self.assertEqual(
+            result["store_tree_sha256"],
+            beta_manifest["store_tree_sha256"],
+        )
+
+    def test_stable_builder_refuses_catalog_regeneration(self):
+        with self.assertRaisesRegex(
+            ro_repo.ContractError,
+            "stable publication requires exact beta Ro-Store reuse",
+        ):
+            ro_repo.build_signed_remote_publication(
+                self.snapshot,
+                "stable",
+                self.root / "stable-output",
+                "600",
+                self.root / "gnupg",
+                "B" * 40,
+                self.passphrase,
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
