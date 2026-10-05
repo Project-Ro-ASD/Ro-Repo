@@ -260,6 +260,35 @@
           "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-kernel-policy.yml"
         }
       ]
+    },
+    {
+      "repository": "Project-Ro-ASD/ro-Installer",
+      "owner": "Project-Ro-ASD/ro-Installer maintainers",
+      "components": [
+        {
+          "component": "ro-installer",
+          "package_names": [
+            "ro-installer"
+          ],
+          "architectures": [
+            "x86_64"
+          ],
+          "risk_class": "critical-system",
+          "promotion_group": "ro-installer",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/ro-Installer/.github/workflows/release.yml"
+        }
+      ]
     }
   ]
 }
