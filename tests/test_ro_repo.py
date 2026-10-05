@@ -39,6 +39,28 @@ class ContractTests(unittest.TestCase):
         if not workflow:
             data[0]["verificationResult"]["statement"]["predicate"]["buildDefinition"]["externalParameters"].pop("workflow")
         (directory / f"{name}.json").write_text(json.dumps(data))
+    def test_rpm_header_parses_sourcepackage_flag_for_srpm(self):
+        fake = mock.Mock()
+        fake.stdout = "ro-installer\t0\t2.4.3\t1.fc44\tx86_64\t(none)\t1"
+        with mock.patch.object(ro_repo, "run", return_value=fake) as run_mock:
+            header = ro_repo.rpm_header(pathlib.Path("ro-installer-2.4.3-1.fc44.src.rpm"))
+        self.assertEqual(header["name"], "ro-installer")
+        self.assertEqual(header["architecture"], "src")
+        self.assertIsNone(header["source_rpm"])
+        self.assertEqual(header["nevra"], "ro-installer-0:2.4.3-1.fc44.src")
+        query = run_mock.call_args.args[0]
+        self.assertIn("%{SOURCEPACKAGE}", query)
+        self.assertNotIn("SOURCEPACKAGE?", query)
+
+    def test_rpm_header_keeps_binary_arch_and_source_linkage(self):
+        fake = mock.Mock()
+        fake.stdout = "ro-installer\t0\t2.4.3\t1.fc44\tx86_64\tro-installer-2.4.3-1.fc44.src.rpm\t0"
+        with mock.patch.object(ro_repo, "run", return_value=fake):
+            header = ro_repo.rpm_header(pathlib.Path("ro-installer-2.4.3-1.fc44.x86_64.rpm"))
+        self.assertEqual(header["architecture"], "x86_64")
+        self.assertEqual(header["source_rpm"], "ro-installer-2.4.3-1.fc44.src.rpm")
+        self.assertEqual(header["nevra"], "ro-installer-0:2.4.3-1.fc44.x86_64")
+
     def test_valid_component_and_acceptance(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers): ro_repo.verify_component(self.mp,self.artifacts,self.config,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True); ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_unattested=True,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True)
         self.assertTrue(list((self.root/"accepted").rglob("acceptance-evidence-v1.json")))
