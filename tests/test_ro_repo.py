@@ -48,7 +48,8 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(header["architecture"], "src")
         self.assertIsNone(header["source_rpm"])
         self.assertEqual(header["nevra"], "ro-installer-0:2.4.3-1.fc44.src")
-        query = run_mock.call_args.args[0]
+        argv = run_mock.call_args.args[0]
+        query = argv[3]
         self.assertIn("%{SOURCEPACKAGE}", query)
         self.assertNotIn("SOURCEPACKAGE?", query)
 
