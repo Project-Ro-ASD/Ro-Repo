@@ -355,7 +355,7 @@ def verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow
     return verified
 
 def rpm_header(path):
-    query = "%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\t%{ARCH}\t%{SOURCERPM}\t%|SOURCEPACKAGE?{true}:{false}|"
+    query = "%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\t%{ARCH}\t%{SOURCERPM}\t%{SOURCEPACKAGE}"
     try:
         values = run(["rpm", "-qp", "--qf", query, str(path)]).stdout.split("\t")
     except ContractError as exc:
@@ -364,11 +364,24 @@ def rpm_header(path):
             stage="rpm-header", received=pathlib.Path(path).name,
             hint="Publish a readable RPM with headers matching the manifest.",
         ) from exc
-    if len(values) != 7: raise ContractError(f"unexpected RPM header: {path}", code="RPM_HEADER_MISMATCH", stage="rpm-header", received=pathlib.Path(path).name, hint="Publish a valid RPM with complete headers.")
-    name, epoch, version, release, arch, source_rpm, is_source = values
-    arch = "src" if is_source == "true" else arch
-    return {"name":name,"epoch":int(epoch or 0),"version":version,"release":release,"architecture":arch,
-            "source_rpm":None if is_source == "true" else source_rpm,"nevra":f"{name}-{int(epoch or 0)}:{version}-{release}.{arch}"}
+    if len(values) != 7:
+        raise ContractError(
+            f"unexpected RPM header: {path}", code="RPM_HEADER_MISMATCH",
+            stage="rpm-header", received=pathlib.Path(path).name,
+            hint="Publish a valid RPM with complete headers.",
+        )
+    name, epoch, version, release, arch, source_rpm, sourcepackage = values
+    is_source = sourcepackage.strip() == "1"
+    arch = "src" if is_source else arch
+    return {
+        "name": name,
+        "epoch": int(epoch or 0),
+        "version": version,
+        "release": release,
+        "architecture": arch,
+        "source_rpm": None if is_source else source_rpm,
+        "nevra": f"{name}-{int(epoch or 0)}:{version}-{release}.{arch}",
+    }
 
 def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_path=None, test_only_allow_empty_fedora=False, test_only_allow_missing_sha256sums=False):
     try:
