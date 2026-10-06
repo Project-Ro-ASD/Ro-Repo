@@ -28,8 +28,24 @@ jobs:
     container: fedora:44
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Initialize provisional acceptance report
+        shell: bash
+        env:
+          PRODUCER: ${{ inputs.repository }}
+          TAG: ${{ inputs.tag }}
+          COMMIT: ${{ inputs.commit }}
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: |
+          set -euo pipefail
+          bash scripts/init_acceptance_report.sh \
+            "$PRODUCER" \
+            "$TAG" \
+            "$COMMIT" \
+            "$RELEASE_ID" \
+            acceptance-report-v1.json
       - name: Install acceptance tools
-        run: dnf -y install gh python3 python3-yaml python3-jsonschema rpm dnf-plugins-core
+        shell: bash
+        run: bash scripts/install_acceptance_tools.sh
       - name: Download and verify exact release identity
         shell: bash
         env:
@@ -130,6 +146,17 @@ jobs:
 
           with open("incoming/component-artifact-manifest-v1.json") as f:
               manifest = json.load(f)
+          try:
+              ro_repo.validate_schema(manifest, "component-artifact-manifest-v1")
+          except ro_repo.ContractError as error:
+              reject(
+                  str(error),
+                  "MANIFEST_IDENTITY_MISMATCH",
+                  "manifest-schema",
+                  expected="component-artifact-manifest-v1",
+                  received=None,
+                  hint="Publish a schema-valid immutable component manifest.",
+              )
           manifest_identity = ro_repo.normalize_acceptance_identity(manifest)
           identity["workflow_run"] = manifest_identity["workflow_run"]
 
@@ -263,18 +290,16 @@ jobs:
               raise
           PY
 
-          RUN_ID="$(jq -r '.run_id' attested-invocation.json)"
-          RUN_ATTEMPT="$(jq -r '.attempt' attested-invocation.json)"
-          ATTEMPT_JSON="$(gh api "repos/$PRODUCER/actions/runs/$RUN_ID/attempts/$RUN_ATTEMPT")"
-          [[ "$(jq -r '.status' <<<"$ATTEMPT_JSON")" == "completed" ]]
-          [[ "$(jq -r '.conclusion' <<<"$ATTEMPT_JSON")" == "success" ]]
-          [[ "$(jq -r '.event' <<<"$ATTEMPT_JSON")" == "push" ]]
-          [[ "$(jq -r '.head_sha' <<<"$ATTEMPT_JSON")" == "$COMMIT" ]]
-          [[ "$(jq -r '.head_branch' <<<"$ATTEMPT_JSON")" == "$TAG" ]]
+          python3 scripts/verify_attested_attempt.py \
+            --producer "$PRODUCER" \
+            --tag "$TAG" \
+            --commit "$COMMIT" \
+            --workflow "$(cat workflow.txt)" \
+            --invocation attested-invocation.json \
+            --manifest incoming/component-artifact-manifest-v1.json \
+            --report acceptance-report-v1.json
 
-          dnf repoquery --available --qf '%{name}' > fedora-44-package-names.raw
-          test -s fedora-44-package-names.raw
-          sort -u fedora-44-package-names.raw > fedora-44-package-names.txt
+          bash scripts/query_fedora_package_names.sh fedora-44-package-names.txt
           tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt --report acceptance-report-v1.json --expected-repository "$PRODUCER" --expected-tag "$TAG" --expected-commit "$COMMIT" --expected-release-id "$RELEASE_ID"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: success()
@@ -285,9 +310,11 @@ jobs:
           if-no-files-found: error
       - name: Write acceptance job summary
         if: always()
+        shell: bash
         run: |
-          if [[ -f acceptance-report-v1.json ]]; then
-            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          set +e
+          if [[ -f acceptance-report-v1.json ]] && command -v python3 >/dev/null 2>&1; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY" 2>/dev/null
           import json
           report = json.load(open("acceptance-report-v1.json", encoding="utf-8"))
           print(f"## Acceptance {report['result'].upper()}")
@@ -297,9 +324,12 @@ jobs:
           print(f"- Error code: `{report.get('error_code') or 'none'}`")
           print(f"- Remediation: {report.get('remediation_hint') or 'none'}")
           PY
-          else
-            printf '## Acceptance REJECTED\n- Report was not produced because setup failed before acceptance reporting.\n' >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$?" -eq 0 ]]; then
+              exit 0
+            fi
           fi
+          printf '## Acceptance REJECTED\n- Structured report is unavailable or could not be summarized; inspect the acceptance job log and uploaded report artifact when present.\n' >> "$GITHUB_STEP_SUMMARY"
+          exit 0
       - name: Upload acceptance report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -327,6 +357,7 @@ jobs:
           name: accepted-component-${{ github.run_id }}
           path: accepted
       - name: Sign accepted component with the isolated RPM subkey
+        shell: bash
         env:
           RO_REPO_RPM_SIGNING_SUBKEY_B64: ${{ secrets.RO_REPO_RPM_SIGNING_SUBKEY_B64 }}
           RO_REPO_RPM_SIGNING_PASSPHRASE: ${{ secrets.RO_REPO_RPM_SIGNING_PASSPHRASE }}

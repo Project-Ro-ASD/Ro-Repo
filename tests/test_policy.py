@@ -36,6 +36,16 @@ class PolicyTests(unittest.TestCase):
         self.assertIn("pathlib.Path(", workflow)
         self.assertRegex(workflow, r"import[^\n]*\bpathlib\b")
 
+    def test_acceptance_workflow_uses_shared_runtime_contract(self):
+        workflow = (ROOT / ".github/workflows/accept-component.yml").read_text(encoding="utf-8")
+        compatibility = (ROOT / ".github/workflows/fedora-compatibility.yml").read_text(encoding="utf-8")
+        test_workflow = (ROOT / ".github/workflows/test.yml").read_text(encoding="utf-8")
+        self.assertIn("scripts/install_acceptance_tools.sh", workflow)
+        self.assertIn("scripts/query_fedora_package_names.sh fedora-44-package-names.txt", workflow)
+        self.assertIn("scripts/verify_attested_attempt.py", workflow)
+        self.assertIn("scripts/query_fedora_package_names.sh fedora-44-package-names.txt", compatibility)
+        self.assertIn("acceptance-runtime-contract:", test_workflow)
+
     def test_no_implicit_latest_downloads(self):
         violations = []
         for path in ROOT.rglob('*'):

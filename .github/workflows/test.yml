@@ -23,3 +23,31 @@ jobs:
         run: dnf -y install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c dnf-plugins-core gnupg2 rpmlint gcc make jq python3-yaml
       - name: Run E2E Local
         run: tests/e2e-local.sh
+
+  acceptance-runtime-contract:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install exact acceptance runtime
+        shell: bash
+        run: bash scripts/install_acceptance_tools.sh
+      - name: Verify exact runtime executables
+        shell: bash
+        run: |
+          set -euo pipefail
+          for command_name in gh python3 rpm dnf bash sort awk base64 sha256sum; do
+            command -v "$command_name" >/dev/null
+          done
+          dnf repoquery --help >/dev/null
+      - name: Verify DNF5 package-name formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash scripts/query_fedora_package_names.sh package-names.txt bash coreutils
+          grep -qx 'bash' package-names.txt
+          grep -qx 'coreutils' package-names.txt
+          [[ "$(wc -l < package-names.txt)" -eq 2 ]]
+      - name: Run acceptance runtime contract tests
+        shell: bash
+        run: python3 -m unittest tests.test_acceptance_runtime -v

@@ -188,6 +188,21 @@ class ProductionSigningTests(unittest.TestCase):
             self.assertNotEqual(item["producer_artifact_sha256"], item["signed_artifact_sha256"])
             self.assertEqual(item["signed_artifact_sha256"], ro_repo.digest(output / item["filename"]))
 
+    def test_verify_signed_rpms_requires_all_signatures(self):
+        fake = mock.Mock()
+        with mock.patch.object(ro_repo, "run", return_value=fake) as run_mock:
+            ro_repo.verify_signed_rpms([self.rpm, self.srpm], self.test_public_key)
+        checks = [
+            call.args[0]
+            for call in run_mock.call_args_list
+            if "--checksig" in call.args[0]
+        ]
+        self.assertEqual(len(checks), 2)
+        for argv in checks:
+            self.assertIn("--define", argv)
+            define_index = argv.index("--define")
+            self.assertEqual(argv[define_index + 1], "_pkgverify_level all")
+
     def test_rpm6_exact_selector_uses_only_passphrase_file_path(self):
         source = self.root / "source.rpm"
         target = self.root / "target.rpm"
