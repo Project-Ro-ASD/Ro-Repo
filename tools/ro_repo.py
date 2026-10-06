@@ -394,7 +394,11 @@ def verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow
         candidate_invocations = set()
         for entry in payload:
             certificate = entry.get("verificationResult", {}).get("signature", {}).get("certificate", {})
-            uri = certificate.get("extensions", {}).get("runInvocationURI")
+            uri = certificate.get("runInvocationURI")
+            if uri is None:
+                extensions = certificate.get("extensions", {})
+                if isinstance(extensions, dict):
+                    uri = extensions.get("runInvocationURI")
             parsed = _parse_attestation_invocation_uri(uri)
             if parsed and parsed["repository"] == repo and parsed["run_id"] == expected_run:
                 candidate_invocations.add((parsed["run_id"], parsed["attempt"]))
