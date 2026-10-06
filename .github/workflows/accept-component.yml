@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           cat << 'EOF' > verify_identity.py
-          import yaml, json, sys, os, subprocess
+          import yaml, json, sys, os, subprocess, pathlib
           sys.path.insert(0, "tools")
           import ro_repo
 
