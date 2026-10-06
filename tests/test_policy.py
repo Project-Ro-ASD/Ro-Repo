@@ -31,6 +31,11 @@ class PolicyTests(unittest.TestCase):
                     
         self.assertEqual(violations, [], "Found forbidden gpgcheck=0 configurations")
 
+    def test_acceptance_inline_python_imports_pathlib_when_used(self):
+        workflow = (ROOT / ".github/workflows/accept-component.yml").read_text(encoding="utf-8")
+        self.assertIn("pathlib.Path(", workflow)
+        self.assertRegex(workflow, r"import[^\n]*\bpathlib\b")
+
     def test_no_implicit_latest_downloads(self):
         violations = []
         for path in ROOT.rglob('*'):
