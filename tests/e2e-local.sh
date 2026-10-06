@@ -87,7 +87,7 @@ chmod 600 "$work/test-passphrase"
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --fedora-names "$work/fedora-44-package-names.txt"
 "$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested --report "$work/acceptance-report-v1.json"
 
-expect_failure "signature|SIGNATURE" python3 - "$root" "$work/incoming" "$work/rpm-signing-public.asc" <<'PY'
+expect_failure "command failed: rpmkeys .*--checksig" python3 - "$root" "$work/incoming" "$work/rpm-signing-public.asc" <<'PY'
 import pathlib, sys
 sys.path.insert(0, str(pathlib.Path(sys.argv[1]) / "tools"))
 import ro_repo
