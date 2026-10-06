@@ -561,14 +561,21 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
         for item in manifest["artifacts"]
         if item["architecture"] not in {"src", "nosrc"}
     }
-    required_architectures = set(producer["architectures"])
-    if binary_architectures != required_architectures:
+    if not binary_architectures:
         raise ContractError(
-            "binary architecture coverage mismatch",
+            "component release contains no binary RPM",
             code="ARCHITECTURE_DENIED", stage="architecture",
-            expected=sorted(required_architectures), received=sorted(binary_architectures),
-            hint="Publish exactly the required binary architecture coverage for this component.",
+            expected="at least one allowed binary architecture", received=[],
         )
+    if config.get("schema_version") == 2:
+        required_architectures = set(producer["architectures"])
+        if binary_architectures != required_architectures:
+            raise ContractError(
+                "binary architecture coverage mismatch",
+                code="ARCHITECTURE_DENIED", stage="architecture",
+                expected=sorted(required_architectures), received=sorted(binary_architectures),
+                hint="Publish exactly the V2 component architecture coverage declared by producer policy.",
+            )
 
     if producer.get("srpm_required"):
         source_items = {
