@@ -269,6 +269,7 @@ def component_policies(config):
                     "sbom_required": bool(component.get("sbom_required")),
                     "allow_fedora_override": bool(component.get("allow_fedora_override")),
                     "trusted_signer_workflow": component.get("trusted_signer_workflow"),
+                    "require_complete_architecture_set": bool(component.get("require_complete_architecture_set", False)),
                 }
         return
 
@@ -288,6 +289,7 @@ def component_policies(config):
                 "sbom_required": bool(producer.get("sbom_required")),
                 "allow_fedora_override": bool(producer.get("allow_fedora_override")),
                 "trusted_signer_workflow": producer.get("trusted_signer_workflow"),
+                "require_complete_architecture_set": False,
             }
 
 
@@ -567,14 +569,14 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
             code="ARCHITECTURE_DENIED", stage="architecture",
             expected="at least one allowed binary architecture", received=[],
         )
-    if config.get("schema_version") == 2:
+    if producer.get("require_complete_architecture_set"):
         required_architectures = set(producer["architectures"])
         if binary_architectures != required_architectures:
             raise ContractError(
                 "binary architecture coverage mismatch",
                 code="ARCHITECTURE_DENIED", stage="architecture",
                 expected=sorted(required_architectures), received=sorted(binary_architectures),
-                hint="Publish exactly the V2 component architecture coverage declared by producer policy.",
+                hint="Publish exactly the component architecture coverage declared by producer policy.",
             )
 
     if producer.get("srpm_required"):
