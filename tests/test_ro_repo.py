@@ -92,9 +92,8 @@ class ContractTests(unittest.TestCase):
         self.assertIsNone(ro_repo._parse_attestation_invocation_uri("https://example.com/nope"))
 
     def test_binary_architecture_coverage_is_required(self):
-        source_only = [dict(self.manifest["artifacts"][1]), dict(self.manifest["artifacts"][1])]
-        source_only[1]["filename"] = "other.src.rpm"
-        source_only[1]["producer_artifact_sha256"] = source_only[0]["producer_artifact_sha256"]
+        self.rpm.unlink()
+        source_only = [dict(self.manifest["artifacts"][1])]
         self.manifest["artifacts"] = source_only
         self.mp.write_text(json.dumps(self.manifest))
         with mock.patch.object(ro_repo, "rpm_header", side_effect=self.headers):
@@ -146,10 +145,10 @@ class ContractTests(unittest.TestCase):
             self.assertEqual(json.loads((self.root/"accepted"/ro_repo.digest(self.mp)/"acceptance-evidence-v1.json").read_text())["verified_attestation"]["ro-control-1.0-1.fc44.x86_64.rpm"]["workflow_identity"], "Project-Ro-ASD/ro-Control/.github/workflows/release.yml")
     def test_attestation_commit_mismatch_rejected(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", side_effect=ro_repo.ContractError("gh fail")):
-            with self.assertRaisesRegex(ro_repo.ContractError,"gh cli rejection"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
+            with self.assertRaisesRegex(ro_repo.ContractError,"attestation validation failed"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
     def test_attestation_workflow_identity_missing_rejected(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", side_effect=ro_repo.ContractError("gh fail")):
-            with self.assertRaisesRegex(ro_repo.ContractError,"gh cli rejection"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
+            with self.assertRaisesRegex(ro_repo.ContractError,"attestation validation failed"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
     def test_cross_arch_variants_do_not_conflict(self):
         x86 = self.root/"pkg.x86_64.rpm"; x86.write_bytes(b"x86")
         arm = self.root/"pkg.aarch64.rpm"; arm.write_bytes(b"arm")
