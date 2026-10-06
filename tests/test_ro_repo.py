@@ -93,8 +93,13 @@ class ContractTests(unittest.TestCase):
 
     def test_binary_architecture_coverage_is_required(self):
         self.rpm.unlink()
-        source_only = [dict(self.manifest["artifacts"][1])]
-        self.manifest["artifacts"] = source_only
+        second_srpm = self.artifacts / "ro-control-1.0-1.fc44.other.src.rpm"
+        second_srpm.write_bytes(b"second-source-rpm")
+        first_source = dict(self.manifest["artifacts"][1])
+        second_source = dict(first_source)
+        second_source["filename"] = second_srpm.name
+        second_source["producer_artifact_sha256"] = ro_repo.digest(second_srpm)
+        self.manifest["artifacts"] = [first_source, second_source]
         self.mp.write_text(json.dumps(self.manifest))
         with mock.patch.object(ro_repo, "rpm_header", side_effect=self.headers):
             with self.assertRaisesRegex(ro_repo.ContractError, "contains no binary RPM"):
