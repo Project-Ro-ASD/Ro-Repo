@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install exact acceptance runtime
         shell: bash
-        run: scripts/install_acceptance_tools.sh
+        run: bash scripts/install_acceptance_tools.sh
       - name: Verify exact runtime executables
         shell: bash
         run: |
@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          scripts/query_fedora_package_names.sh package-names.txt bash coreutils
+          bash scripts/query_fedora_package_names.sh package-names.txt bash coreutils
           grep -qx 'bash' package-names.txt
           grep -qx 'coreutils' package-names.txt
           [[ "$(wc -l < package-names.txt)" -eq 2 ]]
