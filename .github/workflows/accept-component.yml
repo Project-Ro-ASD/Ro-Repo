@@ -31,6 +31,7 @@ jobs:
       - name: Install acceptance tools
         run: dnf -y install gh python3 python3-yaml python3-jsonschema rpm dnf-plugins-core
       - name: Download and verify exact release identity
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           PRODUCER: ${{ inputs.repository }}
@@ -38,6 +39,7 @@ jobs:
           COMMIT: ${{ inputs.commit }}
           RELEASE_ID: ${{ inputs.release_id }}
         run: |
+          set -euo pipefail
           cat << 'EOF' > verify_identity.py
           import yaml, json, sys, os, subprocess
           sys.path.insert(0, "tools")
@@ -101,6 +103,26 @@ jobs:
               reject("Release ID mismatch", "RELEASE_ID_MISMATCH", "release-id", expected=RELEASE_ID, received=release_data["id"], hint="Use the numeric ID of the exact GitHub release.")
           if release_data["tag_name"] != TAG:
               reject("Release tag mismatch", "MANIFEST_IDENTITY_MISMATCH", "release-identity", expected=TAG, received=release_data["tag_name"], hint="Use the exact immutable release tag.")
+          if release_data.get("draft") is not False:
+              reject("Release is still draft", "MANIFEST_IDENTITY_MISMATCH", "release-identity", expected=False, received=release_data.get("draft"), hint="Accept only a published immutable release.")
+          if release_data.get("immutable") is not True:
+              reject("Release is not natively immutable", "MANIFEST_IDENTITY_MISMATCH", "release-identity", expected=True, received=release_data.get("immutable"), hint="Enable GitHub immutable releases before publishing producer artifacts.")
+
+          expected_assets = {
+              "SHA256SUMS",
+              "component-artifact-manifest-v1.json",
+          }
+          release_asset_names = {asset.get("name") for asset in release_data.get("assets", [])}
+          rpm_asset_names = {name for name in release_asset_names if isinstance(name, str) and name.endswith(".rpm")}
+          if len(release_asset_names) != 4 or len(rpm_asset_names) != 2 or not expected_assets.issubset(release_asset_names):
+              reject(
+                  "Release asset inventory mismatch",
+                  "ARTIFACT_SET_MISMATCH",
+                  "artifact-set",
+                  expected="exactly 2 RPMs + SHA256SUMS + component-artifact-manifest-v1.json",
+                  received=sorted(release_asset_names),
+                  hint="Publish only the exact component release asset set.",
+              )
 
           print("Release verified. Downloading...")
           os.makedirs("incoming", exist_ok=True)
@@ -109,6 +131,16 @@ jobs:
 
           if not os.path.isfile("incoming/component-artifact-manifest-v1.json"):
               reject("Missing manifest", "ARTIFACT_SET_MISMATCH", "artifact-set", expected="component-artifact-manifest-v1.json", hint="Publish the required manifest in the immutable release.")
+
+          downloaded = {path.name for path in pathlib.Path("incoming").iterdir() if path.is_file()}
+          if downloaded != release_asset_names:
+              reject(
+                  "Downloaded release inventory differs from GitHub release inventory",
+                  "ARTIFACT_SET_MISMATCH",
+                  "artifact-set",
+                  expected=sorted(release_asset_names),
+                  received=sorted(downloaded),
+              )
 
           with open("incoming/component-artifact-manifest-v1.json") as f:
               manifest = json.load(f)
@@ -148,9 +180,13 @@ jobs:
               reject("Workflow run repository mismatch", "PROVENANCE_MISMATCH", "provenance", expected=PRODUCER, received=run_data["head_repository"]["full_name"])
           if run_data["head_sha"] != COMMIT:
               reject("Workflow run commit mismatch", "PROVENANCE_MISMATCH", "provenance", expected=COMMIT, received=run_data["head_sha"])
-          if run_data["conclusion"] != "success":
-              reject("Workflow run not success", "PROVENANCE_MISMATCH", "provenance", expected="success", received=run_data["conclusion"])
+          if run_data["event"] != "push":
+              reject("Workflow run event mismatch", "PROVENANCE_MISMATCH", "provenance", expected="push", received=run_data["event"])
+          if run_data.get("head_branch") != TAG:
+              reject("Workflow run tag ref mismatch", "PROVENANCE_MISMATCH", "provenance", expected=TAG, received=run_data.get("head_branch"))
 
+          # Aggregate run conclusion may change after a rerun. Cryptographic
+          # provenance is bound below to one verified run attempt instead.
           # gh attestation uses the repo prefix for workflow matching, so does our trusted_signer_workflow
           # The run_data["path"] from GitHub API is usually just '.github/workflows/something.yml'
           # We check if PRODUCER + "/" + run_data["path"] matches exactly
@@ -163,7 +199,39 @@ jobs:
               f.write(workflow_path)
           EOF
           python3 verify_identity.py
-          dnf repoquery --available --qf '%{name}' | sort -u > fedora-44-package-names.txt
+
+          python3 - <<'PY'
+          import json, pathlib, subprocess, sys
+          sys.path.insert(0, "tools")
+          import ro_repo
+
+          manifest_path = pathlib.Path("incoming/component-artifact-manifest-v1.json")
+          manifest = json.loads(manifest_path.read_text())
+          config = ro_repo.load_producer_registry("config/producers-v2.json")
+          policy = ro_repo.resolve_component_policy(config, manifest["source_repository"], manifest["component"])
+          verified = ro_repo.verify_attestations(manifest, pathlib.Path("incoming"), manifest_path, policy["trusted_signer_workflow"])
+          invocations = {
+              (item["workflow_run"], item["workflow_attempt"])
+              for item in verified.values()
+          }
+          if len(invocations) != 1:
+              raise SystemExit(f"expected one attested workflow attempt, got {sorted(invocations)}")
+          run_id, attempt = next(iter(invocations))
+          pathlib.Path("attested-invocation.json").write_text(json.dumps({"run_id": run_id, "attempt": attempt}))
+          PY
+
+          RUN_ID="$(jq -r '.run_id' attested-invocation.json)"
+          RUN_ATTEMPT="$(jq -r '.attempt' attested-invocation.json)"
+          ATTEMPT_JSON="$(gh api "repos/$PRODUCER/actions/runs/$RUN_ID/attempts/$RUN_ATTEMPT")"
+          [[ "$(jq -r '.status' <<<"$ATTEMPT_JSON")" == "completed" ]]
+          [[ "$(jq -r '.conclusion' <<<"$ATTEMPT_JSON")" == "success" ]]
+          [[ "$(jq -r '.event' <<<"$ATTEMPT_JSON")" == "push" ]]
+          [[ "$(jq -r '.head_sha' <<<"$ATTEMPT_JSON")" == "$COMMIT" ]]
+          [[ "$(jq -r '.head_branch' <<<"$ATTEMPT_JSON")" == "$TAG" ]]
+
+          dnf repoquery --available --qf '%{name}' > fedora-44-package-names.raw
+          test -s fedora-44-package-names.raw
+          sort -u fedora-44-package-names.raw > fedora-44-package-names.txt
           tools/ro-repo accept-package --manifest incoming/component-artifact-manifest-v1.json --artifacts incoming --accepted accepted --fedora-names fedora-44-package-names.txt --report acceptance-report-v1.json --expected-repository "$PRODUCER" --expected-tag "$TAG" --expected-commit "$COMMIT" --expected-release-id "$RELEASE_ID"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: success()
