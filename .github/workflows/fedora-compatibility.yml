@@ -18,7 +18,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Fetching available Fedora 44 package names..."
-          scripts/query_fedora_package_names.sh fedora-44-package-names.txt
+          bash scripts/query_fedora_package_names.sh fedora-44-package-names.txt
           echo "Checking for collisions with allowed Ro-ASD components..."
           python3 - <<'PY'
           import sys
