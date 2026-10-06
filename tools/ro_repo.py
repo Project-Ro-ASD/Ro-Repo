@@ -269,6 +269,7 @@ def component_policies(config):
                     "sbom_required": bool(component.get("sbom_required")),
                     "allow_fedora_override": bool(component.get("allow_fedora_override")),
                     "trusted_signer_workflow": component.get("trusted_signer_workflow"),
+                    "require_complete_architecture_set": bool(component.get("require_complete_architecture_set", False)),
                 }
         return
 
@@ -288,6 +289,7 @@ def component_policies(config):
                 "sbom_required": bool(producer.get("sbom_required")),
                 "allow_fedora_override": bool(producer.get("allow_fedora_override")),
                 "trusted_signer_workflow": producer.get("trusted_signer_workflow"),
+                "require_complete_architecture_set": False,
             }
 
 
@@ -329,6 +331,22 @@ def require(obj, fields, where):
     missing = sorted(set(fields) - set(obj))
     if missing: raise ContractError(f"{where} missing fields: {', '.join(missing)}")
 
+def _parse_attestation_invocation_uri(value):
+    if not isinstance(value, str):
+        return None
+    match = re.fullmatch(
+        r"https://github\.com/([^/]+/[^/]+)/actions/runs/([1-9][0-9]*)/attempts/([1-9][0-9]*)",
+        value,
+    )
+    if not match:
+        return None
+    return {
+        "repository": match.group(1),
+        "run_id": int(match.group(2)),
+        "attempt": int(match.group(3)),
+    }
+
+
 def verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow):
     targets = {item["filename"]: pathlib.Path(artifacts_dir) / item["filename"] for item in manifest["artifacts"]}
     if (pathlib.Path(artifacts_dir) / "SHA256SUMS").is_file():
@@ -337,21 +355,82 @@ def verify_attestations(manifest, artifacts_dir, manifest_path, trusted_workflow
     verified = {}
     repo = manifest["source_repository"]
     commit = manifest["source_commit"]
+    tag_ref = f"refs/tags/{manifest['release_tag']}"
+    expected_run = _normalize_numeric_identity(manifest.get("workflow_run"))
+    if expected_run is None:
+        raise ContractError(
+            "manifest workflow_run must be a positive numeric run ID",
+            code="MANIFEST_IDENTITY_MISMATCH", stage="provenance",
+            expected="positive numeric workflow run ID", received=manifest.get("workflow_run"),
+        )
+
+    invocation = None
     for name, path in sorted(targets.items()):
         try:
-            run(["gh", "attestation", "verify", str(path), "--repo", repo, "--source-digest", commit, "--signer-workflow", trusted_workflow, "--deny-self-hosted-runners"])
-        except Exception:
+            result = run([
+                "gh", "attestation", "verify", str(path),
+                "--repo", repo,
+                "--source-digest", commit,
+                "--source-ref", tag_ref,
+                "--signer-workflow", trusted_workflow,
+                "--deny-self-hosted-runners",
+                "--format", "json",
+            ])
+            payload = json.loads(result.stdout)
+        except Exception as exc:
+            detail = str(exc)
             raise ContractError(
-                f"attestation validation failed (gh cli rejection): {name}",
+                f"attestation validation failed for {name}: {detail}",
                 code="PROVENANCE_MISMATCH", stage="provenance",
-                hint="Regenerate the release asset and GitHub attestation from the trusted workflow.",
+                hint="Retry verifier transport failures; regenerate only when provenance identity is actually invalid.",
+            ) from exc
+
+        if not isinstance(payload, list) or not payload:
+            raise ContractError(
+                f"attestation verifier returned no verified certificates for {name}",
+                code="PROVENANCE_MISMATCH", stage="provenance",
             )
+
+        candidate_invocations = set()
+        for entry in payload:
+            certificate = entry.get("verificationResult", {}).get("signature", {}).get("certificate", {})
+            uri = certificate.get("extensions", {}).get("runInvocationURI")
+            parsed = _parse_attestation_invocation_uri(uri)
+            if parsed and parsed["repository"] == repo and parsed["run_id"] == expected_run:
+                candidate_invocations.add((parsed["run_id"], parsed["attempt"]))
+
+        if len(candidate_invocations) != 1:
+            raise ContractError(
+                f"attestation invocation mismatch for {name}",
+                code="PROVENANCE_MISMATCH", stage="provenance",
+                expected={"repository": repo, "run_id": expected_run},
+                received=sorted(candidate_invocations),
+                hint="Attest every release asset from the exact producer run and tag ref.",
+            )
+
+        this_invocation = next(iter(candidate_invocations))
+        if invocation is None:
+            invocation = this_invocation
+        elif invocation != this_invocation:
+            raise ContractError(
+                "release assets were attested by different workflow attempts",
+                code="PROVENANCE_MISMATCH", stage="provenance",
+                expected=invocation, received=this_invocation,
+            )
+
         verified[name] = {
             "artifact_sha256": digest(path),
             "source_repository": repo,
             "source_commit": commit,
+            "source_ref": tag_ref,
             "workflow_identity": trusted_workflow,
+            "workflow_run": invocation[0],
+            "workflow_attempt": invocation[1],
         }
+
+    if invocation is None:
+        raise ContractError("no verified attestation invocation found", code="PROVENANCE_MISMATCH", stage="provenance")
+
     return verified
 
 def rpm_header(path):
@@ -457,8 +536,13 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
         for item in manifest["artifacts"]:
             if item["filename"] not in sums: raise ContractError(f"SHA256SUMS missing entry for {item['filename']}", code="SHA256SUMS_INVALID", stage="sha256sums", expected=item["filename"], hint="Regenerate SHA256SUMS for the complete artifact set.")
             if sums[item["filename"]] != item["producer_artifact_sha256"]: raise ContractError(f"SHA256SUMS digest mismatch for {item['filename']}", code="SHA256SUMS_INVALID", stage="sha256sums", expected=item["producer_artifact_sha256"], received=sums[item["filename"]], hint="Rebuild the immutable release with matching manifest and checksum data.")
-        extra_sums = {k for k in sums.keys() if k.endswith('.rpm')} - manifest_rpms
-        if extra_sums: raise ContractError(f"SHA256SUMS contains unknown RPMs: {extra_sums}", code="SHA256SUMS_INVALID", stage="sha256sums", received=sorted(extra_sums), hint="Remove undeclared RPM entries by publishing a corrected immutable release.")
+        if set(sums) != manifest_rpms:
+            raise ContractError(
+                "SHA256SUMS filename set must exactly equal the manifest RPM set",
+                code="SHA256SUMS_INVALID", stage="sha256sums",
+                expected=sorted(manifest_rpms), received=sorted(sums),
+                hint="Regenerate canonical SHA256SUMS for exactly the declared RPM artifacts.",
+            )
 
     for item in manifest["artifacts"]:
         filename=item["filename"]
@@ -474,9 +558,58 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
         if item["architecture"] not in {"src","nosrc"} and item["architecture"] not in producer["architectures"]: raise ContractError(f"architecture denied: {item['architecture']}", code="ARCHITECTURE_DENIED", stage="architecture", expected=producer["architectures"], received=item["architecture"], hint="Publish only an architecture allowed by the producer registry.")
         if item["architecture"] in {"src","nosrc"}: source_names.add(filename)
         headers.append(header)
+    binary_architectures = {
+        item["architecture"]
+        for item in manifest["artifacts"]
+        if item["architecture"] not in {"src", "nosrc"}
+    }
+    if not binary_architectures:
+        raise ContractError(
+            "component release contains no binary RPM",
+            code="ARCHITECTURE_DENIED", stage="architecture",
+            expected="at least one allowed binary architecture", received=[],
+        )
+    if producer.get("require_complete_architecture_set"):
+        required_architectures = set(producer["architectures"])
+        if binary_architectures != required_architectures:
+            raise ContractError(
+                "binary architecture coverage mismatch",
+                code="ARCHITECTURE_DENIED", stage="architecture",
+                expected=sorted(required_architectures), received=sorted(binary_architectures),
+                hint="Publish exactly the component architecture coverage declared by producer policy.",
+            )
+
     if producer.get("srpm_required"):
+        source_items = {
+            item["filename"]: item
+            for item in manifest["artifacts"]
+            if item["architecture"] in {"src", "nosrc"}
+        }
+        if len(source_items) != 1:
+            raise ContractError(
+                "exactly one matching source RPM is required",
+                code="SRPM_MISSING", stage="srpm-parity",
+                expected=1, received=len(source_items),
+            )
         for item in manifest["artifacts"]:
-            if item["architecture"] not in {"src","nosrc"} and item["source_rpm"] not in source_names: raise ContractError(f"missing matching SRPM: {item['source_rpm']}", code="SRPM_MISSING", stage="srpm-parity", expected=item["source_rpm"], received=sorted(source_names), hint="Publish the matching source RPM in the same immutable release.")
+            if item["architecture"] in {"src", "nosrc"}:
+                continue
+            if item["source_rpm"] not in source_items:
+                raise ContractError(
+                    f"missing matching SRPM: {item['source_rpm']}",
+                    code="SRPM_MISSING", stage="srpm-parity",
+                    expected=item["source_rpm"], received=sorted(source_items),
+                    hint="Publish the matching source RPM in the same immutable release.",
+                )
+            source = source_items[item["source_rpm"]]
+            for field in ("name", "epoch", "version", "release"):
+                if item[field] != source[field]:
+                    raise ContractError(
+                        f"binary/source RPM identity mismatch: {field}",
+                        code="SRPM_MISSING", stage="srpm-parity",
+                        expected=source[field], received=item[field],
+                        hint="Build binary and source RPMs from the same exact package identity.",
+                    )
     if producer.get("sbom_required") and not manifest.get("sbom"): raise ContractError("SBOM required", code="ARTIFACT_SET_MISMATCH", stage="artifact-set", expected="SBOM", hint="Publish the required SBOM with the immutable release.")
     names_path=pathlib.Path(fedora_names_path) if fedora_names_path else ROOT/config["fedora_package_names_file"]
     fedora=set(line.strip() for line in names_path.read_text().splitlines() if line.strip() and not line.startswith("#"))

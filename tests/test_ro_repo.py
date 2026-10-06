@@ -15,6 +15,25 @@ class ContractTests(unittest.TestCase):
     def tearDown(self): self.tmp.cleanup()
     def headers(self,path):
         source=path.name.endswith("src.rpm"); return {"name":"ro-control","epoch":0,"version":"1.0","release":"1.fc44","architecture":"src" if source else "x86_64","source_rpm":None if source else self.srpm.name,"nevra":"ro-control-0:1.0-1.fc44."+("src" if source else "x86_64")}
+    def verified_attestation_result(self, run_id=20, attempt=1):
+        payload = [{
+            "verificationResult": {
+                "signature": {
+                    "certificate": {
+                        "extensions": {
+                            "runInvocationURI": (
+                                "https://github.com/Project-Ro-ASD/ro-Control/"
+                                f"actions/runs/{run_id}/attempts/{attempt}"
+                            )
+                        }
+                    }
+                }
+            }
+        }]
+        result = mock.Mock()
+        result.stdout = json.dumps(payload)
+        return result
+
     def write_attestation(self, directory, name, path, commit=None, workflow=True):
         data = [{
             "verificationResult": {
@@ -62,20 +81,79 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(header["source_rpm"], "ro-installer-2.4.3-1.fc44.src.rpm")
         self.assertEqual(header["nevra"], "ro-installer-0:2.4.3-1.fc44.x86_64")
 
+    def test_parse_attestation_invocation_uri(self):
+        parsed = ro_repo._parse_attestation_invocation_uri(
+            "https://github.com/Project-Ro-ASD/ro-Installer/actions/runs/12345/attempts/2"
+        )
+        self.assertEqual(
+            parsed,
+            {"repository": "Project-Ro-ASD/ro-Installer", "run_id": 12345, "attempt": 2},
+        )
+        self.assertIsNone(ro_repo._parse_attestation_invocation_uri("https://example.com/nope"))
+
+    def test_binary_architecture_coverage_is_required(self):
+        self.rpm.unlink()
+        second_srpm = self.artifacts / "ro-control-1.0-1.fc44.other.src.rpm"
+        second_srpm.write_bytes(b"second-source-rpm")
+        first_source = dict(self.manifest["artifacts"][1])
+        second_source = dict(first_source)
+        second_source["filename"] = second_srpm.name
+        second_source["producer_artifact_sha256"] = ro_repo.digest(second_srpm)
+        self.manifest["artifacts"] = [first_source, second_source]
+        self.mp.write_text(json.dumps(self.manifest))
+        with mock.patch.object(ro_repo, "rpm_header", side_effect=self.headers):
+            with self.assertRaisesRegex(ro_repo.ContractError, "contains no binary RPM"):
+                ro_repo.verify_component(
+                    self.mp, self.artifacts, self.config,
+                    test_only_allow_empty_fedora=True,
+                    test_only_allow_missing_sha256sums=True,
+                )
+
+    def test_binary_source_identity_mismatch_is_rejected(self):
+        self.manifest["artifacts"][1]["version"] = "9.9.9"
+        self.mp.write_text(json.dumps(self.manifest))
+        def mismatched_headers(path):
+            header = self.headers(path)
+            if path.name.endswith("src.rpm"):
+                header["version"] = "9.9.9"
+            return header
+        with mock.patch.object(ro_repo, "rpm_header", side_effect=mismatched_headers):
+            with self.assertRaisesRegex(ro_repo.ContractError, "binary/source RPM identity mismatch"):
+                ro_repo.verify_component(
+                    self.mp, self.artifacts, self.config,
+                    test_only_allow_empty_fedora=True,
+                    test_only_allow_missing_sha256sums=True,
+                )
+
+    def test_sha256sums_extra_non_rpm_entry_is_rejected(self):
+        sums = self.artifacts / "SHA256SUMS"
+        sums.write_text(
+            "\n".join(
+                [f"{item['producer_artifact_sha256']}  {item['filename']}" for item in self.manifest["artifacts"]]
+                + [f"{'0'*64}  README.txt"]
+            ) + "\n"
+        )
+        with mock.patch.object(ro_repo, "rpm_header", side_effect=self.headers):
+            with self.assertRaisesRegex(ro_repo.ContractError, "filename set"):
+                ro_repo.verify_component(
+                    self.mp, self.artifacts, self.config,
+                    test_only_allow_empty_fedora=True,
+                )
+
     def test_valid_component_and_acceptance(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers): ro_repo.verify_component(self.mp,self.artifacts,self.config,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True); ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_unattested=True,test_only_allow_empty_fedora=True,test_only_allow_missing_sha256sums=True)
         self.assertTrue(list((self.root/"accepted").rglob("acceptance-evidence-v1.json")))
     def test_attestation_exact_match_acceptance(self):
-        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", return_value=mock.Mock()):
+        with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", return_value=self.verified_attestation_result()):
             ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
             self.assertEqual(json.loads((self.root/"accepted"/ro_repo.digest(self.mp)/"acceptance-evidence-v1.json").read_text())["verified_provenance"], "github_attestation_exact_match")
             self.assertEqual(json.loads((self.root/"accepted"/ro_repo.digest(self.mp)/"acceptance-evidence-v1.json").read_text())["verified_attestation"]["ro-control-1.0-1.fc44.x86_64.rpm"]["workflow_identity"], "Project-Ro-ASD/ro-Control/.github/workflows/release.yml")
     def test_attestation_commit_mismatch_rejected(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", side_effect=ro_repo.ContractError("gh fail")):
-            with self.assertRaisesRegex(ro_repo.ContractError,"gh cli rejection"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
+            with self.assertRaisesRegex(ro_repo.ContractError,"attestation validation failed"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
     def test_attestation_workflow_identity_missing_rejected(self):
         with mock.patch.object(ro_repo,"rpm_header",side_effect=self.headers), mock.patch.object(ro_repo,"run", side_effect=ro_repo.ContractError("gh fail")):
-            with self.assertRaisesRegex(ro_repo.ContractError,"gh cli rejection"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
+            with self.assertRaisesRegex(ro_repo.ContractError,"attestation validation failed"): ro_repo.accept(self.mp,self.artifacts,self.root/"accepted",self.config,test_only_allow_missing_sha256sums=True,test_only_allow_empty_fedora=True)
     def test_cross_arch_variants_do_not_conflict(self):
         x86 = self.root/"pkg.x86_64.rpm"; x86.write_bytes(b"x86")
         arm = self.root/"pkg.aarch64.rpm"; arm.write_bytes(b"arm")

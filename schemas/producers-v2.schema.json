@@ -2,32 +2,55 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "fedora_release", "fedora_package_names_file", "producers"],
+  "required": [
+    "schema_version",
+    "fedora_release",
+    "fedora_package_names_file",
+    "producers"
+  ],
   "properties": {
-    "schema_version": {"const": 2},
-    "fedora_release": {"const": 44},
-    "fedora_package_names_file": {"type": "string", "minLength": 1},
+    "schema_version": {
+      "const": 2
+    },
+    "fedora_release": {
+      "const": 44
+    },
+    "fedora_package_names_file": {
+      "type": "string",
+      "minLength": 1
+    },
     "producers": {
       "type": "array",
       "minItems": 1,
-      "items": {"$ref": "#/$defs/producer"}
+      "items": {
+        "$ref": "#/$defs/producer"
+      }
     }
   },
   "$defs": {
     "producer": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "owner", "components"],
+      "required": [
+        "repository",
+        "owner",
+        "components"
+      ],
       "properties": {
         "repository": {
           "type": "string",
           "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
         },
-        "owner": {"type": "string", "minLength": 1},
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
         "components": {
           "type": "array",
           "minItems": 1,
-          "items": {"$ref": "#/$defs/component"}
+          "items": {
+            "$ref": "#/$defs/component"
+          }
         }
       }
     },
@@ -47,32 +70,66 @@
         "trusted_signer_workflow"
       ],
       "properties": {
-        "component": {"type": "string", "minLength": 1},
+        "component": {
+          "type": "string",
+          "minLength": 1
+        },
         "package_names": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "architectures": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {"enum": ["x86_64", "aarch64", "noarch"]}
+          "items": {
+            "enum": [
+              "x86_64",
+              "aarch64",
+              "noarch"
+            ]
+          }
         },
         "risk_class": {
-          "enum": ["normal-app", "critical-desktop", "critical-system"]
+          "enum": [
+            "normal-app",
+            "critical-desktop",
+            "critical-system"
+          ]
         },
-        "promotion_group": {"type": "string", "minLength": 1},
+        "promotion_group": {
+          "type": "string",
+          "minLength": 1
+        },
         "required_tests": {
           "type": "array",
           "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
-        "srpm_required": {"type": "boolean"},
-        "sbom_required": {"type": "boolean"},
-        "allow_fedora_override": {"type": "boolean"},
-        "trusted_signer_workflow": {"type": "string", "minLength": 1}
+        "srpm_required": {
+          "type": "boolean"
+        },
+        "sbom_required": {
+          "type": "boolean"
+        },
+        "allow_fedora_override": {
+          "type": "boolean"
+        },
+        "trusted_signer_workflow": {
+          "type": "string",
+          "minLength": 1
+        },
+        "require_complete_architecture_set": {
+          "type": "boolean"
+        }
       }
     }
   }

@@ -171,6 +171,7 @@ class ProducerRegistryV2Tests(unittest.TestCase):
             policy["trusted_signer_workflow"],
             "Project-Ro-ASD/ro-Installer/.github/workflows/release.yml",
         )
+        self.assertTrue(policy["require_complete_architecture_set"])
 
     def test_v2_wrong_component_is_fail_closed(self):
         with self.assertRaisesRegex(ro_repo.ContractError, "component policy missing"):
