@@ -211,23 +211,56 @@ jobs:
           python3 verify_identity.py
 
           python3 - <<'PY'
-          import json, pathlib, subprocess, sys
+          import json, os, pathlib, sys
           sys.path.insert(0, "tools")
           import ro_repo
 
           manifest_path = pathlib.Path("incoming/component-artifact-manifest-v1.json")
           manifest = json.loads(manifest_path.read_text())
-          config = ro_repo.load_producer_registry("config/producers-v2.json")
-          policy = ro_repo.resolve_component_policy(config, manifest["source_repository"], manifest["component"])
-          verified = ro_repo.verify_attestations(manifest, pathlib.Path("incoming"), manifest_path, policy["trusted_signer_workflow"])
-          invocations = {
-              (item["workflow_run"], item["workflow_attempt"])
-              for item in verified.values()
-          }
-          if len(invocations) != 1:
-              raise SystemExit(f"expected one attested workflow attempt, got {sorted(invocations)}")
-          run_id, attempt = next(iter(invocations))
-          pathlib.Path("attested-invocation.json").write_text(json.dumps({"run_id": run_id, "attempt": attempt}))
+          identity = ro_repo.normalize_acceptance_identity(manifest)
+          try:
+              config = ro_repo.load_producer_registry("config/producers-v2.json")
+              policy = ro_repo.resolve_component_policy(
+                  config, manifest["source_repository"], manifest["component"]
+              )
+              verified = ro_repo.verify_attestations(
+                  manifest,
+                  pathlib.Path("incoming"),
+                  manifest_path,
+                  policy["trusted_signer_workflow"],
+              )
+              invocations = {
+                  (item["workflow_run"], item["workflow_attempt"])
+                  for item in verified.values()
+              }
+              if len(invocations) != 1:
+                  raise ro_repo.ContractError(
+                      f"expected one attested workflow attempt, got {sorted(invocations)}",
+                      code="PROVENANCE_MISMATCH",
+                      stage="provenance",
+                      expected="one exact workflow run attempt",
+                      received=sorted(invocations),
+                  )
+              run_id, attempt = next(iter(invocations))
+              pathlib.Path("attested-invocation.json").write_text(
+                  json.dumps({"run_id": run_id, "attempt": attempt})
+              )
+          except ro_repo.ContractError as error:
+              ro_repo.write_acceptance_report(
+                  "acceptance-report-v1.json", "rejected", identity, error
+              )
+              raise
+          except Exception as error:
+              internal = ro_repo.ContractError(
+                  f"unexpected provenance precheck error: {type(error).__name__}",
+                  code="INTERNAL_ACCEPTANCE_ERROR",
+                  stage="provenance",
+                  hint="Inspect the provenance precheck logs and retry after correcting the internal failure.",
+              )
+              ro_repo.write_acceptance_report(
+                  "acceptance-report-v1.json", "rejected", identity, internal
+              )
+              raise
           PY
 
           RUN_ID="$(jq -r '.run_id' attested-invocation.json)"
@@ -274,7 +307,7 @@ jobs:
           name: acceptance-report-${{ github.run_id }}
           path: acceptance-report-v1.json
           retention-days: 30
-          if-no-files-found: error
+          if-no-files-found: warn
   sign:
     needs: accept
     runs-on: ubuntu-24.04
