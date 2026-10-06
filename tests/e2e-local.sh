@@ -86,7 +86,24 @@ chmod 600 "$work/test-passphrase"
 
 "$root/tools/ro-repo" verify-component --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --fedora-names "$work/fedora-44-package-names.txt"
 "$root/tools/ro-repo" accept-package --manifest "$work/incoming/component-artifact-manifest-v1.json" --artifacts "$work/incoming" --accepted "$work/accepted" --fedora-names "$work/fedora-44-package-names.txt" --test-only-allow-unattested --report "$work/acceptance-report-v1.json"
+
+expect_failure "signature|SIGNATURE" python3 - "$root" "$work/incoming" "$work/rpm-signing-public.asc" <<'PY'
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(sys.argv[1]) / "tools"))
+import ro_repo
+rpms = sorted(pathlib.Path(sys.argv[2]).glob("*.rpm"))
+ro_repo.verify_signed_rpms(rpms, pathlib.Path(sys.argv[3]))
+PY
+
 "$root/tools/ro-repo" sign-accepted-component --accepted "$work/accepted" --output "$work/production-signed" --gnupghome "$work/production-signing-gnupg" --key-id "$rpm_key" --workflow-run 123 --passphrase-file "$work/test-passphrase" --test-only-public-key "$work/rpm-signing-public.asc" --test-only-allow-unattested
+
+python3 - "$root" "$work/production-signed" "$work/rpm-signing-public.asc" <<'PY'
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(sys.argv[1]) / "tools"))
+import ro_repo
+rpms = sorted(pathlib.Path(sys.argv[2]).glob("*.rpm"))
+ro_repo.verify_signed_rpms(rpms, pathlib.Path(sys.argv[3]))
+PY
 expect_failure "not a primary key" "$root/tools/ro-repo" sign-accepted-component --accepted "$work/accepted" --output "$work/primary-key-output" --gnupghome "$work/production-signing-gnupg" --key-id "$primary_fpr" --workflow-run 123 --passphrase-file "$work/test-passphrase" --test-only-public-key "$work/rpm-signing-public.asc" --test-only-allow-unattested
 expect_failure "signing subkey not found|not isolated" "$root/tools/ro-repo" sign-accepted-component --accepted "$work/accepted" --output "$work/wrong-role-output" --gnupghome "$work/production-signing-gnupg" --key-id "$meta_key" --workflow-run 123 --passphrase-file "$work/test-passphrase" --test-only-public-key "$work/rpm-signing-public.asc" --test-only-allow-unattested
 python3 - "$work/production-signed/rpm-signing-evidence-v1.json" <<'PY'
