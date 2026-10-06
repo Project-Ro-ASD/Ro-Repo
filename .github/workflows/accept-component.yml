@@ -108,21 +108,7 @@ jobs:
           if release_data.get("immutable") is not True:
               reject("Release is not natively immutable", "MANIFEST_IDENTITY_MISMATCH", "release-identity", expected=True, received=release_data.get("immutable"), hint="Enable GitHub immutable releases before publishing producer artifacts.")
 
-          expected_assets = {
-              "SHA256SUMS",
-              "component-artifact-manifest-v1.json",
-          }
           release_asset_names = {asset.get("name") for asset in release_data.get("assets", [])}
-          rpm_asset_names = {name for name in release_asset_names if isinstance(name, str) and name.endswith(".rpm")}
-          if len(release_asset_names) != 4 or len(rpm_asset_names) != 2 or not expected_assets.issubset(release_asset_names):
-              reject(
-                  "Release asset inventory mismatch",
-                  "ARTIFACT_SET_MISMATCH",
-                  "artifact-set",
-                  expected="exactly 2 RPMs + SHA256SUMS + component-artifact-manifest-v1.json",
-                  received=sorted(release_asset_names),
-                  hint="Publish only the exact component release asset set.",
-              )
 
           print("Release verified. Downloading...")
           os.makedirs("incoming", exist_ok=True)
@@ -168,6 +154,30 @@ jobs:
                   expected=error.expected,
                   received=error.received,
                   hint=error.hint,
+              )
+
+          expected_release_assets = {
+              item["filename"] for item in manifest["artifacts"]
+          } | {"SHA256SUMS", "component-artifact-manifest-v1.json"}
+          if manifest.get("sbom"):
+              sbom_filename = manifest["sbom"].get("filename") if isinstance(manifest["sbom"], dict) else None
+              if not sbom_filename:
+                  reject(
+                      "SBOM metadata lacks a filename",
+                      "ARTIFACT_SET_MISMATCH",
+                      "artifact-set",
+                      expected="sbom.filename",
+                      received=manifest.get("sbom"),
+                  )
+              expected_release_assets.add(sbom_filename)
+          if release_asset_names != expected_release_assets:
+              reject(
+                  "Release asset inventory mismatch",
+                  "ARTIFACT_SET_MISMATCH",
+                  "artifact-set",
+                  expected=sorted(expected_release_assets),
+                  received=sorted(release_asset_names),
+                  hint="Publish exactly the manifest-declared RPMs plus required metadata assets.",
               )
 
           workflow_path = component_policy["trusted_signer_workflow"]
