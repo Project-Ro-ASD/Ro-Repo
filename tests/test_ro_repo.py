@@ -20,12 +20,10 @@ class ContractTests(unittest.TestCase):
             "verificationResult": {
                 "signature": {
                     "certificate": {
-                        "extensions": {
-                            "runInvocationURI": (
-                                "https://github.com/Project-Ro-ASD/ro-Control/"
-                                f"actions/runs/{run_id}/attempts/{attempt}"
-                            )
-                        }
+                        "runInvocationURI": (
+                            "https://github.com/Project-Ro-ASD/ro-Control/"
+                            f"actions/runs/{run_id}/attempts/{attempt}"
+                        )
                     }
                 }
             }
@@ -80,6 +78,15 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(header["architecture"], "x86_64")
         self.assertEqual(header["source_rpm"], "ro-installer-2.4.3-1.fc44.src.rpm")
         self.assertEqual(header["nevra"], "ro-installer-0:2.4.3-1.fc44.x86_64")
+
+    def test_attestation_parser_accepts_canonical_gh_certificate_shape(self):
+        payload = self.verified_attestation_result(run_id=20, attempt=3)
+        certificate = json.loads(payload.stdout)[0]["verificationResult"]["signature"]["certificate"]
+        self.assertEqual(
+            certificate["runInvocationURI"],
+            "https://github.com/Project-Ro-ASD/ro-Control/actions/runs/20/attempts/3",
+        )
+        self.assertNotIn("extensions", certificate)
 
     def test_parse_attestation_invocation_uri(self):
         parsed = ro_repo._parse_attestation_invocation_uri(
