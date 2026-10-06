@@ -312,8 +312,9 @@ jobs:
         if: always()
         shell: bash
         run: |
-          if [[ -f acceptance-report-v1.json ]]; then
-            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          set +e
+          if [[ -f acceptance-report-v1.json ]] && command -v python3 >/dev/null 2>&1; then
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY" 2>/dev/null
           import json
           report = json.load(open("acceptance-report-v1.json", encoding="utf-8"))
           print(f"## Acceptance {report['result'].upper()}")
@@ -323,9 +324,12 @@ jobs:
           print(f"- Error code: `{report.get('error_code') or 'none'}`")
           print(f"- Remediation: {report.get('remediation_hint') or 'none'}")
           PY
-          else
-            printf '## Acceptance REJECTED\n- Report was not produced because setup failed before acceptance reporting.\n' >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$?" -eq 0 ]]; then
+              exit 0
+            fi
           fi
+          printf '## Acceptance REJECTED\n- Structured report is unavailable or could not be summarized; inspect the acceptance job log and uploaded report artifact when present.\n' >> "$GITHUB_STEP_SUMMARY"
+          exit 0
       - name: Upload acceptance report
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
