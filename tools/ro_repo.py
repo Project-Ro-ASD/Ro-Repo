@@ -804,7 +804,12 @@ def verify_signed_rpms(rpm_paths, public_key_path):
         rpmdb.mkdir()
         run(["rpmkeys", "--dbpath", str(rpmdb), "--import", str(public_key_path)])
         for rpm_path in rpm_paths:
-            run(["rpmkeys", "--dbpath", str(rpmdb), "--checksig", str(rpm_path)])
+            run([
+                "rpmkeys",
+                "--dbpath", str(rpmdb),
+                "--define", "_pkgverify_level all",
+                "--checksig", str(rpm_path),
+            ])
 
 
 def sign_accepted_component(accepted_path, output_dir, gnupghome, key_id, workflow_run,
