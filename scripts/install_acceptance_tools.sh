@@ -2,6 +2,9 @@
 set -euo pipefail
 
 dnf -y install \
+  bash \
+  coreutils \
+  gawk \
   gh \
   python3 \
   python3-yaml \
