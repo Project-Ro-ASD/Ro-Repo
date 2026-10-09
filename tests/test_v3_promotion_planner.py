@@ -37,7 +37,7 @@ def assist(version="0.2.5"):
 
 
 def dolphin():
-    return [rpm(n, "26.08.1") for n in ["dolphin", "dolphin-libs", "dolphin-devel"]] + [rpm("dolphin", "26.08.1", "src")]
+    return [rpm(n, "26.08.1", "x86_64") for n in ["dolphin", "dolphin-libs", "dolphin-devel"]] + [rpm("dolphin", "26.08.1", "src")]
 
 
 class PlannerTests(unittest.TestCase):
