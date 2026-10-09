@@ -203,6 +203,45 @@ python3 "$root/tests/v3-signed-rpm-real-e2e.py" \
   "$work/rpm-signing-public.asc" \
   "$work/incoming"
 
+# Compose the first stable view from ONLY the selected signed group, then
+# create a real signed repository-metadata preview with ephemeral test keys.
+python3 "$root/tools/v3_stable_composer.py" \
+  --beta-snapshot "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020" \
+  --registry "$root/config/producers-v2.json" \
+  --promotion-group ro-control \
+  --output "$work/v3-first-stable-composition" > "$work/v3-composition.log"
+rpm_key_sha="$(sha256sum "$work/rpm-signing-public.asc" | cut -d ' ' -f1)"
+meta_key_sha="$(sha256sum "$work/metadata-signing-public.asc" | cut -d ' ' -f1)"
+python3 "$root/tools/v3_signed_stable_preview.py" \
+  --composition "$work/v3-first-stable-composition" \
+  --output "$work/v3-signed-stable-preview" \
+  --snapshot-id repo-f44-20261010-099 \
+  --gnupghome "$work/gnupg" \
+  --metadata-signing-key "$meta_key" \
+  --rpm-signing-key "$rpm_key" \
+  --rpm-public-key "$work/rpm-signing-public.asc" \
+  --rpm-key-sha256 "$rpm_key_sha" \
+  --metadata-public-key "$work/metadata-signing-public.asc" \
+  --metadata-key-sha256 "$meta_key_sha" \
+  --passphrase-file "$work/test-passphrase" \
+  --workflow-run 789 \
+  --i-understand-this-is-test-only > "$work/v3-signed-preview.json"
+python3 - "$work/v3-signed-stable-preview" <<'PY'
+import json,pathlib,sys
+root=pathlib.Path(sys.argv[1])
+receipt=json.loads((root/"v3-preview-NOT-FOR-PUBLICATION.json").read_text())
+assert receipt["publishable"] is False
+assert receipt["publication_authorized"] is False
+assert receipt["signed_repodata_arches"] == ["aarch64","source","x86_64"]
+snapshot=root/"snapshots/fedora/44/repo-f44-20261010-099"
+manifest=json.loads((snapshot/"repository-snapshot-v1.json").read_text())
+assert len(manifest["packages"]) == 2
+assert all(p["nevra"].startswith("ro-control-") for p in manifest["packages"])
+assert (snapshot/"rpm/x86_64/repodata/repomd.xml.asc").is_file()
+assert not (snapshot/"snapshot-build-evidence-v1.json").exists()
+print("V3 signed TEST ONLY first stable snapshot preview PASS")
+PY
+
 # Real Fedora 44 DNF5 transactions on test-only signed V3 RPMs.
 V3_EVIDENCE_DIR="$root/v3-evidence" bash "$root/tests/v3-dnf5-local-e2e.sh" \
   "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020" \
