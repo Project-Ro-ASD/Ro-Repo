@@ -63,7 +63,9 @@ def transaction_inputs(matrix,baseline_dir):
             "names":sorted(names),"candidate_targets":[names[n]["nevra"] for n in sorted(names)],
             "expected_candidate_evr":{n:":".join([names[n]["epoch"],names[n]["version"]+"-"+names[n]["release"]]) for n in sorted(names)},
             "expected_baseline_evr":{n:":".join([baseline[n]["epoch"],baseline[n]["version"]+"-"+baseline[n]["release"]]) for n in sorted(names)},
-            "baseline_files":[baseline[n]["filename"] for n in sorted(names)],"publishable":False}
+            "baseline_files":[baseline[n]["filename"] for n in sorted(names)],
+            "baseline_targets":[f'{n}-{baseline[n]["version"]}-{baseline[n]["release"]}.{baseline[n]["arch"]}' for n in sorted(names)],
+            "publishable":False}
 
 def main():
     p=argparse.ArgumentParser()
