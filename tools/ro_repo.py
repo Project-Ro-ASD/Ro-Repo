@@ -171,22 +171,64 @@ def rpmlint_check(path):
         return (True, "rpmlint not available")
 
 def file_conflict_check(rpm_paths):
-    """Check for file path conflicts among RPMs that can coexist in one repo."""
+    """Fail closed on overlapping RPM payload paths, but permit compatible directories.
+
+    RPM subpackages commonly co-own directories such as /usr/lib/.build-id.
+    A pathname-only query incorrectly rejects those legitimate subpackages.
+    Query per-file mode and ownership from the actual RPM header instead.
+    """
     file_owners = {}
     conflicts = []
+    query = r"[%{FILEMODES:perms}\t%{FILEUSERNAME}\t%{FILEGROUPNAME}\t%{FILENAMES}\n]"
     for path in rpm_paths:
         try:
-            files = subprocess.check_output(["rpm", "-qpl", str(path)], text=True, stderr=subprocess.PIPE).strip().splitlines()
+            output = subprocess.check_output(
+                ["rpm", "-qp", "--qf", query, str(path)],
+                text=True, stderr=subprocess.PIPE,
+            )
         except (OSError, subprocess.CalledProcessError) as exc:
             raise ContractError(
                 f"failed to query rpm contents for {path.name}: {exc}",
                 code="RPM_HEADER_MISMATCH", stage="rpm-content", received=path.name,
                 hint="Publish a readable, valid RPM artifact.",
             ) from exc
-        for f in files:
-            if f in file_owners and file_owners[f] != path.name:
-                conflicts.append(f"{f} owned by both {file_owners[f]} and {path.name}")
-            file_owners[f] = path.name
+        seen = set()
+        for line in output.splitlines():
+            fields = line.split("\t", 3)
+            if len(fields) != 4:
+                raise ContractError(
+                    f"malformed RPM file metadata in {path.name}",
+                    code="RPM_HEADER_MISMATCH", stage="rpm-content", received=path.name,
+                    hint="Publish RPMs with complete file mode and ownership metadata.",
+                )
+            permissions, user, group, filename = fields
+            if (len(permissions) != 10 or permissions[0] not in "-dlcbps"
+                    or not user or not group or not filename.startswith("/")
+                    or filename in seen):
+                raise ContractError(
+                    f"invalid or duplicate RPM file metadata in {path.name}",
+                    code="RPM_HEADER_MISMATCH", stage="rpm-content", received=filename,
+                    hint="Publish RPMs with distinct absolute file paths and valid metadata.",
+                )
+            seen.add(filename)
+            metadata = (permissions, user, group)
+            previous = file_owners.get(filename)
+            if previous is not None:
+                previous_package, previous_metadata = previous
+                # A directory can be shared only if permissions and owner/group
+                # match. Regular files, symlinks and all other file types remain
+                # strictly exclusive to prevent collisions or type mismatches.
+                shared_directory = (
+                    permissions[0] == "d"
+                    and previous_metadata[0][0] == "d"
+                    and metadata == previous_metadata
+                )
+                if not shared_directory:
+                    conflicts.append(
+                        f"{filename} owned by both {previous_package} and {path.name}"
+                    )
+            else:
+                file_owners[filename] = (path.name, metadata)
     return (len(conflicts) == 0, conflicts)
 
 
