@@ -203,6 +203,12 @@ python3 "$root/tests/v3-signed-rpm-real-e2e.py" \
   "$work/rpm-signing-public.asc" \
   "$work/incoming"
 
+# Real Fedora 44 DNF5 transactions on test-only signed V3 RPMs.
+bash "$root/tests/v3-dnf5-local-e2e.sh" \
+  "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020" \
+  "$work/baseline" \
+  "$work/rpm-signing-public.asc"
+
 cp -a "$work/components" "$work/components-bad-run"
 python3 - "$work/components-bad-run/123/signed/rpm-signing-evidence-v1.json" <<'PY'
 import json, pathlib, sys
