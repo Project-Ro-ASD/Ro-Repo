@@ -23,6 +23,14 @@ jobs:
         run: dnf -y install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c dnf-plugins-core gnupg2 rpmlint gcc make jq python3-yaml
       - name: Run E2E Local
         run: tests/e2e-local.sh
+      - name: Upload test-only V3 DNF receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: v3-dnf-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: v3-evidence/
+          if-no-files-found: ignore
+          retention-days: 14
 
   acceptance-runtime-contract:
     runs-on: ubuntu-24.04

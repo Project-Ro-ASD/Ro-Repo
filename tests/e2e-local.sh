@@ -204,14 +204,14 @@ python3 "$root/tests/v3-signed-rpm-real-e2e.py" \
   "$work/incoming"
 
 # Real Fedora 44 DNF5 transactions on test-only signed V3 RPMs.
-bash "$root/tests/v3-dnf5-local-e2e.sh" \
+V3_EVIDENCE_DIR="$root/v3-evidence" bash "$root/tests/v3-dnf5-local-e2e.sh" \
   "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020" \
   "$work/baseline" \
   "$work/rpm-signing-public.asc"
 
 # Test actual DNF5 atomic upgrade of TWO related RPMs from one SRPM.
 # Disposable signing role and isolated RPM roots; no channel publication.
-bash "$root/tests/v3-atomic-multipackage-e2e.sh" \
+V3_EVIDENCE_DIR="$root/v3-evidence" bash "$root/tests/v3-atomic-multipackage-e2e.sh" \
   "$work" "$top" "$work/gnupg" "$rpm_key" "$work/rpm-signing-public.asc"
 
 cp -a "$work/components" "$work/components-bad-run"
