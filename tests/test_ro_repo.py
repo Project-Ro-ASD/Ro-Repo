@@ -132,6 +132,37 @@ class ContractTests(unittest.TestCase):
                     test_only_allow_missing_sha256sums=True,
                 )
 
+    def test_srpm_can_build_distinct_binary_subpackage_names(self):
+        libs = self.artifacts / "ro-control-libs-1.0-1.fc44.x86_64.rpm"
+        libs.write_bytes(b"binary-subpackage")
+        self.manifest["artifacts"].insert(1, {
+            "filename": libs.name,
+            "name": "ro-control-libs",
+            "epoch": 0,
+            "version": "1.0",
+            "release": "1.fc44",
+            "architecture": "x86_64",
+            "source_rpm": self.srpm.name,
+            "producer_artifact_sha256": ro_repo.digest(libs),
+        })
+        self.mp.write_text(json.dumps(self.manifest))
+        original = ro_repo.resolve_component_policy
+        def policy_with_subpackage(*args, **kwargs):
+            policy = dict(original(*args, **kwargs))
+            policy["package_names"] = [*policy["package_names"], "ro-control-libs"]
+            return policy
+        def subpackage_headers(path):
+            header = self.headers(path)
+            if path.name == libs.name:
+                header["name"] = "ro-control-libs"
+            return header
+        with mock.patch.object(ro_repo, "resolve_component_policy", side_effect=policy_with_subpackage), mock.patch.object(ro_repo, "rpm_header", side_effect=subpackage_headers), mock.patch.object(ro_repo, "rpmlint_check", return_value=(True, "")), mock.patch.object(ro_repo, "repository_file_conflict_check", return_value=(True, [])):
+            ro_repo.verify_component(
+                self.mp, self.artifacts, self.config,
+                test_only_allow_empty_fedora=True,
+                test_only_allow_missing_sha256sums=True,
+            )
+
     def test_sha256sums_extra_non_rpm_entry_is_rejected(self):
         sums = self.artifacts / "SHA256SUMS"
         sums.write_text(

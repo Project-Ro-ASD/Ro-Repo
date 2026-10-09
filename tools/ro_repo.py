@@ -606,7 +606,12 @@ def verify_component(manifest_path, artifacts_dir, config_path, fedora_names_pat
                     hint="Publish the matching source RPM in the same immutable release.",
                 )
             source = source_items[item["source_rpm"]]
-            for field in ("name", "epoch", "version", "release"):
+            # A single SRPM can legitimately build multiple differently named
+            # binary subpackages (e.g. dolphin, dolphin-libs, dolphin-devel).
+            # The exact source_rpm filename is matched above and is also
+            # verified against each binary RPM header. Preserve strict EVR
+            # parity without incorrectly requiring identical package names.
+            for field in ("epoch", "version", "release"):
                 if item[field] != source[field]:
                     raise ContractError(
                         f"binary/source RPM identity mismatch: {field}",
