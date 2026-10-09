@@ -33,6 +33,23 @@ python3 "$root/tools/v3_rpm_preflight.py" \
   --expected-key-sha256 "$key_sha" \
   --output "$work/preflight.json"
 
+# Derive the precise candidate group transaction matrix from V3 metadata.
+# This fixture still exercises ro-control only; other groups must later get
+# their own actual DNF transactions and desktop/system risk-gated tests.
+python3 "$root/tools/v3_dnf_group_matrix.py" \
+  --plan "$work/stable-candidate/promotion-plan-v3.json" \
+  --registry "$root/config/producers-v2.json" \
+  --arch x86_64 \
+  --output "$work/dnf-group-matrix.json"
+python3 - "$work/dnf-group-matrix.json" <<'PY'
+import json,sys
+item=json.load(open(sys.argv[1]))
+assert item["scope"] == "offline-v3-dnf-matrix-untrusted"
+assert item["promotion_group"] == "ro-control"
+assert [p["nevra"] for p in item["binary_packages"]] == ["ro-control-0:9.9.9-1.fc44.x86_64"]
+assert item["dnf_executed"] is False and item["publishable"] is False
+PY
+
 python3 - "$work/stable-candidate/promotion-plan-v3.json" <<'PY'
 import json,sys
 data=json.load(open(sys.argv[1]))
