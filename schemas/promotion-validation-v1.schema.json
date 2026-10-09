@@ -17,8 +17,12 @@
     "baseline"
   ],
   "properties": {
-    "schema_version": { "const": 1 },
-    "scope": { "const": "remote-beta-promotion" },
+    "schema_version": {
+      "const": 1
+    },
+    "scope": {
+      "const": "remote-beta-promotion"
+    },
     "snapshot_id": {
       "type": "string",
       "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
@@ -39,12 +43,16 @@
       "type": "string",
       "format": "date-time"
     },
-    "architecture": { "const": "x86_64" },
+    "architecture": {
+      "const": "x86_64"
+    },
     "remote_base": {
       "type": "string",
       "pattern": "^https://repo\\.ro-asd\\.org/rpm/fedora/44/beta/x86_64/?$"
     },
-    "result": { "const": "pass" },
+    "result": {
+      "const": "pass"
+    },
     "tests": {
       "type": "array",
       "minItems": 6,
@@ -52,7 +60,10 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "result"],
+        "required": [
+          "name",
+          "result"
+        ],
         "properties": {
           "name": {
             "enum": [
@@ -61,10 +72,14 @@
               "upgrade",
               "file-conflict",
               "rpmlint",
-              "smoke"
+              "smoke",
+              "plasma-integration",
+              "login-session"
             ]
           },
-          "result": { "const": "pass" }
+          "result": {
+            "const": "pass"
+          }
         }
       }
     },
@@ -78,9 +93,18 @@
         "sha256"
       ],
       "properties": {
-        "repository": { "type": "string", "minLength": 1 },
-        "release_tag": { "type": "string", "minLength": 1 },
-        "filename": { "type": "string", "minLength": 1 },
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "release_tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
         "sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
