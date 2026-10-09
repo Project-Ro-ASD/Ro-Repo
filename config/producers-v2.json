@@ -290,6 +290,40 @@
           "require_complete_architecture_set": true
         }
       ]
+    },
+    {
+      "repository": "Project-Ro-ASD/Ro-KDE-Dolphin",
+      "owner": "Project-Ro-ASD/Ro-KDE-Dolphin maintainers",
+      "components": [
+        {
+          "component": "ro-kde-dolphin",
+          "package_names": [
+            "dolphin",
+            "dolphin-libs",
+            "dolphin-devel"
+          ],
+          "architectures": [
+            "x86_64"
+          ],
+          "risk_class": "critical-desktop",
+          "promotion_group": "ro-kde-dolphin",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke",
+            "plasma-integration",
+            "login-session"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": true,
+          "trusted_signer_workflow": "Project-Ro-ASD/Ro-KDE-Dolphin/.github/workflows/release.yml",
+          "require_complete_architecture_set": true
+        }
+      ]
     }
   ]
 }
