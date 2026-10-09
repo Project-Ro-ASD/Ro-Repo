@@ -209,6 +209,11 @@ bash "$root/tests/v3-dnf5-local-e2e.sh" \
   "$work/baseline" \
   "$work/rpm-signing-public.asc"
 
+# Test actual DNF5 atomic upgrade of TWO related RPMs from one SRPM.
+# Disposable signing role and isolated RPM roots; no channel publication.
+bash "$root/tests/v3-atomic-multipackage-e2e.sh" \
+  "$work" "$top" "$work/gnupg" "$rpm_key" "$work/rpm-signing-public.asc"
+
 cp -a "$work/components" "$work/components-bad-run"
 python3 - "$work/components-bad-run/123/signed/rpm-signing-evidence-v1.json" <<'PY'
 import json, pathlib, sys
