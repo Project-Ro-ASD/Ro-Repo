@@ -9,6 +9,9 @@ sign_key="${4:?test RPM signing subkey required}"
 pubkey="${5:?test public key required}"
 mkdir -p "$work/atomic-sources" "$work/atomic-baseline" "$work/atomic-unsigned" "$top/SPECS"
 cat > "$top/SPECS/ro-atomic-fixture.spec" <<'SPEC'
+# The fixture installs text payloads only. RPM 6 otherwise generates an
+# empty debugsourcefiles.list and Fedora 44 rpmbuild fails the test build.
+%global debug_package %{nil}
 Name: ro-atomic-fixture
 Version: 2.0
 Release: 1%{?dist}
