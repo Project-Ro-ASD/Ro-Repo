@@ -43,7 +43,7 @@ class SignedHistoryTests(unittest.TestCase):
             (self.s/snap["snapshot_id"]).mkdir(exist_ok=True)
             self.pubs[run]=pub(run,snap["snapshot_id"],date)
     def tearDown(self):self.tmp.cleanup()
-    def read(self,name,folder,keyring):
+    def read(self,folder,name,keyring):
         if name=="publication-v1.json":
             return self.pubs[folder.name]
         return self.snap[folder.name]
