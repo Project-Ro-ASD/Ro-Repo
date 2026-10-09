@@ -7,6 +7,8 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 snapshot="${1:?usage: v3-dnf5-local-e2e.sh SIGNED_SNAPSHOT OLD_BINARY_RPM_DIR EPHEMERAL_PUBLIC_KEY}"
 baseline_dir="${2:?baseline RPM directory required}"
 rpm_key="${3:?ephemeral RPM public key required}"
+promotion_group="${4:-ro-control}"
+producer_registry="${5:-$root/config/producers-v2.json}"
 
 for executable in dnf rpm rpmkeys createrepo_c python3; do
   command -v "$executable" >/dev/null
@@ -21,8 +23,8 @@ trap 'rm -rf "$work"' EXIT
 # V3 composer remains explicitly offline/untrusted, not publication-ready.
 python3 "$root/tools/v3_stable_composer.py" \
   --beta-snapshot "$snapshot" \
-  --registry "$root/config/producers-v2.json" \
-  --promotion-group ro-control \
+  --registry "$producer_registry" \
+  --promotion-group "$promotion_group" \
   --output "$work/stable-candidate" > "$work/composition-output.json"
 
 # Validate genuine signed RPM bytes + headers before generating any metadata.
@@ -38,26 +40,26 @@ python3 "$root/tools/v3_rpm_preflight.py" \
 # their own actual DNF transactions and desktop/system risk-gated tests.
 python3 "$root/tools/v3_dnf_group_matrix.py" \
   --plan "$work/stable-candidate/promotion-plan-v3.json" \
-  --registry "$root/config/producers-v2.json" \
+  --registry "$producer_registry" \
   --arch x86_64 \
   --output "$work/dnf-group-matrix.json"
-python3 - "$work/dnf-group-matrix.json" <<'PY'
+python3 - "$work/dnf-group-matrix.json" "$promotion_group" <<'PY'
 import json,sys
 item=json.load(open(sys.argv[1]))
 assert item["scope"] == "offline-v3-dnf-matrix-untrusted"
-assert item["promotion_group"] == "ro-control"
-assert [p["nevra"] for p in item["binary_packages"]] == ["ro-control-0:9.9.9-1.fc44.x86_64"]
+assert item["promotion_group"] == sys.argv[2]
+assert item["binary_packages"]
 assert item["dnf_executed"] is False and item["publishable"] is False
 PY
 
-python3 - "$work/stable-candidate/promotion-plan-v3.json" <<'PY'
+python3 - "$work/stable-candidate/promotion-plan-v3.json" "$promotion_group" <<'PY'
 import json,sys
 data=json.load(open(sys.argv[1]))
-assert data["promotion_group"] == "ro-control"
+assert data["promotion_group"] == sys.argv[2]
 assert data["publishable"] is False
 items=data["resulting_stable_packages"]
-assert sorted(p["architecture"] for p in items) == ["src","x86_64"]
-assert any(p["nevra"] == "ro-control-0:9.9.9-1.fc44.x86_64" for p in items)
+assert len([p for p in items if p["architecture"] in ("src","nosrc")]) == 1
+assert len([p for p in items if p["architecture"] == "x86_64"]) >= 1
 PY
 
 # Test-only repodata: cannot be mistaken for a production signed snapshot.
