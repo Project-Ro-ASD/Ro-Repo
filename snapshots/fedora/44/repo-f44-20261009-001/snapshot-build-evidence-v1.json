@@ -1,0 +1,113 @@
+{
+  "components": [
+    {
+      "acceptance_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+      "producer_workflow_run": 35597720775,
+      "release_id": 392928847,
+      "release_tag": "v0.2.5",
+      "signing_run": 35598114906,
+      "source_commit": "b89e3524deb790ec6ac4dfeb6699508e58e08ad5",
+      "source_repository": "Project-Ro-ASD/ro-Assist"
+    },
+    {
+      "acceptance_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+      "producer_workflow_run": 35763824167,
+      "release_id": 393992852,
+      "release_tag": "ro-asd-release-v0.1.2",
+      "signing_run": 35764930485,
+      "source_commit": "569cd6007be7df01ad5461d8127de42b526b1587",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    },
+    {
+      "acceptance_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+      "producer_workflow_run": 35790861821,
+      "release_id": 394157607,
+      "release_tag": "ro-asd-keyring-v0.1.0",
+      "signing_run": 35791224315,
+      "source_commit": "46fe66b56de94ab4801b6833db4a7a844bd870f9",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    },
+    {
+      "acceptance_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+      "producer_workflow_run": 35858465878,
+      "release_id": 394620348,
+      "release_tag": "ro-asd-defaults-v0.1.0",
+      "signing_run": 35858705995,
+      "source_commit": "3102828dedd083c8fb46bc87f46fc8c2ce1b0092",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    },
+    {
+      "acceptance_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+      "producer_workflow_run": 35861868117,
+      "release_id": 394648110,
+      "release_tag": "ro-asd-branding-v0.1.0",
+      "signing_run": 35862090436,
+      "source_commit": "cff1f8d700d555e098e1478c499d9fe850f25076",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    },
+    {
+      "acceptance_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+      "producer_workflow_run": 35876652919,
+      "release_id": 394762846,
+      "release_tag": "ro-asd-desktop-standard-v0.1.0",
+      "signing_run": 35876902292,
+      "source_commit": "fabbc44763279420032b8b97407e8d43363ab91c",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    },
+    {
+      "acceptance_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+      "producer_workflow_run": 35879306187,
+      "release_id": 394783447,
+      "release_tag": "ro-asd-kernel-policy-v0.1.0",
+      "signing_run": 35879756844,
+      "source_commit": "167b5780130c4fab61af5b494e37b643f0051072",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    },
+    {
+      "acceptance_manifest_digest": "fdafd7a66a05aca34e82c5eb13caf4b6fd96d5009c9d3a0adf1ba4e47ea36549",
+      "producer_workflow_run": 37451969709,
+      "release_id": 404599015,
+      "release_tag": "v2.4.4",
+      "signing_run": 37517236231,
+      "source_commit": "e47d387e9a81d17aa76c4ea78382dda3c87cf20e",
+      "source_repository": "Project-Ro-ASD/ro-Installer"
+    },
+    {
+      "acceptance_manifest_digest": "2c2427849d7fdead5aed8876e4bb0b4e7452bb6f277f4968f6a2c61aa201f848",
+      "producer_workflow_run": 37927209351,
+      "release_id": 407878985,
+      "release_tag": "v0.1.0",
+      "signing_run": 37932037884,
+      "source_commit": "b40839aeda2115697044f3649f012eb36b11b6a7",
+      "source_repository": "Project-Ro-ASD/Ro-KDE-Dolphin"
+    },
+    {
+      "acceptance_manifest_digest": "99c06b6a4f9f6b12c17614359b5a82f982a863d8a80d10113804c1db39124d1e",
+      "producer_workflow_run": 37933531548,
+      "release_id": 407917162,
+      "release_tag": "ro-asd-repos-v0.1.1",
+      "signing_run": 37934149576,
+      "source_commit": "2f751e387c5d199be2f58b97a65d6e4f54e4bff4",
+      "source_repository": "Project-Ro-ASD/Ro-ASD-release"
+    }
+  ],
+  "created_at": "2026-10-09T13:09:58Z",
+  "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+  "repository_snapshot_sha256": "c2afc6d079537ddc6576c643e2d49445d3ba47b310ef4a3faf03789b336bbfd7",
+  "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+  "schema_version": 1,
+  "snapshot_id": "repo-f44-20261009-001",
+  "source_signing_runs": [
+    35598114906,
+    35764930485,
+    35791224315,
+    35858705995,
+    35862090436,
+    35876902292,
+    35879756844,
+    37517236231,
+    37932037884,
+    37934149576
+  ],
+  "workflow_run": 37934749345
+}
