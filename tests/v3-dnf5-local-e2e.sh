@@ -84,6 +84,11 @@ import json,sys
 print("\n".join(json.load(open(sys.argv[1]))["baseline_files"]))
 PY
 )
+mapfile -t baseline_targets < <(python3 - "$work/transaction-inputs.json" <<'PY'
+import json,sys
+print("\n".join(json.load(open(sys.argv[1]))["baseline_targets"]))
+PY
+)
 test "${#candidate_targets[@]}" -gt 0
 test "${#candidate_targets[@]}" -eq "${#group_names[@]}"
 old_packages=()
@@ -153,7 +158,7 @@ PY
 # This old fixture is unsigned only because it is generated during local CI.
 dnf -y "${common[@]}" --installroot "$work/upgrade-root" \
   --repo=v3-baseline --repo=fedora --repo=updates \
-  install "${baseline_names[@]}" > "$work/baseline-install.log" 2>&1 || {
+  install "${baseline_targets[@]}" > "$work/baseline-install.log" 2>&1 || {
     tail -120 "$work/baseline-install.log" >&2; exit 1;
   }
 python3 - "$work/transaction-inputs.json" "$work/upgrade-root" <<'PY'
