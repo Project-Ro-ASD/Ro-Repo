@@ -204,26 +204,74 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(conflicts, [])
         query.assert_not_called()
 
+    def test_compatible_shared_build_id_directory_is_allowed(self):
+        first = self.root/"first.x86_64.rpm"; first.write_bytes(b"one")
+        second = self.root/"second.x86_64.rpm"; second.write_bytes(b"two")
+        outputs = [
+            "drwxr-xr-x\troot\troot\t/usr/lib/.build-id\n"
+            "-rwxr-xr-x\troot\troot\t/usr/bin/first\n",
+            "drwxr-xr-x\troot\troot\t/usr/lib/.build-id\n"
+            "-rwxr-xr-x\troot\troot\t/usr/bin/second\n",
+        ]
+        with mock.patch("ro_repo.subprocess.check_output", side_effect=outputs) as query:
+            ok, conflicts = ro_repo.repository_file_conflict_check([
+                (first, "x86_64"), (second, "x86_64"),
+            ])
+        self.assertTrue(ok)
+        self.assertEqual(conflicts, [])
+        self.assertIn("%{FILEMODES:perms}", query.call_args.args[0][3])
+
     def test_same_arch_file_conflict_is_rejected(self):
         first = self.root/"first.x86_64.rpm"; first.write_bytes(b"one")
         second = self.root/"second.x86_64.rpm"; second.write_bytes(b"two")
-        with mock.patch("ro_repo.subprocess.check_output", return_value="/usr/bin/shared\n"):
+        output = "-rw-r--r--\troot\troot\t/usr/bin/shared\n"
+        with mock.patch("ro_repo.subprocess.check_output", return_value=output):
             ok, conflicts = ro_repo.repository_file_conflict_check([
-                (first, "x86_64"),
-                (second, "x86_64"),
+                (first, "x86_64"), (second, "x86_64"),
             ])
         self.assertFalse(ok)
         self.assertEqual(conflicts, [
             "x86_64: /usr/bin/shared owned by both first.x86_64.rpm and second.x86_64.rpm"
         ])
 
+    def test_directory_mode_or_owner_mismatch_is_rejected(self):
+        first = self.root/"first.x86_64.rpm"; first.write_bytes(b"one")
+        second = self.root/"second.x86_64.rpm"; second.write_bytes(b"two")
+        for second_entry in [
+            "drwx------\troot\troot\t/usr/share/shared\n",
+            "drwxr-xr-x\tother\troot\t/usr/share/shared\n",
+            "-rw-r--r--\troot\troot\t/usr/share/shared\n",
+        ]:
+            with self.subTest(second_entry=second_entry):
+                with mock.patch("ro_repo.subprocess.check_output", side_effect=[
+                    "drwxr-xr-x\troot\troot\t/usr/share/shared\n", second_entry
+                ]):
+                    ok, conflicts = ro_repo.file_conflict_check([first, second])
+                self.assertFalse(ok)
+                self.assertEqual(len(conflicts), 1)
+
+    def test_same_path_symlinks_are_rejected(self):
+        first = self.root/"first.x86_64.rpm"; first.write_bytes(b"one")
+        second = self.root/"second.x86_64.rpm"; second.write_bytes(b"two")
+        with mock.patch("ro_repo.subprocess.check_output", return_value=
+                        "lrwxrwxrwx\troot\troot\t/usr/bin/shared\n"):
+            ok, conflicts = ro_repo.file_conflict_check([first, second])
+        self.assertFalse(ok)
+        self.assertEqual(len(conflicts), 1)
+
+    def test_malformed_file_metadata_fails_closed(self):
+        first = self.root/"first.x86_64.rpm"; first.write_bytes(b"one")
+        with mock.patch("ro_repo.subprocess.check_output", return_value="/usr/bin/shared\n"):
+            with self.assertRaisesRegex(ro_repo.ContractError, "malformed RPM file metadata"):
+                ro_repo.file_conflict_check([first])
+
     def test_noarch_conflicts_with_target_arch_package(self):
         common = self.root/"common.noarch.rpm"; common.write_bytes(b"common")
         native = self.root/"native.aarch64.rpm"; native.write_bytes(b"native")
-        with mock.patch("ro_repo.subprocess.check_output", return_value="/usr/share/shared\n"):
+        with mock.patch("ro_repo.subprocess.check_output", return_value=
+                        "-rw-r--r--\troot\troot\t/usr/share/shared\n"):
             ok, conflicts = ro_repo.repository_file_conflict_check([
-                (common, "noarch"),
-                (native, "aarch64"),
+                (common, "noarch"), (native, "aarch64"),
             ])
         self.assertFalse(ok)
         self.assertEqual(conflicts, [
