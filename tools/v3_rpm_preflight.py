@@ -142,7 +142,7 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
                     or reported_arch != arch or (arch in {"src", "nosrc"}) != (output[5] == "1")):
                 raise PlanningError("actual RPM headers mismatch snapshot manifest")
             if arch not in {"src", "nosrc"} and output[6] not in sources:
-                raise PlanningError("binary RPM is not linked to selected source RPM")
+                raise PlanningError("binary RPM is not linked to selected source RPM: reported " + repr(output[6]) + ", expected " + repr(sorted(sources)))
             checked.append({"path": rel, "signed_rpm_sha256": actual, "header_nevra": p["nevra"]})
     return {
         "scope": "v3-local-rpm-preflight-only",
