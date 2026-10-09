@@ -172,6 +172,12 @@ for name in data["names"]:
 print("V3 DNF5 atomic baseline install PASS")
 PY
 
+# Capture the actual historical RPMDB before DNF changes the installroot.
+python3 "$root/tools/v3_dnf_receipt.py" --phase baseline \
+  --transaction-inputs "$work/transaction-inputs.json" \
+  --root "$work/upgrade-root" \
+  --output "$work/baseline-checkpoint.json"
+
 # The baseline repository is DISABLED here; the candidate's RPM signature is
 # checked by DNF on the real upgrade transaction.
 dnf -y "${common[@]}" --installroot "$work/upgrade-root" \
@@ -191,4 +197,23 @@ PY
 # This test log is NOT V3 group-validation-v3 evidence, and cannot authorize a
 # stable release. Multiarch, Plasma, QEMU, signed repodata and provenance gates
 # must be provided by subsequent workflows.
+# Generate and retain a checkable receipt only after both real transactions.
+python3 "$root/tools/v3_dnf_receipt.py" --phase final \
+  --plan "$work/stable-candidate/promotion-plan-v3.json" \
+  --matrix "$work/dnf-group-matrix.json" \
+  --transaction-inputs "$work/transaction-inputs.json" \
+  --preflight "$work/preflight.json" \
+  --baseline-checkpoint "$work/baseline-checkpoint.json" \
+  --clean-root "$work/clean-root" --upgrade-root "$work/upgrade-root" \
+  --logs-dir "$work" --output "$work/dnf-receipt.json"
+
+if [[ -n "${V3_EVIDENCE_DIR:-}" ]]; then
+  evidence="$V3_EVIDENCE_DIR/$promotion_group"
+  if [[ -e "$evidence" ]]; then echo "evidence directory already exists" >&2; exit 1; fi
+  mkdir -p "$evidence"
+  cp "$work/dnf-receipt.json" "$evidence/"
+  cp "$work/clean-install.log" "$work/baseline-install.log" "$work/upgrade.log" "$evidence/"
+  cp "$work/preflight.json" "$work/transaction-inputs.json" "$work/baseline-checkpoint.json" "$evidence/"
+  cp "$work/stable-candidate/promotion-plan-v3.json" "$work/dnf-group-matrix.json" "$evidence/"
+fi
 echo "V3 TEST-ONLY SIGNED RPM + DNF5 INSTALL/UPGRADE PASSED; publishable=false"
