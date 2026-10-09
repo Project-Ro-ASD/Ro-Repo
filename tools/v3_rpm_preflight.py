@@ -45,7 +45,11 @@ def _run(args):
         raise PlanningError("RPM verification command unavailable or timed out") from exc
     if result.returncode != 0:
         raise PlanningError("RPM command failed: " + str(args[0]) + ": " + result.stderr[-300:])
-    return result.stdout + result.stderr
+    # RPM can emit a harmless 'NOKEY' diagnostic on stderr when querying
+    # headers even after rpmkeys verified the signature against our isolated
+    # trusted rpmdb. Never append diagnostics to machine-readable stdout:
+    # doing so corrupts SOURCERPM (the last field) and creates false rejects.
+    return result.stdout
 
 
 def _manifest_inventory(plan):
