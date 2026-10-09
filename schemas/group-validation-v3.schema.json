@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://repo.ro-asd.org/schemas/group-validation-v3.schema.json",
+  "title": "Ro-Repo V3 group validation claim (untrusted until verified)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "promotion_group",
+    "candidate_sha256",
+    "beta_snapshot_id",
+    "stable_base_snapshot_id",
+    "stable_set_sha256",
+    "validation_run",
+    "workflow_identity",
+    "tested_at",
+    "baselines",
+    "checks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "scope": {
+      "const": "v3-group-validation-claim"
+    },
+    "promotion_group": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "beta_snapshot_id": {
+      "type": "string",
+      "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+    },
+    "stable_base_snapshot_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+        }
+      ]
+    },
+    "stable_set_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "validation_run": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "workflow_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "baselines": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "architecture",
+          "source",
+          "package_set_sha256"
+        ],
+        "properties": {
+          "architecture": {
+            "enum": [
+              "x86_64",
+              "aarch64"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "package_set_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "architecture",
+          "name",
+          "result",
+          "candidate_sha256",
+          "stable_set_sha256",
+          "runner_image_digest",
+          "log_sha256"
+        ],
+        "properties": {
+          "architecture": {
+            "enum": [
+              "x86_64",
+              "aarch64"
+            ]
+          },
+          "name": {
+            "enum": [
+              "dependency-solve",
+              "clean-install",
+              "upgrade",
+              "file-conflict",
+              "rpmlint",
+              "smoke",
+              "plasma-integration",
+              "login-session",
+              "boot",
+              "reboot",
+              "recovery",
+              "qemu"
+            ]
+          },
+          "result": {
+            "const": "pass"
+          },
+          "candidate_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "stable_set_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "runner_image_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "log_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  }
+}
