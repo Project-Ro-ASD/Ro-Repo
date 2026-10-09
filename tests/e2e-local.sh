@@ -195,6 +195,14 @@ if evidence["rpm_signing_fingerprint"] == evidence["metadata_signing_fingerprint
     raise SystemExit("production snapshot role fingerprints unexpectedly match")
 PY
 
+# V3 real RPM header/signature preflight on the ephemeral signed Fedora fixture.
+# This deliberately does not publish, use production signing keys, or claim DNF/Plasma results.
+python3 "$root/tests/v3-signed-rpm-real-e2e.py" \
+  "$work/production-out/snapshots/fedora/44/repo-f44-20260920-020" \
+  "$root/config/producers-v2.json" \
+  "$work/rpm-signing-public.asc" \
+  "$work/incoming"
+
 cp -a "$work/components" "$work/components-bad-run"
 python3 - "$work/components-bad-run/123/signed/rpm-signing-evidence-v1.json" <<'PY'
 import json, pathlib, sys
