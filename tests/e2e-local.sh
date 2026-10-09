@@ -36,6 +36,48 @@ rpmbuild -ba --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define 
   tail -200 "$work/rpmbuild.log" >&2
   exit 1
 }
+# Real Fedora RPM regression: two subpackages co-own a directory, but
+# independent files must not be flagged as a conflict. Never bypass RPM metadata.
+cat > "$top/SPECS/ro-subpackages.spec" <<'SPEC'
+Name: ro-subpackages
+Version: 1.0
+Release: 1%{?dist}
+Summary: Ro-Repo shared directory E2E fixture
+License: MIT
+BuildArch: noarch
+%description
+Acceptance regression fixture.
+%package libs
+Summary: Second RPM owning a shared directory
+%description libs
+Second RPM for conflict checks.
+%prep
+%build
+%install
+mkdir -p %{buildroot}%{_datadir}/ro-repo-shared
+printf first > %{buildroot}%{_datadir}/ro-repo-shared/first
+printf second > %{buildroot}%{_datadir}/ro-repo-shared/second
+%files
+%dir %{_datadir}/ro-repo-shared
+%{_datadir}/ro-repo-shared/first
+%files libs
+%dir %{_datadir}/ro-repo-shared
+%{_datadir}/ro-repo-shared/second
+SPEC
+rpmbuild -bb --define "_topdir $top" --define "_tmppath $work/rpm-tmp" --define "dist .fc44" "$top/SPECS/ro-subpackages.spec" > "$work/rpmbuild-subpackages.log" 2>&1 || {
+  tail -200 "$work/rpmbuild-subpackages.log" >&2
+  exit 1
+}
+python3 - "$root" "$top/RPMS/noarch" <<'PY'
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(sys.argv[1]) / "tools"))
+import ro_repo
+rpms = sorted(pathlib.Path(sys.argv[2]).glob("ro-subpackages-*.rpm"))
+assert len(rpms) == 2, [p.name for p in rpms]
+ok, conflicts = ro_repo.file_conflict_check(rpms)
+assert ok and not conflicts, conflicts
+PY
+
 mkdir -p "$work/source/ro-control-9.9.8" "$work/baseline"
 cp "$work/source/ro-control-9.9.9/ro-control.c" "$work/source/ro-control-9.9.9/Makefile" "$work/source/ro-control-9.9.8/"
 tar -C "$work/source" -czf "$top/SOURCES/ro-control-9.9.8.tar.gz" ro-control-9.9.8
