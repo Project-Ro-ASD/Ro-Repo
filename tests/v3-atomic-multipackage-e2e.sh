@@ -61,9 +61,27 @@ snapshot.mkdir(parents=True)
 entries=[]
 producer="e"*64
 for package in sorted(signed.glob("*.rpm")):
-    fields=subprocess.check_output(["rpm","-qp","--qf","%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\t%{ARCH}\n",str(package)],text=True).strip().split("\t")
-    name,epoch,ver,rel,arch=fields
-    directory="source" if arch in ("src","nosrc") else arch
+    # RPM 6 may report build architecture even in source RPM headers.
+    # Require both the source package marker AND filename extension, then
+    # normalize the manifest's source architecture to src.
+    fields=subprocess.check_output(["rpm","-qp","--qf","%{NAME}\t%{EPOCHNUM}\t%{VERSION}\t%{RELEASE}\t%{ARCH}\t%{SOURCEPACKAGE}\n",str(package)],text=True).strip().split("\t")
+    if len(fields)!=6:
+        raise SystemExit(f"malformed RPM header: {package.name}: {fields!r}")
+    name,epoch,ver,rel,header_arch,source_flag=fields
+    is_source=package.name.endswith(".src.rpm")
+    if is_source != (source_flag=="1"):
+        raise SystemExit(f"RPM source marker/filename mismatch: {package.name}: {source_flag!r}")
+    if is_source:
+        arch="src"
+        directory="source"
+    else:
+        if source_flag!="0" or header_arch!="x86_64":
+            raise SystemExit(f"unexpected binary RPM architecture: {package.name}: {header_arch!r}")
+        arch=header_arch
+        directory=arch
+    if package.name != f"{name}-{ver}-{rel}.{arch}.rpm":
+        raise SystemExit(f"RPM filename/NEVRA mismatch: {package.name}")
+    print(f"V3 synthetic fixture: {package.name} (source={is_source}, arch={arch}, header_arch={header_arch})")
     target=snapshot/"rpm"/directory/package.name
     target.parent.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(package,target)
