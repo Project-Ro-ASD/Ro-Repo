@@ -75,8 +75,10 @@ for package in sorted(signed.glob("*.rpm")):
         arch="src"
         directory="source"
     else:
-        if source_flag!="0" or header_arch!="x86_64":
-            raise SystemExit(f"unexpected binary RPM architecture: {package.name}: {header_arch!r}")
+        # RPM 6 omits SOURCEPACKAGE for binary RPMs, printing "(none)".
+        # A source RPM MUST still explicitly report SOURCEPACKAGE=1.
+        if source_flag not in ("0", "(none)") or header_arch!="x86_64":
+            raise SystemExit(f"unexpected binary RPM identity: {package.name}: arch={header_arch!r}, SOURCEPACKAGE={source_flag!r}")
         arch=header_arch
         directory=arch
     if package.name != f"{name}-{ver}-{rel}.{arch}.rpm":
