@@ -13,8 +13,8 @@ def item(name):
     return {"name":name,"nevra":f"{name}-0:2.0-1.fc44.x86_64","filename":f"{name}-2.0-1.fc44.x86_64.rpm",
             "arch":"x86_64","epoch":"0","version":"2.0","release":"1.fc44"}
 
-def rpm_probe(args):
-    filename=pathlib.Path(args[-1]).name
+def rpm_probe(path):
+    filename=pathlib.Path(path).name
     name=filename.split("-1.0-")[0]
     return [name,"0","1.0","1.fc44","x86_64"]
 
@@ -60,8 +60,13 @@ class DnfInputs(unittest.TestCase):
         with self.assertRaisesRegex(PlanningError,"duplicate"):
             self.run_matrix()
     def test_reject_baseline_same_version(self):
-        with patch("v3_dnf_transaction_inputs.rpm_header",return_value=["dolphin","0","2.0","1.fc44","x86_64"]):
-            with self.assertRaises(PlanningError):
-                self.run_matrix()
+        def equal_version(path):
+            result=rpm_probe(path)
+            if result[0]=="dolphin":
+                result[2]="2.0"
+            return result
+        with patch("v3_dnf_transaction_inputs.rpm_header",side_effect=equal_version):
+            with self.assertRaisesRegex(PlanningError,"same version"):
+                transaction_inputs(self.matrix,self.root)
 if __name__=="__main__":
     unittest.main()
