@@ -65,12 +65,37 @@ candidate_repo="$work/stable-candidate/rpm/x86_64"
 createrepo_c --quiet "$candidate_repo"
 test -f "$candidate_repo/repodata/repomd.xml"
 
-old_packages=( "$baseline_dir"/ro-control-9.9.8-*.x86_64.rpm )
-test "${#old_packages[@]}" -eq 1
-test -f "${old_packages[0]}"
+python3 "$root/tools/v3_dnf_transaction_inputs.py" \
+  --matrix "$work/dnf-group-matrix.json" \
+  --baseline-dir "$baseline_dir" \
+  --output "$work/transaction-inputs.json"
+mapfile -t candidate_targets < <(python3 - "$work/transaction-inputs.json" <<'PY'
+import json,sys
+print("\n".join(json.load(open(sys.argv[1]))["candidate_targets"]))
+PY
+)
+mapfile -t group_names < <(python3 - "$work/transaction-inputs.json" <<'PY'
+import json,sys
+print("\n".join(json.load(open(sys.argv[1]))["names"]))
+PY
+)
+mapfile -t baseline_names < <(python3 - "$work/transaction-inputs.json" <<'PY'
+import json,sys
+print("\n".join(json.load(open(sys.argv[1]))["baseline_files"]))
+PY
+)
+mapfile -t baseline_targets < <(python3 - "$work/transaction-inputs.json" <<'PY'
+import json,sys
+print("\n".join(json.load(open(sys.argv[1]))["baseline_targets"]))
+PY
+)
+test "${#candidate_targets[@]}" -gt 0
+test "${#candidate_targets[@]}" -eq "${#group_names[@]}"
+old_packages=()
+for filename in "${baseline_names[@]}"; do old_packages+=("$baseline_dir/$filename"); done
 old_repo="$work/old-fixture"
 mkdir -p "$old_repo"
-cp "${old_packages[0]}" "$old_repo/"
+cp "${old_packages[@]}" "$old_repo/"
 createrepo_c --quiet "$old_repo"
 
 repos="$work/repos"
@@ -116,43 +141,50 @@ common=(
 # the other Ro-ASD channel or arbitrary host third-party repositories.
 dnf -y "${common[@]}" --installroot "$work/clean-root" \
   --repo=v3-candidate --repo=fedora --repo=updates \
-  install ro-control-9.9.9-1.fc44.x86_64 > "$work/clean-install.log" 2>&1 || {
+  install "${candidate_targets[@]}" > "$work/clean-install.log" 2>&1 || {
     tail -120 "$work/clean-install.log" >&2; exit 1;
   }
-installed="$(rpm --root "$work/clean-root" -q --qf '%{VERSION}-%{RELEASE}' ro-control)"
-test "$installed" = "9.9.9-1.fc44" || {
-  echo "clean install: unexpected installed version '$installed'" >&2; exit 1;
-}
-test -x "$work/clean-root/usr/bin/ro-control"
-echo "V3 DNF5 actual clean-install PASS: ro-control $installed"
+python3 - "$work/transaction-inputs.json" "$work/clean-root" candidate <<'PY'
+import json,subprocess,sys
+data=json.load(open(sys.argv[1])); root=sys.argv[2]; version=sys.argv[3]
+expected=data["expected_candidate_evr"]
+for name in data["names"]:
+    value=subprocess.check_output(["rpm","--root",root,"-q","--qf","%{EPOCHNUM}:%{VERSION}-%{RELEASE}",name],text=True)
+    if value != expected[name]: raise SystemExit(f"clean install mismatch: {name}: {value} != {expected[name]}")
+print("V3 DNF5 atomic clean-install PASS: "+", ".join(data["names"]))
+PY
 
 # Real DNF initial INSTALL, NOT rpm --justdb/--nodeps and NOT --assumeno.
 # This old fixture is unsigned only because it is generated during local CI.
 dnf -y "${common[@]}" --installroot "$work/upgrade-root" \
   --repo=v3-baseline --repo=fedora --repo=updates \
-  install ro-control-9.9.8-1.fc44.x86_64 > "$work/baseline-install.log" 2>&1 || {
+  install "${baseline_targets[@]}" > "$work/baseline-install.log" 2>&1 || {
     tail -120 "$work/baseline-install.log" >&2; exit 1;
   }
-before="$(rpm --root "$work/upgrade-root" -q --qf '%{VERSION}-%{RELEASE}' ro-control)"
-test "$before" = "9.9.8-1.fc44" || {
-  echo "baseline: unexpected installed version '$before'" >&2; exit 1;
-}
-test -x "$work/upgrade-root/usr/bin/ro-control"
-echo "V3 DNF5 actual baseline install PASS: ro-control $before"
+python3 - "$work/transaction-inputs.json" "$work/upgrade-root" <<'PY'
+import json,subprocess,sys
+data=json.load(open(sys.argv[1]))
+for name in data["names"]:
+    value=subprocess.check_output(["rpm","--root",sys.argv[2],"-q","--qf","%{EPOCHNUM}:%{VERSION}-%{RELEASE}",name],text=True)
+    if value != data["expected_baseline_evr"][name]: raise SystemExit("incorrect baseline RPM: "+name)
+print("V3 DNF5 atomic baseline install PASS")
+PY
 
 # The baseline repository is DISABLED here; the candidate's RPM signature is
 # checked by DNF on the real upgrade transaction.
 dnf -y "${common[@]}" --installroot "$work/upgrade-root" \
   --repo=v3-candidate --repo=fedora --repo=updates \
-  upgrade ro-control > "$work/upgrade.log" 2>&1 || {
+  upgrade "${group_names[@]}" > "$work/upgrade.log" 2>&1 || {
     tail -120 "$work/upgrade.log" >&2; exit 1;
   }
-after="$(rpm --root "$work/upgrade-root" -q --qf '%{VERSION}-%{RELEASE}' ro-control)"
-test "$after" = "9.9.9-1.fc44" || {
-  echo "upgrade: unexpected installed version '$after'" >&2; exit 1;
-}
-test -x "$work/upgrade-root/usr/bin/ro-control"
-echo "V3 DNF5 actual upgrade PASS: ro-control $before -> $after"
+python3 - "$work/transaction-inputs.json" "$work/upgrade-root" <<'PY'
+import json,subprocess,sys
+data=json.load(open(sys.argv[1]))
+for name in data["names"]:
+    value=subprocess.check_output(["rpm","--root",sys.argv[2],"-q","--qf","%{EPOCHNUM}:%{VERSION}-%{RELEASE}",name],text=True)
+    if value != data["expected_candidate_evr"][name]: raise SystemExit("incorrect upgraded RPM: "+name)
+print("V3 DNF5 atomic group upgrade PASS: "+", ".join(data["names"]))
+PY
 
 # This test log is NOT V3 group-validation-v3 evidence, and cannot authorize a
 # stable release. Multiarch, Plasma, QEMU, signed repodata and provenance gates
