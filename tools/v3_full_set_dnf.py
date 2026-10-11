@@ -97,7 +97,7 @@ def _rpm_set_preflight(root, manifest, key, key_sha256, output):
 
 
 def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_sha256,
-             metadata_key, metadata_key_sha256, config_paths=()):
+             metadata_key, metadata_key_sha256, config_paths=(), upstream=()):
     distro = pathlib.Path("/etc/os-release").read_text()
     if 'ID=fedora\n' not in distro or 'VERSION_ID=44\n' not in distro:
         raise PlanningError("real Fedora 44 environment required")
@@ -106,6 +106,14 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
     dnf_version = _run(["dnf", "--version"])
     if "dnf5" not in dnf_version.lower():
         raise PlanningError("real DNF5 required")
+    from v3_pinned_upstream import PinnedUpstream
+    upstream = tuple(upstream)
+    if any(not isinstance(repo, PinnedUpstream) or repo.manifest["architecture"] != arch for repo in upstream):
+        raise PlanningError("independently verified architecture-specific upstream required")
+    if len({repo.manifest["repo_id"] for repo in upstream}) != len(upstream):
+        raise PlanningError("duplicate pinned upstream repository identity")
+    for repo in upstream:
+        repo.check()
     for source in (snapshot, beta, baseline, rpm_key, metadata_key):
         if source is not None and pathlib.Path(source).is_symlink():
             raise PlanningError("symlinked DNF trust input")
@@ -170,6 +178,20 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
         logs.mkdir()
         repos = work / "repos"
         repos.mkdir()
+        upstream_ids = []
+        for index, repo in enumerate(upstream):
+            frozen_upstream = work / ("upstream-" + str(index))
+            shutil.copytree(repo.root, frozen_upstream, symlinks=True)
+            if sha(tree_inventory(frozen_upstream)) != repo.manifest["tree_sha256"]:
+                raise PlanningError("upstream changed during transaction freezing")
+            pinned_key = work / ("upstream-key-" + str(index) + ".asc")
+            pinned_key.write_bytes(repo.public_key)
+            identifier = repo.manifest["repo_id"]
+            upstream_ids.append(identifier)
+            (repos / (identifier + ".repo")).write_text(
+                f"[{identifier}]\nname=Pinned upstream\nbaseurl=file://{frozen_upstream}\n"
+                f"enabled=0\ngpgcheck=1\nrepo_gpgcheck={int(repo.manifest['metadata_authentication'] == 'gpg')}\n"
+                f"skip_if_unavailable=0\ngpgkey=file://{pinned_key}\n")
         for channel, root in (("stable", snapshot), ("beta", beta), ("baseline", baseline)):
             if root is None:
                 continue
@@ -180,14 +202,23 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
         common = ["dnf", "-y", "--use-host-config", "--releasever=44",
                   "--setopt=reposdir=" + str(repos), "--setopt=install_weak_deps=False",
                   "--setopt=cachedir=" + str(work / "cache"), "--setopt=persistdir=" + str(work / "persist")]
-        def dnf(channel, root, args, name):
-            return _run(common + ["--installroot", str(root), "--repo=ro-" + channel, *args], log=logs / name)
+        def dnf(channel, root, args, name, *, dependencies=True):
+            allowed = upstream_ids if dependencies else []
+            return _run(common + ["--installroot", str(root), "--repo=ro-" + channel,
+                                 *["--repo=" + identifier for identifier in allowed], *args], log=logs / name)
         for channel, expected in (("stable", targets), ("beta", beta_targets)):
-            result = dnf(channel, work / (channel + "-query"), ["repoquery", "--qf", "%{name}\\n"], channel + "-only.log")
+            result = dnf(channel, work / (channel + "-query"), ["repoquery", "--qf", "%{name}\\n"], channel + "-only.log", dependencies=False)
             if set(result.splitlines()) != set(expected):
                 raise PlanningError("effective " + channel + "-only package view mismatch: " + repr(result) + " expected " + repr(sorted(expected)))
         dnf("stable", work / "clean", ["install", *[x["target"] for x in targets.values()]], "clean-install.log")
         clean = _rpmdb(work / "clean", targets)
+        def dependency_inventory(installroot):
+            installed = sorted(_run(["rpm", "--root", str(installroot), "-qa", "--qf", "%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\\n"]).splitlines())
+            approved = {p["nevra"] for repo in upstream for p in repo.manifest["packages"]} | {p["target"] for p in targets.values()}
+            if any(n not in approved and not n.startswith("gpg-pubkey-") for n in installed):
+                raise PlanningError("installed dependency outside independently pinned closure")
+            return [n for n in installed if not n.startswith("gpg-pubkey-")]
+        installed_closure = dependency_inventory(work / "clean")
         upgraded = None
         config_evidence = {}
         if prior is not None:
@@ -213,6 +244,7 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
             if additions:
                 dnf("stable", work / "upgrade", ["install", *sorted(additions)], "new-groups.log")
             upgraded = _rpmdb(work / "upgrade", targets)
+            dependency_inventory(work / "upgrade")
             for path, evidence in config_evidence.items():
                 config = work / "upgrade" / path.lstrip("/")
                 rpmnew = pathlib.Path(str(config) + ".rpmnew")
@@ -222,6 +254,8 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
         if any(tree_inventory(source) != expected or tree_inventory(frozen[source]) != expected
                for source, expected in input_trees.items()):
             raise PlanningError("DNF input changed during validation")
+        for repo in upstream:
+            repo.check()
         receipt = {
             "schema_version": 3, "scope": "v3-full-set-dnf-observation-test-only",
             "stable_set_sha256": stable_set_digest(plan), "result_tree_sha256": sha(tree_inventory(snapshot)),
@@ -230,6 +264,8 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
             "runtime_package_set_sha256": sha(sorted(_run(["rpm", "-qa", "--qf", "%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\\n"]).splitlines())),
             "dnf_version": dnf_version.strip(), "rpmdb_clean": clean, "rpmdb_upgrade": upgraded,
             "configuration_upgrade": config_evidence,
+            "upstream_manifest_sha256": {repo.manifest["repo_id"]: sha(repo.manifest) for repo in upstream},
+            "installed_dependency_closure": installed_closure,
             "rpm_preflight_sha256": {name: sha(value) for name, value in preflights.items()},
             "logs_sha256": {p.name: _sha256(p) for p in logs.iterdir()},
             "checks": {"dependency-solve": "PASS", "clean-install": "PASS",

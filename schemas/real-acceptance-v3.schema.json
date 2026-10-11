@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "real-acceptance-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "promotion_group",
+    "architecture",
+    "snapshot_tree_sha256",
+    "beta_tree_sha256",
+    "baseline_tree_sha256",
+    "plan_sha256",
+    "registry_sha256",
+    "config_paths"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "scope": {
+      "const": "v3-real-acceptance-inputs"
+    },
+    "promotion_group": {
+      "type": "string",
+      "minLength": 1
+    },
+    "architecture": {
+      "enum": [
+        "x86_64",
+        "aarch64"
+      ]
+    },
+    "snapshot_tree_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "beta_tree_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "baseline_tree_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "plan_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "registry_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "config_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^/etc/[^\\n]+$"
+      },
+      "uniqueItems": true
+    }
+  }
+}
