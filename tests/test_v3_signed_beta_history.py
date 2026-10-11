@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).parents[1] / "tools"))
-from v3_signed_beta_history import signed_history, assess
+from v3_signed_beta_history import signed_history, signed_archive_bundle, assess
 from v3_promotion_planner import PlanningError, plan
 
 A="a"*64
@@ -61,6 +61,21 @@ class SignedHistoryTests(unittest.TestCase):
         self.assertEqual(result["first_publication_run"],"10")
         self.assertFalse(result["publishable"])
         self.assertFalse(result["trusted_publication_times_verified"])
+    def test_unrelated_earlier_archive_stays_in_coverage(self):
+        old=snapshot("repo-f44-20260930-001",pkg("dolphin","0.9"))
+        self.snap[old["snapshot_id"]]=old
+        (self.s/old["snapshot_id"]).mkdir()
+        (self.p/"9").mkdir()
+        self.pubs["9"]=pub("9",old["snapshot_id"],"2026-09-30T12:00:00Z")
+        with patch("v3_signed_beta_history._keyring",return_value=self.root/"keyring"),patch(
+                "v3_signed_beta_history._signature",side_effect=self.read):
+            bundle=signed_archive_bundle(self.p,self.s,REG,"ro-assist","key",A,N)
+        self.assertEqual(len(bundle["signed_publications"]),4)
+        self.assertEqual(len(bundle["candidate_history"]),3)
+        self.assertIsNone(next(p for p in bundle["signed_publications"]
+                               if p["publication_run"]=="9")["candidate_sha256"])
+        self.assertFalse(bundle["publishable"])
+
     def test_wrong_run_identity_rejected(self):
         self.pubs["10"]["publication_run"]="99"
         with self.assertRaisesRegex(PlanningError,"publication identity mismatch"):self.history()
