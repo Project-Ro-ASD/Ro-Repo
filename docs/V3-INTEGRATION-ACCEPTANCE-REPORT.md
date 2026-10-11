@@ -119,7 +119,17 @@ explicitly distinguished from real immutable, authenticated release evidence.
 | Compatibility evidence generator with relative output and absolute temporary snapshot | Original main reproduced `ValueError` from `relative_to`; corrected generator executed successfully in the regression test | PASS |
 | Persisted evidence integrity | All inventory/log hashes verified, public-only key files checked and source digest matched the exact current tools/tests/schemas/config files | PASS |
 | Standalone actionlint | Not installed; YAML/schema/permission checks ran instead | UNVERIFIED |
-| GitHub PR CI | To be inspected after the draft PR is opened; no manual workflow dispatch authorized or performed | UNVERIFIED |
+| GitHub PR CI for implementation commit `23f43d32dcaee236685364abd35ad93f3cc93e82` | All five automatic checks passed: full unit policy, legacy Fedora E2E, runtime contract, V3 security contracts and V3 Fedora full-set E2E; no manual workflow dispatch | PASS |
+
+Draft [PR #71](https://github.com/Project-Ro-ASD/Ro-Repo/pull/71) targets `main`.
+Observed successful CI runs for the implementation commit:
+[V2 regression/runtime](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38170722823)
+and [V3 integration acceptance](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38170722870).
+The latter executed 40 integrated security/workflow/pin tests and the real
+Fedora full-set fixture. Documentation-only follow-ups can trigger fresh CI;
+these recorded observations refer to the exact implementation commit above.
+Neither successful run authenticates production source/test attestations,
+protected human approval or unavailable real application/graphical acceptance.
 
 The **41 added unit tests** check security decisions, signed approval and local
 state transitions, not just output field existence. The 224-test V3 group is a
