@@ -16,13 +16,20 @@ import urllib.request
 from v3_promotion_planner import PlanningError
 from v3_github_beta_audit import validate_history
 
-REPO = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+REPO = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?/[A-Za-z0-9_.-]{1,100}$")
 RUN = re.compile(r"^[1-9][0-9]*$")
 WORKFLOW = "publish-remote-beta.yml"
 
 
+def valid_repository(repository):
+    """Accept one GitHub owner/repo path, never dot segments or traversal."""
+    if not isinstance(repository, str) or not REPO.fullmatch(repository):
+        return False
+    return repository.split("/", 1)[1] not in (".", "..")
+
+
 def collect(repository, token, request_json, *, page_size=100):
-    if not REPO.fullmatch(repository) or not token:
+    if not valid_repository(repository) or not token:
         raise PlanningError("missing trusted GitHub API repository/token")
     runs = []
     seen = set()
