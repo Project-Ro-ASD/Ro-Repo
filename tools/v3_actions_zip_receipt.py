@@ -37,6 +37,8 @@ def _unique_json(raw):
         return json.loads(raw.decode("utf-8"), object_pairs_hook=unique_pairs,
                           parse_constant=lambda _: (_ for _ in ()).throw(
                               PlanningError("non-finite receipt JSON value")))
+    except PlanningError:
+        raise
     except (UnicodeError, ValueError) as exc:
         raise PlanningError("invalid artifact receipt JSON") from exc
 
