@@ -13,12 +13,12 @@ After this operation, 12 B extra will be used (install 12 B, remove 0 B).
 --------------------------------------------------------------------------------
 [1/1] Total                             100% |   6.7 MiB/s |   6.9 KiB |  00m00s
 Running transaction
-Importing OpenPGP key 0xFEDEC9CC:
+Importing OpenPGP key 0x4330853F:
  UserID     : "V3 INTEGRATION TEST ONLY <test@invalid>"
- Fingerprint: C6DAB62F3109B3AF6036B73EEEB02726FEDEC9CC
- From       : file:///tmp/v3-fedora-integration-gqsasz0y/evidence/.v3-full-dnf-pc170qw3/dnf-merged-public.asc
+ Fingerprint: 12799F0FD44F922394470F888230C8C04330853F
+ From       : file:///tmp/v3-fedora-integration-ysudxp11/evidence/.v3-full-dnf-thns6osd/dnf-merged-public.asc
 The key was successfully imported.
 [1/3] Verify package files              100% |   0.0   B/s |   1.0   B |  00m00s
 [2/3] Prepare transaction               100% |   0.0   B/s |   1.0   B |  00m00s
-[3/3] Installing ro-assist-0:1.0-1.fc44 100% |   9.5 KiB/s | 408.0   B |  00m00s
+[3/3] Installing ro-assist-0:1.0-1.fc44 100% |  14.8 KiB/s | 408.0   B |  00m00s
 Complete!
