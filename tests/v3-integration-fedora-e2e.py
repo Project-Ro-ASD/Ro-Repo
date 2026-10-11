@@ -141,7 +141,7 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             path = root / name
             path.write_bytes(canonical(value) + b"\n")
             _sign_file_exact(path, home, meta_fpr, password)
-        def make_snapshot(identifier, members):
+        def make_snapshot(identifier, members, parent=None):
             root = snapshots / identifier
             root.mkdir()
             entries = [p for pair in members for p in packages[pair]]
@@ -158,6 +158,7 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             # fixture composition by progressively retaining approved groups.
             composition = work / (identifier + "-composition")
             p = plan(stub, None, registry, "ro-assist" if ("ro-assist", "1.0") in members or ("ro-assist", "2.0") in members else "ro-control")
+            p["stable_base_snapshot_id"] = parent
             p["resulting_stable_packages"] = sorted(entries, key=lambda x: (x["nevra"], x["filename"]))
             composition.mkdir()
             shutil.copytree(root / "rpm", composition / "rpm")
@@ -246,10 +247,27 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                  metadata_key=meta_key, metadata_key_sha256=meta_sha)
         validate(second, retained, beta3, second_plan, "x86_64", evidence / "upgrade", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
                  metadata_key=meta_key, metadata_key_sha256=meta_sha, config_paths=["/etc/ro-assist.conf"])
+        # A metadata signature cannot replace the independent RPM signing role.
+        unsigned_root = work / "unsigned-source" / first.name
+        shutil.copytree(first, unsigned_root)
+        unsigned_source = next((unsigned_root / "rpm/source").glob("*.rpm"))
+        run(["rpmsign", "--delsign", str(unsigned_source)])
+        unsigned_manifest = json.loads((unsigned_root / "repository-snapshot-v1.json").read_bytes())
+        unsigned_plan = copy.deepcopy(first_plan)
+        new_digest = hashlib.sha256(unsigned_source.read_bytes()).hexdigest()
+        for members in (unsigned_manifest["packages"], unsigned_plan["resulting_stable_packages"], unsigned_plan["selected_group_packages"]):
+            for item in members:
+                if item["architecture"] == "src":
+                    item["published_signed_artifact_sha256"] = new_digest
+        (unsigned_root / "repository-snapshot-v1.json").write_bytes(canonical(unsigned_manifest))
+        _sign_file_exact(unsigned_root / "repository-snapshot-v1.json", home, meta_fpr, password)
+        unsigned_reason = fail_closed(lambda: validate(unsigned_root, None, beta1, unsigned_plan, "x86_64",
+                                      work / "unsigned-source-observation", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
+                                      metadata_key=meta_key, metadata_key_sha256=meta_sha), "signature")
         negative_results = {}
         for version, identifier, expected in (("2.0", "repo-f44-20261011-020", "real transaction failed"),
                                                ("3.0", "repo-f44-20261011-021", "full-set file conflict")):
-            broken = make_snapshot(identifier, [("ro-assist", "2.0"), ("ro-control", version)])
+            broken = make_snapshot(identifier, [("ro-assist", "2.0"), ("ro-control", version)], parent=second.name)
             broken_plan = plan(json.loads((broken / "repository-snapshot-v1.json").read_bytes()),
                                json.loads((second / "repository-snapshot-v1.json").read_bytes()), registry, "ro-control")
             reason = fail_closed(lambda: validate(broken, second, broken, broken_plan, "x86_64", work / ("negative-" + version),
@@ -276,7 +294,7 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                       "missing-dependency-rejection": "PASS", "retained-group-conflict-rejection": "PASS",
                       "aarch64": "UNVERIFIED", "real-producer-applications": "UNVERIFIED", "plasma-login": "UNVERIFIED",
                       "boot-recovery-qemu": "UNVERIFIED", "ro-store-application": "UNVERIFIED", "production-activation": "BLOCKED"},
-            "negative_results": negative_results,
+            "negative_results": {**negative_results, "unsigned-source": {"status": "PASS", "rejection": unsigned_reason}},
             "first_proposal": first_proposal, "second_proposal": second_proposal, "publishable": False}) + b"\n")
         shutil.copyfile(rpm_key, evidence / "ephemeral-rpm-public.asc")
         shutil.copyfile(meta_key, evidence / "ephemeral-metadata-public.asc")

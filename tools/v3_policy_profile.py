@@ -54,12 +54,17 @@ def profile(registry, group, *, expected=None):
 
 
 def require_complete(plan, registry):
-    """V3 integration requires every registered architecture, including Tier 2."""
+    """Require registered architecture closure for selected and retained groups."""
     group = plan["promotion_group"]
-    selected = plan["selected_group_packages"]
     p = profile(registry, group)
-    for arch in p["architectures"]:
-        names = {_parse(rpm)[0] for rpm in selected if rpm["architecture"] == arch}
-        if names != set(p["package_names"]):
-            raise PlanningError("incomplete registered architecture set: " + arch)
+    _, owners = _policies(registry)
+    packages = plan["resulting_stable_packages"]
+    groups = {owners[_parse(rpm)[0]] for rpm in packages}
+    for selected_group in sorted(groups | {group}):
+        policy = profile(registry, selected_group)
+        members = [rpm for rpm in packages if owners[_parse(rpm)[0]] == selected_group]
+        for arch in policy["architectures"]:
+            names = {_parse(rpm)[0] for rpm in members if rpm["architecture"] == arch}
+            if names != set(policy["package_names"]):
+                raise PlanningError("incomplete registered architecture set: " + selected_group + "/" + arch)
     return p

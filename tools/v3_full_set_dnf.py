@@ -9,6 +9,7 @@ import hashlib
 import json
 import pathlib
 import platform
+import shutil
 import subprocess
 import tempfile
 
@@ -18,6 +19,7 @@ from v3_policy_profile import canonical, sha
 from v3_promotion_planner import PlanningError, _parse
 from v3_signed_beta_history import _keyring, _signature, _verify, _json_file
 from v3_stable_composer import _file_paths, _sha256
+from v3_rpm_preflight import verify as verify_rpm_set
 
 
 def _run(argv, *, log=None):
@@ -76,6 +78,24 @@ def _signed_view(root, ring):
     return manifest
 
 
+def _rpm_set_preflight(root, manifest, key, key_sha256, output):
+    """Reuse complete header/signature/SRPM-linkage checks, including sources."""
+    output.mkdir()
+    shutil.copytree(root / "rpm", output / "rpm")
+    packages = manifest["packages"]
+    candidate = sha(packages)
+    group = "full-set-observation"
+    files = [{"path": path.relative_to(root).as_posix(), "sha256": item["published_signed_artifact_sha256"]}
+             for item in packages for _, path in _file_paths(root, item)]
+    (output / "promotion-plan-v3.json").write_bytes(canonical({
+        "publishable": False, "promotion_group": group, "candidate_sha256": candidate,
+        "resulting_stable_packages": packages}))
+    (output / "composition-v3.json").write_bytes(canonical({
+        "scope": "offline-v3-untrusted-composition", "publishable": False,
+        "promotion_group": group, "candidate_sha256": candidate, "files": files}))
+    return verify_rpm_set(output, key, key_sha256)
+
+
 def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_sha256,
              metadata_key, metadata_key_sha256, config_paths=()):
     distro = pathlib.Path("/etc/os-release").read_text()
@@ -95,27 +115,49 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
     if output.exists() or output.is_symlink():
         raise PlanningError("immutable DNF evidence output already exists")
     rpm_key, metadata_key = pathlib.Path(rpm_key).resolve(), pathlib.Path(metadata_key).resolve()
-    if _sha256(rpm_key) != rpm_key_sha256:
+    rpm_bytes, metadata_bytes = rpm_key.read_bytes(), metadata_key.read_bytes()
+    if hashlib.sha256(rpm_bytes).hexdigest() != rpm_key_sha256:
         raise PlanningError("unpinned RPM signing public key")
+    if hashlib.sha256(metadata_bytes).hexdigest() != metadata_key_sha256:
+        raise PlanningError("unpinned metadata signing public key")
+    input_trees = {source: tree_inventory(source) for source in (snapshot, beta, baseline) if source is not None}
+    if any(source in output.resolve().parents for source in input_trees):
+        raise PlanningError("DNF evidence cannot be placed inside an input repository")
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".v3-full-dnf-", dir=output.parent) as workdir:
         work = pathlib.Path(workdir)
+        frozen = {}
+        for index, (source, inventory) in enumerate(input_trees.items()):
+            target = work / "frozen" / str(index) / source.name
+            shutil.copytree(source, target, symlinks=True)
+            if tree_inventory(target) != inventory:
+                raise PlanningError("DNF input changed during freezing")
+            frozen[source] = target
+        snapshot, beta = frozen[snapshot], frozen[beta]
+        baseline = None if baseline is None else frozen[baseline]
+        rpm_key, metadata_key = work / "pinned-rpm-public.asc", work / "pinned-metadata-public.asc"
+        rpm_key.write_bytes(rpm_bytes)
+        metadata_key.write_bytes(metadata_bytes)
         ring = _keyring(metadata_key, metadata_key_sha256, work)
         manifest = _signed_view(snapshot, ring)
         beta_manifest = _signed_view(beta, ring)
         prior = None if baseline is None else _signed_view(baseline, ring)
+        if plan.get("stable_base_snapshot_id") != (None if prior is None else prior["snapshot_id"]):
+            raise PlanningError("DNF baseline differs from plan stable base")
+        if manifest.get("parent_snapshot") != plan.get("stable_base_snapshot_id"):
+            raise PlanningError("DNF result parent differs from plan stable base")
         if sorted(manifest["packages"], key=lambda x: x["nevra"]) != sorted(plan["resulting_stable_packages"], key=lambda x: x["nevra"]):
             raise PlanningError("DNF view differs from exact resulting stable set")
         targets, beta_targets = _targets(manifest["packages"], arch), _targets(beta_manifest["packages"], arch)
-        from ro_repo import file_conflict_check, verify_signed_rpms
+        from ro_repo import file_conflict_check
         rpm_paths = sorted((snapshot / "rpm" / arch).glob("*.rpm"))
         # DNF/librepo can deduplicate keys by primary fingerprint and ignore
         # the second isolated role's subkey. Enforce roles independently first,
         # then give DNF one merged *public* key with exactly the pinned roles.
-        verify_signed_rpms(rpm_paths, rpm_key)
-        verify_signed_rpms(sorted((beta / "rpm" / arch).glob("*.rpm")), rpm_key)
-        if baseline is not None:
-            verify_signed_rpms(sorted((baseline / "rpm" / arch).glob("*.rpm")), rpm_key)
+        preflights = {"stable": _rpm_set_preflight(snapshot, manifest, rpm_key, rpm_key_sha256, work / "stable-preflight"),
+                      "beta": _rpm_set_preflight(beta, beta_manifest, rpm_key, rpm_key_sha256, work / "beta-preflight")}
+        if prior is not None:
+            preflights["baseline"] = _rpm_set_preflight(baseline, prior, rpm_key, rpm_key_sha256, work / "baseline-preflight")
         merged_home = work / "dnf-public-keys"
         merged_home.mkdir(mode=0o700)
         _run(["gpg", "--no-options", "--homedir", str(merged_home), "--batch", "--import", str(rpm_key), str(metadata_key)])
@@ -177,6 +219,9 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
                 if _sha256(config) != evidence["modified_sha256"] or not rpmnew.is_file():
                     raise PlanningError("configuration preservation/.rpmnew upgrade regression")
                 evidence["rpmnew_sha256"] = _sha256(rpmnew)
+        if any(tree_inventory(source) != expected or tree_inventory(frozen[source]) != expected
+               for source, expected in input_trees.items()):
+            raise PlanningError("DNF input changed during validation")
         receipt = {
             "schema_version": 3, "scope": "v3-full-set-dnf-observation-test-only",
             "stable_set_sha256": stable_set_digest(plan), "result_tree_sha256": sha(tree_inventory(snapshot)),
@@ -185,6 +230,7 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
             "runtime_package_set_sha256": sha(sorted(_run(["rpm", "-qa", "--qf", "%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\\n"]).splitlines())),
             "dnf_version": dnf_version.strip(), "rpmdb_clean": clean, "rpmdb_upgrade": upgraded,
             "configuration_upgrade": config_evidence,
+            "rpm_preflight_sha256": {name: sha(value) for name, value in preflights.items()},
             "logs_sha256": {p.name: _sha256(p) for p in logs.iterdir()},
             "checks": {"dependency-solve": "PASS", "clean-install": "PASS",
                        "upgrade": "UNVERIFIED" if prior is None else "PASS",
