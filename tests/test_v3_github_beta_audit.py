@@ -41,9 +41,17 @@ class GitHubBetaTests(unittest.TestCase):
         self.assertEqual(result["first_publication_run"],"100")
         self.assertFalse(result["github_api_provenance_authenticated"])
         self.assertFalse(result["publishable"])
-    def test_incomplete_archive_rejected(self):
+    def test_incomplete_github_run_and_job_evidence_rejected(self):
+        # Removing a run but retaining its jobs must fail before signed
+        # publication coverage is evaluated.
         self.runs.pop()
-        with self.assertRaisesRegex(PlanningError,"coverage"):
+        with self.assertRaisesRegex(PlanningError,"run and job evidence sets disagree"):
+            self.check()
+    def test_signed_publication_missing_from_complete_github_evidence_rejected(self):
+        # With complete and consistent GitHub runs/jobs, a missing signed
+        # publication is a distinct archive-coverage failure.
+        self.rows.pop()
+        with self.assertRaisesRegex(PlanningError,"incomplete GitHub beta archive coverage"):
             self.check()
     def test_wrong_workflow_rejected(self):
         self.runs[0]["path"]=".github/workflows/another.yml"
