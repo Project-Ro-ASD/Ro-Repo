@@ -22,6 +22,8 @@ Documentation-only commits do not change this tested inventory.
   had no errors and four synthetic fixture warnings. Its copied source inventory
   also matched the digest above. The retry log records an output-directory collision
   caused by the review driver; that retry exited 1 and is excluded from PASS totals.
+  The completed legacy log's trailing whitespace is normalized for repository
+  whitespace checks; its original raw SHA-256 is retained in `test-summary.json`.
 - `rpm-vercmp-probe.py` / `rpm-vercmp-observation.json`: 1,500 deterministic native
   RPM 6.0.2 comparisons over the planner's admitted version/release segment grammar.
   Hyphen is an EVR delimiter and is rejected within those planner segments. Epoch

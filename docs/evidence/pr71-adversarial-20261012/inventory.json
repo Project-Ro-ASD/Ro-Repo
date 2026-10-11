@@ -5,7 +5,7 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "8eddd23bcbf17edd9ace4e296d821351b8b68ebdedd8fd533acbe51705e6436a"
+      "sha256": "9ba2dd8d22c2c43a7510b5a247ce16752acd2b7523ac91040965fed50579bd20"
     },
     {
       "path": "acceptance.json",
@@ -53,7 +53,7 @@
     },
     {
       "path": "review-logs/legacy-local-completed.log",
-      "sha256": "56c56fa4dc8fdf401cf4dbeb49b2703732afe5ba24c7f670a548d09f43335a74"
+      "sha256": "340de30acf70c7e5e4d9555c20e92513dff817123fc5c115303fd32ea1968bda"
     },
     {
       "path": "review-logs/live-before-2-failures.log",
@@ -89,7 +89,7 @@
     },
     {
       "path": "test-summary.json",
-      "sha256": "0987fc9986c695df93c532e8ed2d35ef094ccefe3b56c749d921ab27679aa60f"
+      "sha256": "4ba930630c32923760afe746278e4351aa840c8d159a6d93d261be1ad1eb056d"
     },
     {
       "path": "tested-sources.json",

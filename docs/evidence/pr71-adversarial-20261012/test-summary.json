@@ -22,5 +22,9 @@
   "automatic_ci_checks": "5/5 PASS",
   "legacy_fedora_e2e_ci": "PASS",
   "local_legacy_retry": "Exit 1: output collision; not included in PASS totals",
-  "legacy_fedora_e2e_local_first_attempt": "PASS: final record and log verified; 0 rpmlint errors, 4 fixture warnings"
+  "legacy_fedora_e2e_local_first_attempt": "PASS: final record and log verified; 0 rpmlint errors, 4 fixture warnings",
+  "legacy_log_normalization": {
+    "raw_sha256": "56c56fa4dc8fdf401cf4dbeb49b2703732afe5ba24c7f670a548d09f43335a74",
+    "method": "trailing whitespace removed; test output content unchanged"
+  }
 }

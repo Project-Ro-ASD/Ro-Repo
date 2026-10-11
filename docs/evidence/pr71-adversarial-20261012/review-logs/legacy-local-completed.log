@@ -148,4 +148,4 @@ ro-control.x86_64: W: unstripped-binary-or-object /usr/bin/ro-control
 ro-control.x86_64: W: position-independent-executable-suggested /usr/bin/ro-control
 ro-control.x86_64: W: no-manual-page-for-binary ro-control
 ro-control.x86_64: W: no-documentation
- 1 packages and 0 specfiles checked; 0 errors, 4 warnings, 3 filtered, 0 badness; has taken 0.1 s 
+ 1 packages and 0 specfiles checked; 0 errors, 4 warnings, 3 filtered, 0 badness; has taken 0.1 s
