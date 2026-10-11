@@ -53,6 +53,46 @@ class GitHubBetaTests(unittest.TestCase):
         self.rows.pop()
         with self.assertRaisesRegex(PlanningError,"incomplete GitHub beta archive coverage"):
             self.check()
+    def bundle(self):
+        return {"scope":"v3-signed-beta-archive-bundle-untrusted",
+                "promotion_group":"ro-assist",
+                "signed_publications":[
+                    {"publication_run":r["publication_run"],"published_at":r["published_at"],
+                     "snapshot_id":"repo-f44-20261001-001","store_tree_sha256":"f"*64,
+                     "candidate_sha256":r["candidate_sha256"]} for r in self.rows],
+                "candidate_history":copy.deepcopy(self.rows),
+                "archive_completeness_verified":False,
+                "trusted_publication_times_verified":False,"publishable":False}
+
+    def test_unrelated_beta_still_audited_but_not_candidate(self):
+        # Run 50 is an earlier beta publication without selected RPMs.
+        unrelated=fixture(50,"01","f"*64)
+        self.runs.append(unrelated[1]);self.jobs.append(unrelated[2])
+        bundle=self.bundle()
+        bundle["signed_publications"].append({
+            "publication_run":"50","published_at":unrelated[0]["published_at"],
+            "snapshot_id":"repo-f44-20261001-001",
+            "store_tree_sha256":"f"*64,"candidate_sha256":None})
+        verified=validate_history(bundle,self.runs,self.jobs,self.now)
+        self.assertEqual([r["publication_run"] for r in verified],["100","200","300"])
+        bundle["signed_publications"].pop()
+        with self.assertRaisesRegex(PlanningError,"coverage"):
+            validate_history(bundle,self.runs,self.jobs,self.now)
+
+    def test_signed_candidate_selection_cannot_be_forged(self):
+        bundle=self.bundle()
+        bundle["candidate_history"][0]["candidate_sha256"]="e"*64
+        with self.assertRaisesRegex(PlanningError,"selection mismatch"):
+            validate_history(bundle,self.runs,self.jobs,self.now)
+
+    def test_unselected_run_still_requires_successful_remote_verification(self):
+        bundle=self.bundle()
+        bundle["signed_publications"][0]["candidate_sha256"]=None
+        bundle["candidate_history"].pop(0)
+        self.jobs[0]["jobs"][2]["conclusion"]="failure"
+        with self.assertRaisesRegex(PlanningError,"unsuccessful"):
+            validate_history(bundle,self.runs,self.jobs,self.now)
+
     def test_wrong_workflow_rejected(self):
         self.runs[0]["path"]=".github/workflows/another.yml"
         with self.assertRaisesRegex(PlanningError,"not trusted"):
