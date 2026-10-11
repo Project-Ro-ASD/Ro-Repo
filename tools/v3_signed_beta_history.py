@@ -69,15 +69,18 @@ def _keyring(public_key, expected_hash, tmp):
     key = pathlib.Path(public_key)
     if key.is_symlink() or not key.is_file() or not isinstance(expected_hash, str) or not SHA.fullmatch(expected_hash):
         raise PlanningError("metadata key must have a pinned SHA256")
-    if hashlib.sha256(key.read_bytes()).hexdigest() != expected_hash:
+    raw = key.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_hash:
         raise PlanningError("metadata signing key pin mismatch")
     ring = pathlib.Path(tmp) / "metadata.gpg"
     home = pathlib.Path(tmp) / "gnupg"
     home.mkdir(mode=0o700)
+    frozen_key = pathlib.Path(tmp) / "pinned-metadata-public.asc"
+    frozen_key.write_bytes(raw)
     # Do not inherit the host's use-keyboxd configuration: it can ignore
     # --keyring and import the audit key into the user's persistent key store.
     _verify(["gpg", "--no-options", "--homedir", str(home), "--batch", "--no-default-keyring", "--keyring", str(ring),
-             "--import", str(key)])
+             "--import", str(frozen_key)])
     return ring
 
 

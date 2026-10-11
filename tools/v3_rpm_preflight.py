@@ -91,7 +91,8 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
         raise PlanningError("unsafe candidate directory or trusted key")
     if not isinstance(expected_key_sha256, str) or not HEX.fullmatch(expected_key_sha256):
         raise PlanningError("trusted key digest must be explicitly pinned")
-    if _digest(key) != expected_key_sha256:
+    key_bytes = key.read_bytes()
+    if hashlib.sha256(key_bytes).hexdigest() != expected_key_sha256:
         raise PlanningError("trusted RPM public key hash mismatch")
     plan = _load(root, "promotion-plan-v3.json")
     composition = _load(root, "composition-v3.json")
@@ -120,7 +121,9 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
 
     checked = []
     with tempfile.TemporaryDirectory(prefix="v3-rpmdb-") as temp:
-        _run(["rpmkeys", "--dbpath", temp, "--import", str(key.resolve())])
+        frozen_key = pathlib.Path(temp) / "pinned-rpm-public.asc"
+        frozen_key.write_bytes(key_bytes)
+        _run(["rpmkeys", "--dbpath", temp, "--import", str(frozen_key)])
         for rel in sorted(expected):
             p, fields = expected[rel]
             file = root / rel

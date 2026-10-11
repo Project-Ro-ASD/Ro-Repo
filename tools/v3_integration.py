@@ -156,13 +156,14 @@ def prepare(beta, stable, registry, group, output, *, publications, snapshots,
     output = pathlib.Path(output)
     if output.exists() or output.is_symlink():
         raise PlanningError("immutable integration output already exists")
-    for source in (beta, stable):
+    result_snapshot = None if result_snapshot is None else pathlib.Path(result_snapshot)
+    for source in (beta, stable, result_snapshot):
         if source is not None and (source.is_symlink() or not source.is_dir()
                                   or source.resolve() in output.resolve().parents):
             raise PlanningError("unsafe input snapshot/output relationship")
     with tempfile.TemporaryDirectory(prefix="v3-integration-key-") as home:
         ring = _keyring(metadata_key, metadata_key_sha256, home)
-        input_trees = {source: tree_inventory(source) for source in (beta, stable) if source is not None}
+        input_trees = {source: tree_inventory(source) for source in (beta, stable, result_snapshot) if source is not None}
         manifest = _signature(beta, "repository-snapshot-v1.json", ring)
         prior = None if stable is None else _signature(stable, "repository-snapshot-v1.json", ring)
         p = plan(manifest, prior, registry, group)
@@ -192,9 +193,14 @@ def prepare(beta, stable, registry, group, output, *, publications, snapshots,
                 evidence["group-validation-claim"] = sha(claim)
             result_sha = None
             if result_snapshot is not None:
-                result_root = pathlib.Path(result_snapshot)
+                result_root = pathlib.Path(temp) / "frozen-result" / result_snapshot.name
+                shutil.copytree(result_snapshot, result_root, symlinks=True)
+                if tree_inventory(result_root) != input_trees[result_snapshot]:
+                    raise PlanningError("signed result changed during freezing")
                 from v3_full_set_dnf import _signed_view
                 result_manifest = _signed_view(result_root, ring)
+                if result_manifest["parent_snapshot"] != p["stable_base_snapshot_id"]:
+                    raise PlanningError("signed result parent differs from stable base")
                 if sorted(result_manifest["packages"], key=lambda x: x["nevra"]) != sorted(p["resulting_stable_packages"], key=lambda x: x["nevra"]):
                     raise PlanningError("signed result does not match composed full stable set")
                 from v3_stable_composer import _file_paths
@@ -202,7 +208,9 @@ def prepare(beta, stable, registry, group, output, *, publications, snapshots,
                     for _, path in _file_paths(result_root, item):
                         if _sha256(path) != item["published_signed_artifact_sha256"]:
                             raise PlanningError("retained result RPM changed")
-                result_sha = sha(tree_inventory(result_root))
+                if tree_inventory(result_root) != input_trees[result_snapshot]:
+                    raise PlanningError("signed result changed during verification")
+                result_sha = sha(input_trees[result_snapshot])
             if any(tree_inventory(source) != expected for source, expected in input_trees.items()):
                 raise PlanningError("source snapshot changed during integrated verification")
             value = proposal(p, registry, bridge["candidate_remote_verify_times"], provenance,
@@ -231,6 +239,7 @@ def prepare_live(pages_checkout, registry, group, output, *, token, request_json
     from v3_github_source_pins import audit_with_live_pins, verify_registry_pin, _refs_match
     from v3_github_beta_api import collect
     from v3_live_receipt_audit import audit_live_run
+    from v3_pages_archive_provenance import verify_checkout, _tracked_bytes, _git
     from v3_stable_composer import SNAPSHOT_ID
     for identifier in (beta_snapshot_id, stable_snapshot_id):
         if identifier is not None and (not isinstance(identifier, str) or not SNAPSHOT_ID.fullmatch(identifier)):
@@ -242,17 +251,26 @@ def prepare_live(pages_checkout, registry, group, output, *, token, request_json
                                     promotion_group=group, now=now)
     runtime_audit = audit_live_run(source_receipt_run, token, request_json, download_zip)
     collection = collect("Project-Ro-ASD/Ro-Repo", token, request_json)
-    root = pathlib.Path(pages_checkout)
+    root = verify_checkout(pages_checkout, pages_sha)
     snapshots = root / "snapshots/fedora/44"
     beta = snapshots / beta_snapshot_id
     stable = None if stable_snapshot_id is None else snapshots / stable_snapshot_id
     stable_channel = root / "rpm/fedora/44/stable"
-    if stable_snapshot_id is None and stable_channel.exists():
+    stable_relative = "rpm/fedora/44/stable"
+    pinned_stable = _git(root, "ls-tree", "HEAD", "--", stable_relative)
+    stable_bytes = {}
+    if stable_snapshot_id is None and (pinned_stable or stable_channel.exists() or stable_channel.is_symlink()):
         raise PlanningError("empty bootstrap would discard existing stable channel")
     if stable_snapshot_id is not None:
+        for name in ("publication-v1.json", "publication-v1.json.asc"):
+            stable_bytes[name] = _tracked_bytes(root, stable_relative + "/" + name)
         with tempfile.TemporaryDirectory(prefix="v3-live-base-key-") as home:
             ring = _keyring(metadata_key, metadata_key_sha256, home)
-            publication = _signature(stable_channel, "publication-v1.json", ring)
+            frozen = pathlib.Path(home) / "pinned-stable"
+            frozen.mkdir()
+            for name, raw in stable_bytes.items():
+                (frozen / name).write_bytes(raw)
+            publication = _signature(frozen, "publication-v1.json", ring)
             if publication.get("channel") != "stable" or publication.get("snapshot_id") != stable_snapshot_id:
                 raise PlanningError("stale signed current stable base")
     # These checks are intentionally separate assertions; there is no
@@ -268,6 +286,12 @@ def prepare_live(pages_checkout, registry, group, output, *, token, request_json
                                          "pinned-registry": sha(registry_check)})
         value["proposal_sha256"] = sha({k: v for k, v in value.items() if k != "proposal_sha256"})
         _refs_match(request_json, token, main_sha, pages_sha)
+        verify_checkout(root, pages_sha)
+        for name, raw in stable_bytes.items():
+            if _tracked_bytes(root, stable_relative + "/" + name) != raw:
+                raise PlanningError("pinned stable publication changed during proposal")
+        if stable_snapshot_id is None and (stable_channel.exists() or stable_channel.is_symlink()):
+            raise PlanningError("stable channel appeared during bootstrap proposal")
         output = pathlib.Path(output)
         if output.exists() or output.is_symlink():
             raise PlanningError("immutable live integration output already exists")
