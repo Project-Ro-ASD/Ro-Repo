@@ -34,7 +34,28 @@ class CollectorTests(unittest.TestCase):
             return {"total_count":3,"workflow_runs":[]}
         with self.assertRaisesRegex(PlanningError,"truncated"):collect(REPO,"token",truncated)
     def test_invalid_repo_rejected(self):
-        with self.assertRaisesRegex(PlanningError,"repository"):collect("../oops","token",self.fixture)
+        invalid_repositories = (
+            "../oops", "owner/..", "./repo", "owner/.",
+            "owner//repo", "owner/repo/extra", "", "owner/", "/repo",
+            "-owner/repo", "owner-/repo", "own.er/repo",
+            "owner/repo?query=1", "owner/repo#fragment", "owner\\\\repo",
+            "owner/repo\\nextra", None, 17,
+        )
+        for repository in invalid_repositories:
+            with self.subTest(repository=repository):
+                def forbidden_request(_path, _token):
+                    self.fail("invalid repository reached request_json")
+                with self.assertRaisesRegex(PlanningError, "repository"):
+                    collect(repository, "test-token", forbidden_request)
+
+    def test_valid_repository_names(self):
+        def empty_history(_path, _token):
+            return {"total_count": 0, "workflow_runs": []}
+        for repository in ("Project-Ro-ASD/Ro-Repo", "octocat/.github", "a/b", "owner/repo_name.with-dots"):
+            with self.subTest(repository=repository):
+                result = collect(repository, "test-token", empty_history)
+                self.assertEqual(result["total_workflow_runs"], 0)
+                self.assertFalse(result["publishable"])
     def test_missing_token_rejected(self):
         with self.assertRaisesRegex(PlanningError,"repository/token"):collect(REPO,"",self.fixture)
     def test_audit_never_promotes(self):
