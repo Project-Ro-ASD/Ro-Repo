@@ -27,14 +27,14 @@ def validate_history(signed_rows, run_details, jobs_details, now):
         raise PlanningError("missing GitHub evidence")
     runs = {}
     for item in run_details:
-        if not isinstance(item, dict) or not RUN.fullmatch(str(item.get("id", ""))) or item["id"] in runs:
+        if not isinstance(item, dict) or not RUN.fullmatch(str(item.get("id", ""))) or str(item["id"]) in runs:
             raise PlanningError("malformed/duplicate GitHub run")
-        runs[item["id"]] = item
+        runs[str(item["id"])] = item
     jobs = {}
     for record in jobs_details:
-        if not isinstance(record, dict) or not RUN.fullmatch(str(record.get("run_id", ""))) or record["run_id"] in jobs:
+        if not isinstance(record, dict) or not RUN.fullmatch(str(record.get("run_id", ""))) or str(record["run_id"]) in jobs:
             raise PlanningError("malformed/duplicate jobs record")
-        jobs[record["run_id"]] = record.get("jobs")
+        jobs[str(record["run_id"])] = record.get("jobs")
     if set(runs) != set(jobs):
         raise PlanningError("run and job evidence sets disagree")
     rows = {}
