@@ -56,7 +56,7 @@ def _manifest_inventory(plan):
     if not isinstance(plan, dict) or plan.get("publishable") is not False or not isinstance(plan.get("resulting_stable_packages"), list):
         raise PlanningError("invalid or publishable V3 plan")
     expected = {}
-    sources = set()
+    sources = {}
     for p in plan["resulting_stable_packages"]:
         name, epoch, version, release, arch = _parse(p)
         filename = f"{name}-{version}-{release}.{arch}.rpm"
@@ -64,7 +64,7 @@ def _manifest_inventory(plan):
             raise PlanningError("package filename disagrees with NEVRA")
         if arch in {"src", "nosrc"}:
             folders = ("source",)
-            sources.add(filename)
+            sources[filename] = p
         elif arch == "noarch":
             folders = ("x86_64", "aarch64")
         else:
@@ -147,6 +147,11 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
                 raise PlanningError("actual RPM headers mismatch snapshot manifest")
             if arch not in {"src", "nosrc"} and output[6] not in sources:
                 raise PlanningError("binary RPM is not linked to selected source RPM: reported " + repr(output[6]) + ", expected " + repr(sorted(sources)))
+            if arch not in {"src", "nosrc"}:
+                source = sources[output[6]]
+                if (source["producer_manifest_digest"] != p["producer_manifest_digest"]
+                        or _parse(source)[1:4] != fields[1:4]):
+                    raise PlanningError("binary RPM linked to a substituted source/provenance")
             checked.append({"path": rel, "signed_rpm_sha256": actual, "header_nevra": p["nevra"]})
     return {
         "scope": "v3-local-rpm-preflight-only",

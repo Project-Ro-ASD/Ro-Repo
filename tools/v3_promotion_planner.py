@@ -19,6 +19,54 @@ DIGEST = re.compile(r"^[a-f0-9]{64}$")
 ARCHES = {"x86_64", "aarch64", "noarch", "src", "nosrc"}
 
 
+def version_compare(left, right):
+    """RPM segment ordering, including numeric segments, tilde and caret."""
+    while left or right:
+        left = re.sub(r"^[^A-Za-z0-9~^]+", "", left)
+        right = re.sub(r"^[^A-Za-z0-9~^]+", "", right)
+        if left.startswith("~") or right.startswith("~"):
+            if not left.startswith("~"):
+                return 1
+            if not right.startswith("~"):
+                return -1
+            left, right = left[1:], right[1:]
+            continue
+        if left.startswith("^") or right.startswith("^"):
+            if not left:
+                return -1
+            if not right:
+                return 1
+            if not left.startswith("^"):
+                return 1
+            if not right.startswith("^"):
+                return -1
+            left, right = left[1:], right[1:]
+            continue
+        if not left or not right:
+            return (bool(left) > bool(right)) - (bool(left) < bool(right))
+        numeric = left[0].isdigit()
+        a = re.match(r"[0-9]+" if numeric else r"[A-Za-z]+", left)
+        b = re.match(r"[0-9]+" if numeric else r"[A-Za-z]+", right)
+        if not b:
+            return 1 if numeric else -1
+        x, y = a[0], b[0]
+        left, right = left[len(x):], right[len(y):]
+        if numeric:
+            x, y = x.lstrip("0"), y.lstrip("0")
+            if len(x) != len(y):
+                return 1 if len(x) > len(y) else -1
+        if x != y:
+            return 1 if x > y else -1
+    return 0
+
+
+def evr_compare(left, right):
+    a, b = _parse(left), _parse(right)
+    if int(a[1]) != int(b[1]):
+        return 1 if int(a[1]) > int(b[1]) else -1
+    return version_compare(a[2], b[2]) or version_compare(a[3], b[3])
+
+
 def _parse(entry):
     if not isinstance(entry, dict) or any(not isinstance(entry.get(k), str) or not entry[k] for k in FIELDS):
         raise PlanningError("missing or malformed package metadata")
@@ -32,7 +80,9 @@ def _parse(entry):
         name, epoch = name_epoch.rsplit("-", 1)
     except ValueError as exc:
         raise PlanningError("malformed NEVRA") from exc
-    if not name or not epoch.isdecimal() or not version or not release or arch not in ARCHES:
+    if (not re.fullmatch(r"[A-Za-z0-9_+.-]+", name) or not epoch.isdecimal()
+            or not re.fullmatch(r"[A-Za-z0-9._+~^]+", version)
+            or not re.fullmatch(r"[A-Za-z0-9._+~^]+", release) or arch not in ARCHES):
         raise PlanningError("malformed NEVRA")
     if arch != entry["architecture"] or not entry["filename"].endswith(".rpm") or "/" in entry["filename"] or "\\" in entry["filename"]:
         raise PlanningError("invalid filename or architecture")
@@ -131,6 +181,8 @@ def plan(candidate_snapshot, stable_snapshot, registry, promotion_group):
         raise PlanningError("unknown promotion group")
     candidate = _packages(candidate_snapshot, owner)
     stable = _packages(stable_snapshot, owner, empty=True)
+    for retained_group in {_group_of(p, owner) for p in stable.values()}:
+        _verify_candidate(stable, groups[retained_group], owner, retained_group)
     chosen = _verify_candidate(candidate, groups[promotion_group], owner, promotion_group)
     old_group = {key: p for key, p in stable.items() if _group_of(p, owner) == promotion_group}
     additions = {(_parse(p)[0], p["architecture"]): p for p in chosen}
@@ -146,6 +198,8 @@ def plan(candidate_snapshot, stable_snapshot, registry, promotion_group):
             raise PlanningError("unrelated stable package changed")
     for key, p in additions.items():
         prev = old_group.get(key)
+        if prev is not None and evr_compare(p, prev) < 0:
+            raise PlanningError("unapproved package downgrade")
         if prev is not None and prev["nevra"] == p["nevra"] and prev["published_signed_artifact_sha256"] != p["published_signed_artifact_sha256"]:
             raise PlanningError("same NEVRA has different signed bytes")
     before = sorted(old_group.values(), key=lambda p: (p["nevra"], p["filename"]))
