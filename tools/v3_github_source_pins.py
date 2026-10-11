@@ -67,16 +67,16 @@ def _refs_match(request_json, token, main_sha, pages_sha):
         raise PlanningError("GitHub Pages branch differs from pinned commit")
 
 
-def _api_key_bytes(request_json, token, main_sha):
-    response = _get(request_json, ROOT + "/contents/" + KEY_PATH + "?ref=" + main_sha, token)
+def _api_file_bytes(request_json, token, main_sha, path=KEY_PATH, limit=KEY_LIMIT):
+    response = _get(request_json, ROOT + "/contents/" + path + "?ref=" + main_sha, token)
     encoded = response.get("content")
     blob = response.get("sha")
-    if (response.get("path") != KEY_PATH or response.get("type") != "file"
+    if (response.get("path") != path or response.get("type") != "file"
             or response.get("encoding") != "base64"
             or not isinstance(encoded, str)
             or not isinstance(blob, str) or not SHA1.fullmatch(blob)
             or type(response.get("size")) is not int
-            or response["size"] < 1 or response["size"] > KEY_LIMIT):
+            or response["size"] < 1 or response["size"] > limit):
         raise PlanningError("invalid GitHub metadata public key response")
     try:
         raw = base64.b64decode("".join(encoded.split()), validate=True)
@@ -88,6 +88,23 @@ def _api_key_bytes(request_json, token, main_sha):
     if git_blob != blob:
         raise PlanningError("GitHub public key Git blob mismatch")
     return raw
+
+
+def _api_key_bytes(request_json, token, main_sha):
+    return _api_file_bytes(request_json, token, main_sha)
+
+
+def verify_registry_pin(request_json, token, main_sha, registry):
+    """Bind the derived policy to registry bytes from the exact pinned source."""
+    from v3_policy_profile import sha
+    _check_sha(main_sha, SHA1, "registry commit")
+    raw = _api_file_bytes(request_json, token, main_sha, "config/producers-v2.json", 1024 * 1024)
+    from v3_actions_zip_receipt import _unique_json
+    fetched = _unique_json(raw)
+    if fetched != registry:
+        raise PlanningError("local producer registry diverges from pinned main source")
+    return {"registry_sha256": sha(registry), "registry_file_sha256": hashlib.sha256(raw).hexdigest(),
+            "source_main_commit": main_sha, "independently_authenticated": False}
 
 
 def verify_source_pins(request_json, token, *, expected_main_sha,
