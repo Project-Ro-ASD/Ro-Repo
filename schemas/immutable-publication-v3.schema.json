@@ -15,7 +15,8 @@
     "signing_key_sha256",
     "baseurls",
     "issued_at",
-    "expires_at"
+    "expires_at",
+    "signing_key_identity"
   ],
   "properties": {
     "schema_version": {
@@ -230,6 +231,10 @@
     },
     "expires_at": {
       "type": "integer"
+    },
+    "signing_key_identity": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     }
   }
 }

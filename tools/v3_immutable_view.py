@@ -12,7 +12,7 @@ import urllib.parse
 import urllib.request
 
 from v3_backend_trust import (TOKEN, TestSigner, canonical, digest, require_attestation,
-                              require_test_root, verify_envelope)
+                              require_test_root, verify_envelope, key_identity)
 from v3_integration import tree_inventory
 from v3_policy_profile import sha
 from v3_promotion_planner import PlanningError
@@ -50,9 +50,17 @@ def verify_result(source, proposal, plan, *, beta, baseline, registry, rpm_key, 
     """Real frozen GPG/RPM/SRPM preflight, reusing the merged V3 validators."""
     from v3_full_set_dnf import _signed_view, _rpm_set_preflight
     from v3_signed_beta_history import _keyring
+    from v3_integration import verify_proposal
+    from v3_group_validation import stable_set_digest
+    verify_proposal(proposal)
     before = tree_inventory(source)
     from v3_policy_profile import require_complete
     require_complete(plan, registry)
+    if (plan["selected_group_packages"] != proposal["candidate_identity"]["packages"] or
+            stable_set_digest(plan) != proposal["stable_set_sha256"] or
+            (baseline is None) != (proposal["previous_stable_sha256"] is None) or
+            (baseline is not None and sha(tree_inventory(baseline)) != proposal["previous_stable_sha256"])):
+        raise PlanningError("canonical result/approved stable-base digest mismatch")
     if operation not in {"promote", "recover"}:
         raise PlanningError("invalid result operation")
     if sha(before) != proposal["result_stable_sha256"]:
@@ -126,11 +134,14 @@ class IsolatedStore:
         if (now >= authorization.expiry or payload["request"]["result_stable_sha256"] != result.sha256 or
                 signer.key_sha256 in {audit_key_sha256, payload["approval_key_sha256"], payload["witness_key_sha256"]}):
             raise PlanningError("expired/substituted approval or signing role collision")
+        if key_identity(signer.public) in {payload["approval_key_identity"], payload["witness_key_identity"]}:
+            raise PlanningError("canonical approval/publication key role collision")
         result.check()
         descriptor = {"schema_version": 3, "scope": "v3-immutable-publication-test-only", "publishable": False,
                       "result_stable_sha256": result.sha256, "inventory": result.inventory,
                       "authorization_sha256": authorization.sha256, "request": payload["request"],
                       "preflight_sha256": result.receipt, "signing_key_sha256": signer.key_sha256,
+                      "signing_key_identity": key_identity(signer.public),
                       "baseurls": {arch: immutable_url(origin, result.sha256, arch) for arch in ("x86_64", "aarch64", "source")},
                       "issued_at": now, "expires_at": int(authorization.expiry)}
         from ro_repo import validate_schema
@@ -187,6 +198,9 @@ class DirectoryReader:
     def inventory(self):
         return tree_inventory(self.view.path / "payload")
 
+    def advertisement(self):
+        return (self.view.path / "stable-advertisement.json").read_bytes()
+
 
 class HTTPSReader:
     """Read-only bounded HTTPS transport, no redirects or implicit credentials."""
@@ -197,6 +211,7 @@ class HTTPSReader:
             raise PlanningError("invalid publication identity")
         self.base = origin.rstrip("/") + "/v3/views/" + result_digest + "/"
         self.publication_url = origin.rstrip("/") + "/v3/publications/" + attempt + ".json"
+        self.advertisement_url = origin.rstrip("/") + "/v3/stable.json"
         self.max_bytes = max_bytes
 
     def _get(self, path, url=None):
@@ -218,6 +233,9 @@ class HTTPSReader:
     def publication(self):
         return self._get("publication.json", self.publication_url)
 
+    def advertisement(self):
+        return self._get("stable.json", self.advertisement_url)
+
 
 class RemoteVerification:
     def __init__(self, data, seal):
@@ -226,7 +244,8 @@ class RemoteVerification:
         self.data, self.sha256 = data, sha(data)
 
 
-def verify_remote(view, reader, deployment, *, now, post_ledger=None):
+def verify_remote(view, reader, deployment, *, now, post_ledger=None,
+                  advertisement_key=None, advertisement_key_sha256=None):
     payload = require_attestation(deployment, "deployment")
     view.check()
     if (not payload["issued_at"] <= now < payload["expires_at"] or
@@ -245,9 +264,28 @@ def verify_remote(view, reader, deployment, *, now, post_ledger=None):
             raise PlanningError("unexpected remote files")
     except OSError as exc:
         raise PlanningError("incomplete remote view") from exc
-    post = None if post_ledger is None else post_ledger.inspect()
+    from v3_backend_ledger import Ledger
+    if post_ledger is not None and not isinstance(post_ledger, Ledger):
+        raise PlanningError("authenticated ledger required for post-verification")
+    post = None if post_ledger is None else post_ledger.inspect(view.descriptor["request"]["attempt_id"])
     if post is not None and post["head"]["digest"] != view.sha256:
         raise PlanningError("advertisement differs from post-verified view")
+    if post is not None:
+        if advertisement_key_sha256 != view.descriptor["signing_key_sha256"]:
+            raise PlanningError("independent advertisement key pin required")
+        expected = {"result_stable_sha256": view.sha256, "publication_sha256": view.envelope_sha256,
+                    "authorization_sha256": view.descriptor["authorization_sha256"],
+                    "previous_stable_sha256": view.descriptor["request"]["previous_stable_sha256"],
+                    "generation": post["head"]["generation"], "baseurls": view.descriptor["baseurls"],
+                    "staged_git_commit": post["attempt"]["proofs"]["REMOTE_VERIFIED"]["verification"]["git_commit"],
+                    "publishable": False}
+        from v3_backend_trust import strict_json
+        try:
+            raw = reader.advertisement()
+            verify_envelope(raw, role="stable-advertisement", public_key=advertisement_key,
+                            key_sha256=advertisement_key_sha256, expected=expected, now=now)
+        except (OSError, AttributeError) as exc:
+            raise PlanningError("missing remote signed stable advertisement") from exc
     return RemoteVerification({"result_stable_sha256": view.sha256, "publication_sha256": view.envelope_sha256,
                                "deployment_sha256": deployment.sha256, "deployment_id": payload["deployment_id"],
                                "git_commit": payload["git_commit"], "verified_at": now,

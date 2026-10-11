@@ -56,7 +56,7 @@ def main():
         if sorted(r[0] for r in results) != ["conflict", "published"]:
             raise PlanningError("independent PostgreSQL CAS allowed multiple stable writers")
         winner = next(fx for fx in fixtures if ("published", fx.attempt) in results)
-        post = verify_remote(winner.view, DirectoryReader(winner.view), winner.deployment, now=NOW, post_ledger=ledger)
+        post = winner.verify_post()
         winner.backend.post_verified(winner.attempt, post)
         status = ledger.inspect(winner.attempt)
         # Crash within a transaction cannot clear consumed approvals.

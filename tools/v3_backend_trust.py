@@ -13,6 +13,7 @@ import pathlib
 import re
 import subprocess
 import tempfile
+from functools import lru_cache
 from types import MappingProxyType
 
 from v3_policy_profile import canonical, sha
@@ -84,6 +85,7 @@ def rsa_pem(jwk):
 def verify_bytes(public_key, expected_sha256, data, signature):
     if not HEX.fullmatch(expected_sha256) or digest(public_key) != expected_sha256:
         raise PlanningError("independent signing key pin mismatch")
+    key_identity(public_key)
     with tempfile.TemporaryDirectory(prefix="v3-verify-") as directory:
         root = pathlib.Path(directory)
         for name, content in (("key", public_key), ("data", data), ("sig", signature)):
@@ -93,6 +95,19 @@ def verify_bytes(public_key, expected_sha256, data, signature):
                                 capture_output=True, timeout=30)
         if result.returncode:
             raise PlanningError("invalid asymmetric signature")
+
+
+@lru_cache(maxsize=128)
+def key_identity(public_key):
+    """Canonical key identity prevents whitespace/encoding role collisions."""
+    result = subprocess.run(["openssl", "pkey", "-pubin", "-outform", "DER"], input=public_key,
+                            capture_output=True, timeout=30)
+    text_result = subprocess.run(["openssl", "pkey", "-pubin", "-text_pub", "-noout"], input=public_key,
+                                 capture_output=True, timeout=30)
+    bits = re.search(rb"Public-Key: \((\d+) bit\)", text_result.stdout)
+    if result.returncode or text_result.returncode or b"\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01" not in result.stdout or not bits or not 2048 <= int(bits.group(1)) <= 8192:
+        raise PlanningError("pinned RSA signing key must be 2048..8192 bits")
+    return digest(result.stdout)
 
 
 class Workload:
@@ -186,7 +201,7 @@ def test_workspace():
 def require_test_root(root):
     root = pathlib.Path(root)
     if (root.is_symlink() or root.parent.resolve() != pathlib.Path(tempfile.gettempdir()).resolve() or
-            not root.name.startswith("v3-backend-test-") or root.stat().st_uid != os.getuid() or
+            not re.fullmatch(r"v3-backend-test-[a-z0-9_-]+", root.name) or root.stat().st_uid != os.getuid() or
             root.stat().st_mode & 0o077 or (root / ".test-only").is_symlink() or
             (root / ".test-only").read_text() != "publishable=false\n"):
         raise PlanningError("only private disposable test storage is executable")

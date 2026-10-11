@@ -146,8 +146,20 @@ class Fixture:
         self.advance("AUTHORIZED")
         self.stage()
         self.backend.publish(self.attempt, self.approval)
-        self.remote = verify_remote(self.view, DirectoryReader(self.view), self.deployment, now=NOW, post_ledger=self.ledger)
+        self.remote = self.verify_post()
         self.backend.post_verified(self.attempt, self.remote)
+
+    def verify_post(self):
+        head = self.ledger.inspect()["head"]
+        payload = {"result_stable_sha256": self.view.sha256, "publication_sha256": self.view.envelope_sha256,
+                   "authorization_sha256": self.approval.sha256,
+                   "previous_stable_sha256": self.proposal["previous_stable_sha256"],
+                   "generation": head["generation"], "baseurls": self.view.descriptor["baseurls"], "publishable": False,
+                   "staged_git_commit": "a"*40, "issued_at": NOW, "expires_at": NOW+300}
+        signer = self.keys.signers["publication"]
+        (self.view.path / "stable-advertisement.json").write_bytes(signer.envelope("stable-advertisement", payload))
+        return verify_remote(self.view, DirectoryReader(self.view), self.deployment, now=NOW, post_ledger=self.ledger,
+                             advertisement_key=signer.public, advertisement_key_sha256=signer.key_sha256)
 
     def close(self):
         shutil.rmtree(self.root)

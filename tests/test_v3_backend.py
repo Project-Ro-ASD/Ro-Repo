@@ -175,7 +175,7 @@ class BackendTests(unittest.TestCase):
         recovery.backend.authorized(recovery.attempt, recovery.approval)
         recovery.stage()
         recovery.backend.publish(recovery.attempt, recovery.approval)
-        recovery.remote = verify_remote(recovery.view, DirectoryReader(recovery.view), recovery.deployment, now=NOW, post_ledger=recovery.ledger)
+        recovery.remote = recovery.verify_post()
         recovery.backend.post_verified(recovery.attempt, recovery.remote)
         self.assertEqual(self.fx.ledger.inspect()["head"]["last_verified"], old)
         self.assertEqual(self.fx.ledger.inspect()["head"]["generation"], 3)
@@ -330,6 +330,17 @@ class BackendTests(unittest.TestCase):
         self.fx.backend.publish(self.fx.attempt, self.fx.approval)
         self.reject(lambda: self.fx.backend.post_verified(self.fx.attempt, self.fx.remote))
 
+    def test_remote_stable_advertisement_substitution_rejected(self):
+        self.fx.complete()
+        file = self.fx.view.path / "stable-advertisement.json"
+        raw = strict_json(file.read_bytes())
+        raw["payload"]["result_stable_sha256"] = "0" * 64
+        file.write_bytes(canonical(raw))
+        signer = self.keys.signers["publication"]
+        self.reject(lambda: verify_remote(self.fx.view, DirectoryReader(self.fx.view), self.fx.deployment,
+                    now=NOW, post_ledger=self.fx.ledger, advertisement_key=signer.public,
+                    advertisement_key_sha256=signer.key_sha256))
+
 
 def make_oidc_negative(field, bad):
     def test(self):
@@ -351,6 +362,32 @@ def make_skip_transition(target):
 
 for _state in STATES[2:]:
     setattr(BackendTests, "test_no_stage_skip_to_" + _state.lower(), make_skip_transition(_state))
+
+
+def make_transition_crash(target):
+    def test(self):
+        real = self.fx.ledger.execute
+        operation = "create-promote" if target == "PROPOSED" else target
+        def execute(name, attempt, change, **kwargs):
+            if name == operation:
+                def crash(point):
+                    if point == "after-audit":
+                        raise RuntimeError("interrupted " + target)
+                kwargs["inject"] = crash
+            return real(name, attempt, change, **kwargs)
+        with mock.patch.object(self.fx.ledger, "execute", side_effect=execute):
+            with self.assertRaisesRegex(RuntimeError, "interrupted"):
+                self.fx.complete()
+        status = self.fx.ledger.inspect(None if target == "PROPOSED" else self.fx.attempt)
+        if target != "PROPOSED":
+            self.assertEqual(status["attempt"]["state"], STATES[STATES.index(target) - 1])
+        self.assertIsNone(status["head"]["last_verified"])
+        self.assertEqual(status["head"]["generation"], 1 if target == "POST_VERIFIED" else 0)
+    return test
+
+
+for _state in STATES:
+    setattr(BackendTests, "test_interrupted_transition_" + _state.lower(), make_transition_crash(_state))
 
 
 if __name__ == "__main__":

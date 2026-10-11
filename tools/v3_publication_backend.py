@@ -8,7 +8,7 @@ import copy
 
 from v3_authorization import ID
 from v3_backend_evidence import Authorization, Evidence, bindings
-from v3_backend_trust import canonical, strict_json
+from v3_backend_trust import canonical, strict_json, key_identity
 from v3_immutable_view import VerifiedResult, StagedView, RemoteVerification
 from v3_integration import verify_proposal
 from v3_policy_profile import require_complete, sha
@@ -45,6 +45,8 @@ class Backend:
             head = self.ledger.head(db)
             if proposal["previous_stable_sha256"] != head["digest"]:
                 raise PlanningError("stale stable base")
+            if operation == "promote" and head["digest"] != head["last_verified"]:
+                raise PlanningError("unverified advertisement requires recovery before another promotion")
             if operation == "recover":
                 target = db.execute("SELECT body FROM views WHERE digest=?", (proposal["result_stable_sha256"],)).fetchone()
                 if target is None or strict_json(target[0])["state"] != "POST_VERIFIED":
@@ -133,6 +135,7 @@ class Backend:
         view.check()
         def validate(db, value):
             if (view.sha256 != value["immutable"]["proposal"]["result_stable_sha256"] or
+                    view.descriptor["signing_key_identity"] == key_identity(self.ledger.audit_key) or
                     view.descriptor["authorization_sha256"] != value["proofs"]["AUTHORIZED"]["authorization_sha256"] or
                     self.ledger.clock() >= value["proofs"]["AUTHORIZED"]["expires_at"]):
                 raise PlanningError("signing result/approval substitution or expiry")
@@ -160,6 +163,7 @@ class Backend:
                     not 0 <= self.ledger.clock() - remote.data["verified_at"] <= 60):
                 raise PlanningError("stale/substituted remote verification")
             if target == "POST_VERIFIED":
+                self.ledger._integrity(db, remote.data["advertisement_checkpoint"])
                 head = self.ledger.head(db)
                 if remote.data["phase"] != "post" or remote.data["advertised_generation"] != head["generation"] or head["digest"] != remote.data["result_stable_sha256"] or head["generation"] != value["base_generation"] + 1:
                     raise PlanningError("publication changed before post-verification")

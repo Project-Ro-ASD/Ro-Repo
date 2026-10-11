@@ -9,7 +9,7 @@ import re
 
 from v3_authorization import request
 from v3_backend_trust import (Attestation, TOKEN, Workload, HEX, require_attestation,
-                              verify_envelope)
+                              verify_envelope, key_identity)
 from v3_group_validation import validate_claim
 from v3_integration import verify_proposal
 from v3_policy_profile import BASE, DESKTOP, SYSTEM, require_complete, sha
@@ -48,6 +48,7 @@ def verify_evidence(proposal, plan, registry, claim, attestations, *, now):
     policy = require_complete(plan, registry)
     verify_proposal(proposal)
     if (proposal["policy_sha256"] != sha(policy) or
+            proposal["minimum_beta_days"] != policy["minimum_beta_days"] or
             plan["selected_group_packages"] != proposal["candidate_identity"]["packages"] or
             sha(claim) != proposal["evidence_sha256"].get("group-validation-claim")):
         raise PlanningError("evidence differs from canonical proposal/claim")
@@ -128,7 +129,7 @@ def verify_protected(proposal, attempt, evidence, workload, *, approval_raw, wit
         raise PlanningError("verified workload and evidence required")
     if not now < min(evidence.expiry, workload.claims["exp"]):
         raise PlanningError("expired workload/evidence at authorization")
-    if approval_key_sha256 == witness_key_sha256 or not HEX.fullmatch(environment_config_sha256):
+    if key_identity(approval_key) == key_identity(witness_key) or not HEX.fullmatch(environment_config_sha256):
         raise PlanningError("independent approval/witness trust roots required")
     expected = authorization_request(proposal, attempt, evidence, operation=operation, target=target)
     from v3_backend_trust import strict_json
@@ -152,6 +153,7 @@ def verify_protected(proposal, attempt, evidence, workload, *, approval_raw, wit
     return Authorization({**expected, "approval_sha256": approval.sha256,
                           "witness_sha256": witness.sha256, "reviewer_id": reviewer,
                           "approval_key_sha256": approval_key_sha256, "witness_key_sha256": witness_key_sha256,
+                          "approval_key_identity": key_identity(approval_key), "witness_key_identity": key_identity(witness_key),
                           "workload_token_sha256": workload.token_sha256,
                           "jti": workload.claims["jti"], "run_id": workload.claims["run_id"],
                           "run_attempt": workload.claims["run_attempt"]},
