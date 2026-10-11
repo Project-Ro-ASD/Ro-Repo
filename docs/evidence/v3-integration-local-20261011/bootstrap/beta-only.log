@@ -1,0 +1,11 @@
+ro-assist
+ro-installer
+Updating and loading repositories:
+ V3 isolated beta                       100% |   0.0   B/s |   2.0 KiB |  00m00s
+Importing OpenPGP key 0xFEDEC9CC:
+ UserID     : "V3 INTEGRATION TEST ONLY <test@invalid>"
+ Fingerprint: C6DAB62F3109B3AF6036B73EEEB02726FEDEC9CC
+ From       : file:///tmp/v3-fedora-integration-gqsasz0y/evidence/.v3-full-dnf-pc170qw3/dnf-merged-public.asc
+The key was successfully imported.
+ V3 isolated beta                       100% | 907.6 KiB/s |   2.7 KiB |  00m00s
+Repositories loaded.

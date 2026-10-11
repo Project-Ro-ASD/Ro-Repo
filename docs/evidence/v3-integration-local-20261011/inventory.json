@@ -1,0 +1,58 @@
+{
+  "scope": "local-test-only-evidence-inventory",
+  "files": [
+    {
+      "path": "acceptance.json",
+      "sha256": "274f5e37ee1918f3a6987fa0a703c27230c10ee4996e1b47eff72dafa9477ca8"
+    },
+    {
+      "path": "bootstrap/beta-only.log",
+      "sha256": "2f067ca519b6dc1ef36b85c2732b906c8974610e19eff9577a97c8fa2a31adbf"
+    },
+    {
+      "path": "bootstrap/clean-install.log",
+      "sha256": "71be2549c4c15f7dae71b8d0871ffaa33a506b3c2c5baedc9e73b0735ca9778b"
+    },
+    {
+      "path": "bootstrap/full-set-dnf-v3.json",
+      "sha256": "4e87e2ca8200a7b9cad6e69216577e7b9d24357758b426564fb620d3adcf7d4e"
+    },
+    {
+      "path": "bootstrap/stable-only.log",
+      "sha256": "cd33ab95cc6a6d39e09f72227d7c7438000336303e19914599688697b7b99fee"
+    },
+    {
+      "path": "ephemeral-metadata-public.asc",
+      "sha256": "cc4e087a9fe0e17a33fc06c3be4f0ab9fcab9f90db54ad96303e943b7eab3d14"
+    },
+    {
+      "path": "ephemeral-rpm-public.asc",
+      "sha256": "c730c038930e81b5f09675539f59a62d7556b7518f119d580d43cbb7a10007c6"
+    },
+    {
+      "path": "upgrade/baseline-install.log",
+      "sha256": "9e09dfbac11f7172ef30ec314c4d00025f01c5752c942e21e2c691012a6c4ce1"
+    },
+    {
+      "path": "upgrade/beta-only.log",
+      "sha256": "532c29dfd0faf9840d56eb7476caf6cea54a1b603cef701f1250b20f7034e837"
+    },
+    {
+      "path": "upgrade/clean-install.log",
+      "sha256": "6f9ce028d8debaa84fd9534ee832c802c2b832ec9ed2589f845fbf5fcf870c78"
+    },
+    {
+      "path": "upgrade/full-set-dnf-v3.json",
+      "sha256": "bb0c1580304dcf36d20ebc1e80c3e17419202ad584be1f15bf4a8d37d04c87e2"
+    },
+    {
+      "path": "upgrade/stable-only.log",
+      "sha256": "00dbb56ce624a8b0dd3afdc075da6670d225d999c41365e5cacad4b363e52baf"
+    },
+    {
+      "path": "upgrade/upgrade.log",
+      "sha256": "72f5053debd1cb820d02ef608c662c462ac665e46597638f8d880a6ffca06da7"
+    }
+  ],
+  "production_authority": false
+}

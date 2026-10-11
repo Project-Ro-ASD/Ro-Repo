@@ -47,6 +47,11 @@ def main(output):
     output = pathlib.Path(output).resolve()
     if output.exists():
         raise RuntimeError("immutable evidence output exists")
+    def source_inventory():
+        return [{"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                for folder in ("tools", "tests", "schemas", "config") for path in sorted((ROOT / folder).glob("*"))
+                if path.is_file() and path.suffix in {".py", ".sh", ".json"}]
+    tested_sources = source_inventory()
     now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
     utc = lambda value: value.isoformat().replace("+00:00", "Z")
     with tempfile.TemporaryDirectory(prefix="v3-fedora-integration-") as directory:
@@ -262,10 +267,10 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             generate(copyroot, 1791676800)
             copies.append(tree_inventory(copyroot / "repodata"))
         assert copies[0] == copies[1], "non-reproducible unsigned metadata"
+        if source_inventory() != tested_sources:
+            raise RuntimeError("tested source tree changed during acceptance run")
         (evidence / "acceptance.json").write_bytes(canonical({"scope": "v3-fedora44-fixture-acceptance",
-            "source_code_sha256": sha([{ "path": path.relative_to(ROOT).as_posix(),
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest() }
-                for folder in ("tools", "tests") for path in sorted((ROOT / folder).glob("*.py"))]),
+            "source_code_sha256": sha(tested_sources),
             "gates": {"signed-bootstrap": "PASS", "unchanged-candidate-dwell": "PASS", "retained-signed-bytes": "PASS",
                       "unapproved-group-exclusion": "PASS", "full-set-upgrade": "PASS", "rpmnew": "PASS", "reproducible-metadata": "PASS",
                       "missing-dependency-rejection": "PASS", "retained-group-conflict-rejection": "PASS",
