@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "backend-envelope-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "domain",
+    "role",
+    "payload",
+    "signature"
+  ],
+  "properties": {
+    "domain": {
+      "const": "ro-repo-v3-backend-1"
+    },
+    "role": {
+      "enum": [
+        "source",
+        "tests",
+        "beta-history",
+        "result-preflight",
+        "human-approval",
+        "protected-environment-witness",
+        "publication",
+        "deployment",
+        "upstream-pin",
+        "acceptance-inputs",
+        "vm-inputs"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$"
+    }
+  }
+}
