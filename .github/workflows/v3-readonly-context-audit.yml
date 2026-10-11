@@ -1,0 +1,42 @@
+name: V3 read-only Actions identity audit
+
+"on":
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-identity:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout pinned event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Verify exact read-only Actions run and job identity
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RUNNER_NAME: ${{ runner.name }}
+          RUNNER_GROUP_NAME: ${{ runner.group }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/v3_actions_run_context.py --output "$RUNNER_TEMP/v3-context-audit.json"
+          python3 - "$RUNNER_TEMP/v3-context-audit.json" <<'PY'
+          import json,sys
+          report=json.load(open(sys.argv[1]))
+          assert report["publishable"] is False
+          assert report["approval_granted"] is False
+          assert report["oidc_identity_verified"] is False
+          PY
+      - name: Upload test-only identity receipt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: v3-actions-context-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/v3-context-audit.json
+          if-no-files-found: error
+          retention-days: 14
