@@ -3,11 +3,28 @@ import unittest
 import yaml
 import json
 import jsonschema
+import subprocess
+import sys
+import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
+    def test_compatibility_evidence_accepts_relative_output_with_temporary_snapshot(self):
+        script = (ROOT / "tests/e2e-local.sh").read_text()
+        block = script.split('if [ -n "$evidence_out" ]; then\n', 1)[1]
+        code = block.split("<<'PY'\n", 1)[1].rsplit("\nPY\n", 1)[0]
+        with tempfile.TemporaryDirectory() as temp:
+            work = pathlib.Path(temp)
+            snapshot = work / "temporary-snapshots/repo-f44-20261011-001"
+            snapshot.mkdir(parents=True)
+            (snapshot / "repository-snapshot-v1.json").write_text('{"fixture": true}')
+            subprocess.run([sys.executable, "-c", code, str(snapshot), "compatibility-evidence.json"],
+                           cwd=work, check=True, capture_output=True)
+            report = json.loads((work / "compatibility-evidence.json").read_text())
+            self.assertEqual(report["reference"], "snapshot:repo-f44-20261011-001/repository-snapshot-v1.json")
+
     def test_all_schemas_and_workflows_parse(self):
         for path in (ROOT / "schemas").glob("*.schema.json"):
             with self.subTest(schema=path.name):
@@ -21,7 +38,7 @@ class WorkflowBoundaryTests(unittest.TestCase):
         value = yaml.safe_load(path.read_text())
         self.assertEqual(value["permissions"], {"contents": "read"})
         self.assertEqual(set(value["on"]), {"workflow_dispatch"})
-        self.assertEqual(len(value["jobs"]), 10)
+        self.assertEqual(len(value["jobs"]), 11)
         for name, job in value["jobs"].items():
             with self.subTest(job=name):
                 self.assertEqual(job["if"], "${{ false }}")

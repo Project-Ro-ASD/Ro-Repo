@@ -31,10 +31,16 @@ jobs:
     needs: component-policy
     runs-on: ubuntu-24.04
     steps:
-      - run: exit 1 # complete signed package set, DNF5 and deterministic result digest
-  protected-authorization:
+      - run: exit 1 # complete signed package set and full-set DNF5 validation
+  deterministic-result:
     if: ${{ false }}
     needs: compose-and-validate
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # reproducible metadata and immutable complete stable result digest
+  protected-authorization:
+    if: ${{ false }}
+    needs: deterministic-result
     runs-on: ubuntu-24.04
     environment: repo-stable
     steps:
