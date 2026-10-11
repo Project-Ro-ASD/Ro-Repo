@@ -1,0 +1,127 @@
+{
+  "scope": "pr71-local-and-ci-test-only-evidence-inventory",
+  "implementation_head": "464925754e27714fda30305f9373b50a45368151",
+  "production_authority": false,
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "8eddd23bcbf17edd9ace4e296d821351b8b68ebdedd8fd533acbe51705e6436a"
+    },
+    {
+      "path": "acceptance.json",
+      "sha256": "680a3095ca7f15c7c7a4eb1665ba4a3ab1c4857b531fd67b16cf93a747043ed0"
+    },
+    {
+      "path": "bootstrap/beta-only.log",
+      "sha256": "8b4bfc65f2200e33271dc2bd0b40e429c7a61f9b4a0a39738a70127cb0096a4c"
+    },
+    {
+      "path": "bootstrap/clean-install.log",
+      "sha256": "3ad1bd339685c99e338eb13b2119086f988fd77ff4351a7ad96729697477b54d"
+    },
+    {
+      "path": "bootstrap/full-set-dnf-v3.json",
+      "sha256": "fb9943e7f3f43e3a08fe5c100e234b0ca703eae7d0ce738d268389fcd0c046f6"
+    },
+    {
+      "path": "bootstrap/stable-only.log",
+      "sha256": "e6ca73a23e6f71b0f027b9b9c39c173ce717340096b475dba47cc9769d9b18e7"
+    },
+    {
+      "path": "ci-checks.json",
+      "sha256": "8eb0b5ccbf2973fa57c2d38f75bbfb2ad74c2bd467423713eb7e228caae9ec04"
+    },
+    {
+      "path": "ephemeral-metadata-public.asc",
+      "sha256": "bde8dee2637cd7162687c831c32d7d60c919c946d5bc7f91a565e4cffcce0ae1"
+    },
+    {
+      "path": "ephemeral-rpm-public.asc",
+      "sha256": "3630f406bcc40f403deb2dbe6dd57c431e7640bd05be4312fceb06984470e9f2"
+    },
+    {
+      "path": "legacy-local-completed.json",
+      "sha256": "b71836cb946c6fd4e2244901fd6e72c77ea6573f77c7fdae098812a70ee61e49"
+    },
+    {
+      "path": "review-logs/baseline-368.log",
+      "sha256": "b736db382c74870f8b0b4a39ff1f0499bd7be5960c4c470e07349eae9fd95c91"
+    },
+    {
+      "path": "review-logs/fedora-full-set-final.log",
+      "sha256": "5e1110d6657e325b1e49d73c3db68ede70579dddc7fdcdc3c8dfea918387ca65"
+    },
+    {
+      "path": "review-logs/legacy-local-completed.log",
+      "sha256": "56c56fa4dc8fdf401cf4dbeb49b2703732afe5ba24c7f670a548d09f43335a74"
+    },
+    {
+      "path": "review-logs/live-before-2-failures.log",
+      "sha256": "cee511ac2820b9505bc21dab3fb2f62079f5238646ba46d7ed534cf0de9db6d8"
+    },
+    {
+      "path": "review-logs/local-v2-retry-output-collision.log",
+      "sha256": "131e72f199649d76f8a3dbf154d6066eeda4a7067956ea13a2692aa973444848"
+    },
+    {
+      "path": "review-logs/negative-before-7-failures.log",
+      "sha256": "6f40e93d393104948e67cf70fe888f870b6baa618ff34d3dc70daa209491329f"
+    },
+    {
+      "path": "review-logs/security-final-233.log",
+      "sha256": "bcda7fead40ad4795bef63d531a178ca79595c23082927f81b512728563c1fe9"
+    },
+    {
+      "path": "review-logs/unit-final-377.log",
+      "sha256": "03a8d821134028cd59802e3c07f5320145a98dfd7ace14e6a1a65699d2992493"
+    },
+    {
+      "path": "review-logs/unsigned-source-before-failure.log",
+      "sha256": "24aff948f8009cb102e4e85e80bafdb44c88f0f30d8eb81cc606e0b3fe477014"
+    },
+    {
+      "path": "rpm-vercmp-observation.json",
+      "sha256": "874cae3c26922ae76734141068768abbcda315d739ad972a85644dd92022c524"
+    },
+    {
+      "path": "rpm-vercmp-probe.py",
+      "sha256": "72f7035a27e5f20f7db4f4c04209b604bfb85b6de1a5b0ba7f7f1e6aef840caf"
+    },
+    {
+      "path": "test-summary.json",
+      "sha256": "0987fc9986c695df93c532e8ed2d35ef094ccefe3b56c749d921ab27679aa60f"
+    },
+    {
+      "path": "tested-sources.json",
+      "sha256": "75c4dc2a936423d44e3c96de70edbce253d0f7b0db76f385239752dd9b7c2a0b"
+    },
+    {
+      "path": "upgrade/baseline-install.log",
+      "sha256": "aedb642dd88969b6b799176179eb838be4b6e188dfb779da7befea4a73650db7"
+    },
+    {
+      "path": "upgrade/beta-only.log",
+      "sha256": "5abeeb4cd72598c39215c0eca6d9223061b1820e3a5cb5f2acaa675e9578e9e1"
+    },
+    {
+      "path": "upgrade/clean-install.log",
+      "sha256": "f07de7c6aaa1c53df6c2fd3a02b56ea0fd05fe244361b97f0e626ddedea6884e"
+    },
+    {
+      "path": "upgrade/full-set-dnf-v3.json",
+      "sha256": "24652e914464af4160e96df0ea9538da2218e62b091d8c01f423653b03f8e67c"
+    },
+    {
+      "path": "upgrade/stable-only.log",
+      "sha256": "1f03ee080972b560699e9b137012152bfdbb235076e0ff504a3a3a752de071ed"
+    },
+    {
+      "path": "upgrade/upgrade.log",
+      "sha256": "1a549993f0be0dbca3784d25cf9c40099f7f4e035f729e002c961eeb62628907"
+    },
+    {
+      "path": "workflow-verification.json",
+      "sha256": "9ce910a912597c4c97c743b686ebb417fa5d21718ad06c870eef2eea6d83c931"
+    }
+  ]
+}

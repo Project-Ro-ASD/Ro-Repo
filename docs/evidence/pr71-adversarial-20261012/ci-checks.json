@@ -1,0 +1,36 @@
+{
+  "head_sha": "464925754e27714fda30305f9373b50a45368151",
+  "production_authority": false,
+  "checks": [
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38176096590/job/114578693086",
+      "name": "unit-policy",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38176096573/job/114578692820",
+      "name": "security-contracts",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38176096590/job/114578692942",
+      "name": "fedora44-e2e",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38176096573/job/114578692919",
+      "name": "fedora44-full-stable-set",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38176096590/job/114578693104",
+      "name": "acceptance-runtime-contract",
+      "state": "SUCCESS"
+    }
+  ]
+}

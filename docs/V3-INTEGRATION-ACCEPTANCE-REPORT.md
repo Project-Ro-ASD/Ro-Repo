@@ -1,5 +1,11 @@
 # V3 integration acceptance report
 
+Historical acceptance record for the pre-review implementation. The subsequent
+[PR #71 adversarial security review](V3-PR71-SECURITY-REVIEW.md) found and corrected
+eight offline validation defects and adds source-bound evidence for the revised
+implementation. The PASS observations below do not establish rejection of those
+new negative scenarios or acceptance of the revised source tree.
+
 Session date: 2026-10-11. Branch: `feature/v3-integration-complete`.
 Production activation: **BLOCKED**. No release, workflow dispatch, live
 promotion/rollback, private production key access, merge, `main` push or

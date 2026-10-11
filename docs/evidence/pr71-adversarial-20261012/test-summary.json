@@ -1,0 +1,26 @@
+{
+  "scope": "pr71-adversarial-test-summary",
+  "original_review_head": "580b8f825d3afe8f5613b45f113bbdcdc7d81c2d",
+  "main_sha": "db04a4cbfb0aa904d0a2c1244251e7795987a209",
+  "implementation_head": "464925754e27714fda30305f9373b50a45368151",
+  "production_authority": false,
+  "unit_tests": {
+    "passed": 377,
+    "failures": 0,
+    "skips": 0
+  },
+  "v3_security_tests": {
+    "passed": 233,
+    "failures": 0,
+    "skips": 0
+  },
+  "adversarial_unit_regressions": 9,
+  "real_unsigned_source_rpm_negative": "PASS",
+  "native_rpm_segment_comparison_cases": 1500,
+  "native_rpm_differences": 0,
+  "fedora_full_set_fixture": "PASS",
+  "automatic_ci_checks": "5/5 PASS",
+  "legacy_fedora_e2e_ci": "PASS",
+  "local_legacy_retry": "Exit 1: output collision; not included in PASS totals",
+  "legacy_fedora_e2e_local_first_attempt": "PASS: final record and log verified; 0 rpmlint errors, 4 fixture warnings"
+}

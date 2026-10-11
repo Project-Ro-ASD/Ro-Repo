@@ -1,0 +1,89 @@
+{
+  "scope": "read-only-workflow-verification",
+  "main_sha": "db04a4cbfb0aa904d0a2c1244251e7795987a209",
+  "head_sha": "464925754e27714fda30305f9373b50a45368151",
+  "production_authority": false,
+  "unchanged_main_workflows": [
+    {
+      "path": ".github/workflows/accept-component.yml",
+      "sha256": "085e24fbef750043ee8e4f03b73cd39bb25fbdf970044d1b3a586e940863f02f"
+    },
+    {
+      "path": ".github/workflows/build-candidate-snapshot.yml",
+      "sha256": "0afb575c2fcc9f905206018c0a8de86d87510162a6c84f41d9675da52b0b31f6"
+    },
+    {
+      "path": ".github/workflows/fedora-compatibility.yml",
+      "sha256": "b2c85095826acaa299f478afc2a07cf4556e36d0aa73921c32187d90e875a5da"
+    },
+    {
+      "path": ".github/workflows/promote-remote-stable.yml",
+      "sha256": "20bfeac68d7aebffc09ef6ac9bb66f825b306c2c7e44e490cea575b2034c1b2a"
+    },
+    {
+      "path": ".github/workflows/publish-pages-snapshot.yml",
+      "sha256": "cde01be8ce3d3ed35525eacfb7c51432e9b3529c10809d902fa936e2b1bcbe94"
+    },
+    {
+      "path": ".github/workflows/publish-remote-beta.yml",
+      "sha256": "37e60630a9e5ada9b5d7321629a9fb10b386f06055917160315cd07ebb291136"
+    },
+    {
+      "path": ".github/workflows/rollback-remote-beta.yml",
+      "sha256": "3618b777e97123d7e16b94a0fd9e0af6f1b61caf8a231c371a565f91e7643046"
+    },
+    {
+      "path": ".github/workflows/test.yml",
+      "sha256": "ced071b61afc09446b6c9508567b1155fc8974f1ea173da4e24669b13a52560e"
+    },
+    {
+      "path": ".github/workflows/update-repo.yml",
+      "sha256": "a6178ff81fc5635d9c058dd6a2a16098b179d15ab9d35a80c664c188caab7ea7"
+    },
+    {
+      "path": ".github/workflows/v3-readonly-completed-receipt-audit.yml",
+      "sha256": "6158b5db188880f4666cb3fc2ddde6e019d501393e4df5892af5ff72734cea34"
+    },
+    {
+      "path": ".github/workflows/v3-readonly-context-audit.yml",
+      "sha256": "d310d154bfc96f78722d6e012f47a75c85b76bc439f072c2b2850b8677691b11"
+    },
+    {
+      "path": ".github/workflows/validate-remote-beta-promotion.yml",
+      "sha256": "bb3e3cefe45fcbef06f0f2dd88e8f473c2d7c86df9f3aeeff4d503c3cb8e1faa"
+    },
+    {
+      "path": ".github/workflows/verify-pages-domain.yml",
+      "sha256": "a6da8dd10466e847a281e04ba9bebf753c7c54cfe9caa8576d1c0f88f44a1608"
+    }
+  ],
+  "disabled_v3_jobs": [
+    "proposal",
+    "pinned-beta-evidence",
+    "component-policy",
+    "compose-and-validate",
+    "deterministic-result",
+    "protected-authorization",
+    "sign-publication",
+    "immutable-staging",
+    "controlled-publication",
+    "independent-remote-verification",
+    "audit-receipt"
+  ],
+  "conditions": {
+    "proposal": "${{ false }}",
+    "pinned-beta-evidence": "${{ false }}",
+    "component-policy": "${{ false }}",
+    "compose-and-validate": "${{ false }}",
+    "deterministic-result": "${{ false }}",
+    "protected-authorization": "${{ false }}",
+    "sign-publication": "${{ false }}",
+    "immutable-staging": "${{ false }}",
+    "controlled-publication": "${{ false }}",
+    "independent-remote-verification": "${{ false }}",
+    "audit-receipt": "${{ false }}"
+  },
+  "permissions": {
+    "contents": "read"
+  }
+}
