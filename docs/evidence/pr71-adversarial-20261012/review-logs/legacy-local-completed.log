@@ -1,0 +1,151 @@
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: next trustdb check due at 2026-10-12
+ok: verify-component
+ok: accept-package
+ok: sign-accepted-component
+ok: build-production-snapshot
+real Fedora 44 signed x86_64+SRPM preflight passed
+correctly rejected tampered signed RPM bytes: signed RPM bytes differ from plan or composition
+correctly rejected wrong trusted signing key digest: trusted RPM public key hash mismatch
+correctly rejected unsigned RPM with internally consistent forged metadata: RPM signature missing or not trusted
+real signed RPM V3 integration and negative cases passed
+V3 signed TEST ONLY first stable snapshot preview PASS
+{"result": "pass", "preflight": "/tmp/v3-dnf5-real-dmeS7KuO/preflight.json", "publishable": false}
+V3 DNF5 atomic clean-install PASS: ro-control
+V3 DNF5 atomic baseline install PASS
+{"scope": "v3-baseline-rpmdb-checkpoint-test-only", "publishable": false, "output": "/tmp/v3-dnf5-real-dmeS7KuO/baseline-checkpoint.json"}
+V3 DNF5 atomic group upgrade PASS: ro-control
+{"scope": "v3-dnf-test-receipt-untrusted", "publishable": false, "output": "/tmp/v3-dnf5-real-dmeS7KuO/dnf-receipt.json"}
+V3 TEST-ONLY SIGNED RPM + DNF5 INSTALL/UPGRADE PASSED; publishable=false
+ok: sign-package
+warning: /tmp/tmp.EQaPC2cbCu/atomic-signed/ro-atomic-fixture-2.0-1.fc44.src.rpm: Header OpenPGP V4 RSA/SHA512 signature, key ID 002228045aef85b2: NOKEY
+warning: /tmp/tmp.EQaPC2cbCu/atomic-signed/ro-atomic-fixture-2.0-1.fc44.x86_64.rpm: Header OpenPGP V4 RSA/SHA512 signature, key ID 002228045aef85b2: NOKEY
+warning: /tmp/tmp.EQaPC2cbCu/atomic-signed/ro-atomic-fixture-libs-2.0-1.fc44.x86_64.rpm: Header OpenPGP V4 RSA/SHA512 signature, key ID 002228045aef85b2: NOKEY
+V3 synthetic fixture: ro-atomic-fixture-2.0-1.fc44.src.rpm (source=True, arch=src, header_arch=x86_64)
+V3 synthetic fixture: ro-atomic-fixture-2.0-1.fc44.x86_64.rpm (source=False, arch=x86_64, header_arch=x86_64)
+V3 synthetic fixture: ro-atomic-fixture-libs-2.0-1.fc44.x86_64.rpm (source=False, arch=x86_64, header_arch=x86_64)
+{"result": "pass", "preflight": "/tmp/v3-dnf5-real-W3kLOHQ2/preflight.json", "publishable": false}
+V3 DNF5 atomic clean-install PASS: ro-atomic-fixture, ro-atomic-fixture-libs
+V3 DNF5 atomic baseline install PASS
+{"scope": "v3-baseline-rpmdb-checkpoint-test-only", "publishable": false, "output": "/tmp/v3-dnf5-real-W3kLOHQ2/baseline-checkpoint.json"}
+V3 DNF5 atomic group upgrade PASS: ro-atomic-fixture, ro-atomic-fixture-libs
+{"scope": "v3-dnf-test-receipt-untrusted", "publishable": false, "output": "/tmp/v3-dnf5-real-W3kLOHQ2/dnf-receipt.json"}
+V3 TEST-ONLY SIGNED RPM + DNF5 INSTALL/UPGRADE PASSED; publishable=false
+V3 signed multi-subpackage real DNF5 E2E passed (no promotion authority)
+ok: sign-package
+ok: sign-package
+ok: build-snapshot
+RPM role export fingerprints: 6404FC6099B59A5461AE163640D28F98D75548DD,67A5E3BF521318AB45433672002228045AEF85B2
+Metadata role export fingerprints: 6404FC6099B59A5461AE163640D28F98D75548DD,62BC865B27AABBFDD997FD6770A31A546386178E
+ok: verify-snapshot
+ok: publish-local
+ok: publish-local
+rolled back to: repo-f44-20260908-001
+ok: rollback-publication
+ok: generate-catalog
+ok: accept-package
+ok: sign-package
+Running full-set-validation...
+Updating and loading repositories:
+ ro-snapshot                            100% |   0.0   B/s |   2.0 KiB |  00m00s
+Importing OpenPGP key 0xD75548DD:
+ UserID     : "Ro-Repo TEST ONLY <test@invalid>"
+ Fingerprint: 6404FC6099B59A5461AE163640D28F98D75548DD
+ From       : file:///tmp/tmp.EQaPC2cbCu/out/snapshots/fedora/44/repo-f44-20260908-001/keys/REPODATA-GPG-KEY-ro-asd-TEST-ONLY
+The key was successfully imported.
+ ro-snapshot                            100% | 905.6 KiB/s |   2.7 KiB |  00m00s
+Metadata cache created.
+Repositories loaded.
+Updating and loading repositories:
+Repositories loaded.
+Updating and loading repositories:
+ Fedora 44 - x86_64 - Updates           100% | 166.7 KiB/s |  11.6 MiB |  01m11s
+ Fedora 44 - x86_64                     100% | 281.2 KiB/s |  38.1 MiB |  02m19s
+Repositories loaded.
+Package                        Arch   Version          Repository       Size
+Installing:
+ ro-control                    x86_64 0:9.9.9-1.fc44   ro-snapshot  12.2 KiB
+Installing dependencies:
+ bash                          x86_64 0:5.3.9-3.fc44   fedora        8.5 MiB
+ fedora-gpg-keys               noarch 0:44-2           updates     257.6 KiB
+ fedora-release                noarch 0:44-18          updates       0.0   B
+ fedora-release-common         noarch 0:44-18          updates      20.6 KiB
+ fedora-release-identity-basic noarch 0:44-18          updates     629.0   B
+ fedora-repos                  noarch 0:44-2           updates       4.9 KiB
+ filesystem                    x86_64 0:3.18-52.fc44   fedora      112.0   B
+ glibc                         x86_64 0:2.43-9.fc44    updates       6.9 MiB
+ glibc-common                  x86_64 0:2.43-9.fc44    updates       1.0 MiB
+ glibc-minimal-langpack        x86_64 0:2.43-9.fc44    updates       0.0   B
+ libgcc                        x86_64 0:16.2.1-2.fc44  updates     270.6 KiB
+ ncurses-base                  noarch 0:6.6-1.fc44     fedora      329.7 KiB
+ ncurses-libs                  x86_64 0:6.6-1.fc44     fedora      968.9 KiB
+ setup                         noarch 0:2.15.0-28.fc44 fedora      724.9 KiB
+Installing weak dependencies:
+ glibc-gconv-extra             x86_64 0:2.43-9.fc44    updates       7.4 MiB
+ tzdata                        noarch 0:2026e-1.fc44   updates       1.3 MiB
+
+Transaction Summary:
+ Installing:        17 packages
+
+Total size of inbound packages is 9 MiB. Need to download 9 MiB.
+After this operation, 28 MiB extra will be used (install 28 MiB, remove 0 B).
+Operation aborted by the user.
+Verifying...                          ########################################
+Preparing...                          ########################################
+Updating / installing...
+ro-control-9.9.8-1.fc44               ########################################
+Updating and loading repositories:
+Metadata cache created.
+Repositories loaded.
+Updating and loading repositories:
+Repositories loaded.
+Package                        Arch   Version          Repository       Size
+Upgrading:
+ ro-control                    x86_64 0:9.9.9-1.fc44   ro-snapshot  12.2 KiB
+   replacing ro-control        x86_64 0:9.9.8-1.fc44   <unknown>    12.2 KiB
+Installing dependencies:
+ bash                          x86_64 0:5.3.9-3.fc44   fedora        8.5 MiB
+ fedora-gpg-keys               noarch 0:44-2           updates     257.6 KiB
+ fedora-release                noarch 0:44-18          updates       0.0   B
+ fedora-release-common         noarch 0:44-18          updates      20.6 KiB
+ fedora-release-identity-basic noarch 0:44-18          updates     629.0   B
+ fedora-repos                  noarch 0:44-2           updates       4.9 KiB
+ filesystem                    x86_64 0:3.18-52.fc44   fedora      112.0   B
+ glibc                         x86_64 0:2.43-9.fc44    updates       6.9 MiB
+ glibc-common                  x86_64 0:2.43-9.fc44    updates       1.0 MiB
+ glibc-minimal-langpack        x86_64 0:2.43-9.fc44    updates       0.0   B
+ libgcc                        x86_64 0:16.2.1-2.fc44  updates     270.6 KiB
+ ncurses-base                  noarch 0:6.6-1.fc44     fedora      329.7 KiB
+ ncurses-libs                  x86_64 0:6.6-1.fc44     fedora      968.9 KiB
+ setup                         noarch 0:2.15.0-28.fc44 fedora      724.9 KiB
+Installing weak dependencies:
+ glibc-gconv-extra             x86_64 0:2.43-9.fc44    updates       7.4 MiB
+ tzdata                        noarch 0:2026e-1.fc44   updates       1.3 MiB
+
+Transaction Summary:
+ Installing:        16 packages
+ Upgrading:          1 package
+ Replacing:          1 package
+
+Total size of inbound packages is 9 MiB. Need to download 9 MiB.
+After this operation, 28 MiB extra will be used (install 28 MiB, remove 12 KiB).
+Operation aborted by the user.
+============================ rpmlint session starts ============================
+rpmlint: 2.8.0
+configuration:
+    /usr/lib/python3.14/site-packages/rpmlint/configdefaults.toml
+    /etc/xdg/rpmlint/fedora-spdx-licenses.toml
+    /etc/xdg/rpmlint/fedora.toml
+    /etc/xdg/rpmlint/scoring.toml
+    /etc/xdg/rpmlint/users-groups.toml
+    /etc/xdg/rpmlint/warn-on-functions.toml
+    /work-review/tests/rpmlint-tests.toml
+checks: 32, packages: 1
+
+ro-control.x86_64: W: unstripped-binary-or-object /usr/bin/ro-control
+ro-control.x86_64: W: position-independent-executable-suggested /usr/bin/ro-control
+ro-control.x86_64: W: no-manual-page-for-binary ro-control
+ro-control.x86_64: W: no-documentation
+ 1 packages and 0 specfiles checked; 0 errors, 4 warnings, 3 filtered, 0 badness; has taken 0.1 s

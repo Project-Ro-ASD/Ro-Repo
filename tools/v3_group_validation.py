@@ -9,13 +9,11 @@ import json
 import re
 
 from v3_promotion_planner import PlanningError, _policies
+from v3_policy_profile import profile, BASE, DESKTOP, SYSTEM
 
 SHA = re.compile(r"^[0-9a-f]{64}$")
 RUN = re.compile(r"^[1-9][0-9]*$")
 SNAP = re.compile(r"^repo-f44-[0-9]{8}-[0-9]{3}$")
-BASE = {"dependency-solve", "clean-install", "upgrade", "file-conflict", "rpmlint", "smoke"}
-DESKTOP = {"plasma-integration", "login-session"}
-SYSTEM = {"boot", "reboot", "recovery", "qemu"}
 ARCH = {"x86_64", "aarch64"}
 
 def stable_set_digest(plan):
@@ -39,14 +37,10 @@ def validate_claim(plan, registry, claim):
                 policy = component
     if policy is None:
         raise PlanningError("missing group policy")
-    required = set(policy.get("required_tests", [])) | BASE
+    required = set(profile(registry, group)["required_tests"])
     risk = policy.get("risk_class")
     if risk not in {"normal-app", "critical-desktop", "critical-system"}:
         raise PlanningError("invalid risk class")
-    if risk == "critical-desktop":
-        required |= DESKTOP
-    if risk == "critical-system":
-        required |= SYSTEM
     if not isinstance(claim, dict):
         raise PlanningError("missing validation claim")
     expected_fields = {"schema_version", "scope", "promotion_group", "candidate_sha256",
@@ -79,9 +73,9 @@ def validate_claim(plan, registry, claim):
     except ValueError as exc:
         raise PlanningError("bad tested_at") from exc
 
-    source_arches = {p["architecture"] for p in plan.get("selected_group_packages", []) if p.get("architecture") in ARCH}
+    source_arches = {p["architecture"] for p in plan.get("resulting_stable_packages", []) if p.get("architecture") in ARCH}
     # noarch RPMs are available to both binary architectures.
-    if any(p.get("architecture") == "noarch" for p in plan.get("selected_group_packages", [])):
+    if any(p.get("architecture") == "noarch" for p in plan.get("resulting_stable_packages", [])):
         source_arches |= ARCH
     if not source_arches:
         raise PlanningError("candidate has no binary architecture")

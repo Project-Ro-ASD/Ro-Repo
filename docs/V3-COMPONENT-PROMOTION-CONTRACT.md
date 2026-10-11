@@ -1,6 +1,9 @@
 # Ro-Repo V3: Component-Scoped Promotion Contract (Draft)
 
-Status: **proposal / documentation only**. No V2 code paths, production workflows, signing keys, or published channels are changed by this document.
+Status: **implemented for isolated proposals and acceptance fixtures; production activation blocked**.
+See [integrated implementation](V3-INTEGRATION.md) and
+[acceptance report](V3-INTEGRATION-ACCEPTANCE-REPORT.md). V2 production workflows,
+production signing keys and published channels remain unchanged.
 
 Tracking: [V3 roadmap #44](https://github.com/Project-Ro-ASD/Ro-Repo/issues/44).
 

@@ -1,0 +1,34 @@
+name: V3 isolated integration acceptance
+"on":
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  security-contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y python3-jsonschema python3-yaml gnupg
+      - run: python3 -m unittest discover -s tests -p 'test_v3_*.py' -v
+  fedora44-full-stable-set:
+    runs-on: ubuntu-24.04
+    container: registry.fedoraproject.org/fedora@sha256:07584325a68e0308215aff1de506d8da6452d2e465c25729829a01393446f204 # Fedora 44
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - run: dnf -y --setopt=install_weak_deps=False install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c gnupg2 rpmlint
+      - name: Real signed fixture stable bootstrap and full-set upgrade
+        run: bash tests/v3-integration-e2e.sh v3-integration-evidence
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: v3-integration-test-only-${{ github.run_id }}-${{ github.run_attempt }}
+          path: v3-integration-evidence/
+          if-no-files-found: error
+          retention-days: 14

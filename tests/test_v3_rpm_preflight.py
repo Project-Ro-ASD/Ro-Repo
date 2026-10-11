@@ -108,5 +108,12 @@ class PreflightTests(unittest.TestCase):
             with mock.patch.object(preflight, "_run", side_effect=bad):
                 preflight.verify(self.candidate, self.key, self.digest)
 
+    def test_srpm_from_another_producer_manifest_rejected(self):
+        self.plan["resulting_stable_packages"][0]["producer_manifest_digest"] = "c" * 64
+        self.save()
+        with self.assertRaisesRegex(PlanningError, "substituted source/provenance"):
+            with mock.patch.object(preflight, "_run", side_effect=self.fake_run):
+                preflight.verify(self.candidate, self.key, self.digest)
+
 if __name__ == "__main__":
     unittest.main()

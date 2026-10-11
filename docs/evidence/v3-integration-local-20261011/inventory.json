@@ -1,0 +1,58 @@
+{
+  "scope": "local-test-only-evidence-inventory",
+  "files": [
+    {
+      "path": "acceptance.json",
+      "sha256": "c4fc4e1244b0fd8fcd634563c3f3171e183e3737db1ed908e135521280be4d61"
+    },
+    {
+      "path": "bootstrap/beta-only.log",
+      "sha256": "4633ff9938a5e27de5c06c2225c919cc7734bf084ca1888088e8868b72e513c0"
+    },
+    {
+      "path": "bootstrap/clean-install.log",
+      "sha256": "20f46775450ba78d00d0b8e5ef3a58a34e10e9f67654b44ab02f29becc1f4068"
+    },
+    {
+      "path": "bootstrap/full-set-dnf-v3.json",
+      "sha256": "b20266f274ceb7b518231e5dbead2cfa038a322fcf3f4ae84b4a0606bfdc6c2c"
+    },
+    {
+      "path": "bootstrap/stable-only.log",
+      "sha256": "7013f68d39270e9f383a95d14e734364ae57bc7cc6bba3ff33e386d3413dc24a"
+    },
+    {
+      "path": "ephemeral-metadata-public.asc",
+      "sha256": "0bd03956c8f89fb9e7be7e55008642dca0547df2e288b25f77efbff1949e44d5"
+    },
+    {
+      "path": "ephemeral-rpm-public.asc",
+      "sha256": "34fac320452984b48c0afca823862d735dcea3760cdf61070fa894bdfea9440c"
+    },
+    {
+      "path": "upgrade/baseline-install.log",
+      "sha256": "8ffe368edc539af80754ec8e99b36d48d62db49fb35a0d6ebc5ef9a3af8ba502"
+    },
+    {
+      "path": "upgrade/beta-only.log",
+      "sha256": "b20b202ff336fc6b8f7d43f2f4e9169bf06aeebacd2814317065ba309eae94b6"
+    },
+    {
+      "path": "upgrade/clean-install.log",
+      "sha256": "4ab51420834b46f7caca31c5436f5fd56b8cfd582d95f744cd18572affd01476"
+    },
+    {
+      "path": "upgrade/full-set-dnf-v3.json",
+      "sha256": "b0d3b460dd0b2090b590746c105e1a1c56e1122008c7adacd80faafd32de62ce"
+    },
+    {
+      "path": "upgrade/stable-only.log",
+      "sha256": "fb55aa1959e9bcc7a43aa9f757c0e050524da395e77c3413f98b123c194065d5"
+    },
+    {
+      "path": "upgrade/upgrade.log",
+      "sha256": "55268ae31de1222255cb309949748e0ab2f9aca9df20195a78de81b6be28c8a2"
+    }
+  ],
+  "production_authority": false
+}

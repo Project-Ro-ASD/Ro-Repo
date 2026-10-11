@@ -1,0 +1,21 @@
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: next trustdb check due at 2026-10-12
+ok: verify-component
+ok: accept-package
+ok: sign-accepted-component
+ok: build-production-snapshot
+real Fedora 44 signed x86_64+SRPM preflight passed
+correctly rejected tampered signed RPM bytes: signed RPM bytes differ from plan or composition
+correctly rejected wrong trusted signing key digest: trusted RPM public key hash mismatch
+correctly rejected unsigned RPM with internally consistent forged metadata: RPM signature missing or not trusted
+real signed RPM V3 integration and negative cases passed
+V3 signed TEST ONLY first stable snapshot preview PASS
+{"result": "pass", "preflight": "/tmp/v3-dnf5-real-07Y1rntD/preflight.json", "publishable": false}
+V3 DNF5 atomic clean-install PASS: ro-control
+V3 DNF5 atomic baseline install PASS
+{"scope": "v3-baseline-rpmdb-checkpoint-test-only", "publishable": false, "output": "/tmp/v3-dnf5-real-07Y1rntD/baseline-checkpoint.json"}
+V3 DNF5 atomic group upgrade PASS: ro-control
+{"scope": "v3-dnf-test-receipt-untrusted", "publishable": false, "output": "/tmp/v3-dnf5-real-07Y1rntD/dnf-receipt.json"}
+evidence directory already exists

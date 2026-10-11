@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "integration-acceptance-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scope",
+    "proposal_sha256",
+    "gates",
+    "approval_granted",
+    "publishable"
+  ],
+  "properties": {
+    "scope": {
+      "const": "v3-integration-acceptance"
+    },
+    "proposal_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "gates": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "enum": [
+          "PASS",
+          "FAIL",
+          "UNVERIFIED",
+          "BLOCKED"
+        ]
+      }
+    },
+    "approval_granted": {
+      "const": false
+    },
+    "publishable": {
+      "const": false
+    }
+  }
+}

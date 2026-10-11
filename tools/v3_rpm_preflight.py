@@ -56,7 +56,7 @@ def _manifest_inventory(plan):
     if not isinstance(plan, dict) or plan.get("publishable") is not False or not isinstance(plan.get("resulting_stable_packages"), list):
         raise PlanningError("invalid or publishable V3 plan")
     expected = {}
-    sources = set()
+    sources = {}
     for p in plan["resulting_stable_packages"]:
         name, epoch, version, release, arch = _parse(p)
         filename = f"{name}-{version}-{release}.{arch}.rpm"
@@ -64,7 +64,7 @@ def _manifest_inventory(plan):
             raise PlanningError("package filename disagrees with NEVRA")
         if arch in {"src", "nosrc"}:
             folders = ("source",)
-            sources.add(filename)
+            sources[filename] = p
         elif arch == "noarch":
             folders = ("x86_64", "aarch64")
         else:
@@ -91,7 +91,8 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
         raise PlanningError("unsafe candidate directory or trusted key")
     if not isinstance(expected_key_sha256, str) or not HEX.fullmatch(expected_key_sha256):
         raise PlanningError("trusted key digest must be explicitly pinned")
-    if _digest(key) != expected_key_sha256:
+    key_bytes = key.read_bytes()
+    if hashlib.sha256(key_bytes).hexdigest() != expected_key_sha256:
         raise PlanningError("trusted RPM public key hash mismatch")
     plan = _load(root, "promotion-plan-v3.json")
     composition = _load(root, "composition-v3.json")
@@ -120,7 +121,9 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
 
     checked = []
     with tempfile.TemporaryDirectory(prefix="v3-rpmdb-") as temp:
-        _run(["rpmkeys", "--dbpath", temp, "--import", str(key.resolve())])
+        frozen_key = pathlib.Path(temp) / "pinned-rpm-public.asc"
+        frozen_key.write_bytes(key_bytes)
+        _run(["rpmkeys", "--dbpath", temp, "--import", str(frozen_key)])
         for rel in sorted(expected):
             p, fields = expected[rel]
             file = root / rel
@@ -147,6 +150,11 @@ def verify(bundle_root, trusted_key_path, expected_key_sha256):
                 raise PlanningError("actual RPM headers mismatch snapshot manifest")
             if arch not in {"src", "nosrc"} and output[6] not in sources:
                 raise PlanningError("binary RPM is not linked to selected source RPM: reported " + repr(output[6]) + ", expected " + repr(sorted(sources)))
+            if arch not in {"src", "nosrc"}:
+                source = sources[output[6]]
+                if (source["producer_manifest_digest"] != p["producer_manifest_digest"]
+                        or _parse(source)[1:4] != fields[1:4]):
+                    raise PlanningError("binary RPM linked to a substituted source/provenance")
             checked.append({"path": rel, "signed_rpm_sha256": actual, "header_nevra": p["nevra"]})
     return {
         "scope": "v3-local-rpm-preflight-only",

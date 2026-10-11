@@ -48,7 +48,7 @@ run_assumeno_transaction() {
 }
 
 dnf -y "${repo_args[@]}" --installroot "$validation_root/query-root" --releasever=44 --use-host-config "${snapshot_repo_only[@]}" makecache
-pkgs=$(dnf "${repo_args[@]}" --installroot "$validation_root/query-root" --releasever=44 --use-host-config repoquery "${snapshot_repo_only[@]}" --qf '%{name}' | sort -u)
+pkgs=$(dnf "${repo_args[@]}" --installroot "$validation_root/query-root" --releasever=44 --use-host-config repoquery "${snapshot_repo_only[@]}" --qf '%{name}\n' | sort -u)
 if [ -n "$pkgs" ]; then
     run_assumeno_transaction --installroot "$validation_root/clean-root" --releasever=44 --use-host-config "${solve_repos[@]}" install $pkgs
     if [ -z "$baseline_dir" ]; then
@@ -70,23 +70,13 @@ filecheck_rpmdb="$validation_root/filecheck-rpmdb"
 mkdir -p "$filecheck_rpmdb"
 rpm --dbpath "$filecheck_rpmdb" --initdb
 rpmkeys --dbpath "$filecheck_rpmdb" --import "$public_key"
-python3 - "$filecheck_rpmdb" "${rpm_files[@]}" <<'PY'
+python3 - "$script_root" "${rpm_files[@]}" <<'PY'
 import pathlib
-import subprocess
 import sys
-
-rpmdb = sys.argv[1]
-owners = {}
-conflicts = []
-for rpm in map(pathlib.Path, sys.argv[2:]):
-    files = subprocess.check_output(["rpm", "--dbpath", rpmdb, "-qpl", str(rpm)], text=True).splitlines()
-    for item in files:
-        if item.endswith("/"):
-            continue
-        if item in owners and owners[item] != rpm.name:
-            conflicts.append(f"{item}: {owners[item]} and {rpm.name}")
-        owners[item] = rpm.name
-if conflicts:
+sys.path.insert(0, str(pathlib.Path(sys.argv[1]) / "tools"))
+from ro_repo import file_conflict_check
+ok, conflicts = file_conflict_check(list(map(pathlib.Path, sys.argv[2:])))
+if not ok:
     print("ERROR: file conflicts detected")
     print("\n".join(conflicts))
     raise SystemExit(1)

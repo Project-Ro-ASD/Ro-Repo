@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/repo/tests/v3-integration-fedora-e2e.py", line 306, in <module>
+    main(sys.argv[1])
+    ~~~~^^^^^^^^^^^^^
+  File "/repo/tests/v3-integration-fedora-e2e.py", line 263, in main
+    unsigned_reason = fail_closed(lambda: validate(unsigned_root, None, beta1, unsigned_plan, "x86_64",
+                                  work / "unsigned-source-observation", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
+                                  metadata_key=meta_key, metadata_key_sha256=meta_sha), "signature")
+  File "/repo/tests/v3-integration-fedora-e2e.py", line 43, in fail_closed
+    raise AssertionError("security decision unexpectedly accepted unsafe input")
+AssertionError: security decision unexpectedly accepted unsafe input

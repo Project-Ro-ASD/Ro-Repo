@@ -24,7 +24,15 @@ def _json_file(path):
     if path.is_symlink() or not path.is_file():
         raise PlanningError("missing or symlinked signed manifest")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        def unique(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise PlanningError("duplicate signed metadata JSON key")
+                result[key] = value
+            return result
+        return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique,
+                          parse_constant=lambda _: (_ for _ in ()).throw(PlanningError("non-finite metadata JSON")))
     except (OSError, ValueError) as exc:
         raise PlanningError("malformed signed manifest JSON") from exc
 
@@ -43,19 +51,36 @@ def _signature(directory, name, keyring):
     asc = directory / (name + ".asc")
     if directory.is_symlink() or manifest.is_symlink() or asc.is_symlink() or not manifest.is_file() or not asc.is_file():
         raise PlanningError("missing or unsafe signed metadata")
-    _verify(["gpgv", "--keyring", str(keyring), str(asc), str(manifest)])
-    return _json_file(manifest)
+    raw, signature = manifest.read_bytes(), asc.read_bytes()
+    # Verify frozen copies so the parsed bytes are exactly those signed.
+    # A mutable caller checkout cannot swap JSON after gpgv returns.
+    with tempfile.TemporaryDirectory(prefix="v3-signed-bytes-") as temporary:
+        frozen = pathlib.Path(temporary)
+        (frozen / name).write_bytes(raw)
+        (frozen / (name + ".asc")).write_bytes(signature)
+        _verify(["gpgv", "--keyring", str(keyring), str(frozen / (name + ".asc")), str(frozen / name)])
+        result = _json_file(frozen / name)
+    if manifest.read_bytes() != raw or asc.read_bytes() != signature:
+        raise PlanningError("signed metadata changed during verification")
+    return result
 
 
 def _keyring(public_key, expected_hash, tmp):
     key = pathlib.Path(public_key)
     if key.is_symlink() or not key.is_file() or not isinstance(expected_hash, str) or not SHA.fullmatch(expected_hash):
         raise PlanningError("metadata key must have a pinned SHA256")
-    if hashlib.sha256(key.read_bytes()).hexdigest() != expected_hash:
+    raw = key.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_hash:
         raise PlanningError("metadata signing key pin mismatch")
     ring = pathlib.Path(tmp) / "metadata.gpg"
-    _verify(["gpg", "--batch", "--no-default-keyring", "--keyring", str(ring),
-             "--import", str(key)])
+    home = pathlib.Path(tmp) / "gnupg"
+    home.mkdir(mode=0o700)
+    frozen_key = pathlib.Path(tmp) / "pinned-metadata-public.asc"
+    frozen_key.write_bytes(raw)
+    # Do not inherit the host's use-keyboxd configuration: it can ignore
+    # --keyring and import the audit key into the user's persistent key store.
+    _verify(["gpg", "--no-options", "--homedir", str(home), "--batch", "--no-default-keyring", "--keyring", str(ring),
+             "--import", str(frozen_key)])
     return ring
 
 

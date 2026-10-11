@@ -1,0 +1,75 @@
+test_retained_group_requires_all_registered_architectures (test_v3_adversarial_review.FullSetPolicyReviewTests.test_retained_group_requires_all_registered_architectures) ... FAIL
+test_broken_audit_chain_blocks_completion (test_v3_adversarial_review.SignedBoundaryReviewTests.test_broken_audit_chain_blocks_completion) ... FAIL
+test_completed_begin_must_recheck_historical_tree (test_v3_adversarial_review.SignedBoundaryReviewTests.test_completed_begin_must_recheck_historical_tree) ... FAIL
+test_corrupted_previous_snapshot_blocks_new_attempt (test_v3_adversarial_review.SignedBoundaryReviewTests.test_corrupted_previous_snapshot_blocks_new_attempt) ... FAIL
+test_dnf_baseline_must_match_plan_identity (test_v3_adversarial_review.SignedBoundaryReviewTests.test_dnf_baseline_must_match_plan_identity) ... FAIL
+test_pinned_key_cannot_be_replaced_between_hash_and_import (test_v3_adversarial_review.SignedBoundaryReviewTests.test_pinned_key_cannot_be_replaced_between_hash_and_import) ... FAIL
+test_result_signature_toctou_cannot_bind_unsigned_manifest (test_v3_adversarial_review.SignedBoundaryReviewTests.test_result_signature_toctou_cannot_bind_unsigned_manifest) ... FAIL
+
+======================================================================
+FAIL: test_retained_group_requires_all_registered_architectures (test_v3_adversarial_review.FullSetPolicyReviewTests.test_retained_group_requires_all_registered_architectures)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 33, in test_retained_group_requires_all_registered_architectures
+    with self.assertRaisesRegex(PlanningError, "architecture"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_broken_audit_chain_blocks_completion (test_v3_adversarial_review.SignedBoundaryReviewTests.test_broken_audit_chain_blocks_completion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 118, in test_broken_audit_chain_blocks_completion
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_completed_begin_must_recheck_historical_tree (test_v3_adversarial_review.SignedBoundaryReviewTests.test_completed_begin_must_recheck_historical_tree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 109, in test_completed_begin_must_recheck_historical_tree
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_corrupted_previous_snapshot_blocks_new_attempt (test_v3_adversarial_review.SignedBoundaryReviewTests.test_corrupted_previous_snapshot_blocks_new_attempt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 139, in test_corrupted_previous_snapshot_blocks_new_attempt
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_dnf_baseline_must_match_plan_identity (test_v3_adversarial_review.SignedBoundaryReviewTests.test_dnf_baseline_must_match_plan_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 231, in test_dnf_baseline_must_match_plan_identity
+    with self.assertRaisesRegex(PlanningError, "baseline|base"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_pinned_key_cannot_be_replaced_between_hash_and_import (test_v3_adversarial_review.SignedBoundaryReviewTests.test_pinned_key_cannot_be_replaced_between_hash_and_import)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 100, in test_pinned_key_cannot_be_replaced_between_hash_and_import
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_result_signature_toctou_cannot_bind_unsigned_manifest (test_v3_adversarial_review.SignedBoundaryReviewTests.test_result_signature_toctou_cannot_bind_unsigned_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/smurat/Ro-ASD/Ro-Repo/tests/test_v3_adversarial_review.py", line 202, in test_result_signature_toctou_cannot_bind_unsigned_manifest
+    with self.assertRaisesRegex(PlanningError, "changed|digest|signature"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.656s
+
+FAILED (failures=7)

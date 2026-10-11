@@ -389,7 +389,7 @@ tmp_out.write_text(json.dumps({
         {"name": "rpmlint", "result": "pass"},
         {"name": "smoke", "result": "pass"}
     ],
-    "reference": str(manifest.relative_to(out.parent.parent)),
+    "reference": f"snapshot:{snapshot.name}/repository-snapshot-v1.json",
     "digest": digest,
     "timestamp": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 }, indent=2, sort_keys=True) + "\n", encoding="utf-8")

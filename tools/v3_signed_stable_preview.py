@@ -5,6 +5,7 @@ snapshot-build evidence, authenticated policy, full-set DNF closure, protected
 approval, or remote publication. Never connect to live beta/stable channels.
 """
 import argparse
+import datetime as dt
 import hashlib
 import json
 import os
@@ -16,6 +17,7 @@ import tempfile
 
 from v3_promotion_planner import PlanningError
 from v3_rpm_preflight import verify as verify_rpms
+from v3_repository_metadata import generate as generate_metadata
 from ro_repo import (
     _sign_file_exact, require_secret_signing_subkey,
     validate_role_public_key, validate_schema, verify_snapshot,
@@ -68,7 +70,7 @@ def create_preview(composition_dir, output_dir, snapshot_id, *,
                    gnupghome, metadata_signing_key, rpm_signing_key,
                    rpm_public_key, rpm_key_sha256,
                    metadata_public_key, metadata_key_sha256,
-                   passphrase_file, workflow_run):
+                   passphrase_file, workflow_run, source_date_epoch=None):
     if not isinstance(snapshot_id, str) or not SNAP.fullmatch(snapshot_id):
         raise PlanningError("invalid immutable stable snapshot identifier")
     if not isinstance(workflow_run, str) or not re.fullmatch(r"[1-9][0-9]*", workflow_run):
@@ -102,6 +104,9 @@ def create_preview(composition_dir, output_dir, snapshot_id, *,
     expected = plan.get("resulting_stable_packages")
     if not isinstance(expected, list) or not expected:
         raise PlanningError("missing stable package set")
+    if source_date_epoch is None:
+        source_date_epoch = int(dt.datetime.strptime(snapshot_id[9:17], "%Y%m%d").replace(tzinfo=dt.timezone.utc).timestamp())
+    expected_files = {item["path"]: item["signed_rpm_sha256"] for item in preflight["checked_rpm_files"]}
 
     output.parent.mkdir(parents=True, exist_ok=True)
     temp = pathlib.Path(tempfile.mkdtemp(prefix=".v3-test-stable-", dir=output.parent))
@@ -120,10 +125,9 @@ def create_preview(composition_dir, output_dir, snapshot_id, *,
                         raise PlanningError("unsafe RPM source file")
                     target = folder / original.name
                     shutil.copyfile(original, target)
-                    if digest(target) != digest(original):
+                    if digest(target) != expected_files.get(f"rpm/{arch}/{original.name}"):
                         raise PlanningError("RPM bytes changed during snapshot staging")
-            subprocess.run(["createrepo_c", "--unique-md-filenames", str(folder)],
-                           check=True, capture_output=True, text=True)
+            generate_metadata(folder, source_date_epoch)
             _sign_file_exact(folder / "repodata" / "repomd.xml", home, meta_fpr, password)
 
         keys = snapshot / "keys"
@@ -140,7 +144,7 @@ def create_preview(composition_dir, output_dir, snapshot_id, *,
         manifest = {
             "schema_version": 1,
             "snapshot_id": snapshot_id,
-            "created_at": timestamp(),
+            "created_at": dt.datetime.fromtimestamp(source_date_epoch, dt.timezone.utc).isoformat().replace("+00:00", "Z"),
             "fedora_release": 44,
             "parent_snapshot": plan.get("stable_base_snapshot_id"),
             "packages": sorted(expected, key=lambda e: (e["filename"], e["architecture"])),
@@ -199,6 +203,7 @@ def main():
                   "passphrase-file", "workflow-run"):
         p.add_argument("--" + field, required=True)
     p.add_argument("--i-understand-this-is-test-only", action="store_true", required=True)
+    p.add_argument("--source-date-epoch", type=int)
     args = p.parse_args()
     print(json.dumps(create_preview(args.composition, args.output, args.snapshot_id,
                                    gnupghome=args.gnupghome,
@@ -209,7 +214,8 @@ def main():
                                    metadata_public_key=args.metadata_public_key,
                                    metadata_key_sha256=args.metadata_key_sha256,
                                    passphrase_file=args.passphrase_file,
-                                   workflow_run=args.workflow_run),
+                                   workflow_run=args.workflow_run,
+                                   source_date_epoch=args.source_date_epoch),
                      sort_keys=True, indent=2))
 
 
