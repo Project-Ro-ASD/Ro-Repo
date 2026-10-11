@@ -101,12 +101,15 @@ class PagesAuditTests(unittest.TestCase):
             self.check()
 
     def test_remote_ref_mismatch_fails_closed(self):
-        self.git("branch", "-f", "other", self.sha)
-        # A tracking ref takes precedence if present and must match the pin.
-        self.git("update-ref", "refs/remotes/origin/pages-storage", "a"*40) if False else None
-        with self.assertRaisesRegex(PlanningError, "branch ref differs"):
-            self.git("branch", "-f", "pages-storage", "HEAD~0") if False else None
-            verify_checkout(self.root, "b"*40)
+        # A stale origin/pages-storage ref cannot override exact HEAD.
+        older = self.sha
+        (self.root/"extra.txt").write_text("next")
+        self.git("add", ".")
+        self.git("commit", "-qm", "new HEAD")
+        newer = self.git("rev-parse", "HEAD")
+        self.git("update-ref", "refs/remotes/origin/pages-storage", older)
+        with self.assertRaisesRegex(PlanningError, "remote-tracking branch differs"):
+            verify_checkout(self.root, newer)
 
     def test_git_tree_rejects_untracked_metadata(self):
         rogue = self.root/"untracked.txt"
