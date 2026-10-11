@@ -1,0 +1,40 @@
+name: V3 read-only completed receipt audit
+"on":
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Completed V3 read-only identity workflow run ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-receipt:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact audit source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Validate completed identity receipt from GitHub
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/v3_live_receipt_audit.py \
+            --source-run-id "$SOURCE_RUN_ID" \
+            --output "$RUNNER_TEMP/v3-completed-receipt-audit.json"
+      - name: Upload read-only result
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: v3-completed-receipt-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/v3-completed-receipt-audit.json
+          if-no-files-found: error
+          retention-days: 14
