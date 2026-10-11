@@ -16,13 +16,64 @@ from v3_promotion_policy import evaluate, _time
 
 RUN = re.compile(r"^[1-9][0-9]*$")
 SHA = re.compile(r"^[0-9a-f]{40}$")
+DIGEST = re.compile(r"^[0-9a-f]{64}$")
+SNAP = re.compile(r"^repo-f44-[0-9]{8}-[0-9]{3}$")
 PATH = ".github/workflows/publish-remote-beta.yml"
 REQUIRED_JOBS = ("sign-beta-publication", "publish-beta", "verify-remote-beta")
 
 
+def _split_signed_history(signed_rows):
+    """Verify selection matches signed archive coverage; never silently drop runs."""
+    if isinstance(signed_rows, list):
+        if not signed_rows:
+            raise PlanningError("signed beta history missing")
+        return signed_rows, None
+    required = {"scope", "promotion_group", "signed_publications", "candidate_history",
+                "archive_completeness_verified", "trusted_publication_times_verified", "publishable"}
+    if (not isinstance(signed_rows, dict) or set(signed_rows) != required
+            or signed_rows["scope"] != "v3-signed-beta-archive-bundle-untrusted"
+            or any(signed_rows[k] is not False for k in (
+                "archive_completeness_verified", "trusted_publication_times_verified", "publishable"))):
+        raise PlanningError("invalid signed archive bundle")
+    group = signed_rows["promotion_group"]
+    publications = signed_rows["signed_publications"]
+    selected = signed_rows["candidate_history"]
+    if (not isinstance(group, str) or not group or not isinstance(publications, list)
+            or not publications or not isinstance(selected, list)):
+        raise PlanningError("invalid signed archive selection")
+    times, expected, actual = {}, {}, {}
+    for pub in publications:
+        if not isinstance(pub, dict) or set(pub) != {
+                "publication_run", "published_at", "snapshot_id", "store_tree_sha256", "candidate_sha256"}:
+            raise PlanningError("malformed signed archive publication")
+        rid = pub["publication_run"]
+        digest = pub["candidate_sha256"]
+        if (not isinstance(rid, str) or not RUN.fullmatch(rid) or rid in times
+                or not isinstance(pub["snapshot_id"], str) or not SNAP.fullmatch(pub["snapshot_id"])
+                or not isinstance(pub["store_tree_sha256"], str)
+                or not DIGEST.fullmatch(pub["store_tree_sha256"])
+                or (digest is not None and (not isinstance(digest, str) or not DIGEST.fullmatch(digest)))):
+            raise PlanningError("invalid or duplicate signed archive publication")
+        _time(pub["published_at"])
+        times[rid] = pub["published_at"]
+        if digest is not None:
+            expected[rid] = {"publication_run": rid, "published_at": pub["published_at"],
+                             "promotion_group": group, "candidate_sha256": digest}
+    for row in selected:
+        if not isinstance(row, dict) or set(row) != {
+                "publication_run", "published_at", "promotion_group", "candidate_sha256"}:
+            raise PlanningError("malformed selected candidate history")
+        rid = row["publication_run"]
+        if not isinstance(rid, str) or not RUN.fullmatch(rid) or rid in actual:
+            raise PlanningError("invalid or duplicate candidate publication")
+        actual[rid] = row
+    if actual != expected:
+        raise PlanningError("signed archive candidate selection mismatch")
+    return selected, times
+
+
 def validate_history(signed_rows, run_details, jobs_details, now):
-    if not isinstance(signed_rows, list) or not signed_rows:
-        raise PlanningError("signed beta history missing")
+    selected, signed_times = _split_signed_history(signed_rows)
     if not isinstance(run_details, list) or not isinstance(jobs_details, list):
         raise PlanningError("missing GitHub evidence")
     runs = {}
@@ -38,18 +89,20 @@ def validate_history(signed_rows, run_details, jobs_details, now):
     if set(runs) != set(jobs):
         raise PlanningError("run and job evidence sets disagree")
     rows = {}
-    for row in signed_rows:
+    for row in selected:
         if not isinstance(row, dict) or set(row) != {"publication_run", "published_at", "promotion_group", "candidate_sha256"}:
             raise PlanningError("malformed signed history")
         run = row["publication_run"]
-        if run in rows:
+        if not isinstance(run, str) or not RUN.fullmatch(run) or run in rows:
             raise PlanningError("duplicate signed publication run")
         rows[run] = row
-    if set(rows) != set(runs):
+    if signed_times is None:
+        signed_times = {run: row["published_at"] for run, row in rows.items()}
+    if set(signed_times) != set(runs):
         raise PlanningError("incomplete GitHub beta archive coverage")
     now_time = _time(now)
     verified = []
-    for run_id in sorted(rows, key=int):
+    for run_id in sorted(signed_times, key=int):
         record = runs[run_id]
         if (str(record.get("id")) != run_id or record.get("path") != PATH
                 or record.get("event") != "workflow_dispatch"
@@ -60,7 +113,7 @@ def validate_history(signed_rows, run_details, jobs_details, now):
             raise PlanningError("GitHub beta run not trusted for dwell: " + run_id)
         started = _time(record.get("run_started_at"))
         finished = _time(record.get("updated_at"))
-        signed = _time(rows[run_id]["published_at"])
+        signed = _time(signed_times[run_id])
         if not started <= signed <= finished <= now_time:
             raise PlanningError("signed beta timestamp outside actual GitHub run")
         job_set = jobs[run_id]
@@ -79,7 +132,8 @@ def validate_history(signed_rows, run_details, jobs_details, now):
             raise PlanningError("beta workflow job ordering invalid")
         # Conservative first-seen: only after public remote tree verification.
         timestamp = order[2][1].isoformat().replace("+00:00", "Z")
-        verified.append({**rows[run_id], "published_at": timestamp})
+        if run_id in rows:
+            verified.append({**rows[run_id], "published_at": timestamp})
     return verified
 
 

@@ -12,7 +12,7 @@ import re
 import subprocess
 import tempfile
 
-from v3_promotion_planner import PlanningError, plan
+from v3_promotion_planner import PlanningError, plan, _policies, _parse, _packages
 from v3_promotion_policy import evaluate, _time
 
 RUN = re.compile(r"^[1-9][0-9]*$")
@@ -59,7 +59,7 @@ def _keyring(public_key, expected_hash, tmp):
     return ring
 
 
-def signed_history(beta_publications, snapshots, registry, candidate_group, key_path, key_sha256, now):
+def signed_archive_bundle(beta_publications, snapshots, registry, candidate_group, key_path, key_sha256, now):
     """Read ALL supplied archive entries, fail closed on malformed entries.
 
     The caller must source complete immutable archives independently.
@@ -72,7 +72,11 @@ def signed_history(beta_publications, snapshots, registry, candidate_group, key_
     if publication_root.is_symlink() or snapshot_root.is_symlink() or not publication_root.is_dir() or not snapshot_root.is_dir():
         raise PlanningError("invalid archive roots")
     rows = []
+    publications = []
     manifests = {}
+    groups, owner = _policies(registry)
+    if candidate_group not in groups:
+        raise PlanningError("unknown promotion group")
     with tempfile.TemporaryDirectory(prefix="v3-metadata-gpg-") as temp:
         keyring = _keyring(key_path, key_sha256, temp)
         folders = sorted(publication_root.iterdir())
@@ -101,19 +105,34 @@ def signed_history(beta_publications, snapshots, registry, candidate_group, key_
                     raise PlanningError("snapshot mismatch")
                 manifests[snap_id] = manifest
             snapshot = manifests[snap_id]
-            # The selected group need not appear in every earlier snapshot.
-            from v3_promotion_planner import _policies, _parse
-            groups, owner = _policies(registry)
-            if candidate_group not in groups:
-                raise PlanningError("unknown promotion group")
-            group_present = any(owner.get(_parse(p)[0]) == candidate_group for p in snapshot["packages"])
-            if group_present:
-                proposed = plan(snapshot, None, registry, candidate_group)
-                rows.append({"publication_run": directory.name,
-                             "published_at": pub["published_at"],
-                             "promotion_group": candidate_group,
-                             "candidate_sha256": proposed["candidate_sha256"]})
-    return rows
+            # Every published snapshot remains in the signed archive coverage,
+            # whether the selected group exists in that snapshot or not.
+            packages = _packages(snapshot, owner)
+            present = any(owner.get(name) == candidate_group for name, arch in packages)
+            digest = plan(snapshot, None, registry, candidate_group)["candidate_sha256"] if present else None
+            publications.append({"publication_run":directory.name,
+                                 "published_at":pub["published_at"],
+                                 "snapshot_id":snap_id,
+                                 "store_tree_sha256":pub["store_tree_sha256"],
+                                 "candidate_sha256":digest})
+            if digest is not None:
+                rows.append({"publication_run":directory.name,
+                             "published_at":pub["published_at"],
+                             "promotion_group":candidate_group,
+                             "candidate_sha256":digest})
+    return {"scope":"v3-signed-beta-archive-bundle-untrusted",
+            "promotion_group":candidate_group,
+            "signed_publications":publications,
+            "candidate_history":rows,
+            "archive_completeness_verified":False,
+            "trusted_publication_times_verified":False,
+            "publishable":False}
+
+
+def signed_history(beta_publications, snapshots, registry, candidate_group, key_path, key_sha256, now):
+    """Legacy candidate-only view; full coverage is signed_archive_bundle."""
+    return signed_archive_bundle(beta_publications, snapshots, registry, candidate_group,
+                                 key_path, key_sha256, now)["candidate_history"]
 
 
 def assess(candidate, archive_root, snapshot_root, registry, key, key_sha, risk, mode, now, reason=None):
