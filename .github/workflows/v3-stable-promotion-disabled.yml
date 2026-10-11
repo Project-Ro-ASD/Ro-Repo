@@ -1,0 +1,73 @@
+name: V3 stable promotion architecture (activation blocked)
+"on":
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ro-repo-v3-stable-activation-blocked
+  cancel-in-progress: false
+# No inputs, secrets, writable token, deploy action or write command exists.
+# Activation requires a separate reviewed implementation AND proven gates.
+jobs:
+  proposal:
+    if: ${{ false }}
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # use v3_integration.prepare after trusted acquisition is implemented
+  pinned-beta-evidence:
+    if: ${{ false }}
+    needs: proposal
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # reuse source pins, signed history, remote parity and receipt audit
+  component-policy:
+    if: ${{ false }}
+    needs: pinned-beta-evidence
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # authenticated complete per-architecture BASE/Plasma/system evidence
+  compose-and-validate:
+    if: ${{ false }}
+    needs: component-policy
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # complete signed package set, DNF5 and deterministic result digest
+  protected-authorization:
+    if: ${{ false }}
+    needs: compose-and-validate
+    runs-on: ubuntu-24.04
+    environment: repo-stable
+    steps:
+      - run: exit 1 # exact result/base/evidence/policy/attempt-bound human authorization
+  sign-publication:
+    if: ${{ false }}
+    needs: protected-authorization
+    runs-on: ubuntu-24.04
+    environment: repo-production-signing
+    steps:
+      - run: exit 1 # approved metadata role; never rebuild/re-sign promoted RPMs
+  immutable-staging:
+    if: ${{ false }}
+    needs: sign-publication
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # new immutable snapshot; approval replay ledger and stable-base CAS
+  controlled-publication:
+    if: ${{ false }}
+    needs: immutable-staging
+    runs-on: ubuntu-24.04
+    environment: repo-stable
+    steps:
+      - run: exit 1 # Pages atomicity unresolved; production backend intentionally absent
+  independent-remote-verification:
+    if: ${{ false }}
+    needs: controlled-publication
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # complete signed remote view and deployment identity verification
+  audit-receipt:
+    if: ${{ false }}
+    needs: independent-remote-verification
+    runs-on: ubuntu-24.04
+    steps:
+      - run: exit 1 # authenticated attempted/failed/completed operation history
