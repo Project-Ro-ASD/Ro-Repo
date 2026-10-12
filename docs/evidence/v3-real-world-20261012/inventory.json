@@ -2,15 +2,15 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "a2a8e2bb25e4eae8ab87d5bd0b0db6f0f6f585d1f08acc826dc384572956ba59"
+      "sha256": "af7709cb9ae1c35e0d39fd7f61bdefee9895c4df370c5a7c4f1a196129f3ba2f"
     },
     {
       "path": "acquisition.json",
       "sha256": "20ea9ab5d37ed4d7639ad942536bd2153520c310e729c0dab3087e2ef4cee670"
     },
     {
-      "path": "acquisition.log",
-      "sha256": "a67699fcc6b36aee39a3b8251cd388bbb693ce67dd5b8f3bba7b1580b1f2c6b1"
+      "path": "acquisition.log.gz",
+      "sha256": "b99329875ad8c12ea79168cc6cd9f62c166b253f3b76773907eb00157f50d805"
     },
     {
       "path": "backend/approval-ephemeral-public.pem",
@@ -41,8 +41,8 @@
       "sha256": "38fbb04e310146c85b39c5c64318ff71a2bfb605db4e1ded6c9b07e612a17751"
     },
     {
-      "path": "backend.log",
-      "sha256": "8dfb0fd522ffc8da5f953e9bf867ca044f3b04e4f49a9cee3e8fd2182b17df49"
+      "path": "backend.log.gz",
+      "sha256": "040e10340ed2ab335cc27ca05de2eaaa41f4decb38e6f4f667fda0ea8b4b5ed1"
     },
     {
       "path": "before-new-group-fix.json",
@@ -57,20 +57,20 @@
       "sha256": "923ba15ab0a07c4b65286aaab00b123743df22e8cf94790670a9fb329baffcff"
     },
     {
-      "path": "fixture/bootstrap/beta-only.log",
-      "sha256": "bd541cda166e8944b24264a1c105d353193d2e1c7dcd277055bd859da68c9bb9"
+      "path": "fixture/bootstrap/beta-only.log.gz",
+      "sha256": "ed6f867df1f4263c50edea5dcf6d2057b32f17389c0cb8851a2b35723c0f39fa"
     },
     {
-      "path": "fixture/bootstrap/clean-install.log",
-      "sha256": "b9188c929075a42ba8c8175dea5248b8acaf7cf44f86938652bfc2cf9d97e420"
+      "path": "fixture/bootstrap/clean-install.log.gz",
+      "sha256": "e1ef78a2efb36bf2c00c443e94beffd4eab6b9baf7319932e3774ba3a18e5155"
     },
     {
       "path": "fixture/bootstrap/full-set-dnf-v3.json",
       "sha256": "7432c4a4e5ee349578220a1e4e17040461d61df543ac494bab3f1fe3cc040ea7"
     },
     {
-      "path": "fixture/bootstrap/stable-only.log",
-      "sha256": "4d063885b14d77ef6517ebd6b190905f800e8ed1727e116af0fc487d83baadee"
+      "path": "fixture/bootstrap/stable-only.log.gz",
+      "sha256": "8e450cdf006c6b5f2728d259b82fa2738793b52ae5995681914019108b2ad1e9"
     },
     {
       "path": "fixture/ephemeral-metadata-public.asc",
@@ -85,108 +85,108 @@
       "sha256": "8e4ffba4c527bcf74acd5f217baf6e13aacf7464762b30a0485ab9733b8f8bcd"
     },
     {
-      "path": "fixture/new-group-install/baseline-install.log",
-      "sha256": "bac1df58b4df43423eaeda51a063398b349c41539ac51a5c2e4f72c6b1a445a8"
+      "path": "fixture/new-group-install/baseline-install.log.gz",
+      "sha256": "ca0d47ec3d97b5172fb796e2953a90c0e0287ca010d5a2c69c281437a792606b"
     },
     {
-      "path": "fixture/new-group-install/beta-only.log",
-      "sha256": "892f5da1c26c2e66905eb8aa00c1996dece0f16ae52cf34378e2eea5bae6c3c7"
+      "path": "fixture/new-group-install/beta-only.log.gz",
+      "sha256": "4b0b8bae24cffe9fa682279b5ac788696bb7a28273f53bbb4d4157825d286806"
     },
     {
-      "path": "fixture/new-group-install/clean-install.log",
-      "sha256": "eea0e83a2ae83893d1d145d043dca630e62809a474a45474e1ed1fece4302646"
+      "path": "fixture/new-group-install/clean-install.log.gz",
+      "sha256": "89b85f05ee616b9456e1357e4cf88c5c019c791c936b340ba9b0fb9b144b5a4b"
     },
     {
       "path": "fixture/new-group-install/full-set-dnf-v3.json",
       "sha256": "b5e362b2696bab1560faab5bc7dbe5c8a9d74f3d2293bc2afb017803607308cc"
     },
     {
-      "path": "fixture/new-group-install/new-groups.log",
-      "sha256": "aa5ce8062f442113d05ae02ee3c8505e5b675e521089d44dbdaee9290d30656d"
+      "path": "fixture/new-group-install/new-groups.log.gz",
+      "sha256": "4db1020df9adc999db80a5ccdeb956febf2be89a6ec918bf05695773395b9019"
     },
     {
-      "path": "fixture/new-group-install/stable-only.log",
-      "sha256": "9697797bbe44d1d5f38d2c8c27d1e521846c1f24d8a19757068501315540ad5c"
+      "path": "fixture/new-group-install/stable-only.log.gz",
+      "sha256": "af44305b29646775cc57363998bee0787bb6050b9d147ace34928d362ba33235"
     },
     {
-      "path": "fixture/new-group-install/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "fixture/new-group-install/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
-      "path": "fixture/pinned-dependency-closure/baseline-install.log",
-      "sha256": "08efd53178d5465fc1ded6345c0ae5caf526b315ed3c7b31de3ffd0c01c9ab96"
+      "path": "fixture/pinned-dependency-closure/baseline-install.log.gz",
+      "sha256": "5cf8a4304adaa2bebed838fabe163f854883551b8765a84e41552f8a68898ef3"
     },
     {
-      "path": "fixture/pinned-dependency-closure/beta-only.log",
-      "sha256": "43b9f5134e64d55046d53464dcbef23623ec6fc5c6816b942408cf6f10933ed4"
+      "path": "fixture/pinned-dependency-closure/beta-only.log.gz",
+      "sha256": "3061a2bb70f998e41f32d845fde4fd782abf6e01b2f0ff39b52b038f5f4e53e0"
     },
     {
-      "path": "fixture/pinned-dependency-closure/clean-install.log",
-      "sha256": "b37795234c62192b3f5a9895805e883a7077c1ba8500449a5a39ecac4eb220c5"
+      "path": "fixture/pinned-dependency-closure/clean-install.log.gz",
+      "sha256": "b4e824dff4eaeb806743d5f2e534ee53bd2e9938e8aae4baf6e5e43363a0a865"
     },
     {
       "path": "fixture/pinned-dependency-closure/full-set-dnf-v3.json",
       "sha256": "495123fd2aeeba5b75022091fb55cce49a94b1659d5653e868720c0e01671314"
     },
     {
-      "path": "fixture/pinned-dependency-closure/stable-only.log",
-      "sha256": "96b79a8f26aa3654f888e1116785cfc1efae8ee507648db584d36c877f0048ed"
+      "path": "fixture/pinned-dependency-closure/stable-only.log.gz",
+      "sha256": "30ead8373e2df55ae3a941e1bee388d809ee3bae756bd8309dd9468f89f90722"
     },
     {
-      "path": "fixture/pinned-dependency-closure/upgrade.log",
-      "sha256": "9220c8cd2d6f5f60594a3a83b58acb3be904a02bf7f0a106bb4faedf5210b492"
+      "path": "fixture/pinned-dependency-closure/upgrade.log.gz",
+      "sha256": "0a1b4b2ceba40d62ad573aa25b1850dcfb11be2ec68909463228fa35c94bf451"
     },
     {
-      "path": "fixture/upgrade/baseline-install.log",
-      "sha256": "56bd6ede5ddd7475095968d198aebe8c86bc551115dc27ce46477e4bf5d151b1"
+      "path": "fixture/upgrade/baseline-install.log.gz",
+      "sha256": "d850fc63fc2a430e8faa8bf2f6ba839c598133acdbe60e0604b5aab85c21649f"
     },
     {
-      "path": "fixture/upgrade/beta-only.log",
-      "sha256": "5a8ff07a97e255412fa93d79eb72397fdd459316bcaefc56a032e8ef4e109558"
+      "path": "fixture/upgrade/beta-only.log.gz",
+      "sha256": "7ef77d95da5db1bb4f3989a3d646ef520c058118ecb89477c766c0a621a329f4"
     },
     {
-      "path": "fixture/upgrade/clean-install.log",
-      "sha256": "7be01633e31e67258c70e93a54bc444dd714f1448765811d0a9f1642724ea309"
+      "path": "fixture/upgrade/clean-install.log.gz",
+      "sha256": "7d729cc8e58e986872fc696aaae1c9a0ae62dbc25fb110160885b11a36ba09d0"
     },
     {
       "path": "fixture/upgrade/full-set-dnf-v3.json",
       "sha256": "b3d5bd5aced6d8e1a5871ebe58a046963b3f1f40aeadfda97ef44a7e614ff661"
     },
     {
-      "path": "fixture/upgrade/stable-only.log",
-      "sha256": "4ab1361d27229667bf9ca609e7566249adca15d975d8ca7aaf27d36a5080f5a9"
+      "path": "fixture/upgrade/stable-only.log.gz",
+      "sha256": "01ef96c841d0e2dce24b0839d6de6b3a4ce90bb31d88e6097eecaff6d35d999c"
     },
     {
-      "path": "fixture/upgrade/upgrade.log",
-      "sha256": "77a10841d9e1b4b7f642109e7abe0773e567f04db9dd63cd48e30841ce4e5c9b"
+      "path": "fixture/upgrade/upgrade.log.gz",
+      "sha256": "931e18294998abd0c4322d3707f0638e19789313e14525ca1539f985462962ee"
     },
     {
       "path": "fixture/upstream-fixture.json",
       "sha256": "4b7648017e031bcb1964fd4db3ad0d5313c8195bb9ac70eb48a6fdf78ad3840c"
     },
     {
-      "path": "fixture.log",
-      "sha256": "127e784c2375bf109ad9ad8f5832a4850dbba508f0c364c21fca24f3cfbd78ba"
+      "path": "fixture.log.gz",
+      "sha256": "ce94b26dd68d121df0847f005f10cd7d1320a9633d45edc8afa3bdaeb211cf9f"
     },
     {
       "path": "git-object-proof.json",
       "sha256": "b8c6788e3d529e08e6f4e8da8e8e479c58a1e5d76aac86e6bce481f2161ea351"
     },
     {
-      "path": "immutable-view-dnf.log",
-      "sha256": "f445cef9298aa533d56973eaa72b59a435fc3270c21aa359249c7b6a79043b55"
+      "path": "immutable-view-dnf.log.gz",
+      "sha256": "53a9e1db759c691fae36da6cf6d0b3f549a51822f247b74cb0a32f8d0225d425"
     },
     {
       "path": "immutable-view.json",
       "sha256": "31f9e4a4adf136c7b5e962201d4155f8420ecc192bd514f55a211204e43f6d81"
     },
     {
-      "path": "installer-bare-chroot.log",
-      "sha256": "9a5e453c7a7efd0babb62a47646296bafe90240175af29d41e9bf9aa0a8c2260"
+      "path": "installer-bare-chroot.log.gz",
+      "sha256": "a3e56a2420bb0f7a2dda80330684fc1ba4756a802bff878b2fa8aeafc337cd39"
     },
     {
-      "path": "installer-explicit-origin.log",
-      "sha256": "29bbbd6c36a9722e5cabc6d437d56ca71bee46a12d434a3b7e3d1a2b2ed88981"
+      "path": "installer-explicit-origin.log.gz",
+      "sha256": "be51f2090affba9f102d668c423a3c17e36ff0beeb062c5365970ca56a109dff"
     },
     {
       "path": "installer-loader-diagnostic.json",
@@ -217,108 +217,108 @@
       "sha256": "fb614b62a91dd5200a44aa0d1adb5228840a6dddf698017c636f8bc4a7d64508"
     },
     {
-      "path": "released/assist-bootstrap/beta-only.log",
-      "sha256": "40398a1770424547a76bd897e9b110811471b0f70a4fa1c58fcaed299803b920"
+      "path": "released/assist-bootstrap/beta-only.log.gz",
+      "sha256": "39862c1efe122358731d4bf072f181ec199ac31edf66e75666a300a75a975f31"
     },
     {
-      "path": "released/assist-bootstrap/clean-install.log",
-      "sha256": "e6a54ed7779ce9fca36ddc13879ff8d32db5755e2dec3d13d4d4c02093b5b66f"
+      "path": "released/assist-bootstrap/clean-install.log.gz",
+      "sha256": "603811633072bdc16b8fff85e12d936fbbed74c7a83414cd450647dea44a45da"
     },
     {
       "path": "released/assist-bootstrap/full-set-dnf-v3.json",
       "sha256": "fc155d9598b0bdaaa64436ecdfed735ed08b592f84b67083ccbf5a09305c81a8"
     },
     {
-      "path": "released/assist-bootstrap/stable-only.log",
-      "sha256": "f9bac653d7615b667b8dc58b8093953e641fe3687e33922c82b90c2a56a0f119"
+      "path": "released/assist-bootstrap/stable-only.log.gz",
+      "sha256": "ca7787a99e95012cbfb60eb62696630a3cd4c5008a945e3f31ce98952a7ae093"
     },
     {
-      "path": "released/assist-bootstrap-cli-0.log",
-      "sha256": "92c88976523ec3ff5a42ff98a2d3a1142fbbfd431f9959933ba4a4b421cfd3ee"
+      "path": "released/assist-bootstrap-cli-0.log.gz",
+      "sha256": "751020e1a90cde6d0d8ed0b92fa0294ac57ada15911db680906d607aab97f57a"
     },
     {
       "path": "released/assist-bootstrap-observation.json",
       "sha256": "225fa9a2cf884a5cfad065d98e720c3482aab2fdcdb9ad2b097f99916518bd8b"
     },
     {
-      "path": "released/assist-upgrade/baseline-install.log",
-      "sha256": "61f89327145e3ebb03f51c382782735a7bb4e0149a42a4b42fc242785523b998"
+      "path": "released/assist-upgrade/baseline-install.log.gz",
+      "sha256": "5ffa67b47b560b10ec5e2592c275ba9baad22df2faf250c6b94b379e0df71528"
     },
     {
-      "path": "released/assist-upgrade/beta-only.log",
-      "sha256": "fbf9d30071c4871fea8b8f426985ff42895722e0d8beba6497d87b39762b7953"
+      "path": "released/assist-upgrade/beta-only.log.gz",
+      "sha256": "83e7a72828fdbe2cf43d4ce663d2cc4d90e6059f89ab794e5fc700645148ba0b"
     },
     {
-      "path": "released/assist-upgrade/clean-install.log",
-      "sha256": "1dbcf1e22d98ad479c653ba846d2d5f693d66bdfc832a0f39d472545e4bf20c1"
+      "path": "released/assist-upgrade/clean-install.log.gz",
+      "sha256": "c61e5935a91420f4c4d34767830402a2538485d80d27683db51fc6185c6b435f"
     },
     {
       "path": "released/assist-upgrade/full-set-dnf-v3.json",
       "sha256": "1c2976e63c4c9e724d67f7fc66371fb7bed97f01cc59db88c226d19d45dcff99"
     },
     {
-      "path": "released/assist-upgrade/stable-only.log",
-      "sha256": "04419c2ce272915a0291f5335631c28dabd948b4bcfb20b7a7cc759f1ae9516c"
+      "path": "released/assist-upgrade/stable-only.log.gz",
+      "sha256": "46395220688f910251197e1bd7658a33f6533075695ad03c6e4505208fedb2a1"
     },
     {
-      "path": "released/assist-upgrade/upgrade.log",
-      "sha256": "0d359be501e7d0279bb179838e2bc3888a3b73b22a11cbba99432f269c450c98"
+      "path": "released/assist-upgrade/upgrade.log.gz",
+      "sha256": "d8a5ae71adb1f9b2d07e360ba75de3e138d5a62067aa17ae5ae26c6e22e366ce"
     },
     {
-      "path": "released/assist-upgrade-cli-0.log",
-      "sha256": "92c88976523ec3ff5a42ff98a2d3a1142fbbfd431f9959933ba4a4b421cfd3ee"
+      "path": "released/assist-upgrade-cli-0.log.gz",
+      "sha256": "751020e1a90cde6d0d8ed0b92fa0294ac57ada15911db680906d607aab97f57a"
     },
     {
-      "path": "released/assist-upgrade-cli-1.log",
-      "sha256": "92c88976523ec3ff5a42ff98a2d3a1142fbbfd431f9959933ba4a4b421cfd3ee"
+      "path": "released/assist-upgrade-cli-1.log.gz",
+      "sha256": "751020e1a90cde6d0d8ed0b92fa0294ac57ada15911db680906d607aab97f57a"
     },
     {
-      "path": "released/assist-upgrade-cli-2.log",
-      "sha256": "92c88976523ec3ff5a42ff98a2d3a1142fbbfd431f9959933ba4a4b421cfd3ee"
+      "path": "released/assist-upgrade-cli-2.log.gz",
+      "sha256": "751020e1a90cde6d0d8ed0b92fa0294ac57ada15911db680906d607aab97f57a"
     },
     {
       "path": "released/assist-upgrade-observation.json",
       "sha256": "c80eb8811a470789e07d0e8ff93012d5d26fd5685c39cf9784d445e0b19026b5"
     },
     {
-      "path": "released/dolphin-full-group/baseline-install.log",
-      "sha256": "91a889bfd7db704ca78ba8f69e25e53e244e968575f7accf5dd87c8dcedfde79"
+      "path": "released/dolphin-full-group/baseline-install.log.gz",
+      "sha256": "ec12675bd229badf2eadf0e6241d977c934085eabce3427141973249bd7abf24"
     },
     {
-      "path": "released/dolphin-full-group/beta-only.log",
-      "sha256": "ade653c48b82d27cf0cdcaef68d6b085c4ef464148b603a3346ed3fc0a600a06"
+      "path": "released/dolphin-full-group/beta-only.log.gz",
+      "sha256": "8b1ad9f981d357d754e22ebd4829ec2d8b4b284e80bb126d9fc10b47b229f1bd"
     },
     {
-      "path": "released/dolphin-full-group/clean-install.log",
-      "sha256": "e86c848ff29dc319ad66ac6d531c6cd54fad3b9c0a3d970c4c51496b7a169033"
+      "path": "released/dolphin-full-group/clean-install.log.gz",
+      "sha256": "ae05ae09bf87d652cbec7e8d21002a20a27fe23890c17104cad453e524669784"
     },
     {
       "path": "released/dolphin-full-group/full-set-dnf-v3.json",
       "sha256": "306e4ab4503010a8fa3b1b559c1d8ea313029a2b6bd108cae1cf5fab301264b9"
     },
     {
-      "path": "released/dolphin-full-group/new-groups.log",
-      "sha256": "27d140b01de1b31ee944cd387bff38ba2e08fc2da0c147f4ef97be4f504d9490"
+      "path": "released/dolphin-full-group/new-groups.log.gz",
+      "sha256": "4aaaaa6c50c7ae2fe890a942dd7e2cde079fbb15d87f7ad1d3a22d35d36fc3cc"
     },
     {
-      "path": "released/dolphin-full-group/stable-only.log",
-      "sha256": "36de3ea97336b46c57cc1e555ad1195fdd26ffaf5d7796f963a9cee39637726f"
+      "path": "released/dolphin-full-group/stable-only.log.gz",
+      "sha256": "10e6ed333a496b52e88504596571bd53ca5a467506b15cb925c4b588fdd32efa"
     },
     {
-      "path": "released/dolphin-full-group/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/dolphin-full-group/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
-      "path": "released/dolphin-full-group-cli-0.log",
-      "sha256": "d961c7e7f1e3b4228a4db16ab6417e0e3db38d9dad752fd57888fd16f25814ae"
+      "path": "released/dolphin-full-group-cli-0.log.gz",
+      "sha256": "4aee6b670896c9296c7bab352cb2a626fa1be7c00b95ae6b75cee44282770663"
     },
     {
-      "path": "released/dolphin-full-group-cli-1.log",
-      "sha256": "fc8cdaafa767b61e220aafd432d0d09284cbe75c01262d467df7561c7914d3b4"
+      "path": "released/dolphin-full-group-cli-1.log.gz",
+      "sha256": "9d18f93d5194b0727229cd4931c237ce0ce0af16f2ffd11886639a63f6c83068"
     },
     {
-      "path": "released/dolphin-full-group-cli-2.log",
-      "sha256": "d961c7e7f1e3b4228a4db16ab6417e0e3db38d9dad752fd57888fd16f25814ae"
+      "path": "released/dolphin-full-group-cli-2.log.gz",
+      "sha256": "4aee6b670896c9296c7bab352cb2a626fa1be7c00b95ae6b75cee44282770663"
     },
     {
       "path": "released/dolphin-full-group-observation.json",
@@ -329,268 +329,268 @@
       "sha256": "93642aec521a1e5e96dd715f7ae0ec0850ebc9de09a94ce03cae5263f26cc18a"
     },
     {
-      "path": "released/installer-full-group/baseline-install.log",
-      "sha256": "2341c923ccd85e786828f05420ac436f6b65d7049ee986f551af26e1809eef5e"
+      "path": "released/installer-full-group/baseline-install.log.gz",
+      "sha256": "e41ebbc7a3418f9c07fcc88469c3cc3aa90438f1e8a4795489514c14ebafa40a"
     },
     {
-      "path": "released/installer-full-group/beta-only.log",
-      "sha256": "daf9477723db6034683c137e4bf913c7e84ed034c5ee55c1903eb2b97579d52a"
+      "path": "released/installer-full-group/beta-only.log.gz",
+      "sha256": "dec73b5ac32ec8ea75656b41a17228b582bc47f3818e4ee90b7e43c248af3025"
     },
     {
-      "path": "released/installer-full-group/clean-install.log",
-      "sha256": "f1c9135a7f799d8f6d9430d9fc1829542919ae1c1317d4836aa2dd68454d8bb4"
+      "path": "released/installer-full-group/clean-install.log.gz",
+      "sha256": "2538339b2b8b3e518de2a875e8684af2f8886520a738f1dc55f8850a2327c53b"
     },
     {
       "path": "released/installer-full-group/full-set-dnf-v3.json",
       "sha256": "d1d56ee6df63033cf1058ab10a2e78b7da32175085b7ed7db9e347d40290de59"
     },
     {
-      "path": "released/installer-full-group/new-groups.log",
-      "sha256": "db39d30e57016735124dff6872b9789f658a11cd2f69e861dcb958efbbaf535d"
+      "path": "released/installer-full-group/new-groups.log.gz",
+      "sha256": "60066f21eba886908dbf190ed7edec81301f11363676d61f8fbbdf4458d29981"
     },
     {
-      "path": "released/installer-full-group/stable-only.log",
-      "sha256": "0630cb8f186adf234df88ca40d82284211d87c151433c8e37da26a83abf592b9"
+      "path": "released/installer-full-group/stable-only.log.gz",
+      "sha256": "ca89b518bc9672929f972ff4ffdeef75e9347f638246841bdfbd412f08d9f30d"
     },
     {
-      "path": "released/installer-full-group/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/installer-full-group/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
-      "path": "released/installer-full-group-cli-0.log",
-      "sha256": "9a5e453c7a7efd0babb62a47646296bafe90240175af29d41e9bf9aa0a8c2260"
+      "path": "released/installer-full-group-cli-0.log.gz",
+      "sha256": "a3e56a2420bb0f7a2dda80330684fc1ba4756a802bff878b2fa8aeafc337cd39"
     },
     {
-      "path": "released/installer-full-group-cli-1.log",
-      "sha256": "20d41d45b80989f73fd986e30629733b5974c6bcb9d3d45792d8b0c8be7dda98"
+      "path": "released/installer-full-group-cli-1.log.gz",
+      "sha256": "9e316b3ffc5c8079274c7caf7e9f095cf05a70f3abececf0e445eb56f82c59ec"
     },
     {
-      "path": "released/installer-full-group-cli-2.log",
-      "sha256": "9a5e453c7a7efd0babb62a47646296bafe90240175af29d41e9bf9aa0a8c2260"
+      "path": "released/installer-full-group-cli-2.log.gz",
+      "sha256": "a3e56a2420bb0f7a2dda80330684fc1ba4756a802bff878b2fa8aeafc337cd39"
     },
     {
       "path": "released/installer-full-group-observation.json",
       "sha256": "6a8af322636d6ff5a7128e39175d45cfdacf4945f0e896dbb87af5a1025cc0ca"
     },
     {
-      "path": "released/keyring-retained/baseline-install.log",
-      "sha256": "edfabc5d1c80681d083e8c5a72e1619874f88018c94893ec9a1a0b55f7b51824"
+      "path": "released/keyring-retained/baseline-install.log.gz",
+      "sha256": "76feac99bdd9761ba83c837722137eff721a1678678a08f7c7527fb34395ba1e"
     },
     {
-      "path": "released/keyring-retained/beta-only.log",
-      "sha256": "3c8bef80c3037dce1c1a11cf5839887714c7c98a987d15514902d8407fc3948b"
+      "path": "released/keyring-retained/beta-only.log.gz",
+      "sha256": "138368814a2c8806adc6159ce91ab8a8ce6d86991e308e3ec9f0f33d930e2590"
     },
     {
-      "path": "released/keyring-retained/clean-install.log",
-      "sha256": "7d66d51b8fd29de60b7f1f15d5490f7eea23ece845481f2ae49267098187dc62"
+      "path": "released/keyring-retained/clean-install.log.gz",
+      "sha256": "6a35de94d3515024bb5d7d07f09e920d89eba267d8a6d44b4eba89d4b6c6caa9"
     },
     {
       "path": "released/keyring-retained/full-set-dnf-v3.json",
       "sha256": "e393feb2df5f12d779f3507b07199f9a258a8d12d0bfe874ba2df42ec5a1b6ff"
     },
     {
-      "path": "released/keyring-retained/new-groups.log",
-      "sha256": "3aaa7fe9765f333bad61eca7aedddb0398f4bd8400e64fd2f0efbc1bcfb6654b"
+      "path": "released/keyring-retained/new-groups.log.gz",
+      "sha256": "a6a76f03a55308344bdee092b56bc7df4601e6f8a3faff38998a491e2b505c20"
     },
     {
-      "path": "released/keyring-retained/stable-only.log",
-      "sha256": "c9ade9d238176f531a07737b37c94dceed1c109875a543ba39dc0a9c417caaa1"
+      "path": "released/keyring-retained/stable-only.log.gz",
+      "sha256": "3ae50d0557417ee48ff7f6dbe5027d0887d8b79fa19f21e4d28bfbfd668b8474"
     },
     {
-      "path": "released/keyring-retained/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/keyring-retained/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/keyring-retained-observation.json",
       "sha256": "d531a049b4ec667cbfc264532ad701c9dd4d1b4f54e9d502ecd13b0c80ba0cfb"
     },
     {
-      "path": "released/noarch-branding/baseline-install.log",
-      "sha256": "c6497572018a392e7a0476448a1eec4360b16f7998e3f8d47fd8695a7bf9ce30"
+      "path": "released/noarch-branding/baseline-install.log.gz",
+      "sha256": "a8158bafd0f509cdbe9c037d7c6f9af3b183f1e9e80d0cdb50f21a3574b28ac1"
     },
     {
-      "path": "released/noarch-branding/beta-only.log",
-      "sha256": "cc35d19b2d5e8461b3b6c45466f3f703d3b908b621acd06b7920cf8e6deab739"
+      "path": "released/noarch-branding/beta-only.log.gz",
+      "sha256": "db7444027b67a0f2a5d06df91b0d1362df68364c53204e31686a58cbf9a4bf60"
     },
     {
-      "path": "released/noarch-branding/clean-install.log",
-      "sha256": "a2123532bfde4c403d56b20623f1ec09dd1b4e4354d1b2feb5f88ed3e8e9602f"
+      "path": "released/noarch-branding/clean-install.log.gz",
+      "sha256": "e6ba433d565acc825251c3086114a73bd7bcd4eb72e30b075ae2bac8a8f82929"
     },
     {
       "path": "released/noarch-branding/full-set-dnf-v3.json",
       "sha256": "6f408fa3cf4ff7381dc0609397d435357f092de9f4dd61a2fb90f05f0fb9b620"
     },
     {
-      "path": "released/noarch-branding/new-groups.log",
-      "sha256": "23b97f710462e3a885197479b1d6b1cf610b3fd6008a44f8ff08fae2343044bc"
+      "path": "released/noarch-branding/new-groups.log.gz",
+      "sha256": "bd22907a3229139bbd0c016230c957b8a7de498f90a04c2b2953cb710e2bcaf0"
     },
     {
-      "path": "released/noarch-branding/stable-only.log",
-      "sha256": "a0b349850fd86c6f8c5dbac04d093baec2cfd389b6f796e18b490fcfedd2b1e7"
+      "path": "released/noarch-branding/stable-only.log.gz",
+      "sha256": "cb61e1d3649ba7e4b759ceffb2e579140c8972adddef35f098529f3476b90ece"
     },
     {
-      "path": "released/noarch-branding/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/noarch-branding/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/noarch-branding-observation.json",
       "sha256": "3443c19237e8fddde03092179f2f72655bcffa96a089d416be46d14b42c9ff0c"
     },
     {
-      "path": "released/noarch-defaults/baseline-install.log",
-      "sha256": "879f6caecf4143182d765422df526e9a219f810e24d6dc0c38565cab172acd08"
+      "path": "released/noarch-defaults/baseline-install.log.gz",
+      "sha256": "ebe24ce4cfdf792eae22f304411ce6c21b9bd629cafbd01420613aa53cfb72fc"
     },
     {
-      "path": "released/noarch-defaults/beta-only.log",
-      "sha256": "7f3cdd64d3c0bf59b3f4ed61ce4b1827178ce8e252a0b988af85c84965ce1c93"
+      "path": "released/noarch-defaults/beta-only.log.gz",
+      "sha256": "e384d36e675605d728b9c3aa237ecc2611c03e3c6da61e5178a5f1e3453975bb"
     },
     {
-      "path": "released/noarch-defaults/clean-install.log",
-      "sha256": "1f0e9a78d0cb52a562fd0fc582083c94463f67211232fbc15ac1e67dbd6eaf05"
+      "path": "released/noarch-defaults/clean-install.log.gz",
+      "sha256": "38a80abacf4de4f16896d1daef009117b262fde6e50d53bdd9cf75b4a2bb2858"
     },
     {
       "path": "released/noarch-defaults/full-set-dnf-v3.json",
       "sha256": "ac97224d2d5c76f52baf9aecffd8c4d9f4cd26ae2a981e42eea4515b8fdc0814"
     },
     {
-      "path": "released/noarch-defaults/new-groups.log",
-      "sha256": "2ec1c5dda5933ad10b76f2e7fc1fde2d796faea0fdd0e8963e3b12102e16827b"
+      "path": "released/noarch-defaults/new-groups.log.gz",
+      "sha256": "9a82d6dbbe26eadad9f633fd2d2f1b84d23a64219aaae0b306920db65c9c339f"
     },
     {
-      "path": "released/noarch-defaults/stable-only.log",
-      "sha256": "440a88e01c596067b7f45c16d91b038603c2b919d88461aec301af48e9156dbc"
+      "path": "released/noarch-defaults/stable-only.log.gz",
+      "sha256": "67ae7bec1b76b1329baa2626a115535cf5fac4a3695ed277a9d2d7c2d0195bf8"
     },
     {
-      "path": "released/noarch-defaults/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/noarch-defaults/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/noarch-defaults-observation.json",
       "sha256": "8fc8c2aea37b224cabbc296b5188249cfa48f5c7f6c7e36875232c2b71a67e48"
     },
     {
-      "path": "released/noarch-desktop/baseline-install.log",
-      "sha256": "1c086f5fe16c2fa4a990c4ad738deed1ed78ace7e6eb599fcb77266187d1a828"
+      "path": "released/noarch-desktop/baseline-install.log.gz",
+      "sha256": "9031c10e3c2db9eb92f24470acaf4620e6d73189dbcf0a57f8a06ae98d352269"
     },
     {
-      "path": "released/noarch-desktop/beta-only.log",
-      "sha256": "dd97dfcc673fdebd76c80d4040de3b39f8082c6afc0180b106bd9f377a760f90"
+      "path": "released/noarch-desktop/beta-only.log.gz",
+      "sha256": "0789ccead8884919fe17d48038da3b3bdd031759fc3d8c1b23f1215e2d2bc37c"
     },
     {
-      "path": "released/noarch-desktop/clean-install.log",
-      "sha256": "9c4f921a776e84f6c7c53907829c4e64334e3f03c80f920c1191a6e4adb4d6eb"
+      "path": "released/noarch-desktop/clean-install.log.gz",
+      "sha256": "b53428c5a36c866115e076d7001c0d8d6cd2fb13b694d5186e20e74920750f8f"
     },
     {
       "path": "released/noarch-desktop/full-set-dnf-v3.json",
       "sha256": "df24b537f0842420c44b907b8233441abf4ca7a0186c15f7ad0399e95c46b7f8"
     },
     {
-      "path": "released/noarch-desktop/new-groups.log",
-      "sha256": "5d028abefa2d89144d4443ac2ab0ece2019e1736e51b521b6ecd686168b33c47"
+      "path": "released/noarch-desktop/new-groups.log.gz",
+      "sha256": "369e2984c732f0fc46a67b21c0f3b220ac2ab0e73a8ac05d0c72db08c90feb4d"
     },
     {
-      "path": "released/noarch-desktop/stable-only.log",
-      "sha256": "e4e4662de542053ce09c57c785534a355e62d5b547e40c31021d3b23f60fc854"
+      "path": "released/noarch-desktop/stable-only.log.gz",
+      "sha256": "186d63e253f86548b0473124044e8f76c539810ba1c26a23c88559888fbbca7c"
     },
     {
-      "path": "released/noarch-desktop/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/noarch-desktop/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/noarch-desktop-observation.json",
       "sha256": "446401e44512de884fcb6702950ce4a96d64d33fe65b39d259b00ec7e7adbfcb"
     },
     {
-      "path": "released/noarch-kernel/baseline-install.log",
-      "sha256": "02827a71b1b713df8b2fe2d833f4d5a7d2d79c5d9aeee9e0726d6f53e6e87c3c"
+      "path": "released/noarch-kernel/baseline-install.log.gz",
+      "sha256": "19bd9224ebdf0d677a71ab6cb22d1b2f4364d46c8c63d55b6ae33e67550b8072"
     },
     {
-      "path": "released/noarch-kernel/beta-only.log",
-      "sha256": "580f68f4e37adbebacb0455eb57558e4d93f05054b1dfa64b6d1c44dc63c1887"
+      "path": "released/noarch-kernel/beta-only.log.gz",
+      "sha256": "7e7e1ef5cebb1581249205e1468f6742f77aad86e42a45465e7e3feb4192214c"
     },
     {
-      "path": "released/noarch-kernel/clean-install.log",
-      "sha256": "865df52c2cb02ad3cc40082dc6f4f92e1d975b428a4baf80798530b37add5121"
+      "path": "released/noarch-kernel/clean-install.log.gz",
+      "sha256": "5c5eaabae07ba7196fc365e994857ef3df74add69724df84a31fbd59d43e7cb8"
     },
     {
       "path": "released/noarch-kernel/full-set-dnf-v3.json",
       "sha256": "20ae40d47dced25ff3cbe5cbf5ccc174294ccf8a9f30d8e85dc31de217549640"
     },
     {
-      "path": "released/noarch-kernel/new-groups.log",
-      "sha256": "7443815867ebb765fb572234580abce9365bc39c3da16d0bf5226f7772ab8fa4"
+      "path": "released/noarch-kernel/new-groups.log.gz",
+      "sha256": "78a2efb455b635959665e4435d353b01aba74e69967bddb0614afed6ba5b46e2"
     },
     {
-      "path": "released/noarch-kernel/stable-only.log",
-      "sha256": "ae879046f1beb8acf83af5f98f7f5361c48943c9c26e68366fc98dcb835a4956"
+      "path": "released/noarch-kernel/stable-only.log.gz",
+      "sha256": "059533e6ce541fc33c89a89d746ca3df31601053e74107c3dd5efd1b1b42b4e3"
     },
     {
-      "path": "released/noarch-kernel/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/noarch-kernel/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/noarch-kernel-observation.json",
       "sha256": "f3a72d3ce2d4b059eac9f6a3889f07b01ba10698bf1996875adedb72dea79ae8"
     },
     {
-      "path": "released/noarch-release/baseline-install.log",
-      "sha256": "9ea735b06e02004258ed74d82796a16a17dafff7bfc8805ce6f4adef05272761"
+      "path": "released/noarch-release/baseline-install.log.gz",
+      "sha256": "4e9162d96f93b178053c6b0559e35d4ff940fb80a91cd3375e1443863be4410e"
     },
     {
-      "path": "released/noarch-release/beta-only.log",
-      "sha256": "73b08c0ba0c06fcea7f552d035360cc3c0d8eab127cdaed273b22ebdc2ccbf9d"
+      "path": "released/noarch-release/beta-only.log.gz",
+      "sha256": "29725584faef0758a12e202428c4a5e5da36c6c155207b1820f0c97e3903c936"
     },
     {
-      "path": "released/noarch-release/clean-install.log",
-      "sha256": "2ba4e210fa304efe93e5aea63de5ddee77c7b58c0b0c3cd689b03c458cd77404"
+      "path": "released/noarch-release/clean-install.log.gz",
+      "sha256": "96e05fb66e9b1a4f8d4ba34af7f3a22251925f6358440f076b7bfda71ab15c65"
     },
     {
       "path": "released/noarch-release/full-set-dnf-v3.json",
       "sha256": "b383f2a5da94cb9f91a8f16af79ad4a975d17b4435ffbfa514fb3c79d391ad09"
     },
     {
-      "path": "released/noarch-release/new-groups.log",
-      "sha256": "6d2c07703239bfd453611d62da26f82f01998a2b3a831a65e0cc38a86ed8fc21"
+      "path": "released/noarch-release/new-groups.log.gz",
+      "sha256": "3c6dbe88d8f21e025d8611b5b1c8ff44e81599ed667646cb1468a6a740023f62"
     },
     {
-      "path": "released/noarch-release/stable-only.log",
-      "sha256": "e4a44a4048f3ed0399f41b44e8c201ca1fb1e617dd39edf02aad4278ffef3eb1"
+      "path": "released/noarch-release/stable-only.log.gz",
+      "sha256": "4b6d52976f1423f5d803ab4dd5f91b9d7220ef5237ec38eb4a8dc984196ef54f"
     },
     {
-      "path": "released/noarch-release/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/noarch-release/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/noarch-release-observation.json",
       "sha256": "76460faf06f75c311275af1bb3ab33b02c7530e22e28b675d7daf250fa661917"
     },
     {
-      "path": "released/noarch-repos/baseline-install.log",
-      "sha256": "40a7e6c2bcc09fb3b8b4bb92a4b03c86f6e2e4214971d7332b01b0c1b9aab046"
+      "path": "released/noarch-repos/baseline-install.log.gz",
+      "sha256": "28dcf16e2b01c0915390efbbe85a1bf403768cf33a24c6b6c346813bc80466cf"
     },
     {
-      "path": "released/noarch-repos/beta-only.log",
-      "sha256": "b688dcd76cba46dc3a0f94d105c428b3f147a2aa33e9c2b46fe50cdfdcd7f52f"
+      "path": "released/noarch-repos/beta-only.log.gz",
+      "sha256": "9ae0341d149f774e41e072b5c046cf8a7399316dde741ce6e3476be4709688f7"
     },
     {
-      "path": "released/noarch-repos/clean-install.log",
-      "sha256": "e9a35a477267236d72ddfc168ccd302cf0b0c7dcd070ffcbeafdacf5fbf04b38"
+      "path": "released/noarch-repos/clean-install.log.gz",
+      "sha256": "f26c1320e53f21e7422a2d7922d0053f0cb1d8bfb5cd7ba5066b9317041985ed"
     },
     {
       "path": "released/noarch-repos/full-set-dnf-v3.json",
       "sha256": "b7d4abf8cb62d4d3cf3169653b5bbb1a8e2b088b339f3c95a85a2db0313a9e0d"
     },
     {
-      "path": "released/noarch-repos/new-groups.log",
-      "sha256": "2184f4346d84563d6f6df20e13a0ba8e948eae11771375577a2dcb7a215b82ec"
+      "path": "released/noarch-repos/new-groups.log.gz",
+      "sha256": "7fd170d4841e36944b82df0b4899a6a3813a9e15f2c6dfaee530a4af793e462d"
     },
     {
-      "path": "released/noarch-repos/stable-only.log",
-      "sha256": "f1f2212cf57b89f56f1f6e554d5c834afed58a7951871572319c71968ce9fb2f"
+      "path": "released/noarch-repos/stable-only.log.gz",
+      "sha256": "a22f8d7eddbf639b9a6cdedd6a9e1c4d9caa4738cf85886b8098d91b2715cab1"
     },
     {
-      "path": "released/noarch-repos/upgrade.log",
-      "sha256": "7a841c481b14198c2161527f8acd5415b4578250e1e68969a349e8fac0ec0b93"
+      "path": "released/noarch-repos/upgrade.log.gz",
+      "sha256": "c98496366c12dbeec2632d0658b90298574e054770477c05c1c9a77dbf983250"
     },
     {
       "path": "released/noarch-repos-observation.json",
@@ -613,8 +613,8 @@
       "sha256": "400b7c22c7aec2a6f56b57010c1afaf2b43f622820a8af44ac8f858514abf839"
     },
     {
-      "path": "released.log",
-      "sha256": "b2eb3fa1573d918f012cbe89ba6291700d729e7fee91943f4becf97324643dd4"
+      "path": "released.log.gz",
+      "sha256": "4f09bd9e2b7167d768d5028ce75edbb1e7bbdb110828186646e6ca273a2da2e0"
     },
     {
       "path": "remote-parity.json",
@@ -637,16 +637,16 @@
       "sha256": "7820317ec553b17a1316e3a6ec41014b60e49af03e0b014b9d569a56af945761"
     },
     {
-      "path": "unit.log",
-      "sha256": "8380baaa48f9eba048921a50af1e0b0895b2196ad27c05b54ce7e077e03e9087"
+      "path": "unit.log.gz",
+      "sha256": "b514b967329ef2525abadce0bf29473040b67018a0e348c111866052ca345a15"
     },
     {
       "path": "v2-compatibility.json",
       "sha256": "0d60e85b2e25c78a7b0f09442527cfc88470e272c16c9c853843e99af4532517"
     },
     {
-      "path": "v2.log",
-      "sha256": "6de3478ae24a3d3f3d0ebc5aae17f33aa672241d464903e6d2d33509059b92b7"
+      "path": "v2.log.gz",
+      "sha256": "d7a4fcf7333e828031b08a736d38fc6e82150842d6db1654a95aade16e2e5485"
     }
   ],
   "implementation_source_sha256": "9fdb8c241ea9fad1a4b4e30247f0fa03b2f6174df96475303a84b9a7902d9f58",

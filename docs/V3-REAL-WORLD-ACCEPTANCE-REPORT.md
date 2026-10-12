@@ -173,8 +173,8 @@ Mevcut VM protocol unit tests mock rejection testsidir; gerçek guest kabulü de
 
 ## D — Stable rehearsal ve authority ayrımı
 
-Actual composition/native stable bootstrap/upgrade/retention PASS. Resulting Assist
-+ keyring snapshot, aynı bytes ile disposable
+Actual composition/native stable bootstrap/upgrade/retention PASS. Resulting Assist ve
+keyring snapshot, aynı bytes ile disposable
 `v3/views/16f2295c732e970303da714e1f121b5f1e64ef1ea01c0a49e5fdaadadf6c8f15/`
 altına kopyalandı. Native DNF5 signed repodata stable-only query, yalnızca Assist ve
 keyring'i gördü; before/after inventory digest eşitliği PASS. Bu layout query'si

@@ -87,3 +87,7 @@ Native aarch64, Plasma/login/installer/boot/recovery/Ro-Store VM, independently
 authenticated first-public history and production roots/services remain
 UNVERIFIED/BLOCKED. Existing stable was absent (Git inventory and HTTP404).
 Production activation remains BLOCKED.
+
+Raw logs are stored as .log.gz to preserve exact console whitespace without Git
+whitespace noise. Decompression yields the original bytes. Receipt logs_sha256
+fields refer to decompressed log bytes; inventory.json hashes compressed files.

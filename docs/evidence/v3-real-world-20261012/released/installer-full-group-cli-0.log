@@ -1,1 +1,0 @@
-/usr/bin/ro-installer: error while loading shared libraries: libflutter_linux_gtk.so: cannot open shared object file: No such file or directory

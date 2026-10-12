@@ -1,9 +1,0 @@
-Frozen official metadata: release da3845427d188097f6fd71b417a039bdfb8efefc4f38ca44b5cbb94f95a18991
-Frozen official metadata: updates f1902ee7042cbf18bc9372ec8148a01c935c7a779b2314f09ceb07734b10d9fa
-Actual package solver: assist-previous PASS
-Actual package solver: assist-current PASS
-Actual package solver: dolphin PASS
-Actual package solver: installer PASS
-Actual package solver: noarch PASS
-Captured exact signed-RPM candidates: release 264
-Captured exact signed-RPM candidates: updates 307

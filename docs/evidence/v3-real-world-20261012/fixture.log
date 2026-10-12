@@ -1,3 +1,0 @@
-PASS: Fedora 44 real signed fixture bootstrap/full-set upgrade/channel isolation/rpmnew/reproducible metadata; production BLOCKED
-Native DNF5 location: file:///v3-outside-pinned-cache/probe.rpm
-PASS: pinned upstream rejects DNF xml:base override: upstream package base URL overrides pinned cache
