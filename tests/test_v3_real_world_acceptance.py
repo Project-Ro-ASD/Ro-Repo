@@ -8,6 +8,7 @@ ROOT = pathlib.Path(__file__).parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 from v3_pinned_upstream import trusted_rpm_status
 from v3_promotion_planner import PlanningError
+from v3_full_set_dnf import _config_result
 
 spec = importlib.util.spec_from_file_location("real_acquisition", ROOT / "tests/v3-real-upstream-acquire.py")
 acquisition = importlib.util.module_from_spec(spec)
@@ -41,6 +42,33 @@ class RealAcceptanceTests(unittest.TestCase):
             with self.assertRaises(PlanningError):
                 acquisition.get("http://mirror.invalid/pkg.rpm", pathlib.Path("/tmp/unused-real-acquisition"))
             opener.assert_not_called()
+
+    def test_unchanged_packaged_config_preserves_without_rpmnew(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as root:
+            result = _config_result(pathlib.Path(root) / "config", "a" * 64, "a" * 64)
+            self.assertTrue(result["rpmnew_not_required_unchanged_packaged_file"])
+
+    def test_changed_packaged_config_still_requires_exact_rpmnew(self):
+        import tempfile, hashlib
+        with tempfile.TemporaryDirectory() as root:
+            config = pathlib.Path(root) / "config"
+            with self.assertRaises(PlanningError):
+                _config_result(config, "a" * 64, "b" * 64)
+            rpmnew = pathlib.Path(str(config) + ".rpmnew")
+            rpmnew.write_bytes(b"wrong")
+            with self.assertRaises(PlanningError):
+                _config_result(config, "a" * 64, "b" * 64)
+            expected = hashlib.sha256(b"wrong").hexdigest()
+            self.assertEqual(_config_result(config, "a" * 64, expected)["rpmnew_sha256"], expected)
+
+    def test_config_probe_rejects_rpmnew_symlinks(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as root:
+            config = pathlib.Path(root) / "config"
+            pathlib.Path(str(config) + ".rpmnew").symlink_to("/etc/passwd")
+            with self.assertRaises(PlanningError):
+                _config_result(config, "a" * 64, "a" * 64)
 
 
 if __name__ == "__main__":
