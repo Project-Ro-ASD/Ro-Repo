@@ -49,6 +49,10 @@
       "sha256": "738a2bc27c7d61caa1227144ee9b8321763777ce110551d5f264340de6baceb8"
     },
     {
+      "path": "ci-a928ec4.json",
+      "sha256": "2ed6aab4142f5959dedde06d66baf547c8ce4e518f8e18907497c5b634aa4bc0"
+    },
+    {
       "path": "environment-readiness.json",
       "sha256": "941fd01c05c63f482a02288990434c2449bb583bc5af4e0583d087ed87c60098"
     },

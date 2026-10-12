@@ -1,0 +1,75 @@
+{
+  "headRefOid": "a928ec44287aae50ebe8bbd51f59f5237df6c9e6",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T11:59:52Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097471/job/114800226559",
+      "name": "unit-policy",
+      "startedAt": "2026-10-12T11:58:44Z",
+      "status": "COMPLETED",
+      "workflowName": "Ro-Repo V2 tests"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T12:00:21Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097308/job/114800225434",
+      "name": "backend-security",
+      "startedAt": "2026-10-12T11:58:39Z",
+      "status": "COMPLETED",
+      "workflowName": "V3 isolated backend rehearsal"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T12:00:21Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097588/job/114800227660",
+      "name": "security-contracts",
+      "startedAt": "2026-10-12T11:58:39Z",
+      "status": "COMPLETED",
+      "workflowName": "V3 isolated integration acceptance"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T12:00:18Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097471/job/114800226960",
+      "name": "fedora44-e2e",
+      "startedAt": "2026-10-12T11:58:39Z",
+      "status": "COMPLETED",
+      "workflowName": "Ro-Repo V2 tests"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T11:59:34Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097308/job/114800225635",
+      "name": "postgres-transactions",
+      "startedAt": "2026-10-12T11:58:38Z",
+      "status": "COMPLETED",
+      "workflowName": "V3 isolated backend rehearsal"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T11:59:31Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097588/job/114800227482",
+      "name": "fedora44-full-stable-set",
+      "startedAt": "2026-10-12T11:58:39Z",
+      "status": "COMPLETED",
+      "workflowName": "V3 isolated integration acceptance"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-10-12T11:59:16Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097471/job/114800227104",
+      "name": "acceptance-runtime-contract",
+      "startedAt": "2026-10-12T11:58:39Z",
+      "status": "COMPLETED",
+      "workflowName": "Ro-Repo V2 tests"
+    }
+  ]
+}

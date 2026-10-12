@@ -223,7 +223,7 @@ bağlıdır; kod testler sırasında değişmedi. Testler `git archive b44995a` 
 | Existing V2 compatibility E2E | PASS, exit0; rpmlint0error/4fixturewarning |
 | Python compile, shell syntax, all schemas/YAML | PASS |
 | Eleven unconditional disables / V2 workflows vs main | PASS, byte-identical |
-| GitHub CI | Final PR head'e ait sonuç handoff'ta doğrulanır; local PASS, CI sonucu yerine kullanılmaz |
+| GitHub CI | 7/7 SUCCESS: exact `a928ec4` head; source inventory değişmedi; job bağlantıları aşağıda |
 
 Exact component/package signed-artifact hashes, complete source inventory,
 upstream manifests/metadata/checksums, public key'ler, per-case DNF receipt/log,
@@ -232,6 +232,25 @@ remote parity, environment configuration ve runtime çıktıları
 Tek tek package digests `released/acceptance.json` inventory'sindedir; evidence
 inventory dosyası bütün public outputs için SHA256 verir. Private key, JWT,
 credential, DB backup veya binary RPM cache repository'ye eklenmedi.
+
+### Public CI kanıtı
+
+[Draft PR #73](https://github.com/Project-Ro-ASD/Ro-Repo/pull/73) oluşturuldu.
+`a928ec44287aae50ebe8bbd51f59f5237df6c9e6` head'i için aşağıdaki yedi check'in
+COMPLETED/SUCCESS sonucu doğrulandı. Final documentation commit'inin kendi head
+sonuçları ayrıca handoff'ta kontrol edilir; eski head'in CI sonucu yeni head'e
+atfedilmez. CI actual released-package download/GUI kabulü yerine geçmez;
+CI signed synthetic fixtures ve regression suite'ini yeniden doğrular.
+
+| Check | Public job |
+| --- | --- |
+| unit-policy | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097471/job/114800226559) |
+| backend-security | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097308/job/114800225434) |
+| security-contracts | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097588/job/114800227660) |
+| fedora44-e2e | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097471/job/114800226960) |
+| postgres-transactions | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097308/job/114800225635) |
+| fedora44-full-stable-set | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097588/job/114800227482) |
+| acceptance-runtime-contract | [SUCCESS](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38246097471/job/114800227104) |
 
 ## E — Exact maintainer actions / external blockers
 
@@ -270,8 +289,9 @@ credential, DB backup veya binary RPM cache repository'ye eklenmedi.
 
 ## Öneri
 
-Bu sprint'in kod/kanıt değişiklikleri automated CI de final head'de başarılı olduğunda
-**NON-PRODUCTION milestone olarak merge'e uygundur**. Gerçek x86_64 package/DNF
+Bu sprint'in kod/kanıt değişiklikleri, tamamlanan local testler ve 7/7 CI ile
+**NON-PRODUCTION milestone olarak merge'e uygundur**. Son documentation head'inin
+CI'sı da handoff'ta ayrıca doğrulanır. Gerçek x86_64 package/DNF
 ve integrity kabulü önemli ölçüde ilerledi; tüm release gates tamamlandı denmez.
 **Production stable aktivasyonu uygun değildir, BLOCKED.** On bir job kapalı,
 `production_publish` koşulsuz BLOCKED, main/pages-storage ve V2 publishing değişmedi.
