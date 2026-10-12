@@ -54,6 +54,21 @@ def _rpmdb(root, targets):
     return actual
 
 
+def _config_result(config, baseline_sha256, target_sha256):
+    rpmnew = pathlib.Path(str(config) + ".rpmnew")
+    if rpmnew.is_symlink():
+        raise PlanningError("unsafe configuration rpmnew")
+    if rpmnew.is_file():
+        if _sha256(rpmnew) != target_sha256:
+            raise PlanningError("rpmnew differs from installed signed package header")
+        return {"rpmnew_sha256": target_sha256}
+    if baseline_sha256 == target_sha256:
+        # RPM preserves a locally modified config without .rpmnew when the
+        # packaged file itself did not change between released versions.
+        return {"rpmnew_not_required_unchanged_packaged_file": True}
+    raise PlanningError("changed packaged configuration missing rpmnew")
+
+
 def _signed_view(root, ring):
     root = pathlib.Path(root)
     tree_inventory(root)
@@ -236,21 +251,30 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
                     raise PlanningError("missing baseline configuration")
                 # Explicitly modify the disposable baseline's configuration
                 # before DNF upgrades, then require RPM's .rpmnew behavior.
+                packaged_before = _sha256(config)
                 config.write_bytes(b"# locally modified V3 fixture configuration\n")
-                config_evidence[path] = {"modified_sha256": _sha256(config)}
-            dnf("stable", work / "upgrade", ["upgrade", *sorted(targets)], "upgrade.log")
+                config_evidence[path] = {"modified_sha256": _sha256(config), "baseline_packaged_sha256": packaged_before}
+            # Newly approved groups are installed below; DNF5 rejects an
+            # explicit upgrade argument that is available but not installed.
+            installed_names = sorted(set(targets) & set(old))
+            if installed_names:
+                dnf("stable", work / "upgrade", ["upgrade", *[targets[n]["target"] for n in installed_names]], "upgrade.log")
             # Install genuinely new groups as well as upgrading existing ones.
             additions = set(targets) - set(old)
             if additions:
-                dnf("stable", work / "upgrade", ["install", *sorted(additions)], "new-groups.log")
+                dnf("stable", work / "upgrade", ["install", *[targets[n]["target"] for n in sorted(additions)]], "new-groups.log")
             upgraded = _rpmdb(work / "upgrade", targets)
             dependency_inventory(work / "upgrade")
             for path, evidence in config_evidence.items():
                 config = work / "upgrade" / path.lstrip("/")
-                rpmnew = pathlib.Path(str(config) + ".rpmnew")
-                if _sha256(config) != evidence["modified_sha256"] or not rpmnew.is_file():
+                if config.is_symlink() or _sha256(config) != evidence["modified_sha256"]:
                     raise PlanningError("configuration preservation/.rpmnew upgrade regression")
-                evidence["rpmnew_sha256"] = _sha256(rpmnew)
+                declared = _run(["rpm", "--root", str(work / "upgrade"), "-qf", path,
+                                 "--qf", "[%{FILENAMES}\\t%{FILEDIGESTS}\\n]"])
+                matching = [line.split("\t", 1)[1] for line in declared.splitlines() if line.startswith(path + "\t")]
+                if len(matching) != 1 or not __import__("re").fullmatch(r"[0-9a-f]{64}", matching[0]):
+                    raise PlanningError("unambiguous installed configuration digest required")
+                evidence.update(_config_result(config, evidence["baseline_packaged_sha256"], matching[0]))
         if any(tree_inventory(source) != expected or tree_inventory(frozen[source]) != expected
                for source, expected in input_trees.items()):
             raise PlanningError("DNF input changed during validation")
@@ -271,7 +295,8 @@ def validate(snapshot, baseline, beta, plan, arch, output, *, rpm_key, rpm_key_s
             "checks": {"dependency-solve": "PASS", "clean-install": "PASS",
                        "upgrade": "UNVERIFIED" if prior is None else "PASS",
                        "stable-only": "PASS", "beta-only": "PASS", "file-conflict": "PASS",
-                       "rpmnew": "PASS" if config_evidence else "UNVERIFIED"},
+                       "configuration-preservation": "PASS" if config_evidence else "UNVERIFIED",
+                       "rpmnew": "PASS" if any("rpmnew_sha256" in e for e in config_evidence.values()) else "UNVERIFIED"},
             "runner_attestation": "UNVERIFIED", "publishable": False,
         }
         (logs / "full-set-dnf-v3.json").write_bytes(canonical(receipt) + b"\n")

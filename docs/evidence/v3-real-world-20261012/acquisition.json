@@ -1,0 +1,2913 @@
+{
+  "feeds": {
+    "release": {
+      "metadata_sha256": {
+        "repodata/326f2b47a15d5750b2bd3387831a9335731033b031cf2d5a9ffd26106d48648b-filelists.xml.zst": "326f2b47a15d5750b2bd3387831a9335731033b031cf2d5a9ffd26106d48648b",
+        "repodata/55b3de41b5aceaa7f1e0ba887f2407a4bc37ccac0fc43ba5cfcd29325354380f-filelists.xml.zck": "55b3de41b5aceaa7f1e0ba887f2407a4bc37ccac0fc43ba5cfcd29325354380f",
+        "repodata/58bc3f1a8887a91beedc285006c3777bb5a7deee3ce35ac135d80f245cecaa2d-other.sqlite.zst": "58bc3f1a8887a91beedc285006c3777bb5a7deee3ce35ac135d80f245cecaa2d",
+        "repodata/6a37d36914955dc65cf6dc037c37dcf00c64ded464dc34164a674bf65fa16927-comps-Everything.x86_64.xml.zst": "6a37d36914955dc65cf6dc037c37dcf00c64ded464dc34164a674bf65fa16927",
+        "repodata/75afcf7bef9000b69a2751c30e36685fe9afe25f6a2b6407d12d65acfe42b0d6-other.xml.zst": "75afcf7bef9000b69a2751c30e36685fe9afe25f6a2b6407d12d65acfe42b0d6",
+        "repodata/89b2a448b01b94d6173ecc1352b001d1f9f39d165f7ea480ac3051be9354ed67-other.xml.zck": "89b2a448b01b94d6173ecc1352b001d1f9f39d165f7ea480ac3051be9354ed67",
+        "repodata/94b77791ef59000ff6c51fc68daa922676f91d8f431da9fdc784bbfde496a708-comps-Everything.x86_64.xml.zck": "94b77791ef59000ff6c51fc68daa922676f91d8f431da9fdc784bbfde496a708",
+        "repodata/9db91ff58cf194bf374b1b89073fa52066b5cde56a950b9d74dde3458f283500-primary.sqlite.zst": "9db91ff58cf194bf374b1b89073fa52066b5cde56a950b9d74dde3458f283500",
+        "repodata/c48e47563bbf65b996c95caf4a608223f982c314cab637e6ab87dd1df67b9d26-primary.xml.zst": "c48e47563bbf65b996c95caf4a608223f982c314cab637e6ab87dd1df67b9d26",
+        "repodata/e2f8dbd7ee2e9298504cf6e6c0c3b11fb8236341b24c8cc2a48f70b7e5d408eb-filelists.sqlite.zst": "e2f8dbd7ee2e9298504cf6e6c0c3b11fb8236341b24c8cc2a48f70b7e5d408eb",
+        "repodata/e32a0c328ac8716e71e3f66e87366a172fea8ecb2f452909a42db9c080cd3704-primary.xml.zck": "e32a0c328ac8716e71e3f66e87366a172fea8ecb2f452909a42db9c080cd3704"
+      },
+      "mirror_failures": [],
+      "origin": "https://ask4.mm.fcix.net/fedora/linux/releases/44/Everything/x86_64/os/",
+      "packages": [
+        {
+          "nevra": "PackageKit-Qt6-0:1.1.4-4.fc44.x86_64",
+          "path": "Packages/p/PackageKit-Qt6-1.1.4-4.fc44.x86_64.rpm",
+          "sha256": "aa18efed73ba7f8b87a213da280f57cc26187757574018fcbe6a3dae3c86de79"
+        },
+        {
+          "nevra": "abattis-cantarell-vf-fonts-0:0.301-17.fc44.noarch",
+          "path": "Packages/a/abattis-cantarell-vf-fonts-0.301-17.fc44.noarch.rpm",
+          "sha256": "720fbca1cdaf0e5e4cc388402f5de012c9e26eff129d13dd89560d2eea96585c"
+        },
+        {
+          "nevra": "adwaita-cursor-theme-0:50.0-1.fc44.noarch",
+          "path": "Packages/a/adwaita-cursor-theme-50.0-1.fc44.noarch.rpm",
+          "sha256": "6d46cf5017b77db42f9bfecf3866c193c91b49c1a364c23855efa072ba2be537"
+        },
+        {
+          "nevra": "adwaita-icon-theme-0:50.0-1.fc44.noarch",
+          "path": "Packages/a/adwaita-icon-theme-50.0-1.fc44.noarch.rpm",
+          "sha256": "e0a8a851b955b2b98f94fc159abcec0139d0c936d6de50ca2a21c8ffe798d2f7"
+        },
+        {
+          "nevra": "adwaita-icon-theme-legacy-0:46.2-7.fc44.noarch",
+          "path": "Packages/a/adwaita-icon-theme-legacy-46.2-7.fc44.noarch.rpm",
+          "sha256": "a07ea59c0d1a711a2e5a582ad5e98e1c582851b6ed83db5d2b031a06cf5c713d"
+        },
+        {
+          "nevra": "alternatives-0:1.33-5.fc44.x86_64",
+          "path": "Packages/a/alternatives-1.33-5.fc44.x86_64.rpm",
+          "sha256": "0179df0fadb4de141ec94d765a539cf4ebfaf986de19b7a81850a1ed324d290c"
+        },
+        {
+          "nevra": "aribb24-0:1.0.3^20160216git5e9be27-5.fc44.x86_64",
+          "path": "Packages/a/aribb24-1.0.3^20160216git5e9be27-5.fc44.x86_64.rpm",
+          "sha256": "73e33dfa76f9cb0b49ff47340c219e76d5cb35d7274c71131f82cad5d3f88847"
+        },
+        {
+          "nevra": "authselect-0:1.7.1-1.fc44.x86_64",
+          "path": "Packages/a/authselect-1.7.1-1.fc44.x86_64.rpm",
+          "sha256": "3dd63f279248807a0b96e2c35288117eb987ac1a68bdabc575c87c174e2700ba"
+        },
+        {
+          "nevra": "authselect-libs-0:1.7.1-1.fc44.x86_64",
+          "path": "Packages/a/authselect-libs-1.7.1-1.fc44.x86_64.rpm",
+          "sha256": "ecdc8487654c247e74b72e101a7071a1d93572b7488c588dd6d05929bcf9c019"
+        },
+        {
+          "nevra": "avahi-glib-0:0.9~rc2-8.fc44.x86_64",
+          "path": "Packages/a/avahi-glib-0.9~rc2-8.fc44.x86_64.rpm",
+          "sha256": "060082046613ccf33a065c7569980dea69883c5803d36c171fb774e1e7517ce1"
+        },
+        {
+          "nevra": "avahi-libs-0:0.9~rc2-8.fc44.x86_64",
+          "path": "Packages/a/avahi-libs-0.9~rc2-8.fc44.x86_64.rpm",
+          "sha256": "e1d6490ad8c79ae5047a8cbd822938221242e923082082cde784090bee5f6dcb"
+        },
+        {
+          "nevra": "bash-0:5.3.9-3.fc44.x86_64",
+          "path": "Packages/b/bash-5.3.9-3.fc44.x86_64.rpm",
+          "sha256": "2ccb046d638f5ad23f5613222a78ee71067dc43f0bdf03b60ce311536bc4bed5"
+        },
+        {
+          "nevra": "bzip2-libs-0:1.0.8-23.fc44.x86_64",
+          "path": "Packages/b/bzip2-libs-1.0.8-23.fc44.x86_64.rpm",
+          "sha256": "ead652ccea75f1345305c82e97759a360da5e4f46b2f1862a18ebf0f8547d2b9"
+        },
+        {
+          "nevra": "cdparanoia-libs-0:10.2-50.fc44.x86_64",
+          "path": "Packages/c/cdparanoia-libs-10.2-50.fc44.x86_64.rpm",
+          "sha256": "31932adbec0ff45b5863dcf6b55f410b25e0f22a85eb9e8de3d197cc9aa8e58a"
+        },
+        {
+          "nevra": "cmake-0:4.3.0-1.fc44.x86_64",
+          "path": "Packages/c/cmake-4.3.0-1.fc44.x86_64.rpm",
+          "sha256": "ce8cadc3715334069d80f34b87400cf49ba944088d763f9fb2d3b60a8c5ba1c3"
+        },
+        {
+          "nevra": "cmake-data-0:4.3.0-1.fc44.noarch",
+          "path": "Packages/c/cmake-data-4.3.0-1.fc44.noarch.rpm",
+          "sha256": "65d76ffe8f98b9e599afa78f0dbf1106f437150d9927b15578247dafaba1e371"
+        },
+        {
+          "nevra": "cmake-filesystem-0:4.3.0-1.fc44.x86_64",
+          "path": "Packages/c/cmake-filesystem-4.3.0-1.fc44.x86_64.rpm",
+          "sha256": "1f80541ec3a638a822817170e8f1390f596a9f100067f3cb12bd8dce35093622"
+        },
+        {
+          "nevra": "codec2-0:1.2.0-9.fc44.x86_64",
+          "path": "Packages/c/codec2-1.2.0-9.fc44.x86_64.rpm",
+          "sha256": "4a469d1410e6ca824fde815509a1d8ccb38054fdc224e3c7b084ffebfacd2ae4"
+        },
+        {
+          "nevra": "colord-libs-0:1.4.8-4.fc44.x86_64",
+          "path": "Packages/c/colord-libs-1.4.8-4.fc44.x86_64.rpm",
+          "sha256": "7d501d9060ab6d6a6af5aa0cd662494b74bdcb66fd84c4b58e1378d1cb1e57c2"
+        },
+        {
+          "nevra": "cpio-0:2.15-9.fc44.x86_64",
+          "path": "Packages/c/cpio-2.15-9.fc44.x86_64.rpm",
+          "sha256": "8b8688840d6464f0462ab6284ca8024f119a03aef11da2fbca220506f7976269"
+        },
+        {
+          "nevra": "crypto-policies-0:20251128-3.git19878fe.fc44.noarch",
+          "path": "Packages/c/crypto-policies-20251128-3.git19878fe.fc44.noarch.rpm",
+          "sha256": "bc91e5ceafb7c9884654dc86da14187493a16cec8e6a279d625efb0e3aa4d005"
+        },
+        {
+          "nevra": "cyrus-sasl-lib-0:2.1.28-35.fc44.x86_64",
+          "path": "Packages/c/cyrus-sasl-lib-2.1.28-35.fc44.x86_64.rpm",
+          "sha256": "0175ce156be22a2d129754c74ad0089d02a94a5255cec33320b51c2cc884c47e"
+        },
+        {
+          "nevra": "dbus-1:1.16.2-1.fc44.x86_64",
+          "path": "Packages/d/dbus-1.16.2-1.fc44.x86_64.rpm",
+          "sha256": "95e855674c4e3a419335f5b110ef1931a8df1635c9276ec468c1cc34381e6620"
+        },
+        {
+          "nevra": "dbus-broker-0:37-8.fc44.x86_64",
+          "path": "Packages/d/dbus-broker-37-8.fc44.x86_64.rpm",
+          "sha256": "9cdd6cc622610ca0c3b9c72242e1787811524f506b77fb00e0367baec660e179"
+        },
+        {
+          "nevra": "dbus-common-1:1.16.2-1.fc44.noarch",
+          "path": "Packages/d/dbus-common-1.16.2-1.fc44.noarch.rpm",
+          "sha256": "e4bf3a067db6424b9cd06259de46b8719bd34bc0dac90a8861245f6e3e9e3aac"
+        },
+        {
+          "nevra": "dbus-libs-1:1.16.2-1.fc44.x86_64",
+          "path": "Packages/d/dbus-libs-1.16.2-1.fc44.x86_64.rpm",
+          "sha256": "7feb93ce981ee35dc4a2d7f960a1077bf7656bc439335ff49bf51dfa0ddbd236"
+        },
+        {
+          "nevra": "default-fonts-core-sans-0:4.3-1.fc44.noarch",
+          "path": "Packages/d/default-fonts-core-sans-4.3-1.fc44.noarch.rpm",
+          "sha256": "ef62e81c9f1c6169e2fbd49b21858aed159198e26d80ff5e62ec72577c8a58e0"
+        },
+        {
+          "nevra": "device-mapper-0:1.02.212-2.fc44.x86_64",
+          "path": "Packages/d/device-mapper-1.02.212-2.fc44.x86_64.rpm",
+          "sha256": "d559d7d859ef61fc8676e8dda182ad8df88aac68fc64dea195076dae93210cc4"
+        },
+        {
+          "nevra": "device-mapper-libs-0:1.02.212-2.fc44.x86_64",
+          "path": "Packages/d/device-mapper-libs-1.02.212-2.fc44.x86_64.rpm",
+          "sha256": "faaf83a68262d5bff1e09ae4f7b5596b1acd349b410b3cf3baf7d73e80017b2a"
+        },
+        {
+          "nevra": "docbook-dtds-0:1.0-91.fc44.noarch",
+          "path": "Packages/d/docbook-dtds-1.0-91.fc44.noarch.rpm",
+          "sha256": "d1e30aff11533e3043dbc328fedf21703a7795fb489b195af0405be40183bdf1"
+        },
+        {
+          "nevra": "docbook-style-xsl-0:1.79.2-27.fc44.noarch",
+          "path": "Packages/d/docbook-style-xsl-1.79.2-27.fc44.noarch.rpm",
+          "sha256": "c75f2b97155fb2c2ef303af546c0e6396597237dc20b98c6425f99647dc17bea"
+        },
+        {
+          "nevra": "dosfstools-0:4.2-18.fc44.x86_64",
+          "path": "Packages/d/dosfstools-4.2-18.fc44.x86_64.rpm",
+          "sha256": "11a1ddea2c27bcd9c764f086a1b8fed459a39d9a56be5db14a95128a9df074d0"
+        },
+        {
+          "nevra": "double-conversion-0:3.4.0-3.fc44.x86_64",
+          "path": "Packages/d/double-conversion-3.4.0-3.fc44.x86_64.rpm",
+          "sha256": "f10c2f74d71838faba7e0c66d80d6bf9a9f195f36fd4163d7ce8a248b9a782df"
+        },
+        {
+          "nevra": "duktape-0:2.7.0-11.fc44.x86_64",
+          "path": "Packages/d/duktape-2.7.0-11.fc44.x86_64.rpm",
+          "sha256": "90b487eae6fbf2636b575eedda6c752b58bd5e4b6b24c7dabcb8d74c6319a1f3"
+        },
+        {
+          "nevra": "e2fsprogs-libs-0:1.47.3-4.fc44.x86_64",
+          "path": "Packages/e/e2fsprogs-libs-1.47.3-4.fc44.x86_64.rpm",
+          "sha256": "eb44580c503917972d623c5cda8b31f527019b08c62e3223e909d91dc1eaa3ef"
+        },
+        {
+          "nevra": "efi-filesystem-0:6-6.fc44.noarch",
+          "path": "Packages/e/efi-filesystem-6-6.fc44.noarch.rpm",
+          "sha256": "a020b0886b2e034004edf5dfa8d4a0b6f6038503819090d531c7e689c8caa9a1"
+        },
+        {
+          "nevra": "efibootmgr-0:18-11.fc44.x86_64",
+          "path": "Packages/e/efibootmgr-18-11.fc44.x86_64.rpm",
+          "sha256": "443fcb66255c41c6f5f1c5af066dccab76698bbe397564b40a9da2c5d4c3c71d"
+        },
+        {
+          "nevra": "efivar-libs-0:39-12.fc44.x86_64",
+          "path": "Packages/e/efivar-libs-39-12.fc44.x86_64.rpm",
+          "sha256": "98ad957f0924d8cdf877ec757c9a917628a0254350598f2f259dfa36e0f46e48"
+        },
+        {
+          "nevra": "emacs-filesystem-1:30.2-2.fc44.x86_64",
+          "path": "Packages/e/emacs-filesystem-30.2-2.fc44.x86_64.rpm",
+          "sha256": "df6adb5e3cd8a95e4df52df726d4400de2765388328c312a7780de07e1130a82"
+        },
+        {
+          "nevra": "fdk-aac-free-0:2.0.3-2.fc44.x86_64",
+          "path": "Packages/f/fdk-aac-free-2.0.3-2.fc44.x86_64.rpm",
+          "sha256": "8d8820da6a23e50563259d8cd0850d88e34d63f926bbf539c34faca22fb2aaed"
+        },
+        {
+          "nevra": "fedora-logos-0:42.0.1-3.fc44.noarch",
+          "path": "Packages/f/fedora-logos-42.0.1-3.fc44.noarch.rpm",
+          "sha256": "a4590765fa32911de23b114f7445fce37ccc427aaf856fd59fd8b5356607a2c1"
+        },
+        {
+          "nevra": "filesystem-0:3.18-52.fc44.x86_64",
+          "path": "Packages/f/filesystem-3.18-52.fc44.x86_64.rpm",
+          "sha256": "7abc643d653bf2773c38e183e0e33489cab4880c8a540b315fcd7fff09c6c52c"
+        },
+        {
+          "nevra": "findutils-1:4.10.0-7.fc44.x86_64",
+          "path": "Packages/f/findutils-4.10.0-7.fc44.x86_64.rpm",
+          "sha256": "b1f9fe72be7a0cf0fb53ec00ef9e6b8ccc9987cb5f55e9de02bbc67f9cf3b5cf"
+        },
+        {
+          "nevra": "flac-libs-0:1.5.0-8.fc44.x86_64",
+          "path": "Packages/f/flac-libs-1.5.0-8.fc44.x86_64.rpm",
+          "sha256": "2b3b670cadeb5ae63319bd9841f561c48f8d3e6918425ad6c9b9c7ca97020c39"
+        },
+        {
+          "nevra": "fontconfig-0:2.17.0-4.fc44.x86_64",
+          "path": "Packages/f/fontconfig-2.17.0-4.fc44.x86_64.rpm",
+          "sha256": "2ba589fefa79fd1f5afe5c7b7e632cfe2e8f2eaeb37834100bc8215f1621a805"
+        },
+        {
+          "nevra": "fonts-filesystem-1:5.0.0-2.fc44.noarch",
+          "path": "Packages/f/fonts-filesystem-5.0.0-2.fc44.noarch.rpm",
+          "sha256": "cc83c8f1076438b072e7f49f2d3d02a54abe0abc05ca2ba5395b37a235e030bb"
+        },
+        {
+          "nevra": "fribidi-0:1.0.16-4.fc44.x86_64",
+          "path": "Packages/f/fribidi-1.0.16-4.fc44.x86_64.rpm",
+          "sha256": "6112ddab962e7835fe80d31df2aaa6e3cdddd69a2068bfd63622147a8b78b507"
+        },
+        {
+          "nevra": "game-music-emu-0:0.6.4-3.fc44.x86_64",
+          "path": "Packages/g/game-music-emu-0.6.4-3.fc44.x86_64.rpm",
+          "sha256": "fec8d2478fa6397027fd92b8b091c98acf75e77a034edd1055836c4f6113f06a"
+        },
+        {
+          "nevra": "gdbm-1:1.23-11.fc44.x86_64",
+          "path": "Packages/g/gdbm-1.23-11.fc44.x86_64.rpm",
+          "sha256": "3cab341f8d7325a3645764038eaf5deacc5e4343b104472354ee67f5ff1cca9f"
+        },
+        {
+          "nevra": "gdbm-libs-1:1.23-11.fc44.x86_64",
+          "path": "Packages/g/gdbm-libs-1.23-11.fc44.x86_64.rpm",
+          "sha256": "3fb13a4e2d4292ef3482732f51de572ded34bdf4c657c2dc4dbafe8d0ba2d4b8"
+        },
+        {
+          "nevra": "gdisk-0:1.0.10-5.fc44.x86_64",
+          "path": "Packages/g/gdisk-1.0.10-5.fc44.x86_64.rpm",
+          "sha256": "b6a6b8c1aa33614ec99ebc09101052773350047e376f12849f33ad39098469f9"
+        },
+        {
+          "nevra": "glib-networking-0:2.80.1-4.fc44.x86_64",
+          "path": "Packages/g/glib-networking-2.80.1-4.fc44.x86_64.rpm",
+          "sha256": "322211f0de47b0c5e241e1d94ab3ce096d67fc62725d993a5efdb3a416d4f71b"
+        },
+        {
+          "nevra": "glx-utils-0:9.0.0-11.fc44.x86_64",
+          "path": "Packages/g/glx-utils-9.0.0-11.fc44.x86_64.rpm",
+          "sha256": "b30fc5b7f799f14b42d01ae8b20efba1e7351a4f8aa0eb7a93e966c5ef266e5b"
+        },
+        {
+          "nevra": "gmp-1:6.3.0-5.fc44.x86_64",
+          "path": "Packages/g/gmp-6.3.0-5.fc44.x86_64.rpm",
+          "sha256": "94b960c5eaba00c1cb56abdbed05bd348d1256360cf68fd9cd7a24b3232d6558"
+        },
+        {
+          "nevra": "gnulib-l10n-0:20241231-2.fc44.noarch",
+          "path": "Packages/g/gnulib-l10n-20241231-2.fc44.noarch.rpm",
+          "sha256": "5e55fb0fd56734e71aa6ebeba0a66fde69c07964b43591464a0bb2edf96d18e7"
+        },
+        {
+          "nevra": "google-noto-fonts-common-0:20251201-2.fc44.noarch",
+          "path": "Packages/g/google-noto-fonts-common-20251201-2.fc44.noarch.rpm",
+          "sha256": "1da1dedae72ffbab654de2f5fa465d07f334e3e1929bf5967e32c53ec4d96f66"
+        },
+        {
+          "nevra": "google-noto-sans-vf-fonts-0:20251201-2.fc44.noarch",
+          "path": "Packages/g/google-noto-sans-vf-fonts-20251201-2.fc44.noarch.rpm",
+          "sha256": "f1d4ddf1e251649ab1f2b8772222999b0cdc3f4ccd40aa6ad999a5f41b9e5762"
+        },
+        {
+          "nevra": "graphene-0:1.10.8-4.fc44.x86_64",
+          "path": "Packages/g/graphene-1.10.8-4.fc44.x86_64.rpm",
+          "sha256": "f3617c2a02f80d92ccafce53bcbffa53b08bab6e609503d746ff3fbf12437c30"
+        },
+        {
+          "nevra": "graphite2-0:1.3.14-20.fc44.x86_64",
+          "path": "Packages/g/graphite2-1.3.14-20.fc44.x86_64.rpm",
+          "sha256": "0385b48da1c8691c084df8638ed63b874afc4532427014dfbd78e8c0fa0e0f23"
+        },
+        {
+          "nevra": "grep-0:3.12-3.fc44.x86_64",
+          "path": "Packages/g/grep-3.12-3.fc44.x86_64.rpm",
+          "sha256": "0b1e3d96f14f6346d0af992a8cdc1af696ff8e616311abfdee49d6a3a3f1e746"
+        },
+        {
+          "nevra": "gsm-0:1.0.24-2.fc44.x86_64",
+          "path": "Packages/g/gsm-1.0.24-2.fc44.x86_64.rpm",
+          "sha256": "6459413800414c74b8d04b0c9bb59749779c3230d5936c569e738c8a80a4ea1b"
+        },
+        {
+          "nevra": "gupnp-igd-0:1.6.0-8.fc44.x86_64",
+          "path": "Packages/g/gupnp-igd-1.6.0-8.fc44.x86_64.rpm",
+          "sha256": "4434fd979bb89ff45062708e1715778b155e1ebc40ad9029f93ad917fd2441a6"
+        },
+        {
+          "nevra": "gzip-0:1.14-2.fc44.x86_64",
+          "path": "Packages/g/gzip-1.14-2.fc44.x86_64.rpm",
+          "sha256": "a94d5384a9e8c30b31f5a85ae2ca953f8b0af946f425103f942457770fb268b4"
+        },
+        {
+          "nevra": "hicolor-icon-theme-0:0.18-3.fc44.noarch",
+          "path": "Packages/h/hicolor-icon-theme-0.18-3.fc44.noarch.rpm",
+          "sha256": "28894b2ad620f1b525a5de4db3e17d1782ccfe0ac1322c2336070bee1cacf47e"
+        },
+        {
+          "nevra": "highway-0:1.3.0-2.fc44.x86_64",
+          "path": "Packages/h/highway-1.3.0-2.fc44.x86_64.rpm",
+          "sha256": "0c62804244f3176ea30499708eb36798af32a388652a8d18b6cdc18352c31228"
+        },
+        {
+          "nevra": "ilbc-0:3.0.4-19.fc44.x86_64",
+          "path": "Packages/i/ilbc-3.0.4-19.fc44.x86_64.rpm",
+          "sha256": "083395453a2de7b547dccd44dca570f927f292ab2117e0cdbe1faf611b0c888e"
+        },
+        {
+          "nevra": "inih-0:62-2.fc44.x86_64",
+          "path": "Packages/i/inih-62-2.fc44.x86_64.rpm",
+          "sha256": "15b71f61b82a37b78b2a328634d5a516b93f84a6c22288b464ece3143a9392ed"
+        },
+        {
+          "nevra": "inih-cpp-0:62-2.fc44.x86_64",
+          "path": "Packages/i/inih-cpp-62-2.fc44.x86_64.rpm",
+          "sha256": "432b6bef07d874c85984f7a76bd85b29a6817fe308832e38f70e96b22c000c82"
+        },
+        {
+          "nevra": "iso-codes-0:4.20.1-3.fc44.noarch",
+          "path": "Packages/i/iso-codes-4.20.1-3.fc44.noarch.rpm",
+          "sha256": "56e4d850711d11c21fb9f3b2005b54b2b69c4e218399ca50259f9678ea06e007"
+        },
+        {
+          "nevra": "jansson-0:2.14-4.fc44.x86_64",
+          "path": "Packages/j/jansson-2.14-4.fc44.x86_64.rpm",
+          "sha256": "950a7003c1246568c6d602b222188391b1d4f411638d3470179736195f3b04f9"
+        },
+        {
+          "nevra": "jbigkit-libs-0:2.1-33.fc44.x86_64",
+          "path": "Packages/j/jbigkit-libs-2.1-33.fc44.x86_64.rpm",
+          "sha256": "506ab844edc755a822e203e1c7f426892f1cce3596871efd67e1880f933696a8"
+        },
+        {
+          "nevra": "json-c-0:0.18-8.fc44.x86_64",
+          "path": "Packages/j/json-c-0.18-8.fc44.x86_64.rpm",
+          "sha256": "af4cf667585ec8618b8bf352b4323bb69422130be253fdc4803e2f720dfd893c"
+        },
+        {
+          "nevra": "json-glib-0:1.10.8-5.fc44.x86_64",
+          "path": "Packages/j/json-glib-1.10.8-5.fc44.x86_64.rpm",
+          "sha256": "3423110ed6bd002c44f4539e06372cb5976ba9df83322b31d9c754214d3573af"
+        },
+        {
+          "nevra": "jsoncpp-0:1.9.6-3.fc44.x86_64",
+          "path": "Packages/j/jsoncpp-1.9.6-3.fc44.x86_64.rpm",
+          "sha256": "72038b88089f7357ebc6463075eb0f7fadffdb3bd7975d6c22774f9848533e8c"
+        },
+        {
+          "nevra": "kde-filesystem-0:5-7.fc44.x86_64",
+          "path": "Packages/k/kde-filesystem-5-7.fc44.x86_64.rpm",
+          "sha256": "b915762b4e3234fb39fc374af25e76c60dd49529216d60fa4fe925857664f6e5"
+        },
+        {
+          "nevra": "keyutils-libs-0:1.6.3-7.fc44.x86_64",
+          "path": "Packages/k/keyutils-libs-1.6.3-7.fc44.x86_64.rpm",
+          "sha256": "28b1b356688c24c51affa429feaf908425d52e42758ee068836cdb547aedf8dc"
+        },
+        {
+          "nevra": "kmod-0:34.2-4.fc44.x86_64",
+          "path": "Packages/k/kmod-34.2-4.fc44.x86_64.rpm",
+          "sha256": "a43624a70c2f9782a3dc75c8e8c789a65004835e2ea23ab63cb52b8ad2d8a5f0"
+        },
+        {
+          "nevra": "kmod-libs-0:34.2-4.fc44.x86_64",
+          "path": "Packages/k/kmod-libs-34.2-4.fc44.x86_64.rpm",
+          "sha256": "f048ca8c013278d1ffc8a6b8ff1b6c1782fc19878fe9a55068b1441771fa2c10"
+        },
+        {
+          "nevra": "lame-libs-0:3.100-21.fc44.x86_64",
+          "path": "Packages/l/lame-libs-3.100-21.fc44.x86_64.rpm",
+          "sha256": "02f533c130aabfe13ad20edb935c882b322c6561f9ef39d6370a23f7fd734c68"
+        },
+        {
+          "nevra": "lcms2-0:2.16-7.fc44.x86_64",
+          "path": "Packages/l/lcms2-2.16-7.fc44.x86_64.rpm",
+          "sha256": "8231553d8f429348198ca88cebdc4b37d95ce9437675e5a35a4cddad66f20747"
+        },
+        {
+          "nevra": "libICE-0:1.1.2-4.fc44.x86_64",
+          "path": "Packages/l/libICE-1.1.2-4.fc44.x86_64.rpm",
+          "sha256": "256a6fe32cad068c336f7d82e2b8255a13c965e3cf8376a0d56b61d3e525ad81"
+        },
+        {
+          "nevra": "libSM-0:1.2.5-4.fc44.x86_64",
+          "path": "Packages/l/libSM-1.2.5-4.fc44.x86_64.rpm",
+          "sha256": "34e5587bbefbb6ef3b22ddfaaf09989565d38d0bb03ed7b1e72de1152097845c"
+        },
+        {
+          "nevra": "libXau-0:1.0.12-4.fc44.x86_64",
+          "path": "Packages/l/libXau-1.0.12-4.fc44.x86_64.rpm",
+          "sha256": "2aef79919b82c4d76dd28ef4c81fc86d7d790b4abcbac4e418d541b29cf82fca"
+        },
+        {
+          "nevra": "libXau-devel-0:1.0.12-4.fc44.x86_64",
+          "path": "Packages/l/libXau-devel-1.0.12-4.fc44.x86_64.rpm",
+          "sha256": "11249c81906e43560543971510568186026ea3f91494fd2de883855fe252e779"
+        },
+        {
+          "nevra": "libXcomposite-0:0.4.6-7.fc44.x86_64",
+          "path": "Packages/l/libXcomposite-0.4.6-7.fc44.x86_64.rpm",
+          "sha256": "a323ec28a202d17d0fb57c83e4ddd05f97c97345fcbc478a2fcaf6d122cb8794"
+        },
+        {
+          "nevra": "libXcursor-0:1.2.3-4.fc44.x86_64",
+          "path": "Packages/l/libXcursor-1.2.3-4.fc44.x86_64.rpm",
+          "sha256": "d998a8101f40d7b61ffb28cc5052b195c874b039a9c83a6a0552cdece56ae4f1"
+        },
+        {
+          "nevra": "libXdamage-0:1.1.6-7.fc44.x86_64",
+          "path": "Packages/l/libXdamage-1.1.6-7.fc44.x86_64.rpm",
+          "sha256": "9d9c0dd562f1a2fd8d6d925e9a055e324a3113d32f3f55bda550f2716776dd72"
+        },
+        {
+          "nevra": "libXext-0:1.3.6-5.fc44.x86_64",
+          "path": "Packages/l/libXext-1.3.6-5.fc44.x86_64.rpm",
+          "sha256": "62037a7bb130d6cc6c2d4141d2df83f8acae8c90b918e0bb309691be113d2c0c"
+        },
+        {
+          "nevra": "libXfixes-0:6.0.1-7.fc44.x86_64",
+          "path": "Packages/l/libXfixes-6.0.1-7.fc44.x86_64.rpm",
+          "sha256": "32f0d319c7968cbbcabc79c08c2354716c916f9adaf916b27a085b00e637e48e"
+        },
+        {
+          "nevra": "libXft-0:2.3.8-10.fc44.x86_64",
+          "path": "Packages/l/libXft-2.3.8-10.fc44.x86_64.rpm",
+          "sha256": "a4ac38b27bd9335e72bc9be5a43d3c454c155201f81fd2ec12b97989a2f32cfc"
+        },
+        {
+          "nevra": "libXinerama-0:1.1.5-10.fc44.x86_64",
+          "path": "Packages/l/libXinerama-1.1.5-10.fc44.x86_64.rpm",
+          "sha256": "4d84b8ad9ae72feb00f968209513110c9566b05dc61f189e8ae2766b5d079da1"
+        },
+        {
+          "nevra": "libXrandr-0:1.5.4-7.fc44.x86_64",
+          "path": "Packages/l/libXrandr-1.5.4-7.fc44.x86_64.rpm",
+          "sha256": "b8a0dbcc7c995926f356ae18e6e006ef83e36d4d9c859ac76003bea2ab80860f"
+        },
+        {
+          "nevra": "libXrender-0:0.9.12-4.fc44.x86_64",
+          "path": "Packages/l/libXrender-0.9.12-4.fc44.x86_64.rpm",
+          "sha256": "a536b758cc0144212b75609c9a5e2dda23ec24ca6918a01040ff8bb099e8a623"
+        },
+        {
+          "nevra": "libXtst-0:1.2.5-4.fc44.x86_64",
+          "path": "Packages/l/libXtst-1.2.5-4.fc44.x86_64.rpm",
+          "sha256": "9b1ae705b1ff302a112a41a1f3ec6db5242fdd80857498cb200dc905a254fd45"
+        },
+        {
+          "nevra": "libXv-0:1.0.13-4.fc44.x86_64",
+          "path": "Packages/l/libXv-1.0.13-4.fc44.x86_64.rpm",
+          "sha256": "ecdd8e679c6b9f0a5af026fb9fb5d8e9f364d58718cec8b5153f86070053cdfe"
+        },
+        {
+          "nevra": "libXxf86vm-0:1.1.6-4.fc44.x86_64",
+          "path": "Packages/l/libXxf86vm-1.1.6-4.fc44.x86_64.rpm",
+          "sha256": "734d510ce8b84542631652bbd02544ea4ef647b54b6bd24ce3a27a179b5f7d5c"
+        },
+        {
+          "nevra": "libaribcaption-0:1.1.1-4.fc44.x86_64",
+          "path": "Packages/l/libaribcaption-1.1.1-4.fc44.x86_64.rpm",
+          "sha256": "f3536757c8240c21d08302782f5b5e1f8fa3eb97a3c8bd223d2ca1024526e4e6"
+        },
+        {
+          "nevra": "libassuan-0:2.5.7-5.fc44.x86_64",
+          "path": "Packages/l/libassuan-2.5.7-5.fc44.x86_64.rpm",
+          "sha256": "896bdf9036b526db743f6a4c56619ac1103da0971c707bcd2ab8b9560a7e84b8"
+        },
+        {
+          "nevra": "libb2-0:0.98.1-15.fc44.x86_64",
+          "path": "Packages/l/libb2-0.98.1-15.fc44.x86_64.rpm",
+          "sha256": "00566517f36595c3187a19634bd54359197879ce909431cf73a2c71779962e86"
+        },
+        {
+          "nevra": "libbluray-0:1.4.0-3.fc44.x86_64",
+          "path": "Packages/l/libbluray-1.4.0-3.fc44.x86_64.rpm",
+          "sha256": "6d96a6e30bce6943de76bac0cc8b9ed23de1ffc9d2b269c9a735d21cd893d4ca"
+        },
+        {
+          "nevra": "libbrotli-0:1.2.0-3.fc44.x86_64",
+          "path": "Packages/l/libbrotli-1.2.0-3.fc44.x86_64.rpm",
+          "sha256": "3f678e2c3eadfb559b3f91489cea1118cffe230219366426038a023bb34f5054"
+        },
+        {
+          "nevra": "libcanberra-0:0.30-39.fc44.x86_64",
+          "path": "Packages/l/libcanberra-0.30-39.fc44.x86_64.rpm",
+          "sha256": "e877d28ad617f73b392acac68de3784df1626c7f4b64732a39158a4aeea68dad"
+        },
+        {
+          "nevra": "libcbor-0:0.13.0-2.fc44.x86_64",
+          "path": "Packages/l/libcbor-0.13.0-2.fc44.x86_64.rpm",
+          "sha256": "e5ed0379715086b19c4cf34ba02b5df1543e0648fe8bb1e0b0e7df315b508bc6"
+        },
+        {
+          "nevra": "libchromaprint-0:1.6.0-4.fc44.x86_64",
+          "path": "Packages/l/libchromaprint-1.6.0-4.fc44.x86_64.rpm",
+          "sha256": "4efd9190419a97b1964df80f4359e3db77e47c6d7c405e9ac39969907011d834"
+        },
+        {
+          "nevra": "libcom_err-0:1.47.3-4.fc44.x86_64",
+          "path": "Packages/l/libcom_err-1.47.3-4.fc44.x86_64.rpm",
+          "sha256": "c163f4fce53aa42e032c04299cecf9cc57e69437515a095e667b5a91b7859878"
+        },
+        {
+          "nevra": "libdatrie-0:0.2.14-2.fc44.x86_64",
+          "path": "Packages/l/libdatrie-0.2.14-2.fc44.x86_64.rpm",
+          "sha256": "17ceac9d344c0b9b38551cd4c2b109ae446308f5b7b4ca56d5bc55a10ff58985"
+        },
+        {
+          "nevra": "libdecor-0:0.2.5-2.fc44.x86_64",
+          "path": "Packages/l/libdecor-0.2.5-2.fc44.x86_64.rpm",
+          "sha256": "c73dadc5aeaed8390e09666e911d465eba1a0605acbed46c1a438b44214ddfc4"
+        },
+        {
+          "nevra": "libdvdnav-0:7.0.0-1.fc44.x86_64",
+          "path": "Packages/l/libdvdnav-7.0.0-1.fc44.x86_64.rpm",
+          "sha256": "9c0868fe417ff0243d775e616a2f75fcbaa8c50b944e899c51d21d47c301ef26"
+        },
+        {
+          "nevra": "libdvdread-0:7.0.1-1.fc44.x86_64",
+          "path": "Packages/l/libdvdread-7.0.1-1.fc44.x86_64.rpm",
+          "sha256": "9c0bbc09e385449c163a998f923fb08b771ee71d1997ac5dbfd3a5fcb3c5c94d"
+        },
+        {
+          "nevra": "libeconf-0:0.7.9-3.fc44.x86_64",
+          "path": "Packages/l/libeconf-0.7.9-3.fc44.x86_64.rpm",
+          "sha256": "f8212f510faaa3d6dca692478a686f44f0c27bdad9741e83e3940c17a2d4eb69"
+        },
+        {
+          "nevra": "libepoxy-0:1.5.10-12.fc44.x86_64",
+          "path": "Packages/l/libepoxy-1.5.10-12.fc44.x86_64.rpm",
+          "sha256": "e266d086c3d10abd6da2e6586c937eb429bb0fd19e90d4e8dd08aa6f938ab924"
+        },
+        {
+          "nevra": "libffi-0:3.5.2-2.fc44.x86_64",
+          "path": "Packages/l/libffi-3.5.2-2.fc44.x86_64.rpm",
+          "sha256": "a7dae96d30d007140c7dab605df40e55f90ef16f04392dd8ded32fa230c10dd6"
+        },
+        {
+          "nevra": "libffi-devel-0:3.5.2-2.fc44.x86_64",
+          "path": "Packages/l/libffi-devel-3.5.2-2.fc44.x86_64.rpm",
+          "sha256": "89310f3daf6bdd8dbcc081891a653a4bf54d115e5614020fa761f56f84158911"
+        },
+        {
+          "nevra": "libfido2-0:1.16.0-5.fc44.x86_64",
+          "path": "Packages/l/libfido2-1.16.0-5.fc44.x86_64.rpm",
+          "sha256": "e71e9bb6308be5a693c69f4fac0460e58b5ed58b8fe164e162a6d959a9085f36"
+        },
+        {
+          "nevra": "libglvnd-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "212df4a80c24320c53477d6d4a1fae424c58bbe475761d04a74c648c350a5fdc"
+        },
+        {
+          "nevra": "libglvnd-core-devel-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-core-devel-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "b6d0b8ad1908db9f17aa1815ea4f3bee7737a10e1235cb9dc324d9a135930d06"
+        },
+        {
+          "nevra": "libglvnd-devel-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-devel-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "825f800af6106893ee976a860b7ecadd9655ada9029747053f8bbdf98cefee4f"
+        },
+        {
+          "nevra": "libglvnd-egl-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-egl-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "30286b1e16ab7830a0d9e34dc82fcc0234d3cfc7dbb937940bb3fc7b38b84272"
+        },
+        {
+          "nevra": "libglvnd-gles-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-gles-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "c23493344e44f01306d96e9639eff3b168af74b75262b2ad16b11d666b7b6fbd"
+        },
+        {
+          "nevra": "libglvnd-glx-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-glx-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "f8f04675d76927068b35bfa1af7d5a332bd69498909206efb60a699dbd232d10"
+        },
+        {
+          "nevra": "libglvnd-opengl-1:1.7.0-9.fc44.x86_64",
+          "path": "Packages/l/libglvnd-opengl-1.7.0-9.fc44.x86_64.rpm",
+          "sha256": "9ff4a8342698a36cf9bf8ba2d9a7cea3f2dd957180b133805b1b350e12a0be46"
+        },
+        {
+          "nevra": "libgpg-error-0:1.58-2.fc44.x86_64",
+          "path": "Packages/l/libgpg-error-1.58-2.fc44.x86_64.rpm",
+          "sha256": "15d74f36f267a823f578697f5cac1ea5c7ebf0a765a6768d039f9b333447007d"
+        },
+        {
+          "nevra": "libgudev-0:238-9.fc44.x86_64",
+          "path": "Packages/l/libgudev-238-9.fc44.x86_64.rpm",
+          "sha256": "6666748a718546d220f6e6c2dc4ce3dbc9187290a73d8cf7a5b3adaa90c80d07"
+        },
+        {
+          "nevra": "libgusb-0:0.4.9-5.fc44.x86_64",
+          "path": "Packages/l/libgusb-0.4.9-5.fc44.x86_64.rpm",
+          "sha256": "14d94cd79d0f52400e8eeaae62b37662f84df934ff9f5240d65433331e351be6"
+        },
+        {
+          "nevra": "libidn2-0:2.3.8-3.fc44.x86_64",
+          "path": "Packages/l/libidn2-2.3.8-3.fc44.x86_64.rpm",
+          "sha256": "430ed4991a4364fe88bc220c1771c768b8ef4ebcc9ad6af3afcfea8ab609fa18"
+        },
+        {
+          "nevra": "libjpeg-turbo-0:3.1.3-1.fc44.x86_64",
+          "path": "Packages/l/libjpeg-turbo-3.1.3-1.fc44.x86_64.rpm",
+          "sha256": "e65c9eac2a534c5eed152451bd092d4f2ed491e739bd00dc6f03c66b3e996171"
+        },
+        {
+          "nevra": "libkcapi-0:1.5.0-7.fc44.x86_64",
+          "path": "Packages/l/libkcapi-1.5.0-7.fc44.x86_64.rpm",
+          "sha256": "da899d4a10f249b514ef56139b5a6a4948279e4171005d580458c519cac692a9"
+        },
+        {
+          "nevra": "libkcapi-hasher-0:1.5.0-7.fc44.x86_64",
+          "path": "Packages/l/libkcapi-hasher-1.5.0-7.fc44.x86_64.rpm",
+          "sha256": "e10e5cc6698d86772769844543dec160ddb657b777abc26751b38057d20dd7f3"
+        },
+        {
+          "nevra": "libkcapi-hmaccalc-0:1.5.0-7.fc44.x86_64",
+          "path": "Packages/l/libkcapi-hmaccalc-1.5.0-7.fc44.x86_64.rpm",
+          "sha256": "d84f2a17a995c83903df9d5a052ff8be5c539676fc8a6a268e0e5e136955f660"
+        },
+        {
+          "nevra": "libksba-0:1.6.7-5.fc44.x86_64",
+          "path": "Packages/l/libksba-1.6.7-5.fc44.x86_64.rpm",
+          "sha256": "c356d5f0dc8a24022929705ff369fa362efdc5772a7a2d3951195d8b0f91ed72"
+        },
+        {
+          "nevra": "liblc3-0:1.1.3-7.fc44.x86_64",
+          "path": "Packages/l/liblc3-1.1.3-7.fc44.x86_64.rpm",
+          "sha256": "98f9ceab31418394a5e27c6cc5bd492ffed0f9e521545be3aeb56da4b37c74ed"
+        },
+        {
+          "nevra": "liblerc-0:4.0.0-10.fc44.x86_64",
+          "path": "Packages/l/liblerc-4.0.0-10.fc44.x86_64.rpm",
+          "sha256": "eabd33ee5b55d9d2659dc206d616553533be19dec01f463681ad38dc0dab52a8"
+        },
+        {
+          "nevra": "libmodplug-1:0.8.9.0-29.fc44.x86_64",
+          "path": "Packages/l/libmodplug-0.8.9.0-29.fc44.x86_64.rpm",
+          "sha256": "ea37acdcc55c34e7096dbf801d420fb9fb3231400d7bb16c5265f69936c5c464"
+        },
+        {
+          "nevra": "libndp-0:1.9-5.fc44.x86_64",
+          "path": "Packages/l/libndp-1.9-5.fc44.x86_64.rpm",
+          "sha256": "0ed643a11f18c65ceb742d6a5ee2123a6cc7e179597865caed0bb0e4b51baa33"
+        },
+        {
+          "nevra": "libnice-0:0.1.23-2.fc44.x86_64",
+          "path": "Packages/l/libnice-0.1.23-2.fc44.x86_64.rpm",
+          "sha256": "f67855f19894a96da7d119fbdd7f608e490f21e62157d7038a34f8209fd71161"
+        },
+        {
+          "nevra": "libnsl2-0:2.0.1-5.fc44.x86_64",
+          "path": "Packages/l/libnsl2-2.0.1-5.fc44.x86_64.rpm",
+          "sha256": "23373b28ffac80ed35b4d39f0e7133c05b9cf72b7e45811ecda1decd3489ad1a"
+        },
+        {
+          "nevra": "libogg-2:1.3.6-2.fc44.x86_64",
+          "path": "Packages/l/libogg-1.3.6-2.fc44.x86_64.rpm",
+          "sha256": "b2ee2e92d8685b273c489bc61e9caf5f2c664efafd87ed431f213e3755dfcd98"
+        },
+        {
+          "nevra": "libopenjph-0:0.25.3-3.fc44.x86_64",
+          "path": "Packages/l/libopenjph-0.25.3-3.fc44.x86_64.rpm",
+          "sha256": "f910b8f19ddb3759bc840d149418cd4b1863b187db7a983455fc7d1b292a6a00"
+        },
+        {
+          "nevra": "libpciaccess-0:0.16-17.fc44.x86_64",
+          "path": "Packages/l/libpciaccess-0.16-17.fc44.x86_64.rpm",
+          "sha256": "6883cf376da3dd09ff28923c74f7647c02e14996dddd64e49ae39bcd8085e69d"
+        },
+        {
+          "nevra": "libpkgconf-0:2.5.1-1.fc44.x86_64",
+          "path": "Packages/l/libpkgconf-2.5.1-1.fc44.x86_64.rpm",
+          "sha256": "b59040138169f46c60b79230941ffc0dbce15b9e897bd46d1e83361a393400b8"
+        },
+        {
+          "nevra": "libpq-0:18.0-4.fc44.x86_64",
+          "path": "Packages/l/libpq-18.0-4.fc44.x86_64.rpm",
+          "sha256": "8c034bd2d2139cfe0cb674c43aaf59cc94035e667dc99f463814d2ef123886d2"
+        },
+        {
+          "nevra": "libproxy-0:0.5.12-2.fc44.x86_64",
+          "path": "Packages/l/libproxy-0.5.12-2.fc44.x86_64.rpm",
+          "sha256": "ee7d9b409a2bf32f58881c1a787bac0ba903a7d5437cb9b646d503f9f8fd440b"
+        },
+        {
+          "nevra": "libpsl-0:0.21.5-7.fc44.x86_64",
+          "path": "Packages/l/libpsl-0.21.5-7.fc44.x86_64.rpm",
+          "sha256": "9ea7b4480a43788ec32e0ba44e7a8bc263265fece99f0173b68a469d55374a50"
+        },
+        {
+          "nevra": "libpwquality-0:1.4.5-15.fc44.x86_64",
+          "path": "Packages/l/libpwquality-1.4.5-15.fc44.x86_64.rpm",
+          "sha256": "d388f6f45ddc2f20f35be561117392a9a5bf4701bc059a6fc2ac56532d16f1a7"
+        },
+        {
+          "nevra": "librist-0:0.2.11-1.fc44.x86_64",
+          "path": "Packages/l/librist-0.2.11-1.fc44.x86_64.rpm",
+          "sha256": "ff18b0619f06f1d71674de3b4ec47d1ff22642da7390eb5d1a4bf3511cc79beb"
+        },
+        {
+          "nevra": "libshaderc-0:2026.1-1.fc44.x86_64",
+          "path": "Packages/l/libshaderc-2026.1-1.fc44.x86_64.rpm",
+          "sha256": "c7f03ba93ef58a98e4bd54494292d097f142182cafd9fe08475de393a3a4e9c5"
+        },
+        {
+          "nevra": "libsndfile-0:1.2.2-11.fc44.x86_64",
+          "path": "Packages/l/libsndfile-1.2.2-11.fc44.x86_64.rpm",
+          "sha256": "f7bb2f0abb0a15687ce5e4c972bc2394405457021e0118ef6d43ba2fb97d626c"
+        },
+        {
+          "nevra": "libstemmer-0:3.0.1-11.fc44.x86_64",
+          "path": "Packages/l/libstemmer-3.0.1-11.fc44.x86_64.rpm",
+          "sha256": "df3bafb6551ea650dbe3a571bee8f15f280ba3601ef048edab0140fdc00d0806"
+        },
+        {
+          "nevra": "libtalloc-0:2.4.4-1.fc44.x86_64",
+          "path": "Packages/l/libtalloc-2.4.4-1.fc44.x86_64.rpm",
+          "sha256": "f85faec803d236600ae7181bd0d0fa64ee8408fef267792095cb87836c581538"
+        },
+        {
+          "nevra": "libtasn1-0:4.21.0-1.fc44.x86_64",
+          "path": "Packages/l/libtasn1-4.21.0-1.fc44.x86_64.rpm",
+          "sha256": "32806a98942dc5492838b4642cb830ce20f478609733326fb9388539930d6596"
+        },
+        {
+          "nevra": "libtdb-0:1.4.15-1.fc44.x86_64",
+          "path": "Packages/l/libtdb-1.4.15-1.fc44.x86_64.rpm",
+          "sha256": "99a8984721421a1e85b522bce32a3e22c7927fce505584ad21d8b5f8885ec2d2"
+        },
+        {
+          "nevra": "libtevent-0:0.17.1-4.fc44.x86_64",
+          "path": "Packages/l/libtevent-0.17.1-4.fc44.x86_64.rpm",
+          "sha256": "36fbb72b41dfe7a46123f99578f2b53a188e7a501a10a3d7e64dc698648bc717"
+        },
+        {
+          "nevra": "libthai-0:0.1.30-2.fc44.x86_64",
+          "path": "Packages/l/libthai-0.1.30-2.fc44.x86_64.rpm",
+          "sha256": "b5566d9c8d6054820a305d3b12333e1ee2532b15ec859017308d977c6b192789"
+        },
+        {
+          "nevra": "libtheora-1:1.1.1-41.fc44.x86_64",
+          "path": "Packages/l/libtheora-1.1.1-41.fc44.x86_64.rpm",
+          "sha256": "3365db93d654e2ee1b4c0cd86e84f6fce9c27bf8520bc47f50ea1e746334e8e2"
+        },
+        {
+          "nevra": "libtommath-0:1.3.1~rc1-7.fc44.x86_64",
+          "path": "Packages/l/libtommath-1.3.1~rc1-7.fc44.x86_64.rpm",
+          "sha256": "bfc715fa89924283149ae10ec13c60ed486eedf2fa08c2bbe5e503de4a0be803"
+        },
+        {
+          "nevra": "libtool-ltdl-0:2.5.4-10.fc44.x86_64",
+          "path": "Packages/l/libtool-ltdl-2.5.4-10.fc44.x86_64.rpm",
+          "sha256": "7b9bea37da808d074b26072c9f13612f6997a646e84b8b9b81ca147452d33a88"
+        },
+        {
+          "nevra": "libudfread-0:1.2.0-3.fc44.x86_64",
+          "path": "Packages/l/libudfread-1.2.0-3.fc44.x86_64.rpm",
+          "sha256": "721ff274be4053db1f98866be7c03f93b517c149f6515fb54f9839b075f4e655"
+        },
+        {
+          "nevra": "libunistring-0:1.1-11.fc44.x86_64",
+          "path": "Packages/l/libunistring-1.1-11.fc44.x86_64.rpm",
+          "sha256": "578749cc0f7ac197be5434e65c42f9e88112e3561be731edd52c820cdcacfae5"
+        },
+        {
+          "nevra": "libva-0:2.23.0-3.fc44.x86_64",
+          "path": "Packages/l/libva-2.23.0-3.fc44.x86_64.rpm",
+          "sha256": "d2fc6a290e4f5e142fb4506ed2e188f615c8eb3b407dabbf4159b774edf20402"
+        },
+        {
+          "nevra": "libvdpau-0:1.5-11.fc44.x86_64",
+          "path": "Packages/l/libvdpau-1.5-11.fc44.x86_64.rpm",
+          "sha256": "5955332827a62021cfcfe2cedaa850e4a1d978db790f0e5ebdc6c1b26c24c21f"
+        },
+        {
+          "nevra": "libverto-0:0.3.2-12.fc44.x86_64",
+          "path": "Packages/l/libverto-0.3.2-12.fc44.x86_64.rpm",
+          "sha256": "3e2ef69df14272b2f666be05312242cb65c0e385bd813007362204b5e19c7cb0"
+        },
+        {
+          "nevra": "libvisual-1:0.4.2-4.fc44.x86_64",
+          "path": "Packages/l/libvisual-0.4.2-4.fc44.x86_64.rpm",
+          "sha256": "0ec48de19a467d48ea369fc4393c3690de86ff68e927e21d1e36ff27f016749f"
+        },
+        {
+          "nevra": "libvmaf-0:3.0.0-5.fc44.x86_64",
+          "path": "Packages/l/libvmaf-3.0.0-5.fc44.x86_64.rpm",
+          "sha256": "5e419f4054c85024f8a77f1689119e5038a929f4c9d64e7ce692c890127b7a85"
+        },
+        {
+          "nevra": "libvorbis-1:1.3.7-14.fc44.x86_64",
+          "path": "Packages/l/libvorbis-1.3.7-14.fc44.x86_64.rpm",
+          "sha256": "f003acd249ad988a60ecc5458895f6e444fe13f98108969d82598339d1942f85"
+        },
+        {
+          "nevra": "libvpx-0:1.15.0-5.fc44.x86_64",
+          "path": "Packages/l/libvpx-1.15.0-5.fc44.x86_64.rpm",
+          "sha256": "d57a8be46724d00d1a798706e621b7a0934bc7ddcd58dff815b3bf705d727ec1"
+        },
+        {
+          "nevra": "libwebp-0:1.6.0-3.fc44.x86_64",
+          "path": "Packages/l/libwebp-1.6.0-3.fc44.x86_64.rpm",
+          "sha256": "36d3aec2908e8dbe5a8facfb841d1fe3c3730f52a06be144b6b3a0f3d49c83b0"
+        },
+        {
+          "nevra": "libxcb-0:1.17.0-7.fc44.x86_64",
+          "path": "Packages/l/libxcb-1.17.0-7.fc44.x86_64.rpm",
+          "sha256": "f997c30c7203d9c150f7c4982dd4d4c4c94b3e2cdfd5aec7ed3afa55370f0162"
+        },
+        {
+          "nevra": "libxcb-devel-0:1.17.0-7.fc44.x86_64",
+          "path": "Packages/l/libxcb-devel-1.17.0-7.fc44.x86_64.rpm",
+          "sha256": "ac6047660c8ef9afe4deae57ccebb928d4f9852d507376e51406d65342209ae2"
+        },
+        {
+          "nevra": "libxcrypt-0:4.5.2-3.fc44.x86_64",
+          "path": "Packages/l/libxcrypt-4.5.2-3.fc44.x86_64.rpm",
+          "sha256": "4be1ebfa6079b11d5b4e5119c702df69153788cef8c5b71600482617bdc4ab25"
+        },
+        {
+          "nevra": "libxcrypt-devel-0:4.5.2-3.fc44.x86_64",
+          "path": "Packages/l/libxcrypt-devel-4.5.2-3.fc44.x86_64.rpm",
+          "sha256": "259c773176023af44d474cec4d2d7d02f81f62029a893ea5e5fa57861cd3bf74"
+        },
+        {
+          "nevra": "libxkbcommon-0:1.13.1-2.fc44.x86_64",
+          "path": "Packages/l/libxkbcommon-1.13.1-2.fc44.x86_64.rpm",
+          "sha256": "9c24e901d5daffbd0b78c06af4e63a00fcfec104fea05917314d781d0d439677"
+        },
+        {
+          "nevra": "libxkbcommon-devel-0:1.13.1-2.fc44.x86_64",
+          "path": "Packages/l/libxkbcommon-devel-1.13.1-2.fc44.x86_64.rpm",
+          "sha256": "94e265b4470543cca5e3728fe8ca06beb28dc73bbf1b02266bad35d8db1bce02"
+        },
+        {
+          "nevra": "libxkbcommon-x11-0:1.13.1-2.fc44.x86_64",
+          "path": "Packages/l/libxkbcommon-x11-1.13.1-2.fc44.x86_64.rpm",
+          "sha256": "e533b631e4e99b12f3a4a34c5b1ffbdee10a2a8ecb8d73157b6d05da1bbe9921"
+        },
+        {
+          "nevra": "libxml2-0:2.12.10-6.fc44.x86_64",
+          "path": "Packages/l/libxml2-2.12.10-6.fc44.x86_64.rpm",
+          "sha256": "8df2fb3b424781f56306909f83e9cedd64b68eaa14dc8d52e050b79867d9714d"
+        },
+        {
+          "nevra": "libxml2-devel-0:2.12.10-6.fc44.x86_64",
+          "path": "Packages/l/libxml2-devel-2.12.10-6.fc44.x86_64.rpm",
+          "sha256": "dc79bbb44d797ae8908c695e2fa57d8e9e8d1825723146e5b82f439781edbb3b"
+        },
+        {
+          "nevra": "libxshmfence-0:1.3.2-8.fc44.x86_64",
+          "path": "Packages/l/libxshmfence-1.3.2-8.fc44.x86_64.rpm",
+          "sha256": "c25f27024419607d84725563bdde157887dd8c90b767beaf10745826715ccc5e"
+        },
+        {
+          "nevra": "libxslt-0:1.1.43-6.fc44.x86_64",
+          "path": "Packages/l/libxslt-1.1.43-6.fc44.x86_64.rpm",
+          "sha256": "bf3abcd45083190ea0833d3332526712dee545a7e0d8898307efe5f623ed007f"
+        },
+        {
+          "nevra": "libzstd-0:1.5.7-5.fc44.x86_64",
+          "path": "Packages/l/libzstd-1.5.7-5.fc44.x86_64.rpm",
+          "sha256": "af98832cf1d93eabb442d18520bad10f03f4278a99d54c5d071b2903f6f50fac"
+        },
+        {
+          "nevra": "lm_sensors-libs-0:3.6.0-24.fc44.x86_64",
+          "path": "Packages/l/lm_sensors-libs-3.6.0-24.fc44.x86_64.rpm",
+          "sha256": "8baa6be6981022632fad26a741e598c7e89c864494c676a3b4a9433f7899e4bc"
+        },
+        {
+          "nevra": "lmdb-libs-0:0.9.34-2.fc44.x86_64",
+          "path": "Packages/l/lmdb-libs-0.9.34-2.fc44.x86_64.rpm",
+          "sha256": "506bface042bb5caac4c343147ea4b1275b694ed45c233a5a0728b0a2ff1c21d"
+        },
+        {
+          "nevra": "lpcnetfreedv-0:0.5-10.fc44.x86_64",
+          "path": "Packages/l/lpcnetfreedv-0.5-10.fc44.x86_64.rpm",
+          "sha256": "4800044b4f400aec05c96320ca161bcd07ba086a707d35a8847701bf9556ee2b"
+        },
+        {
+          "nevra": "lua-libs-0:5.4.8-5.fc44.x86_64",
+          "path": "Packages/l/lua-libs-5.4.8-5.fc44.x86_64.rpm",
+          "sha256": "f0e198863835e3e159457fe8de7f47e60896277aaf380fdd3363875a0c985586"
+        },
+        {
+          "nevra": "lz4-libs-0:1.10.0-4.fc44.x86_64",
+          "path": "Packages/l/lz4-libs-1.10.0-4.fc44.x86_64.rpm",
+          "sha256": "3e5697a9804a0c9fe1f1cd2b5a9c99e474bc6c6e2b543a8b1794f2649c013077"
+        },
+        {
+          "nevra": "lzo-0:2.10-16.fc44.x86_64",
+          "path": "Packages/l/lzo-2.10-16.fc44.x86_64.rpm",
+          "sha256": "60c3891e156fee41e3ac6ecfd31a14e9a17f3cc0d06763d4439f54a7d7c7c41e"
+        },
+        {
+          "nevra": "make-1:4.4.1-12.fc44.x86_64",
+          "path": "Packages/m/make-4.4.1-12.fc44.x86_64.rpm",
+          "sha256": "c8fe074463f4292219769505d27456e38a389074da759c058568f6fe56693cc3"
+        },
+        {
+          "nevra": "mokutil-2:0.7.2-3.fc44.x86_64",
+          "path": "Packages/m/mokutil-0.7.2-3.fc44.x86_64.rpm",
+          "sha256": "bf78719f9fea98f6c344bdaaefbb247c6417032b8a0fb1a2574f39f8f3d54e81"
+        },
+        {
+          "nevra": "mpdecimal-0:4.0.1-3.fc44.x86_64",
+          "path": "Packages/m/mpdecimal-4.0.1-3.fc44.x86_64.rpm",
+          "sha256": "f9495b4a3f05e370f6ad6fea7632c83473d94609fe9f8d508a8696bcecf5ab6f"
+        },
+        {
+          "nevra": "mpfr-0:4.2.2-3.fc44.x86_64",
+          "path": "Packages/m/mpfr-4.2.2-3.fc44.x86_64.rpm",
+          "sha256": "18846facd61a5858ac6703bc9f49d55b515a92f183d0e12dda295c0efadb91d4"
+        },
+        {
+          "nevra": "mpg123-libs-0:1.32.10-3.fc44.x86_64",
+          "path": "Packages/m/mpg123-libs-1.32.10-3.fc44.x86_64.rpm",
+          "sha256": "dccdc40cf359eb52d6b4055378f8f967be857f304b3dc906d455f8cd3e29bc0f"
+        },
+        {
+          "nevra": "mtdev-0:1.1.6-12.fc44.x86_64",
+          "path": "Packages/m/mtdev-1.1.6-12.fc44.x86_64.rpm",
+          "sha256": "03a269b7e899a2a57b51aa2328268a82ceec8e456db62bf304d5ab1be56055e6"
+        },
+        {
+          "nevra": "ncurses-base-0:6.6-1.fc44.noarch",
+          "path": "Packages/n/ncurses-base-6.6-1.fc44.noarch.rpm",
+          "sha256": "19c6053ad3e76d47f330da92e5c97e2b9a3617b4ddd8fa2139d9066092cfc181"
+        },
+        {
+          "nevra": "ncurses-libs-0:6.6-1.fc44.x86_64",
+          "path": "Packages/n/ncurses-libs-6.6-1.fc44.x86_64.rpm",
+          "sha256": "d9afd13714bac08fdfbe9b9f5bc5d298497fc1c3fee31fb2e1274ed95ab3d96a"
+        },
+        {
+          "nevra": "nettle-0:3.10.1-3.fc44.x86_64",
+          "path": "Packages/n/nettle-3.10.1-3.fc44.x86_64.rpm",
+          "sha256": "36d7fea745c4d0b17f6dbee48c8f6fe3ca444984aee8ecab863dffa5b5042114"
+        },
+        {
+          "nevra": "noopenh264-0:2.6.0-4.fc44.x86_64",
+          "path": "Packages/n/noopenh264-2.6.0-4.fc44.x86_64.rpm",
+          "sha256": "5083aeb492c4f84d6de3bf2cf9634987ffe2f40fae2beb759b4446c0c0f05cd4"
+        },
+        {
+          "nevra": "npth-0:1.8-4.fc44.x86_64",
+          "path": "Packages/n/npth-1.8-4.fc44.x86_64.rpm",
+          "sha256": "afccdcac1330d48e0be3755f5b8b9d335a0fdc8a82c5215819e14e2f7878be17"
+        },
+        {
+          "nevra": "openapv-libs-0:0.2.1.2-1.fc44.x86_64",
+          "path": "Packages/o/openapv-libs-0.2.1.2-1.fc44.x86_64.rpm",
+          "sha256": "5a7088cdd9afec1125fc37aa9038c5a29f960b22a4627855abac8a43b97dbb15"
+        },
+        {
+          "nevra": "opencore-amr-0:0.1.6-10.fc44.x86_64",
+          "path": "Packages/o/opencore-amr-0.1.6-10.fc44.x86_64.rpm",
+          "sha256": "81a60260e95fe1360e8451d881bd5471815bad1a38a20a746b701be885c9771d"
+        },
+        {
+          "nevra": "openjpeg-0:2.5.4-3.fc44.x86_64",
+          "path": "Packages/o/openjpeg-2.5.4-3.fc44.x86_64.rpm",
+          "sha256": "601584fe3f69567024dfd0dc3c80c35936121f62de828c2e038e13f04bb600bc"
+        },
+        {
+          "nevra": "openpgm-0:5.3.128-6.fc44.x86_64",
+          "path": "Packages/o/openpgm-5.3.128-6.fc44.x86_64.rpm",
+          "sha256": "b2d4c2d378a26407599f7f44a7d7dabf5340806000fe87021fa07b26c72ff085"
+        },
+        {
+          "nevra": "opus-0:1.6-2.fc44.x86_64",
+          "path": "Packages/o/opus-1.6-2.fc44.x86_64.rpm",
+          "sha256": "f5ed58a24530fae234adad01289e3019a08238c51a012e3b0781ca1518216d22"
+        },
+        {
+          "nevra": "orc-0:0.4.41-3.fc44.x86_64",
+          "path": "Packages/o/orc-0.4.41-3.fc44.x86_64.rpm",
+          "sha256": "0ffa36584a12ce23d6623290ef85a95868d315dbd676444ee5919dfe69e753dc"
+        },
+        {
+          "nevra": "os-prober-0:1.81-11.fc44.x86_64",
+          "path": "Packages/o/os-prober-1.81-11.fc44.x86_64.rpm",
+          "sha256": "68f0efad2ff1baf3aa66f6643c6057a1ce99c877c0c459aa8311457a09a00835"
+        },
+        {
+          "nevra": "pango-0:1.57.1-1.fc44.x86_64",
+          "path": "Packages/p/pango-1.57.1-1.fc44.x86_64.rpm",
+          "sha256": "6df0a2b9e60cf72364989eaede54b8535208ffeb4a3666ba848f415a830a6b5b"
+        },
+        {
+          "nevra": "pcre2-0:10.47-1.fc44.1.x86_64",
+          "path": "Packages/p/pcre2-10.47-1.fc44.1.x86_64.rpm",
+          "sha256": "9e3498c301b011ed0f517090e45798fbd3063a10b46468f2f8359738975f8702"
+        },
+        {
+          "nevra": "pcre2-syntax-0:10.47-1.fc44.1.noarch",
+          "path": "Packages/p/pcre2-syntax-10.47-1.fc44.1.noarch.rpm",
+          "sha256": "f764ad48aff82dc0805ce5db071e91c805dea73dcc9696f8686583b1a2b19c16"
+        },
+        {
+          "nevra": "pcre2-utf16-0:10.47-1.fc44.1.x86_64",
+          "path": "Packages/p/pcre2-utf16-10.47-1.fc44.1.x86_64.rpm",
+          "sha256": "a75c0f09747031cdf69d6fbab9e7e5ed1c3793d0ac79065f7cf87adb58c3e525"
+        },
+        {
+          "nevra": "pixman-0:0.46.2-3.fc44.x86_64",
+          "path": "Packages/p/pixman-0.46.2-3.fc44.x86_64.rpm",
+          "sha256": "a2647f765cbea1cee0a0472223efd7538676e9272b5e9725dd3e37d44e0d81c6"
+        },
+        {
+          "nevra": "pkgconf-0:2.5.1-1.fc44.x86_64",
+          "path": "Packages/p/pkgconf-2.5.1-1.fc44.x86_64.rpm",
+          "sha256": "ee3f9558c65ca0a92de766ce54e218be780e703f8d2b1353ebbbff762f067d6e"
+        },
+        {
+          "nevra": "pkgconf-m4-0:2.5.1-1.fc44.noarch",
+          "path": "Packages/p/pkgconf-m4-2.5.1-1.fc44.noarch.rpm",
+          "sha256": "5b45fb58dec26385b34f937b2917608abd66d531eb7d78a878e8ed426c65eff5"
+        },
+        {
+          "nevra": "pkgconf-pkg-config-0:2.5.1-1.fc44.x86_64",
+          "path": "Packages/p/pkgconf-pkg-config-2.5.1-1.fc44.x86_64.rpm",
+          "sha256": "da2ce9b6c5e9fac1da7e418be923ff2bbd202180e4812d7b91f118fcd549ede5"
+        },
+        {
+          "nevra": "polkit-0:127-2.fc44.2.x86_64",
+          "path": "Packages/p/polkit-127-2.fc44.2.x86_64.rpm",
+          "sha256": "0a54ed12ad27bb4a0341b07d3dc95d41cd0bdd0ee9ea1f8c4ab0e9e78a43f291"
+        },
+        {
+          "nevra": "polkit-libs-0:127-2.fc44.2.x86_64",
+          "path": "Packages/p/polkit-libs-127-2.fc44.2.x86_64.rpm",
+          "sha256": "748412047744be5216ffd7a92684edddea688b5ec1123c08de5f1f3684c719d7"
+        },
+        {
+          "nevra": "poly2tri-0:0.0^20130501hg26242d0aa7b8-7.fc44.x86_64",
+          "path": "Packages/p/poly2tri-0.0^20130501hg26242d0aa7b8-7.fc44.x86_64.rpm",
+          "sha256": "d3439ed9f9b6b2cd8d053d86ef4036ce8be5068a1cf58b68ba42fdd94fe77206"
+        },
+        {
+          "nevra": "poppler-0:26.01.0-3.fc44.x86_64",
+          "path": "Packages/p/poppler-26.01.0-3.fc44.x86_64.rpm",
+          "sha256": "4a7de5b6cd1d6254a40922064d98f7383e8963ba94c7ae0a1f09d5af2b715278"
+        },
+        {
+          "nevra": "poppler-data-0:0.4.11-11.fc44.noarch",
+          "path": "Packages/p/poppler-data-0.4.11-11.fc44.noarch.rpm",
+          "sha256": "91b1ad27888f9aa52d4a8b89c628a3ac1e1a8067572966cac5644c0c7cd05264"
+        },
+        {
+          "nevra": "poppler-qt6-0:26.01.0-3.fc44.x86_64",
+          "path": "Packages/p/poppler-qt6-26.01.0-3.fc44.x86_64.rpm",
+          "sha256": "7da58750522784f0fd4fca60063b65cd2ea0dfd9ee75d6f766c5f35cdbdea19b"
+        },
+        {
+          "nevra": "popt-0:1.19-10.fc44.x86_64",
+          "path": "Packages/p/popt-1.19-10.fc44.x86_64.rpm",
+          "sha256": "95d460bfdc12f762ead084ae00f1686ae8bb22ebeed86c097db8a80dd3cf270d"
+        },
+        {
+          "nevra": "procps-ng-0:4.0.6-1.fc44.x86_64",
+          "path": "Packages/p/procps-ng-4.0.6-1.fc44.x86_64.rpm",
+          "sha256": "72336f2e3930ffb779fe205b461bcf5d0debb38bf31d1ee40ec85f27da647017"
+        },
+        {
+          "nevra": "publicsuffix-list-dafsa-0:20260116-1.fc44.noarch",
+          "path": "Packages/p/publicsuffix-list-dafsa-20260116-1.fc44.noarch.rpm",
+          "sha256": "90884464488a98f478d93c76b46e48400de7b2fdb0188ec61dc614def78c1f8b"
+        },
+        {
+          "nevra": "pulseaudio-libs-0:17.0-9.fc44.x86_64",
+          "path": "Packages/p/pulseaudio-libs-17.0-9.fc44.x86_64.rpm",
+          "sha256": "a0cb8816a5694ee5e50e23c8f1233fc9c3a683b137d6c2f0fdb37309392524b4"
+        },
+        {
+          "nevra": "qca-qt6-0:2.3.10-4.fc44.x86_64",
+          "path": "Packages/q/qca-qt6-2.3.10-4.fc44.x86_64.rpm",
+          "sha256": "2e585909b6a10095062bdb7951ea43ced1b1cf1d258faa6c550f8f46a1a0f7de"
+        },
+        {
+          "nevra": "qca-qt6-ossl-0:2.3.10-4.fc44.x86_64",
+          "path": "Packages/q/qca-qt6-ossl-2.3.10-4.fc44.x86_64.rpm",
+          "sha256": "ec27a4d2eaedb9f3b125f39b601cd409114657049d2e7b03f74e3d23ff9ba242"
+        },
+        {
+          "nevra": "rav1e-libs-0:0.8.1-3.fc44.x86_64",
+          "path": "Packages/r/rav1e-libs-0.8.1-3.fc44.x86_64.rpm",
+          "sha256": "14ce90b91a9631b42f6034b6d8c7506502adbfa852391a1682b5055d3195747c"
+        },
+        {
+          "nevra": "readline-0:8.3-4.fc44.x86_64",
+          "path": "Packages/r/readline-8.3-4.fc44.x86_64.rpm",
+          "sha256": "d1f99a29cb7d03781bdf69ae8dcc7aebe7fe45205a36f3756bc67bbe26609608"
+        },
+        {
+          "nevra": "rhash-0:1.4.5-4.fc44.x86_64",
+          "path": "Packages/r/rhash-1.4.5-4.fc44.x86_64.rpm",
+          "sha256": "a16ce66a96fdae2861b17af68b5063f67221b62c66b48b195b0604c20af76f9a"
+        },
+        {
+          "nevra": "sed-0:4.9-7.fc44.x86_64",
+          "path": "Packages/s/sed-4.9-7.fc44.x86_64.rpm",
+          "sha256": "f1cf741fb40f3a911f32ad0161c689c4b9811a604599fc41f33c867c775cd4d1"
+        },
+        {
+          "nevra": "setup-0:2.15.0-28.fc44.noarch",
+          "path": "Packages/s/setup-2.15.0-28.fc44.noarch.rpm",
+          "sha256": "55d58325996df10b4be2f1a9b963dbec3cea3099e43f9f4295eea6e8adfaf7b8"
+        },
+        {
+          "nevra": "sgml-common-0:0.6.3-68.fc44.noarch",
+          "path": "Packages/s/sgml-common-0.6.3-68.fc44.noarch.rpm",
+          "sha256": "3693bf4245754c217488ab5f4ef0d1d321c8f61c9c9fd91402e51fcbbb4d3188"
+        },
+        {
+          "nevra": "shared-mime-info-0:2.4-3.fc44.x86_64",
+          "path": "Packages/s/shared-mime-info-2.4-3.fc44.x86_64.rpm",
+          "sha256": "4a70f4a268e8902ef7e33aed9e1b4d64afec8e7390114aa8a20b883ad07aa8dd"
+        },
+        {
+          "nevra": "snappy-0:1.2.2-4.fc44.x86_64",
+          "path": "Packages/s/snappy-1.2.2-4.fc44.x86_64.rpm",
+          "sha256": "d184204061e5b218328dfcc298b6d7aee4a4d668a89e6987eaa21d3b1632b160"
+        },
+        {
+          "nevra": "sound-theme-freedesktop-0:0.8-31.fc44.noarch",
+          "path": "Packages/s/sound-theme-freedesktop-0.8-31.fc44.noarch.rpm",
+          "sha256": "b377c7b67670a984cad68a682fddbd6df339b078b050dcb7c5a884daeefeecaa"
+        },
+        {
+          "nevra": "soxr-0:0.1.3-21.fc44.x86_64",
+          "path": "Packages/s/soxr-0.1.3-21.fc44.x86_64.rpm",
+          "sha256": "e06810ef05658fb8a532a706b6529ebd58f7c4e9b6b6de437bc24962c3f4014a"
+        },
+        {
+          "nevra": "speex-0:1.2.0-21.fc44.x86_64",
+          "path": "Packages/s/speex-1.2.0-21.fc44.x86_64.rpm",
+          "sha256": "a32e5d218260bc9a5642fd83c3732370e824087c023db4c9b75bd50f230d4af2"
+        },
+        {
+          "nevra": "spirv-tools-libs-0:2026.1-1.fc44.x86_64",
+          "path": "Packages/s/spirv-tools-libs-2026.1-1.fc44.x86_64.rpm",
+          "sha256": "1a0aa8095ec306a62bd5a439c33faeaeb0c34749d0263024f756a5cc67f172ea"
+        },
+        {
+          "nevra": "svt-av1-libs-0:3.1.2-2.fc44.x86_64",
+          "path": "Packages/s/svt-av1-libs-3.1.2-2.fc44.x86_64.rpm",
+          "sha256": "5b57c09d4f315094c0952774d4a3b1b95784704c46e03d1771e278a472fd7415"
+        },
+        {
+          "nevra": "tpm2-tss-0:4.1.3-9.fc44.x86_64",
+          "path": "Packages/t/tpm2-tss-4.1.3-9.fc44.x86_64.rpm",
+          "sha256": "af2f67ebf143220447a059c11aa7a22896e62bff57b8959bcca903ba13d0a663"
+        },
+        {
+          "nevra": "tslib-0:1.24-2.fc44.x86_64",
+          "path": "Packages/t/tslib-1.24-2.fc44.x86_64.rpm",
+          "sha256": "58e91e2432f762b5b87890709b7b054099f3b46e3303c44fb6cf70ee1ef91b55"
+        },
+        {
+          "nevra": "twolame-libs-0:0.4.0-9.fc44.x86_64",
+          "path": "Packages/t/twolame-libs-0.4.0-9.fc44.x86_64.rpm",
+          "sha256": "dd7f47177a802808f68c53dd4ede9d12e7de9e5f65efd7421989b14139753426"
+        },
+        {
+          "nevra": "unixODBC-0:2.3.14-3.fc44.x86_64",
+          "path": "Packages/u/unixODBC-2.3.14-3.fc44.x86_64.rpm",
+          "sha256": "3274eb101ec148230f6dac57a1f847eba6de6558a95794534fcbee0e78485a24"
+        },
+        {
+          "nevra": "vo-amrwbenc-0:0.1.3-24.fc44.x86_64",
+          "path": "Packages/v/vo-amrwbenc-0.1.3-24.fc44.x86_64.rpm",
+          "sha256": "55db9771f8bfe68f71845be99010fca078353ceb846affe5fb3152b061fa647b"
+        },
+        {
+          "nevra": "vulkan-headers-0:1.4.341.0-1.fc44.noarch",
+          "path": "Packages/v/vulkan-headers-1.4.341.0-1.fc44.noarch.rpm",
+          "sha256": "b466a7e3525dbd55f12193b0b24ca913fc3f7c473bb02838af5adbc448c4cd8f"
+        },
+        {
+          "nevra": "vulkan-loader-0:1.4.341.0-1.fc44.x86_64",
+          "path": "Packages/v/vulkan-loader-1.4.341.0-1.fc44.x86_64.rpm",
+          "sha256": "197f97f29330e8dc232c56033aa4f02c28ba80ad53c5a6a5a987348fbc22927e"
+        },
+        {
+          "nevra": "vulkan-loader-devel-0:1.4.341.0-1.fc44.x86_64",
+          "path": "Packages/v/vulkan-loader-devel-1.4.341.0-1.fc44.x86_64.rpm",
+          "sha256": "b626558808e42b8e935cf81d6fe53ef4f997809aa0a9aacdb7e391d4d868c0d9"
+        },
+        {
+          "nevra": "xcb-util-0:0.4.1-9.fc44.x86_64",
+          "path": "Packages/x/xcb-util-0.4.1-9.fc44.x86_64.rpm",
+          "sha256": "4508bd92581604af0a2c93ae0bcb49620cb270db0e80e594c5c5db31dea55551"
+        },
+        {
+          "nevra": "xcb-util-cursor-0:0.1.6-2.fc44.x86_64",
+          "path": "Packages/x/xcb-util-cursor-0.1.6-2.fc44.x86_64.rpm",
+          "sha256": "31e352ce64beef1036d3d8aa8f9347df0418b1d4ceeeab41a2987467f09bb448"
+        },
+        {
+          "nevra": "xcb-util-image-0:0.4.1-9.fc44.x86_64",
+          "path": "Packages/x/xcb-util-image-0.4.1-9.fc44.x86_64.rpm",
+          "sha256": "75ca5a4f61fcb78276b8cd725fb8558fa1050b91c017d02d12708473db60446e"
+        },
+        {
+          "nevra": "xcb-util-keysyms-0:0.4.1-9.fc44.x86_64",
+          "path": "Packages/x/xcb-util-keysyms-0.4.1-9.fc44.x86_64.rpm",
+          "sha256": "6a6213a79a875bddc370061b546027b29e429276b94ebf37275061b38299d23d"
+        },
+        {
+          "nevra": "xcb-util-renderutil-0:0.3.10-9.fc44.x86_64",
+          "path": "Packages/x/xcb-util-renderutil-0.3.10-9.fc44.x86_64.rpm",
+          "sha256": "5b5fc26b794c237b5edc02915e8aac947989714cb13bf35a40ac9fad95cfc260"
+        },
+        {
+          "nevra": "xcb-util-wm-0:0.4.2-9.fc44.x86_64",
+          "path": "Packages/x/xcb-util-wm-0.4.2-9.fc44.x86_64.rpm",
+          "sha256": "21cd91f6389b4d876a8643c71081fdb2c11685278ea84a4711eeb13c4b5d0ac8"
+        },
+        {
+          "nevra": "xevd-libs-0:0.5.0-6.fc44.x86_64",
+          "path": "Packages/x/xevd-libs-0.5.0-6.fc44.x86_64.rpm",
+          "sha256": "fe37a4b43c03e0c2250723076e0fb8d1534521bab510e50c47682d016d83f302"
+        },
+        {
+          "nevra": "xeve-libs-0:0.5.1-6.fc44.x86_64",
+          "path": "Packages/x/xeve-libs-0.5.1-6.fc44.x86_64.rpm",
+          "sha256": "a645f2e7ad84e753bdee498e7fbf78301718ce34c32a7883362d4ecca40cc808"
+        },
+        {
+          "nevra": "xkeyboard-config-0:2.47-1.fc44.noarch",
+          "path": "Packages/x/xkeyboard-config-2.47-1.fc44.noarch.rpm",
+          "sha256": "9f8656378173b895203e8ea66227b23087dd494b031b274ef88090812c257a54"
+        },
+        {
+          "nevra": "xml-common-0:0.6.3-68.fc44.noarch",
+          "path": "Packages/x/xml-common-0.6.3-68.fc44.noarch.rpm",
+          "sha256": "a5ac9f1028fca4218e90d23f379567a8e62a35be668f4cc4760f0189f7fe59fd"
+        },
+        {
+          "nevra": "xorg-x11-proto-devel-0:2025.1-2.fc44.noarch",
+          "path": "Packages/x/xorg-x11-proto-devel-2025.1-2.fc44.noarch.rpm",
+          "sha256": "54c1b06eb8fc190a4fb1f9b201ab69e62266937e6f3a6e92df1357209b87a286"
+        },
+        {
+          "nevra": "xprop-0:1.2.8-5.fc44.x86_64",
+          "path": "Packages/x/xprop-1.2.8-5.fc44.x86_64.rpm",
+          "sha256": "bbbc626d69aa58a67510477a981f22857edec1fac56402730a4b4d88893de96f"
+        },
+        {
+          "nevra": "xvidcore-0:1.3.7-19.fc44.x86_64",
+          "path": "Packages/x/xvidcore-1.3.7-19.fc44.x86_64.rpm",
+          "sha256": "d7b815cd4d464b88c63e30ded360be1dbaee424a4015b150e0d1c7d604249822"
+        },
+        {
+          "nevra": "xz-1:5.8.2-2.fc44.x86_64",
+          "path": "Packages/x/xz-5.8.2-2.fc44.x86_64.rpm",
+          "sha256": "96632b3a01e7a122a275d47f49c2c78c5c36737c8293bbd351e42f298d95f165"
+        },
+        {
+          "nevra": "xz-devel-1:5.8.2-2.fc44.x86_64",
+          "path": "Packages/x/xz-devel-5.8.2-2.fc44.x86_64.rpm",
+          "sha256": "28a9ff5dec94b3ef31a80ccdd80922d389c64e41f5da0adf0cd2a16e23532ba6"
+        },
+        {
+          "nevra": "xz-libs-1:5.8.2-2.fc44.x86_64",
+          "path": "Packages/x/xz-libs-5.8.2-2.fc44.x86_64.rpm",
+          "sha256": "dfe774d950f79fd04deb36c3ff3863c6b8072a41ba578de1c20d33b8e2c2aa45"
+        },
+        {
+          "nevra": "zeromq-0:4.3.5-22.fc43.x86_64",
+          "path": "Packages/z/zeromq-4.3.5-22.fc43.x86_64.rpm",
+          "sha256": "3b4c2b223afb877313cedb1541d66f915d4c532eed623f87852770998e586bf0"
+        },
+        {
+          "nevra": "zlib-ng-compat-0:2.3.3-3.fc44.x86_64",
+          "path": "Packages/z/zlib-ng-compat-2.3.3-3.fc44.x86_64.rpm",
+          "sha256": "53ee3cd7082b1a34e4901f13079b1840648113c809effb5b78e7725235a7d939"
+        },
+        {
+          "nevra": "zlib-ng-compat-devel-0:2.3.3-3.fc44.x86_64",
+          "path": "Packages/z/zlib-ng-compat-devel-2.3.3-3.fc44.x86_64.rpm",
+          "sha256": "66ce7228ae8befaad9282647a5c6a6f649cd20d7702dfa07869d653d7c4589c0"
+        },
+        {
+          "nevra": "zstd-0:1.5.7-5.fc44.x86_64",
+          "path": "Packages/z/zstd-1.5.7-5.fc44.x86_64.rpm",
+          "sha256": "6de5731aebf4c836a98ef1f15753afc251cee8a00359e08f37057f5c1761a329"
+        },
+        {
+          "nevra": "zvbi-0:0.2.44-3.fc44.x86_64",
+          "path": "Packages/z/zvbi-0.2.44-3.fc44.x86_64.rpm",
+          "sha256": "ede61e217f098b0e0754a13b8ad560d79966933e201cbc3730a843164196e9ae"
+        }
+      ],
+      "primary": "repodata/c48e47563bbf65b996c95caf4a608223f982c314cab637e6ab87dd1df67b9d26-primary.xml.zst",
+      "repomd_sha256": "da3845427d188097f6fd71b417a039bdfb8efefc4f38ca44b5cbb94f95a18991"
+    },
+    "updates": {
+      "metadata_sha256": {
+        "repodata/04df8d3dbbd2e027891dff4c58ec0cb578e500e17468e4ae0ca0dce30e09f4ad-updateinfo.xml.zst": "04df8d3dbbd2e027891dff4c58ec0cb578e500e17468e4ae0ca0dce30e09f4ad",
+        "repodata/065b5a46363494d86c1500dd823bbd643887bc1c73f982455b2f274a837b5a0c-primary.xml.zst": "065b5a46363494d86c1500dd823bbd643887bc1c73f982455b2f274a837b5a0c",
+        "repodata/0ce586f7b623d62e132b2440abe8e5c4d2b85b7d411ff0247ed6f91094cef284-other.xml.zck": "0ce586f7b623d62e132b2440abe8e5c4d2b85b7d411ff0247ed6f91094cef284",
+        "repodata/0f66607cd4520d5159ba3443887d211d0ab98ee89bf9273e71563311e80e6953-comps-Everything.x86_64.xml.zck": "0f66607cd4520d5159ba3443887d211d0ab98ee89bf9273e71563311e80e6953",
+        "repodata/10c5c18837d65a7370e97a43558d896533f6db80cec5bb3b6b62c54e37811067-filelists.sqlite.zst": "10c5c18837d65a7370e97a43558d896533f6db80cec5bb3b6b62c54e37811067",
+        "repodata/113adeec2e82c99bd42cf6945208cb470176958acb757882082c0144135aee83-filelists.xml.zst": "113adeec2e82c99bd42cf6945208cb470176958acb757882082c0144135aee83",
+        "repodata/3fde6cebdd43071656e9d851af98c3e5211bb5f39e88cba705d850a3b07bce42-primary.sqlite.zst": "3fde6cebdd43071656e9d851af98c3e5211bb5f39e88cba705d850a3b07bce42",
+        "repodata/72f2f9a37a9bfa343999ffc622f37fdf5e39ce3a6ded30b9dbeb6bafeca5a519-other.sqlite.zst": "72f2f9a37a9bfa343999ffc622f37fdf5e39ce3a6ded30b9dbeb6bafeca5a519",
+        "repodata/9504f86d46f66801d2fb8d2825e8b114d41f5793814516b0004bbcc0ebe00a8f-filelists.xml.zck": "9504f86d46f66801d2fb8d2825e8b114d41f5793814516b0004bbcc0ebe00a8f",
+        "repodata/be65ef015b9cee3014b55614773e163831fcfb2c65aa21f0963969b81ed082c0-primary.xml.zck": "be65ef015b9cee3014b55614773e163831fcfb2c65aa21f0963969b81ed082c0",
+        "repodata/e43af6c409ab4a1552a595ffae9bd8cd72cf4b059180da53b2e1a440d694db53-comps-Everything.x86_64.xml.zst": "e43af6c409ab4a1552a595ffae9bd8cd72cf4b059180da53b2e1a440d694db53",
+        "repodata/eb8fac84265f8d58c89932d42293d57205e8f52da261aa4be945e4df2e393fc5-other.xml.zst": "eb8fac84265f8d58c89932d42293d57205e8f52da261aa4be945e4df2e393fc5",
+        "repodata/f6658194c1637be2285754c30649924cdb388a177ed7ec2a33212dc359a9ade1-updateinfo.xml.zck": "f6658194c1637be2285754c30649924cdb388a177ed7ec2a33212dc359a9ade1"
+      },
+      "mirror_failures": [],
+      "origin": "https://fedora.ip-connect.vn.ua/linux/updates/44/Everything/x86_64/",
+      "packages": [
+        {
+          "nevra": "NetworkManager-1:1.56.1-2.fc44.x86_64",
+          "path": "Packages/n/NetworkManager-1.56.1-2.fc44.x86_64.rpm",
+          "sha256": "8ccdaa8da6ab019fe629bd492ad12c88bb0157608908c3e98f1008f2186a5b62"
+        },
+        {
+          "nevra": "NetworkManager-libnm-1:1.56.1-2.fc44.x86_64",
+          "path": "Packages/n/NetworkManager-libnm-1.56.1-2.fc44.x86_64.rpm",
+          "sha256": "fdac14ad1ce2d8d05fd134d89fe703b555232adb14296a879fad91564ad39daf"
+        },
+        {
+          "nevra": "SDL3-0:3.4.18-1.fc44.x86_64",
+          "path": "Packages/s/SDL3-3.4.18-1.fc44.x86_64.rpm",
+          "sha256": "a54b67e056cb77976d9f0523ae5e0d79baa747d4cd28223eec479c2e20c464ae"
+        },
+        {
+          "nevra": "alsa-lib-0:1.2.16.1-1.fc44.x86_64",
+          "path": "Packages/a/alsa-lib-1.2.16.1-1.fc44.x86_64.rpm",
+          "sha256": "05d9c51183de8b254df47f09ef1c63419eee3e2caea6452f1b39f10b2a22a9fe"
+        },
+        {
+          "nevra": "assimp-0:6.0.5-5.fc44.x86_64",
+          "path": "Packages/a/assimp-6.0.5-5.fc44.x86_64.rpm",
+          "sha256": "fbe961a0602aaa84fc2ba4c381f445354932c72dd40ca84c5d9f37b85e282965"
+        },
+        {
+          "nevra": "at-spi2-atk-0:2.60.7-1.fc44.x86_64",
+          "path": "Packages/a/at-spi2-atk-2.60.7-1.fc44.x86_64.rpm",
+          "sha256": "b47e84f526970b6dff9afec40c15b5d9c3da025259b5db1691d513634d75614e"
+        },
+        {
+          "nevra": "at-spi2-core-0:2.60.7-1.fc44.x86_64",
+          "path": "Packages/a/at-spi2-core-2.60.7-1.fc44.x86_64.rpm",
+          "sha256": "1efec17c9c468d6572101e411211b8d4e285d3a1cdb155f8a2248d6187b1a162"
+        },
+        {
+          "nevra": "atk-0:2.60.7-1.fc44.x86_64",
+          "path": "Packages/a/atk-2.60.7-1.fc44.x86_64.rpm",
+          "sha256": "d6f4034db9cdeb4c5c1526bf448407857d3bb0f1b9dbb4cd0f4b536611149c76"
+        },
+        {
+          "nevra": "audit-libs-0:4.2.1-1.fc44.x86_64",
+          "path": "Packages/a/audit-libs-4.2.1-1.fc44.x86_64.rpm",
+          "sha256": "62a4d7ff91d2115e539b8bcac21c711b591837e1a23ca0be5718c1be788129b5"
+        },
+        {
+          "nevra": "baloo-widgets-0:26.08.1-1.fc44.x86_64",
+          "path": "Packages/b/baloo-widgets-26.08.1-1.fc44.x86_64.rpm",
+          "sha256": "bba51967d5b0bb69d78d83c0341d3eb0939a648268e7ed300a7b1a824a4bcec9"
+        },
+        {
+          "nevra": "binutils-0:2.46.1-1.fc44.x86_64",
+          "path": "Packages/b/binutils-2.46.1-1.fc44.x86_64.rpm",
+          "sha256": "1f522dfb8e2bf92961da0bd880a5e743207f88d259a27e67daf4c672aa07dfe3"
+        },
+        {
+          "nevra": "breeze-icon-theme-0:6.31.0-1.fc44.noarch",
+          "path": "Packages/b/breeze-icon-theme-6.31.0-1.fc44.noarch.rpm",
+          "sha256": "3b81eaa7cecbd4cb9aa711587aaf02ac57d6a77efccabd980f3c740c6720a7d1"
+        },
+        {
+          "nevra": "btrfs-progs-0:7.1-1.fc44.x86_64",
+          "path": "Packages/b/btrfs-progs-7.1-1.fc44.x86_64.rpm",
+          "sha256": "c697e0b114d3773ed844d625f4ae17bc8b473dc6a674e4e3d32956ceec1826b4"
+        },
+        {
+          "nevra": "bubblewrap-0:0.12.0-1.fc44.x86_64",
+          "path": "Packages/b/bubblewrap-0.12.0-1.fc44.x86_64.rpm",
+          "sha256": "708b8d1de44ea16057b8ca8fcf517f3a6f176aa0e65a6bc6e38a694d0b9f8a1d"
+        },
+        {
+          "nevra": "ca-certificates-0:2026.2.90_v9.0.317-1.fc44.noarch",
+          "path": "Packages/c/ca-certificates-2026.2.90_v9.0.317-1.fc44.noarch.rpm",
+          "sha256": "15c37ee7ed6f27598f540496146726cdbc5e8d0518a3acba5101f2164707eeeb"
+        },
+        {
+          "nevra": "cairo-0:1.18.6-1.fc44.x86_64",
+          "path": "Packages/c/cairo-1.18.6-1.fc44.x86_64.rpm",
+          "sha256": "769182b915461b81160b9c2f67565b1c85c4fb00bfafa8ca21c0cc710b8717e5"
+        },
+        {
+          "nevra": "cairo-gobject-0:1.18.6-1.fc44.x86_64",
+          "path": "Packages/c/cairo-gobject-1.18.6-1.fc44.x86_64.rpm",
+          "sha256": "070da44fde8d004f2c2a9150f5bec4fa5d46a8c75b887288dd3c83a804a8dd3c"
+        },
+        {
+          "nevra": "cjson-0:1.7.19-1.fc44.x86_64",
+          "path": "Packages/c/cjson-1.7.19-1.fc44.x86_64.rpm",
+          "sha256": "31053341f0327df941e146c96e7002f9b28859833e2ef301038b7ab4d223f094"
+        },
+        {
+          "nevra": "coreutils-0:9.10-5.fc44.x86_64",
+          "path": "Packages/c/coreutils-9.10-5.fc44.x86_64.rpm",
+          "sha256": "3c8b2c0b3f3e604c78d991a6569ed98a0dbd496bcf54bded2f62649a4e174073"
+        },
+        {
+          "nevra": "coreutils-common-0:9.10-5.fc44.x86_64",
+          "path": "Packages/c/coreutils-common-9.10-5.fc44.x86_64.rpm",
+          "sha256": "042f818350a1b12fc7e7ede9255bafdc9248fabd9001452a062aebe75521a4c9"
+        },
+        {
+          "nevra": "cpp-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/c/cpp-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "a3ca10854d95dc2aefc76e36d116c0a33a305d53b2ba06d92e43aeedb179668b"
+        },
+        {
+          "nevra": "cracklib-0:2.10.3-1.fc44.x86_64",
+          "path": "Packages/c/cracklib-2.10.3-1.fc44.x86_64.rpm",
+          "sha256": "d44fb8d9feac4b9c20106d56570cd50932a9718f274da73f75d02f124feaaba1"
+        },
+        {
+          "nevra": "cryptsetup-libs-0:2.8.8-1.fc44.x86_64",
+          "path": "Packages/c/cryptsetup-libs-2.8.8-1.fc44.x86_64.rpm",
+          "sha256": "76b604d13be697c0e82c6c2b441d361ba1da6d3854e37c01e96461b653dbdb37"
+        },
+        {
+          "nevra": "cups-filesystem-1:2.4.19-3.fc44.noarch",
+          "path": "Packages/c/cups-filesystem-2.4.19-3.fc44.noarch.rpm",
+          "sha256": "c22453b8ceac85980ad8cff7f7561a380d56bb281fd6d58d14a6e508d8b5ebd5"
+        },
+        {
+          "nevra": "cups-libs-1:2.4.19-3.fc44.x86_64",
+          "path": "Packages/c/cups-libs-2.4.19-3.fc44.x86_64.rpm",
+          "sha256": "60eba21016672a37f0002048b7363a0fe1c92df86412463203d76e9984f7c907"
+        },
+        {
+          "nevra": "curl-0:8.18.0-12.fc44.x86_64",
+          "path": "Packages/c/curl-8.18.0-12.fc44.x86_64.rpm",
+          "sha256": "466bc79a9f487fd765a799a87f9aadf4fe0b16c2f7d767967393d927f4df259f"
+        },
+        {
+          "nevra": "dracut-0:108-8.fc44.x86_64",
+          "path": "Packages/d/dracut-108-8.fc44.x86_64.rpm",
+          "sha256": "ad9eae8e9b9def66d685623440e867d7a067fc8f3ae2680f42a25c090d79d73e"
+        },
+        {
+          "nevra": "elfutils-debuginfod-client-0:0.196-1.fc44.x86_64",
+          "path": "Packages/e/elfutils-debuginfod-client-0.196-1.fc44.x86_64.rpm",
+          "sha256": "ab3dbda122ae210400e649334fa7eb9d88f57dbe672843a49152e522b754d8ba"
+        },
+        {
+          "nevra": "elfutils-default-yama-scope-0:0.196-1.fc44.noarch",
+          "path": "Packages/e/elfutils-default-yama-scope-0.196-1.fc44.noarch.rpm",
+          "sha256": "0e34d7afb119707f4158d22e1996808ae72f4da9be43c2249562d345a6095fb4"
+        },
+        {
+          "nevra": "elfutils-libelf-0:0.196-1.fc44.x86_64",
+          "path": "Packages/e/elfutils-libelf-0.196-1.fc44.x86_64.rpm",
+          "sha256": "2298bdb5f374e624389f8ebfc7fedceaa31704f6ab227e4650c04deee94f5691"
+        },
+        {
+          "nevra": "elfutils-libs-0:0.196-1.fc44.x86_64",
+          "path": "Packages/e/elfutils-libs-0.196-1.fc44.x86_64.rpm",
+          "sha256": "22bd4070d369eba8a95140054483b6720e99b0e03e0e1eb517782b04524d2cb3"
+        },
+        {
+          "nevra": "exiv2-libs-0:0.28.9-1.fc44.x86_64",
+          "path": "Packages/e/exiv2-libs-0.28.9-1.fc44.x86_64.rpm",
+          "sha256": "fe88df8c2f30106cdcaadfa4a26eff2abd7d147d2f7c93f2fd47e271696f971d"
+        },
+        {
+          "nevra": "expat-0:2.8.5-1.fc44.x86_64",
+          "path": "Packages/e/expat-2.8.5-1.fc44.x86_64.rpm",
+          "sha256": "47c61183c5fa87b228ce5b68b9947f2eb13f7bc621cd468e7bf25e511ff86d81"
+        },
+        {
+          "nevra": "fedora-gpg-keys-0:44-2.noarch",
+          "path": "Packages/f/fedora-gpg-keys-44-2.noarch.rpm",
+          "sha256": "9d9b65b4d52ca949a0b80bf909c7add1f327baea797febb72314019261960958"
+        },
+        {
+          "nevra": "fedora-release-0:44-18.noarch",
+          "path": "Packages/f/fedora-release-44-18.noarch.rpm",
+          "sha256": "a85259328505a417ddc862747a68ad255bd9b574b9fc0550051549903be67053"
+        },
+        {
+          "nevra": "fedora-release-common-0:44-18.noarch",
+          "path": "Packages/f/fedora-release-common-44-18.noarch.rpm",
+          "sha256": "ea06ce5597746df56a5cc7c3bd184a8e0b05eec048f60456b0b9469fc59a0cdc"
+        },
+        {
+          "nevra": "fedora-release-identity-basic-0:44-18.noarch",
+          "path": "Packages/f/fedora-release-identity-basic-44-18.noarch.rpm",
+          "sha256": "39b4b8a1339183697a6e342062ee8e84bad7457273c4e2c81f6a29e87c082346"
+        },
+        {
+          "nevra": "fedora-repos-0:44-2.noarch",
+          "path": "Packages/f/fedora-repos-44-2.noarch.rpm",
+          "sha256": "a2371ee2ea46ee2787b366e1659bae18d8f495ee7970f09a90e31ea05098b6b9"
+        },
+        {
+          "nevra": "file-0:5.46-10.fc44.x86_64",
+          "path": "Packages/f/file-5.46-10.fc44.x86_64.rpm",
+          "sha256": "d0e2372e97b29daaa98c2acf08e79320bbfc4137bd4f28ce8b2dcb4363a6f65b"
+        },
+        {
+          "nevra": "file-libs-0:5.46-10.fc44.x86_64",
+          "path": "Packages/f/file-libs-5.46-10.fc44.x86_64.rpm",
+          "sha256": "d1d56a90585cb31eeb755509c28079882d9f6c22e0c7d4c5121f2a68e300a8dd"
+        },
+        {
+          "nevra": "freetype-0:2.14.3-1.fc44.x86_64",
+          "path": "Packages/f/freetype-2.14.3-1.fc44.x86_64.rpm",
+          "sha256": "cb9fa536c009a607886b3d5d3ad503a1a4ef2089ce6235e8afa4d35e87c54967"
+        },
+        {
+          "nevra": "fuse3-libs-0:3.18.3-1.fc44.x86_64",
+          "path": "Packages/f/fuse3-libs-3.18.3-1.fc44.x86_64.rpm",
+          "sha256": "b6948d267a2edee02b410b8884507082f41e7f022ef5a06b8be862a448ea8f35"
+        },
+        {
+          "nevra": "gcc-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/g/gcc-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "77a82e328053f73d3881e633ffefb4dd49ebe0ac5b18a996de9b615de4eb9569"
+        },
+        {
+          "nevra": "gcc-c++-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/g/gcc-c++-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "79f6642db8c5ba0433041feb6e33c6dc487e1e2f4dd81eb94e5e615983e25cce"
+        },
+        {
+          "nevra": "gcr-libs-0:4.4.1-1.fc44.x86_64",
+          "path": "Packages/g/gcr-libs-4.4.1-1.fc44.x86_64.rpm",
+          "sha256": "b969c4eff40d175a53250694eadbc3b6854e6e4dc97264ef3c2057a323c402f1"
+        },
+        {
+          "nevra": "gdk-pixbuf2-0:2.44.6^really2.44.4-3.fc44.x86_64",
+          "path": "Packages/g/gdk-pixbuf2-2.44.6^really2.44.4-3.fc44.x86_64.rpm",
+          "sha256": "f47518cb7776296597ef97dacab1f95bc2557ed82c3afce86fd0c42d7a133548"
+        },
+        {
+          "nevra": "gettext-envsubst-0:0.26-5.fc44.x86_64",
+          "path": "Packages/g/gettext-envsubst-0.26-5.fc44.x86_64.rpm",
+          "sha256": "56824030a2deb6401c44af8d86e0a401b4d452623209f1a31a0331282fdff7d2"
+        },
+        {
+          "nevra": "gettext-libs-0:0.26-5.fc44.x86_64",
+          "path": "Packages/g/gettext-libs-0.26-5.fc44.x86_64.rpm",
+          "sha256": "72e855f910164b570dbf424f8ec382473d70be257e354dc5ec294ef9cb8b7802"
+        },
+        {
+          "nevra": "gettext-runtime-0:0.26-5.fc44.x86_64",
+          "path": "Packages/g/gettext-runtime-0.26-5.fc44.x86_64.rpm",
+          "sha256": "53d75e06a0813f00f774ea0010e8f2c3a1c9b56adf5a72e8e310092286d24dc9"
+        },
+        {
+          "nevra": "glib2-0:2.88.4-1.fc44.x86_64",
+          "path": "Packages/g/glib2-2.88.4-1.fc44.x86_64.rpm",
+          "sha256": "52d8b35294ca2bf4f19e18735645c760d7335122673e1cac007287303ec83a01"
+        },
+        {
+          "nevra": "glibc-0:2.43-9.fc44.x86_64",
+          "path": "Packages/g/glibc-2.43-9.fc44.x86_64.rpm",
+          "sha256": "594ef5114f0713bdba2a819b70e662e67321755889247ffec2bed31ad6ca4d9f"
+        },
+        {
+          "nevra": "glibc-common-0:2.43-9.fc44.x86_64",
+          "path": "Packages/g/glibc-common-2.43-9.fc44.x86_64.rpm",
+          "sha256": "3568d7e83e59a6ee97a08c8a5ecee8e435afaa74a9273042945a148845c3c733"
+        },
+        {
+          "nevra": "glibc-devel-0:2.43-9.fc44.x86_64",
+          "path": "Packages/g/glibc-devel-2.43-9.fc44.x86_64.rpm",
+          "sha256": "1ffd34e5b3f818a74804aff2edd9b82ab30b1e092f562f9311cfa3cbfc00edfb"
+        },
+        {
+          "nevra": "glibc-gconv-extra-0:2.43-9.fc44.x86_64",
+          "path": "Packages/g/glibc-gconv-extra-2.43-9.fc44.x86_64.rpm",
+          "sha256": "351d975f677d41f8e237a4fdd3f6d3ff1b4f43b0314ecb693a050724f7d72975"
+        },
+        {
+          "nevra": "glibc-minimal-langpack-0:2.43-9.fc44.x86_64",
+          "path": "Packages/g/glibc-minimal-langpack-2.43-9.fc44.x86_64.rpm",
+          "sha256": "b9da9b984d902a5bd983c5ad700be1e8adaf36224a3713955228a1128e5c4631"
+        },
+        {
+          "nevra": "glycin-libs-0:2.1.5-1.fc44.x86_64",
+          "path": "Packages/g/glycin-libs-2.1.5-1.fc44.x86_64.rpm",
+          "sha256": "bae051a7ff280b8542cb1e9394b3fe03e90b7405c9d676990078c768ff67c2e1"
+        },
+        {
+          "nevra": "glycin-loaders-0:2.1.5-1.fc44.x86_64",
+          "path": "Packages/g/glycin-loaders-2.1.5-1.fc44.x86_64.rpm",
+          "sha256": "f121e3e534b0b68990664e97733a56239fd3233cd88155018e7d7f8f1cd8c953"
+        },
+        {
+          "nevra": "gnupg2-0:2.4.9-16.fc44.x86_64",
+          "path": "Packages/g/gnupg2-2.4.9-16.fc44.x86_64.rpm",
+          "sha256": "54b5121517b7faf01c9895c3f400ba107a53624e5842986e9c548b677e096fdd"
+        },
+        {
+          "nevra": "gnupg2-dirmngr-0:2.4.9-16.fc44.x86_64",
+          "path": "Packages/g/gnupg2-dirmngr-2.4.9-16.fc44.x86_64.rpm",
+          "sha256": "fbb80cd17cbf08e688135d663f5def070338b4c969d97343efdf8ce30963b7d3"
+        },
+        {
+          "nevra": "gnupg2-gpg-agent-0:2.4.9-16.fc44.x86_64",
+          "path": "Packages/g/gnupg2-gpg-agent-2.4.9-16.fc44.x86_64.rpm",
+          "sha256": "59146f8730ecfc93e5f889d53ac4790a293093f3150bb6e477d21af94f44706c"
+        },
+        {
+          "nevra": "gnupg2-gpgconf-0:2.4.9-16.fc44.x86_64",
+          "path": "Packages/g/gnupg2-gpgconf-2.4.9-16.fc44.x86_64.rpm",
+          "sha256": "acb8a84bb5c00e504abcc7203594ad7edd312b5eacfaa4867486a85bcb44e24e"
+        },
+        {
+          "nevra": "gnupg2-keyboxd-0:2.4.9-16.fc44.x86_64",
+          "path": "Packages/g/gnupg2-keyboxd-2.4.9-16.fc44.x86_64.rpm",
+          "sha256": "c1eadf606c963c87a844d11e0e065a93530085f198964dbfb0947c39c732992f"
+        },
+        {
+          "nevra": "gnupg2-verify-0:2.4.9-16.fc44.x86_64",
+          "path": "Packages/g/gnupg2-verify-2.4.9-16.fc44.x86_64.rpm",
+          "sha256": "b65cd9b10d3545f27de77b8e11b6f2f415dea8844e1426be21d94af069183b9a"
+        },
+        {
+          "nevra": "gnutls-0:3.8.13-1.fc44.x86_64",
+          "path": "Packages/g/gnutls-3.8.13-1.fc44.x86_64.rpm",
+          "sha256": "3cd4e8a10a6ff6a9e3d2bac05f4cdc7573e7d94737f7070e5b1ab21a90d4857c"
+        },
+        {
+          "nevra": "gpgme-0:2.0.1-5.fc44.x86_64",
+          "path": "Packages/g/gpgme-2.0.1-5.fc44.x86_64.rpm",
+          "sha256": "47d4f55177f38344089cc68403b98d31cb18447352d7428fdf8ddbcda3e0b1ef"
+        },
+        {
+          "nevra": "gpgmepp-0:2.0.1-5.fc44.x86_64",
+          "path": "Packages/g/gpgmepp-2.0.1-5.fc44.x86_64.rpm",
+          "sha256": "c768902dd8c27a02e44cd5df51488b5b60e9e1ffdda16e01023f589a9d66ef69"
+        },
+        {
+          "nevra": "grub2-common-1:2.12-66.fc44.noarch",
+          "path": "Packages/g/grub2-common-2.12-66.fc44.noarch.rpm",
+          "sha256": "031cb231973ce5509a22937c1c649a4aa1d352f6253c43f23309f10f6e23476b"
+        },
+        {
+          "nevra": "grub2-efi-x64-1:2.12-66.fc44.x86_64",
+          "path": "Packages/g/grub2-efi-x64-2.12-66.fc44.x86_64.rpm",
+          "sha256": "7f6cb5edac8a57b5c8f6933af4c99620316c7cb06e5f9ad58521d91144d5eb4f"
+        },
+        {
+          "nevra": "grub2-tools-1:2.12-66.fc44.x86_64",
+          "path": "Packages/g/grub2-tools-2.12-66.fc44.x86_64.rpm",
+          "sha256": "56f2f58056a7f3cb670903d40c3e2b5f1642a96a3ba5c1f6dfaec056b712c815"
+        },
+        {
+          "nevra": "grub2-tools-minimal-1:2.12-66.fc44.x86_64",
+          "path": "Packages/g/grub2-tools-minimal-2.12-66.fc44.x86_64.rpm",
+          "sha256": "ed4fa7ce6a88abae6d5e3b6ec5d5ca20b30427b2e344ea6923d045d04339496e"
+        },
+        {
+          "nevra": "gsettings-desktop-schemas-0:50.1-1.fc44.x86_64",
+          "path": "Packages/g/gsettings-desktop-schemas-50.1-1.fc44.x86_64.rpm",
+          "sha256": "295467adcf3ee761cec6394c2c75720e8294da4d939e8eb45c33a2567ecd16e5"
+        },
+        {
+          "nevra": "gssdp-0:1.6.6-1.fc44.x86_64",
+          "path": "Packages/g/gssdp-1.6.6-1.fc44.x86_64.rpm",
+          "sha256": "be0f7aa57b9789c0f48e64dcaa9652219799d2c53235c86ae0a39e17a4cadc66"
+        },
+        {
+          "nevra": "gstreamer1-0:1.28.8-1.fc44.x86_64",
+          "path": "Packages/g/gstreamer1-1.28.8-1.fc44.x86_64.rpm",
+          "sha256": "f4c549cf0f7d12f80ab6695fa35d64a03d16fa73f83ab4d5b64269aedc22c6be"
+        },
+        {
+          "nevra": "gstreamer1-plugins-bad-free-libs-0:1.28.8-1.fc44.x86_64",
+          "path": "Packages/g/gstreamer1-plugins-bad-free-libs-1.28.8-1.fc44.x86_64.rpm",
+          "sha256": "cd829663996ac30c665696fc8a635f95ec33abe4b0e0914f214c2fe7cf9befb9"
+        },
+        {
+          "nevra": "gstreamer1-plugins-base-0:1.28.8-1.fc44.x86_64",
+          "path": "Packages/g/gstreamer1-plugins-base-1.28.8-1.fc44.x86_64.rpm",
+          "sha256": "cd12e8d484ad9ddf7e1cbc71f75069629a7290c68a67abe1a3a0c7aa8f97b671"
+        },
+        {
+          "nevra": "gtk-update-icon-cache-0:3.24.52-2.fc44.x86_64",
+          "path": "Packages/g/gtk-update-icon-cache-3.24.52-2.fc44.x86_64.rpm",
+          "sha256": "6ec33c7f26814f70ff69c7e9e4a6d57f772ed01e136c93f9fbf7a2c96becc2fa"
+        },
+        {
+          "nevra": "gtk3-0:3.24.52-2.fc44.x86_64",
+          "path": "Packages/g/gtk3-3.24.52-2.fc44.x86_64.rpm",
+          "sha256": "a79d5e9e687459c9a10d08ac125fc02dab882f9b95e5f95fa8ec638bd8ee228e"
+        },
+        {
+          "nevra": "gupnp-0:1.6.10-1.fc44.x86_64",
+          "path": "Packages/g/gupnp-1.6.10-1.fc44.x86_64.rpm",
+          "sha256": "835f4a4cdc2e41a9f368e88f204f4e9f884040fe210c34a1458f583fd2183084"
+        },
+        {
+          "nevra": "harfbuzz-0:14.1.0-2.fc44.x86_64",
+          "path": "Packages/h/harfbuzz-14.1.0-2.fc44.x86_64.rpm",
+          "sha256": "a6a94a981fe6f57afe3b7251f74705b79ac8dc35987ebe6a94e50498e4fb7a41"
+        },
+        {
+          "nevra": "hwdata-0:0.412-1.fc44.noarch",
+          "path": "Packages/h/hwdata-0.412-1.fc44.noarch.rpm",
+          "sha256": "ffb9a07e488b23a81fc682b9c1acd66be3e5e0839f5199e302440fc7c31f8ecd"
+        },
+        {
+          "nevra": "kbd-0:2.9.0-4.fc44.x86_64",
+          "path": "Packages/k/kbd-2.9.0-4.fc44.x86_64.rpm",
+          "sha256": "1299ebb685439c9f0b35a2fb0503f028e1a8ece642d035f2c3d0378a0fb7104f"
+        },
+        {
+          "nevra": "kbd-legacy-0:2.9.0-4.fc44.noarch",
+          "path": "Packages/k/kbd-legacy-2.9.0-4.fc44.noarch.rpm",
+          "sha256": "ca7e486c221d3f8631a6bf5286d009a579af504a197a278bee4358f1a29cb56d"
+        },
+        {
+          "nevra": "kbd-misc-0:2.9.0-4.fc44.noarch",
+          "path": "Packages/k/kbd-misc-2.9.0-4.fc44.noarch.rpm",
+          "sha256": "9b17d0f1c4955af2112333fb359462d2e2e653c5a436becdcc429f5494a8cdd2"
+        },
+        {
+          "nevra": "kdegraphics-mobipocket-0:26.08.1-1.fc44.x86_64",
+          "path": "Packages/k/kdegraphics-mobipocket-26.08.1-1.fc44.x86_64.rpm",
+          "sha256": "c7603cee8967dd18b807bc3536201b06b4da501196e26a580802aabbbc569269"
+        },
+        {
+          "nevra": "kernel-headers-0:7.2.4-200.fc44.x86_64",
+          "path": "Packages/k/kernel-headers-7.2.4-200.fc44.x86_64.rpm",
+          "sha256": "60801d00dce8a4b6bd54d3c50b806c209af1c8389a6e3e7c15939e3b0c30987d"
+        },
+        {
+          "nevra": "kf6-attica-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-attica-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "3a11c179da6df6098957c594c7c0102a74d603bd9a3a09b7ce8d8a5da10470b0"
+        },
+        {
+          "nevra": "kf6-baloo-libs-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-baloo-libs-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "286fee778b39cb639b1746c17d997c18b71c29caa100b122fa126bead5a63dd4"
+        },
+        {
+          "nevra": "kf6-breeze-icons-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-breeze-icons-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "8b50f848497b789875a3ba0af85fa5389069b8a2c7bbfa0096252b081043006b"
+        },
+        {
+          "nevra": "kf6-filesystem-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-filesystem-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "50132833a51ef40a8e76fdeac398da0b2e9457031c09899c80ffb586490f7a6b"
+        },
+        {
+          "nevra": "kf6-karchive-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-karchive-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "3a5c6cc8f0e238375c3406692444bbca16525d42914e39ef100c128ca5f8aec3"
+        },
+        {
+          "nevra": "kf6-kauth-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kauth-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "597c1e7444748c6a82d9a15cb4c22d00cf660a325e6b61babf840ca0f8b64f35"
+        },
+        {
+          "nevra": "kf6-kauth-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kauth-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "63579aef59b3c787d613693780994a552080a759f1a54e6d9a6f0a8a49e1a3fd"
+        },
+        {
+          "nevra": "kf6-kbookmarks-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kbookmarks-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "7b9fcda22cc0d66ea1f6f1ac422282fa209c29f2732e81986e3889a3a4bd1156"
+        },
+        {
+          "nevra": "kf6-kbookmarks-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kbookmarks-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "adc168b04a397cb0fdcb28e167d1fafc47f171ace22ed759c577557ea66b1234"
+        },
+        {
+          "nevra": "kf6-kcmutils-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcmutils-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "7b0207ec982cf75e3c7c07ee66070a06e0f9ee62e25c5d2ef95ef41e2ead9e4e"
+        },
+        {
+          "nevra": "kf6-kcodecs-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcodecs-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "584876ce7e84c44f1f9640a32e71f90760079b23ea509a19ca82e33d4cb74a89"
+        },
+        {
+          "nevra": "kf6-kcodecs-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcodecs-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "1c3367c14ed3ec656909ebabb2ba168b774adc9e69e35012380e9ca21adb8f9d"
+        },
+        {
+          "nevra": "kf6-kcolorscheme-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcolorscheme-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "eea9b35ef182f1c2be3aef2b3818a378553484fd3ca05093027dde3f4abced52"
+        },
+        {
+          "nevra": "kf6-kcolorscheme-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcolorscheme-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "66381cf43cd1c91fe355eb7efae4850c411ad600cb36964d0b9ec45ed98cc358"
+        },
+        {
+          "nevra": "kf6-kcompletion-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcompletion-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "9968f7a6994bdf5b588ee0904ef62d9476b34fe63ff6075c0412487cca38cce7"
+        },
+        {
+          "nevra": "kf6-kcompletion-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcompletion-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "f966624c620e938a885487bc77bffa562b9284e31eebf7b04c0d02dc12dccd35"
+        },
+        {
+          "nevra": "kf6-kconfig-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kconfig-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "c541c4af02aa06f978ccb818233fc8dbe8591b0179bb3c2aaf7071ebc6dc399f"
+        },
+        {
+          "nevra": "kf6-kconfig-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kconfig-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "a184fc1520f30eb4a27430368f9f72377513d0c8090e9cf4ecbdc265b0075c36"
+        },
+        {
+          "nevra": "kf6-kconfigwidgets-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kconfigwidgets-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "59f419bff5eceec898037e3d80f00cd69a6397ec8a73fbcb037b8db68b258bb5"
+        },
+        {
+          "nevra": "kf6-kconfigwidgets-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kconfigwidgets-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "7fff94087d8ad0ebc571960e2d199df152cce37cb28f91b707e3b26eaed2600d"
+        },
+        {
+          "nevra": "kf6-kcoreaddons-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcoreaddons-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "2ff97c3a0ee59e2b7f5bbc05952ec221a3af965de9f08ad702702010ac18ce8f"
+        },
+        {
+          "nevra": "kf6-kcoreaddons-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcoreaddons-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "3d9e349e5bfcb046f930cb4f804ca4798839da58b822869b811c4a3401c0aae3"
+        },
+        {
+          "nevra": "kf6-kcrash-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kcrash-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "afe7dec555e02694b3898a076cbd16c0c489343ed38df7e75f1bc63397594bec"
+        },
+        {
+          "nevra": "kf6-kdbusaddons-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kdbusaddons-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "0c7b0c9908ad83f3b12955db1a4fe43ded515bd34a1f04ed105fd1756ea230f7"
+        },
+        {
+          "nevra": "kf6-kded-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kded-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "34d08f8303142432259bd19f1c008f70fc9d04aab73257241079aa832d173442"
+        },
+        {
+          "nevra": "kf6-kdoctools-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kdoctools-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "6f81e7e436e1ac4637d3bf409df502f2b911de58ec2be2f68b6e531189894a98"
+        },
+        {
+          "nevra": "kf6-kfilemetadata-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kfilemetadata-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "5e0d06d9c8f1ffd25f626d9cbf8a74e8c13d5f9343372c8ca94ccf4ac90cdec2"
+        },
+        {
+          "nevra": "kf6-kglobalaccel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kglobalaccel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "79c9225a0e3498f52bb0321e4378a1f967da9303c0da0b69ffc3a0eae76e1a4a"
+        },
+        {
+          "nevra": "kf6-kguiaddons-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kguiaddons-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "e1141953b77a4ddfe86251baf9b29b73ba06d80bce7ef15280d2a7915a0c50ee"
+        },
+        {
+          "nevra": "kf6-kguiaddons-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kguiaddons-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "27365e246373ff9cd1fb96482f27194483b8a336521514e27fdd67a95d952e0f"
+        },
+        {
+          "nevra": "kf6-ki18n-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-ki18n-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "ca8d98fc5b8c3ab58e80f749cbd248067c238b4ad9e73e3c7a3d554b8bdc0438"
+        },
+        {
+          "nevra": "kf6-kiconthemes-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kiconthemes-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "69f032db1f15ada837acf672f8f06f63c8f83221de5f0680849ba997b5ec2629"
+        },
+        {
+          "nevra": "kf6-kio-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "6e2d1456eccdfc6a4591aeb8743d6815a00920c7f49d9d0f41cef71b4fc0c111"
+        },
+        {
+          "nevra": "kf6-kio-core-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-core-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "534892600ca921e1c2329d12f2e0156034f793f8b63f60989928abf29cd2a42a"
+        },
+        {
+          "nevra": "kf6-kio-core-libs-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-core-libs-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "d814f81b2ce9540f8035769cb2b995979a71853970785772fc78667a4ef975c2"
+        },
+        {
+          "nevra": "kf6-kio-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "f4a77e312af7306a2c0c245b84d2a6731d1723f1c251019d2ad224b3d83f99aa"
+        },
+        {
+          "nevra": "kf6-kio-doc-0:6.31.0-1.fc44.noarch",
+          "path": "Packages/k/kf6-kio-doc-6.31.0-1.fc44.noarch.rpm",
+          "sha256": "a537f53cdbdf2714a5474004b957cb660253b91debd1162bb8f5ea2e7362ced2"
+        },
+        {
+          "nevra": "kf6-kio-file-widgets-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-file-widgets-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "e47a853a580d321596ff19ed6e6dc2bf0f2bbed25fb392cedeaf7e7725ad0a84"
+        },
+        {
+          "nevra": "kf6-kio-gui-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-gui-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "32d3059935d6b1b20e66cc962b90cfa66799da08ac02335eee91bfce92a8d029"
+        },
+        {
+          "nevra": "kf6-kio-widgets-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-widgets-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "421d63ea67390c682ad1917828153561b0f5433effba17d94ee47b7c12d02bc2"
+        },
+        {
+          "nevra": "kf6-kio-widgets-libs-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kio-widgets-libs-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "144f001c149af7b161d9f245a4da4ad1c1db2ca532b8b85ab76969816f898460"
+        },
+        {
+          "nevra": "kf6-kirigami-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kirigami-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "e5c204885b63f1bc55cdad1267c7e4b3bb23069c56e08822a3978779a7318aed"
+        },
+        {
+          "nevra": "kf6-kitemviews-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kitemviews-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "c28be4499a9f3f87b7ed6df283dc28ff5a98ec8253532b7c1acc1ccd45d981b1"
+        },
+        {
+          "nevra": "kf6-kitemviews-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kitemviews-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "31dac50cb2e5638c735a6a9b2ea442e2c2cef8cc1a7cdb4c38740d13d6635868"
+        },
+        {
+          "nevra": "kf6-kjobwidgets-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kjobwidgets-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "a74db58b3731c68b141d3824bfd4cd31f856b2d1abe55cce58053633a5e7de26"
+        },
+        {
+          "nevra": "kf6-kjobwidgets-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kjobwidgets-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "20ab1ee40f2fd32fe9281c2d8ae0958957502ea69a98b460a969de068a4025a8"
+        },
+        {
+          "nevra": "kf6-knewstuff-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-knewstuff-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "428ea0fb3b28def9c297388a3c0f1084c10e3ce1cbd751ba7c3d8499ee3c0e6e"
+        },
+        {
+          "nevra": "kf6-knotifications-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-knotifications-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "53fb3fe4cbb02c543c968f5cf7f9975af274b7b101b30cb5dd7df7f32786bd4b"
+        },
+        {
+          "nevra": "kf6-kpackage-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kpackage-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "b01c6d0ca6b543c592e49fabe995f2c5e762caef6e986e9060b2583c6460567e"
+        },
+        {
+          "nevra": "kf6-kparts-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kparts-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "bd5fef570a447233129dc25a62b56bc8e5e332dcbacde44a4f495cdddc1f9f5b"
+        },
+        {
+          "nevra": "kf6-kservice-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kservice-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "e30d7af00a0e21b50413ab2f3522c47d2635ad5516bd237abbe1fd4868c95bdb"
+        },
+        {
+          "nevra": "kf6-kservice-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kservice-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "442f7813c093af215fb2c89f951c032c3dcee3d065a5e7010e7e9eba82c71f44"
+        },
+        {
+          "nevra": "kf6-ktextwidgets-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-ktextwidgets-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "78929118893f2783bcb64039f6e4ef82a798058e5cf1f96c98f969d6273a3194"
+        },
+        {
+          "nevra": "kf6-kuserfeedback-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kuserfeedback-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "2acd6f9d966465b8534b47eb82aefa647344c3fefcab2b41c4b18326fce916a5"
+        },
+        {
+          "nevra": "kf6-kwallet-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kwallet-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "faf132c3c82bcbdcaeec782ad6199dc7b42510c827ced62fc0023939493099b6"
+        },
+        {
+          "nevra": "kf6-kwallet-libs-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kwallet-libs-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "9070ee84a8a22a9c8f7271bcaf9debe5fbec8a9b0db9b69d18f5bae6bb471a9f"
+        },
+        {
+          "nevra": "kf6-kwidgetsaddons-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kwidgetsaddons-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "05e0b34942fff4a5e11aa0af0f124552ee942a71390cd9e99253cb9c4035aa72"
+        },
+        {
+          "nevra": "kf6-kwidgetsaddons-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kwidgetsaddons-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "42bb14f78ff5069bc87444d8dc77c81ed4acf38e9224aa7d2885356e27112039"
+        },
+        {
+          "nevra": "kf6-kwindowsystem-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kwindowsystem-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "34449853595315e17baa3d6f3187786d929fb6c3cc1e5929c5d0ee267ba50fde"
+        },
+        {
+          "nevra": "kf6-kwindowsystem-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kwindowsystem-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "658707e489bc7bf5863032066c1742464c5f906550d74601701cf008b2ebd3a8"
+        },
+        {
+          "nevra": "kf6-kxmlgui-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kxmlgui-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "8a627a44004ab16ff6767c56d7b787cfc6d88c2191634dd396ad4b9217efedf4"
+        },
+        {
+          "nevra": "kf6-kxmlgui-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-kxmlgui-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "7da8a091e22f5415ba22a0247d815589ac4a02edc65e1b04df665e17d864a516"
+        },
+        {
+          "nevra": "kf6-solid-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-solid-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "456398c769d871b6e9cbdc759f11c3a2448398eb2d2b0a2a2eb2f99e22aa0047"
+        },
+        {
+          "nevra": "kf6-solid-devel-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-solid-devel-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "cf0d9473a46fcfe54f3cef5e3a7a14285d5a7c3182da179c055924e998c8513f"
+        },
+        {
+          "nevra": "kf6-sonnet-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-sonnet-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "9d9dc1e25b08365ae6c3aaac9899d4b8a8eaf16e162e1d8075974e4f09b52e6e"
+        },
+        {
+          "nevra": "kf6-syndication-0:6.31.0-1.fc44.x86_64",
+          "path": "Packages/k/kf6-syndication-6.31.0-1.fc44.x86_64.rpm",
+          "sha256": "435e8dc7009db2e183184c3aecc9b2d1537d7aa554c9d9297313db17d953071e"
+        },
+        {
+          "nevra": "krb5-libs-0:1.22.2-4.fc44.x86_64",
+          "path": "Packages/k/krb5-libs-1.22.2-4.fc44.x86_64.rpm",
+          "sha256": "4f39c52d3e38fb68dc2cb3c2b808333d29e0abde497802ffbee26c2fafab2548"
+        },
+        {
+          "nevra": "libX11-0:1.8.13-3.fc44.x86_64",
+          "path": "Packages/l/libX11-1.8.13-3.fc44.x86_64.rpm",
+          "sha256": "a3aa5c9199b442e13e5cf4d0996294397057606bef0a349df3a20cc921663041"
+        },
+        {
+          "nevra": "libX11-common-0:1.8.13-3.fc44.noarch",
+          "path": "Packages/l/libX11-common-1.8.13-3.fc44.noarch.rpm",
+          "sha256": "2db18bf693dfb285a17e520a4007063edb4c88b4f2ac2ed6e66ffab1e318c37d"
+        },
+        {
+          "nevra": "libX11-devel-0:1.8.13-3.fc44.x86_64",
+          "path": "Packages/l/libX11-devel-1.8.13-3.fc44.x86_64.rpm",
+          "sha256": "c50738939024df57367c19e6cdebf7b26acb404a3a61daad0544c92613769197"
+        },
+        {
+          "nevra": "libX11-xcb-0:1.8.13-3.fc44.x86_64",
+          "path": "Packages/l/libX11-xcb-1.8.13-3.fc44.x86_64.rpm",
+          "sha256": "952df583a1a31dadbbbdd875d9efe5d091a8b6896e182cff44270345b9671884"
+        },
+        {
+          "nevra": "libXi-0:1.8.3-1.fc44.x86_64",
+          "path": "Packages/l/libXi-1.8.3-1.fc44.x86_64.rpm",
+          "sha256": "1453cf634cde50fcd4dd695a3434807701676715a306ca8beec9bd5a189fefbc"
+        },
+        {
+          "nevra": "libacl-0:2.4.0-1.fc44.x86_64",
+          "path": "Packages/l/libacl-2.4.0-1.fc44.x86_64.rpm",
+          "sha256": "993c3fa1677ce9234530cce9d9bb40ad2292847e18193d37bea881712ded9b27"
+        },
+        {
+          "nevra": "libaom-0:3.13.3-1.fc44.x86_64",
+          "path": "Packages/l/libaom-3.13.3-1.fc44.x86_64.rpm",
+          "sha256": "e1acd54b88cc77febfda0d06809b089f5652edaa1b1726da615a0c28e5690944"
+        },
+        {
+          "nevra": "libarchive-0:3.8.7-1.fc44.x86_64",
+          "path": "Packages/l/libarchive-3.8.7-1.fc44.x86_64.rpm",
+          "sha256": "284cd5415fcfbba93ea228160c59904cbec4e999b41e40399a9bb367c3a33bf0"
+        },
+        {
+          "nevra": "libasyncns-0:0.8-34.fc44.x86_64",
+          "path": "Packages/l/libasyncns-0.8-34.fc44.x86_64.rpm",
+          "sha256": "c2ce1a4d8ea1f9efa807340bd6f42b7c2cc5c68f4a5310f740c38fc5d491e185"
+        },
+        {
+          "nevra": "libatomic-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/l/libatomic-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "5df3c610688ff2548a4bbfd8e9b47c525b339a45b0d01349163079a3ec82f740"
+        },
+        {
+          "nevra": "libattr-0:2.6.0-1.fc44.x86_64",
+          "path": "Packages/l/libattr-2.6.0-1.fc44.x86_64.rpm",
+          "sha256": "d9d3147eaff6f6a6c2472a9b96d9a96878e0e14e17330a2faa7247fc909509e5"
+        },
+        {
+          "nevra": "libavcodec-free-0:8.1.3-1.fc44.x86_64",
+          "path": "Packages/l/libavcodec-free-8.1.3-1.fc44.x86_64.rpm",
+          "sha256": "7ac9e72ded24167355b8cc949037c067354aa482e8c3223c3e6a5220bae6bf2a"
+        },
+        {
+          "nevra": "libavformat-free-0:8.1.3-1.fc44.x86_64",
+          "path": "Packages/l/libavformat-free-8.1.3-1.fc44.x86_64.rpm",
+          "sha256": "d2110c2ff5b08b753177c637e98564cd082c6c0a57fb31303ac2571c64fb28d2"
+        },
+        {
+          "nevra": "libavutil-free-0:8.1.3-1.fc44.x86_64",
+          "path": "Packages/l/libavutil-free-8.1.3-1.fc44.x86_64.rpm",
+          "sha256": "84628594d65649c50542c0535582c3ba36a6f58f859cf7ead1b7cdc61ca34505"
+        },
+        {
+          "nevra": "libblkid-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/l/libblkid-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "4d38e51d031a32ff4bd64d2ba9022eb11e984c6db7db66dbbe57d12af8516b3b"
+        },
+        {
+          "nevra": "libcap-0:2.78-1.fc44.x86_64",
+          "path": "Packages/l/libcap-2.78-1.fc44.x86_64.rpm",
+          "sha256": "69e2f92edc1178b35562b5d92a64d482191eb0fb7e3fc6f6adad853175a2c96b"
+        },
+        {
+          "nevra": "libcap-ng-0:0.9.6-1.fc44.x86_64",
+          "path": "Packages/l/libcap-ng-0.9.6-1.fc44.x86_64.rpm",
+          "sha256": "707c173b60e1f75079a04932b23b413b6d2442e9311c590258c429985d4be009"
+        },
+        {
+          "nevra": "libcloudproviders-0:0.4.1-1.fc44.x86_64",
+          "path": "Packages/l/libcloudproviders-0.4.1-1.fc44.x86_64.rpm",
+          "sha256": "4c50e11807b0e4712fd349cd9646275e23655ad423db73fa5ad2aa6ac9135b1f"
+        },
+        {
+          "nevra": "libcurl-0:8.18.0-12.fc44.x86_64",
+          "path": "Packages/l/libcurl-8.18.0-12.fc44.x86_64.rpm",
+          "sha256": "a37eb09f0a17dc4e07048d8022d8f5581483b80fbe93dd102220837f6529a507"
+        },
+        {
+          "nevra": "libdav1d-0:1.5.4-1.fc44.x86_64",
+          "path": "Packages/l/libdav1d-1.5.4-1.fc44.x86_64.rpm",
+          "sha256": "d57ae8940af083d51d26b88c2c50b84dacb7eadf9a959a75ecda0f7f1b08974c"
+        },
+        {
+          "nevra": "libdrm-0:2.4.134-1.fc44.x86_64",
+          "path": "Packages/l/libdrm-2.4.134-1.fc44.x86_64.rpm",
+          "sha256": "edd4ba5100079961bb7f9ebcb3efda75dac38f7be79f73e55839c699e236e997"
+        },
+        {
+          "nevra": "libedit-0:3.1-59.20260512cvs.fc44.x86_64",
+          "path": "Packages/l/libedit-3.1-59.20260512cvs.fc44.x86_64.rpm",
+          "sha256": "cde77df3beeca1283c16632fe0c1994418102dc9d21706dd7cc755cc95e83b8e"
+        },
+        {
+          "nevra": "libevdev-0:1.13.7-1.fc44.x86_64",
+          "path": "Packages/l/libevdev-1.13.7-1.fc44.x86_64.rpm",
+          "sha256": "70397701d0c98f1e2afa7820e3dda3197c462f5ed03f86cce0599bb6040d4f12"
+        },
+        {
+          "nevra": "libevent-0:2.1.13-1.fc44.x86_64",
+          "path": "Packages/l/libevent-2.1.13-1.fc44.x86_64.rpm",
+          "sha256": "5ed6be9fadb91187080d63a4036227b53fcce1db82983ab5ec24e0d6493e066f"
+        },
+        {
+          "nevra": "libfbclient2-0:5.0.4.1812-1.fc44.x86_64",
+          "path": "Packages/l/libfbclient2-5.0.4.1812-1.fc44.x86_64.rpm",
+          "sha256": "609a82ba8db25c521a61f00dbc79f97414a85c3aae96aa1b266d99263281440d"
+        },
+        {
+          "nevra": "libfdisk-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/l/libfdisk-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "0793107e9b41f79b6ea7ed493f16a5e0aa5de5c29a4e8717197ad567d40a212c"
+        },
+        {
+          "nevra": "libgcc-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/l/libgcc-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "e9ccd7564d639c85ae455693f11d7a6cd990d1efdae6889656dacbeb9e0f846d"
+        },
+        {
+          "nevra": "libgcrypt-0:1.12.2-1.fc44.x86_64",
+          "path": "Packages/l/libgcrypt-1.12.2-1.fc44.x86_64.rpm",
+          "sha256": "9b34c995e8feab6f9623917ee907052aca214d33656015d506ae73a0c5c07ac5"
+        },
+        {
+          "nevra": "libgomp-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/l/libgomp-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "0add0db002191a83c43697ce70b44aa7eec7dd54e21dbe3e4cf998e883507b29"
+        },
+        {
+          "nevra": "libheif-0:1.23.5-3.fc44.x86_64",
+          "path": "Packages/l/libheif-1.23.5-3.fc44.x86_64.rpm",
+          "sha256": "02d5c39df33c85fbaf4493818b47e5975dcd3c0f7e1f7b8c3226292549d9f575"
+        },
+        {
+          "nevra": "libicu-0:77.1-3.fc44.x86_64",
+          "path": "Packages/l/libicu-77.1-3.fc44.x86_64.rpm",
+          "sha256": "db68619033421e65ef4b583946bf301fe3964509f25f4d6e3c7b8c2a41544c29"
+        },
+        {
+          "nevra": "libimobiledevice-0:1.4.0-3.fc44.x86_64",
+          "path": "Packages/l/libimobiledevice-1.4.0-3.fc44.x86_64.rpm",
+          "sha256": "57915ffcce2bd4e898ca3ecac58a3c5d60c2a73711cf7006a83e38e5af6dd763"
+        },
+        {
+          "nevra": "libimobiledevice-glue-0:1.3.2-1.fc44.x86_64",
+          "path": "Packages/l/libimobiledevice-glue-1.3.2-1.fc44.x86_64.rpm",
+          "sha256": "d52288d9de751adef0a6788314a8857787f939a7588b3e257a021d5a3ee8b9f8"
+        },
+        {
+          "nevra": "libinput-0:1.31.3-1.fc44.x86_64",
+          "path": "Packages/l/libinput-1.31.3-1.fc44.x86_64.rpm",
+          "sha256": "6d187c79c517affeb59b7aa6becaa127d15f1423e35b766625c89249a019cbe2"
+        },
+        {
+          "nevra": "libjxl-1:0.11.2-1.fc44.x86_64",
+          "path": "Packages/l/libjxl-0.11.2-1.fc44.x86_64.rpm",
+          "sha256": "883bdd33b1dbe44528af38a4ff1d16edf28261e8a3d8be17606fb7dff15aea37"
+        },
+        {
+          "nevra": "liblastlog2-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/l/liblastlog2-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "b1327aeae3d88c0c65c2070fc3117569cbf101b1aa92d9b05963ca058e9d0349"
+        },
+        {
+          "nevra": "libldb-2:4.24.7-1.fc44.x86_64",
+          "path": "Packages/l/libldb-4.24.7-1.fc44.x86_64.rpm",
+          "sha256": "33be2a775ccaa6faf6d97dc952e025500d370cad1217e95aa5f932f98471ba07"
+        },
+        {
+          "nevra": "libmount-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/l/libmount-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "75ac4afc36e36e6e5c6e888c10075d049f26205edc900b84e99dc111a5439150"
+        },
+        {
+          "nevra": "libmpc-0:1.4.1-1.fc44.x86_64",
+          "path": "Packages/l/libmpc-1.4.1-1.fc44.x86_64.rpm",
+          "sha256": "4dffc953aff5309b0a4d45bf7d9d8167f8062250b957d4b78c372973d290f5c9"
+        },
+        {
+          "nevra": "libnghttp2-0:1.68.0-5.fc44.x86_64",
+          "path": "Packages/l/libnghttp2-1.68.0-5.fc44.x86_64.rpm",
+          "sha256": "8361227cb08abb0ed63de90960a988d3d513180d83f49a081c830865b12a2f1d"
+        },
+        {
+          "nevra": "libnghttp3-0:1.18.0-1.fc44.x86_64",
+          "path": "Packages/l/libnghttp3-1.18.0-1.fc44.x86_64.rpm",
+          "sha256": "e0e422716b5db9f519f02f6a314850bd1eb7753b2cbfd3b49d138fd2685d15d1"
+        },
+        {
+          "nevra": "libopenmpt-0:0.8.9-1.fc44.x86_64",
+          "path": "Packages/l/libopenmpt-0.8.9-1.fc44.x86_64.rpm",
+          "sha256": "6f30552f27274ab2e66ee2ec6ce8202ca28b61e83b271f7ffaa75350418b309e"
+        },
+        {
+          "nevra": "libplist-0:2.7.0-1.fc44.x86_64",
+          "path": "Packages/l/libplist-2.7.0-1.fc44.x86_64.rpm",
+          "sha256": "41378e12d2f124478121f774ad4e2dd6c5b2c0766ad0cc06f4fa0bbad6b63871"
+        },
+        {
+          "nevra": "libpng-2:1.6.58-1.fc44.x86_64",
+          "path": "Packages/l/libpng-1.6.58-1.fc44.x86_64.rpm",
+          "sha256": "88403c9c7b95c25a8b98c6f6ccf37ddc7cc8aa761e21e86d7083d2979148d09e"
+        },
+        {
+          "nevra": "librabbitmq-0:0.18.0-1.fc44.x86_64",
+          "path": "Packages/l/librabbitmq-0.18.0-1.fc44.x86_64.rpm",
+          "sha256": "001f2f798e38ab3b9c2a329e4d9a8e6f145638749c986dbc6752a9d17b8d26f5"
+        },
+        {
+          "nevra": "librsvg2-0:2.62.4-1.fc44.x86_64",
+          "path": "Packages/l/librsvg2-2.62.4-1.fc44.x86_64.rpm",
+          "sha256": "9eec6a2dd8fca527575ea29e838b5289b8f15eb66d900ca32bbb8684de336b6e"
+        },
+        {
+          "nevra": "libseccomp-0:2.6.1-2.fc44.x86_64",
+          "path": "Packages/l/libseccomp-2.6.1-2.fc44.x86_64.rpm",
+          "sha256": "739e423dd898fd54ccadb93a731018d44881536f6d80c0b1ee3885095881d807"
+        },
+        {
+          "nevra": "libsecret-0:0.21.8.2-2.fc44.x86_64",
+          "path": "Packages/l/libsecret-0.21.8.2-2.fc44.x86_64.rpm",
+          "sha256": "58879f04b1f5a4381a70b72d296ee55b89dbd10089a1df2da791d561574f735d"
+        },
+        {
+          "nevra": "libselinux-0:3.11-2.fc44.x86_64",
+          "path": "Packages/l/libselinux-3.11-2.fc44.x86_64.rpm",
+          "sha256": "50fc29cc4e31824d87a2a709f4c3e4873fbc1785da333cd05dc5138a8eceea5f"
+        },
+        {
+          "nevra": "libsepol-0:3.11-1.fc44.x86_64",
+          "path": "Packages/l/libsepol-3.11-1.fc44.x86_64.rpm",
+          "sha256": "8d37fd4f74457700dc646ca9d0b0691debb58ec3627ace0c50b7398fbbad736e"
+        },
+        {
+          "nevra": "libsmartcols-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/l/libsmartcols-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "f6743acc4b48d79f8d9c213d5647d7073daeac2fa3e7292e3f4f1471cc9c94ab"
+        },
+        {
+          "nevra": "libsmbclient-2:4.24.7-1.fc44.x86_64",
+          "path": "Packages/l/libsmbclient-4.24.7-1.fc44.x86_64.rpm",
+          "sha256": "2762a7cc97ca092846e984e706d81dca7a3b5b409bd163947a9820452f3a7a8e"
+        },
+        {
+          "nevra": "libsodium-0:1.0.22-1.fc44.x86_64",
+          "path": "Packages/l/libsodium-1.0.22-1.fc44.x86_64.rpm",
+          "sha256": "d68bfb57a93d95c5f7d0be1fd8557a2cfda20afac3c43904325b30c17b4fae4f"
+        },
+        {
+          "nevra": "libsoup3-0:3.6.6-10.fc44.x86_64",
+          "path": "Packages/l/libsoup3-3.6.6-10.fc44.x86_64.rpm",
+          "sha256": "cfc785b852b1a558010a5be093996bf3fb84cc0d3ed1fe8a4e023b5acbf4a4b5"
+        },
+        {
+          "nevra": "libssh-0:0.12.2-1.fc44.x86_64",
+          "path": "Packages/l/libssh-0.12.2-1.fc44.x86_64.rpm",
+          "sha256": "b99bf757d615dfc15cd6f0c9da944b72dcc38c3d9ae4246b40fc7be142a5e5e1"
+        },
+        {
+          "nevra": "libssh-config-0:0.12.2-1.fc44.noarch",
+          "path": "Packages/l/libssh-config-0.12.2-1.fc44.noarch.rpm",
+          "sha256": "1230cf27692948004c2b6ebc8904b2a28aa9735c827049d54985ce4cdc8fd595"
+        },
+        {
+          "nevra": "libstdc++-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/l/libstdc++-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "09f74b1a9b640c8273998240cb0b219c8f1fbca51197d49ec4dc8ecde39fa7ec"
+        },
+        {
+          "nevra": "libstdc++-devel-0:16.2.1-2.fc44.x86_64",
+          "path": "Packages/l/libstdc++-devel-16.2.1-2.fc44.x86_64.rpm",
+          "sha256": "d5e8e08c38e676fe2be6e7498aa273cdfaaa08a36a385c63f09ae20216fc54cc"
+        },
+        {
+          "nevra": "libswresample-free-0:8.1.3-1.fc44.x86_64",
+          "path": "Packages/l/libswresample-free-8.1.3-1.fc44.x86_64.rpm",
+          "sha256": "cc134f0c57686fb44b5f2e80d5d2aa659e41f9b4643d14b04da4b280ee861e3a"
+        },
+        {
+          "nevra": "libswscale-free-0:8.1.3-1.fc44.x86_64",
+          "path": "Packages/l/libswscale-free-8.1.3-1.fc44.x86_64.rpm",
+          "sha256": "0791f9d059e752ba1d3abe757e364f6babf4037def288b8e45bdce84a439215f"
+        },
+        {
+          "nevra": "libtextstyle-0:0.26-5.fc44.x86_64",
+          "path": "Packages/l/libtextstyle-0.26-5.fc44.x86_64.rpm",
+          "sha256": "5e026ce24da9c9d63eb58c202264c1e33b2119afaf57d7a1eda4fcae1b82c0f2"
+        },
+        {
+          "nevra": "libtiff-0:4.7.2-1.fc44.x86_64",
+          "path": "Packages/l/libtiff-4.7.2-1.fc44.x86_64.rpm",
+          "sha256": "d2d69d4d7f4f5e34abd8f717336d4fc5bd8deba6546c46de7c95c1ec805036a2"
+        },
+        {
+          "nevra": "libtinysparql-0:3.11.1-1.fc44.x86_64",
+          "path": "Packages/l/libtinysparql-3.11.1-1.fc44.x86_64.rpm",
+          "sha256": "95bd2620dd81899da12899631cbccb68cd627a3195f26ea596878c139e6afe65"
+        },
+        {
+          "nevra": "libtirpc-0:1.3.8-0.fc44.x86_64",
+          "path": "Packages/l/libtirpc-1.3.8-0.fc44.x86_64.rpm",
+          "sha256": "3a9bb07325da4ca2d3ff3e2a44cd758f5a67c4e8b300ef34e1878e10cdbafa4e"
+        },
+        {
+          "nevra": "libunwind-0:1.8.3-4.fc44.x86_64",
+          "path": "Packages/l/libunwind-1.8.3-4.fc44.x86_64.rpm",
+          "sha256": "8abdc0be3830e25cf7385a1d23b94038c55752ed2b9d81b0cb936e2afa976b79"
+        },
+        {
+          "nevra": "libusb1-0:1.0.30-1.fc44.x86_64",
+          "path": "Packages/l/libusb1-1.0.30-1.fc44.x86_64.rpm",
+          "sha256": "537c67003264f26559326bc9bf194dcbf03f6a13123a827a6f71fdf457d8838a"
+        },
+        {
+          "nevra": "libusbmuxd-0:2.1.1-1.fc44.x86_64",
+          "path": "Packages/l/libusbmuxd-2.1.1-1.fc44.x86_64.rpm",
+          "sha256": "897fdc45c5e35f86aa3b8a78c309a97843c482c98f3b86888f1da8ab1db0ed01"
+        },
+        {
+          "nevra": "libuuid-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/l/libuuid-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "766313b4be6b60e5f4ef22346f29aeb2c0b6a4d2d13931733ba7e6111f401c3a"
+        },
+        {
+          "nevra": "libuv-1:1.52.1-2.fc44.x86_64",
+          "path": "Packages/l/libuv-1.52.1-2.fc44.x86_64.rpm",
+          "sha256": "ffc27dce5d647e8f56429089faff79eec32bf3eb90c73d4247a7747c7241c165"
+        },
+        {
+          "nevra": "libvpl-1:2.17.0-1.fc44.x86_64",
+          "path": "Packages/l/libvpl-2.17.0-1.fc44.x86_64.rpm",
+          "sha256": "39cb71cb3fad4ac82372d13eb08e1a650f3137326f2547f5df3c2facc7afd2c1"
+        },
+        {
+          "nevra": "libwacom-0:2.19.0-1.fc44.x86_64",
+          "path": "Packages/l/libwacom-2.19.0-1.fc44.x86_64.rpm",
+          "sha256": "ba5748e8c52fbde3d73ca6791e04c861c3a818d454245fd4f1de3b3e229cec22"
+        },
+        {
+          "nevra": "libwacom-data-0:2.19.0-1.fc44.noarch",
+          "path": "Packages/l/libwacom-data-2.19.0-1.fc44.noarch.rpm",
+          "sha256": "5099f8e569baba02dc1343ab49316a3c9876b981e2b51a40636d2b988d946921"
+        },
+        {
+          "nevra": "libwayland-client-0:1.26.0-1.fc44.x86_64",
+          "path": "Packages/l/libwayland-client-1.26.0-1.fc44.x86_64.rpm",
+          "sha256": "0f2b24f04061c1c053a02085f4edb89243e2d4f0284775f164d2c7e77785e7e7"
+        },
+        {
+          "nevra": "libwayland-cursor-0:1.26.0-1.fc44.x86_64",
+          "path": "Packages/l/libwayland-cursor-1.26.0-1.fc44.x86_64.rpm",
+          "sha256": "5ca949179d3ded9e8d0ebf1f2dee8514aa06a472869b04f5fc47d6a47ade2582"
+        },
+        {
+          "nevra": "libwayland-egl-0:1.26.0-1.fc44.x86_64",
+          "path": "Packages/l/libwayland-egl-1.26.0-1.fc44.x86_64.rpm",
+          "sha256": "a8a168af70e986983085ede3a72b741ef15448ae03719e9a6a4fe59c16396bb5"
+        },
+        {
+          "nevra": "libwayland-server-0:1.26.0-1.fc44.x86_64",
+          "path": "Packages/l/libwayland-server-1.26.0-1.fc44.x86_64.rpm",
+          "sha256": "3404b75eb810c828661e2549a1bbb49f44efb2f8e7c61c37e5a3bf6be77bb295"
+        },
+        {
+          "nevra": "libwbclient-2:4.24.7-1.fc44.x86_64",
+          "path": "Packages/l/libwbclient-4.24.7-1.fc44.x86_64.rpm",
+          "sha256": "38e034c79daae59de722b01d313fedaa35106c93bc1d790cd01d21ce41fb9959"
+        },
+        {
+          "nevra": "llvm-filesystem-0:22.1.8-4.fc44.x86_64",
+          "path": "Packages/l/llvm-filesystem-22.1.8-4.fc44.x86_64.rpm",
+          "sha256": "c3a50a21b34d66693388fbb86371d0cc815c3218fbdc89bdecccdf4599a0d008"
+        },
+        {
+          "nevra": "llvm-libs-0:22.1.8-4.fc44.x86_64",
+          "path": "Packages/l/llvm-libs-22.1.8-4.fc44.x86_64.rpm",
+          "sha256": "c033e24457336cc887611599a180b623893cefaf2ad0a540741fdd812b20a81d"
+        },
+        {
+          "nevra": "mariadb-connector-c-0:3.4.9-2.fc44.x86_64",
+          "path": "Packages/m/mariadb-connector-c-3.4.9-2.fc44.x86_64.rpm",
+          "sha256": "7bae47286c8bda9b4d45ab3b46baddfe5bb18b8336b1a49025c71bbc67cf2f27"
+        },
+        {
+          "nevra": "mariadb-connector-c-config-0:3.4.9-2.fc44.noarch",
+          "path": "Packages/m/mariadb-connector-c-config-3.4.9-2.fc44.noarch.rpm",
+          "sha256": "1da5fa0ae9ad33b0a17cd6cd45647491a651154660c776b3b82cd2577387f36b"
+        },
+        {
+          "nevra": "mesa-dri-drivers-0:26.2.4-1.fc44.x86_64",
+          "path": "Packages/m/mesa-dri-drivers-26.2.4-1.fc44.x86_64.rpm",
+          "sha256": "52cb276bd6dc2c17c13a0c2af087fc83d7bbe54cbfd8711e07dea938d967b229"
+        },
+        {
+          "nevra": "mesa-filesystem-0:26.2.4-1.fc44.x86_64",
+          "path": "Packages/m/mesa-filesystem-26.2.4-1.fc44.x86_64.rpm",
+          "sha256": "de411e60dda38e7cb7f855ccb5700d0fdab217012f614f4f0192376a9194712f"
+        },
+        {
+          "nevra": "mesa-libEGL-0:26.2.4-1.fc44.x86_64",
+          "path": "Packages/m/mesa-libEGL-26.2.4-1.fc44.x86_64.rpm",
+          "sha256": "72054e412c4d7f51550c48028347ed4f10d0080ef2c0edd1076fa4704ae9b802"
+        },
+        {
+          "nevra": "mesa-libGL-0:26.2.4-1.fc44.x86_64",
+          "path": "Packages/m/mesa-libGL-26.2.4-1.fc44.x86_64.rpm",
+          "sha256": "d6770ab8e4309de4bb231acb7d584d4638004832950cfd54cac93d9dec36e254"
+        },
+        {
+          "nevra": "mesa-libgbm-0:26.2.4-1.fc44.x86_64",
+          "path": "Packages/m/mesa-libgbm-26.2.4-1.fc44.x86_64.rpm",
+          "sha256": "94f433141aa0d261e89ba736640b9dc11c2de481dd9978187a98e3de25bd8a95"
+        },
+        {
+          "nevra": "ngtcp2-0:1.22.1-1.fc44.x86_64",
+          "path": "Packages/n/ngtcp2-1.22.1-1.fc44.x86_64.rpm",
+          "sha256": "0ca9f4a87d2c3657a7c802e2cc3b9fd09e7668d474dee662b6f221cb92fb7565"
+        },
+        {
+          "nevra": "ngtcp2-crypto-gnutls-0:1.22.1-1.fc44.x86_64",
+          "path": "Packages/n/ngtcp2-crypto-gnutls-1.22.1-1.fc44.x86_64.rpm",
+          "sha256": "5c6dd2c2d28ce5c1a0f052c899f231e841487a6466cb4e87024fe5ef9168a102"
+        },
+        {
+          "nevra": "ngtcp2-crypto-ossl-0:1.22.1-1.fc44.x86_64",
+          "path": "Packages/n/ngtcp2-crypto-ossl-1.22.1-1.fc44.x86_64.rpm",
+          "sha256": "6057b74cea8407eb14e55827d317a0bf3ac4a8dbfd4ee018563a0f285792a5aa"
+        },
+        {
+          "nevra": "nspr-0:4.39.0-6.fc44.x86_64",
+          "path": "Packages/n/nspr-4.39.0-6.fc44.x86_64.rpm",
+          "sha256": "1cb343e966591aa869647d406d7a60c3641ab6f5f4be08863983e814941c1667"
+        },
+        {
+          "nevra": "nss-0:3.130.0-1.fc44.x86_64",
+          "path": "Packages/n/nss-3.130.0-1.fc44.x86_64.rpm",
+          "sha256": "624ce60592769362117699814e2140a391d519239cbc727065040ad1461fd16b"
+        },
+        {
+          "nevra": "nss-softokn-0:3.130.0-1.fc44.x86_64",
+          "path": "Packages/n/nss-softokn-3.130.0-1.fc44.x86_64.rpm",
+          "sha256": "e4482f165d28b05e0726f4ff4e665877b8b2fcfb984018a358fd94798f210302"
+        },
+        {
+          "nevra": "nss-softokn-freebl-0:3.130.0-1.fc44.x86_64",
+          "path": "Packages/n/nss-softokn-freebl-3.130.0-1.fc44.x86_64.rpm",
+          "sha256": "515379d4bce1a61340979524ce8a5e3afd743962b8b19965adb62e14782cc209"
+        },
+        {
+          "nevra": "nss-sysinit-0:3.130.0-1.fc44.x86_64",
+          "path": "Packages/n/nss-sysinit-3.130.0-1.fc44.x86_64.rpm",
+          "sha256": "65752fc2cd6b7e05f043217b48f50d77d42278c50a7ed93aa21f686aea6ceb65"
+        },
+        {
+          "nevra": "nss-util-0:3.130.0-1.fc44.x86_64",
+          "path": "Packages/n/nss-util-3.130.0-1.fc44.x86_64.rpm",
+          "sha256": "5e44bce2ead8d569564fd90f30ebc02f8d5e0c339f0628dde8fdb66b5b8ccf8a"
+        },
+        {
+          "nevra": "ntfs-3g-libs-2:2026.2.25-1.fc44.x86_64",
+          "path": "Packages/n/ntfs-3g-libs-2026.2.25-1.fc44.x86_64.rpm",
+          "sha256": "48780c54b992c6a4c933d580cbb30381e8e6ff051ba13fc2dfe231608cdf1563"
+        },
+        {
+          "nevra": "ntfsprogs-2:2026.2.25-1.fc44.x86_64",
+          "path": "Packages/n/ntfsprogs-2026.2.25-1.fc44.x86_64.rpm",
+          "sha256": "55fc391ebcd74a8b5a56ca067bb1b7f14058b81cdce5e19d75797e5574799583"
+        },
+        {
+          "nevra": "openldap-0:2.6.14-1.fc44.x86_64",
+          "path": "Packages/o/openldap-2.6.14-1.fc44.x86_64.rpm",
+          "sha256": "2651c87ee3543f1c6fd0b8e8c55daea42798d7a768e5310c3a60a344e4396ccf"
+        },
+        {
+          "nevra": "openssl-libs-1:3.5.9-1.fc44.x86_64",
+          "path": "Packages/o/openssl-libs-3.5.9-1.fc44.x86_64.rpm",
+          "sha256": "9b0efe3cf1f2ebaa3dfa0367c0cff4790c6c5d1269f2bcad53d7ace2759e0ede"
+        },
+        {
+          "nevra": "openxr-libs-0:1.1.63-1.fc44.x86_64",
+          "path": "Packages/o/openxr-libs-1.1.63-1.fc44.x86_64.rpm",
+          "sha256": "8e40a189f32ad59ffba585f5732a78bf80ee19ee1cc9b7ba70dbd0e2bac09e57"
+        },
+        {
+          "nevra": "p11-kit-0:0.26.5-1.fc44.x86_64",
+          "path": "Packages/p/p11-kit-0.26.5-1.fc44.x86_64.rpm",
+          "sha256": "cb0ad8fd9fcc88689a6854096126fe3830ee8d660854326da0560b9e0b04f928"
+        },
+        {
+          "nevra": "p11-kit-trust-0:0.26.5-1.fc44.x86_64",
+          "path": "Packages/p/p11-kit-trust-0.26.5-1.fc44.x86_64.rpm",
+          "sha256": "65b326ddb0099b88267e388800b1f38afdc2adba98d9f62699a7225b92389f2b"
+        },
+        {
+          "nevra": "pam-0:1.7.2-2.fc44.x86_64",
+          "path": "Packages/p/pam-1.7.2-2.fc44.x86_64.rpm",
+          "sha256": "2827529cc727da309ab58ebb852bac171b37c2b8d23503bc6920a3e10b943304"
+        },
+        {
+          "nevra": "pam-libs-0:1.7.2-2.fc44.x86_64",
+          "path": "Packages/p/pam-libs-1.7.2-2.fc44.x86_64.rpm",
+          "sha256": "14336e0fbc52bd6106d2fb4f7d9f6d5912b2e2332cf08c4e9237fe99bcdae031"
+        },
+        {
+          "nevra": "parted-0:3.6-15.fc44.x86_64",
+          "path": "Packages/p/parted-3.6-15.fc44.x86_64.rpm",
+          "sha256": "b9a1dcf986668e35df2361ed3f0c8ba34c26b20559757fc6565b3aef730e9f39"
+        },
+        {
+          "nevra": "pinentry-0:1.3.2-3.fc44.x86_64",
+          "path": "Packages/p/pinentry-1.3.2-3.fc44.x86_64.rpm",
+          "sha256": "5cac0146f75c06cb0b6eca9651be96b654dd7e53e395b8c6d58406cdfb935325"
+        },
+        {
+          "nevra": "pinentry-gnome3-0:1.3.2-3.fc44.x86_64",
+          "path": "Packages/p/pinentry-gnome3-1.3.2-3.fc44.x86_64.rpm",
+          "sha256": "9942d292a1234a2a7c22b508956147df6bfdad996ff7ed2b2d7e0da24590d533"
+        },
+        {
+          "nevra": "polkit-qt6-1-0:0.201.1-1.fc44.x86_64",
+          "path": "Packages/p/polkit-qt6-1-0.201.1-1.fc44.x86_64.rpm",
+          "sha256": "39a50324369ec720225868782e13ab31659f396a2a91ee7bbf17912d71f1ebdd"
+        },
+        {
+          "nevra": "pugixml-0:1.16-1.fc44.x86_64",
+          "path": "Packages/p/pugixml-1.16-1.fc44.x86_64.rpm",
+          "sha256": "2128b51f6ab09847cda69f37818fb83599de2073f44814dd5426f54a8be682b1"
+        },
+        {
+          "nevra": "python-pip-wheel-0:26.0.1-3.fc44.noarch",
+          "path": "Packages/p/python-pip-wheel-26.0.1-3.fc44.noarch.rpm",
+          "sha256": "e9a4e974a23e196584716000c0d46a5462c14fd08c4038d2ee46c9b3bc5ac78f"
+        },
+        {
+          "nevra": "python3-0:3.14.8-1.fc44.x86_64",
+          "path": "Packages/p/python3-3.14.8-1.fc44.x86_64.rpm",
+          "sha256": "69d73f1529756aff42a9d5f200f3bd6abbefd9006b36f3345aaaff741ce18332"
+        },
+        {
+          "nevra": "python3-libs-0:3.14.8-1.fc44.x86_64",
+          "path": "Packages/p/python3-libs-3.14.8-1.fc44.x86_64.rpm",
+          "sha256": "a7abe16ab0476c3c1dcf9f85df021a1bd1751129184385d8427c14d425ea05b2"
+        },
+        {
+          "nevra": "qt6-filesystem-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-filesystem-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "d45607a1e6c8bfa9c4e418c06d9abe3e918def590e5c3a1aa90747e770457dd9"
+        },
+        {
+          "nevra": "qt6-qt5compat-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qt5compat-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "b60dcc48b851d18c6f198ebd39ffc92a9feb23dd0efb760a047bcaefd547553b"
+        },
+        {
+          "nevra": "qt6-qtbase-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "3251892958db8b35f5694578ed4523e717d24761b1aef66618e8deeb7b8f8e3b"
+        },
+        {
+          "nevra": "qt6-qtbase-common-0:6.11.2-3.fc44.noarch",
+          "path": "Packages/q/qt6-qtbase-common-6.11.2-3.fc44.noarch.rpm",
+          "sha256": "7518a82ede4fe49f5911e406dd270a8cd047dcd773c717f34472a1f45adf2f67"
+        },
+        {
+          "nevra": "qt6-qtbase-devel-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-devel-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "6b886ab40488e8d28caa832c1d5780d8bfac2f93ca356ccb19b724cf446e2fd2"
+        },
+        {
+          "nevra": "qt6-qtbase-gui-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-gui-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "69a126a7d3f6e941a8f0fd8eb14d926a749a98b6ca8b0a1aeba26c9b4c3eb7cd"
+        },
+        {
+          "nevra": "qt6-qtbase-ibase-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-ibase-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "b3be127f415815a77ba385c77a6446123426adb9caf300840b2637bd66d520ac"
+        },
+        {
+          "nevra": "qt6-qtbase-mysql-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-mysql-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "09377d6277a08953d84c54ef6c9cc25a75646707922dc6eb6213472598108c77"
+        },
+        {
+          "nevra": "qt6-qtbase-odbc-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-odbc-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "0ab5e80ef0ef81880a8f0a9a32eb49045715e45a894405a00b940e95fa635f6a"
+        },
+        {
+          "nevra": "qt6-qtbase-postgresql-0:6.11.2-3.fc44.x86_64",
+          "path": "Packages/q/qt6-qtbase-postgresql-6.11.2-3.fc44.x86_64.rpm",
+          "sha256": "15661d8e49c51b664c4dc02ee729af6d66794edd00b18dace132694f380cd043"
+        },
+        {
+          "nevra": "qt6-qtdeclarative-0:6.11.2-2.fc44.x86_64",
+          "path": "Packages/q/qt6-qtdeclarative-6.11.2-2.fc44.x86_64.rpm",
+          "sha256": "2300ee2633dbedb7b15378c1c090e9786488a26f8299bcec8bf0d873bfcc78df"
+        },
+        {
+          "nevra": "qt6-qtdeclarative-devel-0:6.11.2-2.fc44.x86_64",
+          "path": "Packages/q/qt6-qtdeclarative-devel-6.11.2-2.fc44.x86_64.rpm",
+          "sha256": "931285e49a0c379c47429d98e6ce90d42b424561752bdff7d5bc9deadbce1f1d"
+        },
+        {
+          "nevra": "qt6-qtmultimedia-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qtmultimedia-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "ec0db0dfe0441e242103acd933a72ea05d7922c21ec21ed2329cb4dd94620bc7"
+        },
+        {
+          "nevra": "qt6-qtquick3d-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qtquick3d-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "4af0b24c400ab55850168f364d60adbf348419d8327a4e8affd21c072301ae89"
+        },
+        {
+          "nevra": "qt6-qtquicktimeline-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qtquicktimeline-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "700b02a04c33f5fd9da12a0f056943f4ecc1b4a9e15caca91bb5276492348d28"
+        },
+        {
+          "nevra": "qt6-qtshadertools-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qtshadertools-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "9904a3b23c809bf047ea6661970ca19d7788bf8323c20786820e63987be3206c"
+        },
+        {
+          "nevra": "qt6-qtspeech-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qtspeech-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "da5849d129723a39d307283a5328f5b7654ef8527d1b962b95a00369bfce4324"
+        },
+        {
+          "nevra": "qt6-qtsvg-0:6.11.2-1.fc44.x86_64",
+          "path": "Packages/q/qt6-qtsvg-6.11.2-1.fc44.x86_64.rpm",
+          "sha256": "6630b3bef4d0bebc0fbabad2e650b08a4dff74d32bda95eb9750a43d25e50d66"
+        },
+        {
+          "nevra": "qt6-rpm-macros-0:6.11.2-1.fc44.noarch",
+          "path": "Packages/q/qt6-rpm-macros-6.11.2-1.fc44.noarch.rpm",
+          "sha256": "02b8a853aacc6653b7735f5baaca5bec63801215acbaebfb75c5c489380779ba"
+        },
+        {
+          "nevra": "rpm-0:6.0.2-1.fc44.x86_64",
+          "path": "Packages/r/rpm-6.0.2-1.fc44.x86_64.rpm",
+          "sha256": "08c6408900cba542b1a0568f45f1290f7d4d65b0ea185def8f20b172e7bdf31f"
+        },
+        {
+          "nevra": "rpm-libs-0:6.0.2-1.fc44.x86_64",
+          "path": "Packages/r/rpm-libs-6.0.2-1.fc44.x86_64.rpm",
+          "sha256": "4c8cdef1ef1f62712e6a954ba967519baf4155a53e548d81d4750ea55c4dc35d"
+        },
+        {
+          "nevra": "rpm-sequoia-0:1.10.3-1.fc44.x86_64",
+          "path": "Packages/r/rpm-sequoia-1.10.3-1.fc44.x86_64.rpm",
+          "sha256": "ebb66ed71066eed096c2b1621de96979ea09be3a9b17ca8f4b7092d2f4584d1d"
+        },
+        {
+          "nevra": "rsync-0:3.5.1-1.fc44.x86_64",
+          "path": "Packages/r/rsync-3.5.1-1.fc44.x86_64.rpm",
+          "sha256": "f794e6f220be46e1f4c4476304f65a8f5d351ae94c3038a72e2ec8a578052f56"
+        },
+        {
+          "nevra": "samba-client-libs-2:4.24.7-1.fc44.x86_64",
+          "path": "Packages/s/samba-client-libs-4.24.7-1.fc44.x86_64.rpm",
+          "sha256": "c916f46469fbf07266c225cf3f1c625bf0fe9b98f15058d6bf90a5446816e5c9"
+        },
+        {
+          "nevra": "samba-common-2:4.24.7-1.fc44.noarch",
+          "path": "Packages/s/samba-common-4.24.7-1.fc44.noarch.rpm",
+          "sha256": "4aa912394bd2f185648aa9f3e452abf9656b5960895bbfe582280300624c6dd7"
+        },
+        {
+          "nevra": "samba-core-libs-2:4.24.7-1.fc44.x86_64",
+          "path": "Packages/s/samba-core-libs-4.24.7-1.fc44.x86_64.rpm",
+          "sha256": "356e9a294933f0eaec39b6a216eddec048eef1d44b39848bcc6f1d7c27086e2c"
+        },
+        {
+          "nevra": "samba-ndr-libs-2:4.24.7-1.fc44.x86_64",
+          "path": "Packages/s/samba-ndr-libs-4.24.7-1.fc44.x86_64.rpm",
+          "sha256": "f77c60f61b51f91e33ccdab235e6807907d57a0db52ee2e96d965d46ad1ade72"
+        },
+        {
+          "nevra": "sdl2-compat-0:2.32.74-1.fc44.x86_64",
+          "path": "Packages/s/sdl2-compat-2.32.74-1.fc44.x86_64.rpm",
+          "sha256": "d3fc0a7c5d76c56d6c37e222ad3ce8ca4b3e466a53796ae0360074e4c0e1c622"
+        },
+        {
+          "nevra": "shim-x64-0:16.1-7.x86_64",
+          "path": "Packages/s/shim-x64-16.1-7.x86_64.rpm",
+          "sha256": "4badee0c00c4c41a53f41c8a2dd566dca815ca051f1d2fba92490d0a0194f5c3"
+        },
+        {
+          "nevra": "sqlite-libs-0:3.51.2-2.fc44.x86_64",
+          "path": "Packages/s/sqlite-libs-3.51.2-2.fc44.x86_64.rpm",
+          "sha256": "c1c6c6cb5258e361068379c9eeef6897e256b3d99a8d65cbb9c3cff29d9bf775"
+        },
+        {
+          "nevra": "srt-libs-0:1.5.7-1.fc44.x86_64",
+          "path": "Packages/s/srt-libs-1.5.7-1.fc44.x86_64.rpm",
+          "sha256": "94acbc01093077ca3ea9ae82cc1eed9729220c6683630e18c5031cc2880ee42d"
+        },
+        {
+          "nevra": "systemd-0:259.9-1.fc44.x86_64",
+          "path": "Packages/s/systemd-259.9-1.fc44.x86_64.rpm",
+          "sha256": "e5ebedb5c7b0893ec884cf8f187b39c6937d1b753c888f8b5f30761217400c88"
+        },
+        {
+          "nevra": "systemd-libs-0:259.9-1.fc44.x86_64",
+          "path": "Packages/s/systemd-libs-259.9-1.fc44.x86_64.rpm",
+          "sha256": "c95149e789f24bc4c840fd2446a95adab661ea93b0f106ea9496b97eccd2ca55"
+        },
+        {
+          "nevra": "systemd-shared-0:259.9-1.fc44.x86_64",
+          "path": "Packages/s/systemd-shared-259.9-1.fc44.x86_64.rpm",
+          "sha256": "5164dd19e6330fcac0158b75ecc9678bbef8e7f47d8966ee42904542fb54c64f"
+        },
+        {
+          "nevra": "systemd-sysusers-0:259.9-1.fc44.x86_64",
+          "path": "Packages/s/systemd-sysusers-259.9-1.fc44.x86_64.rpm",
+          "sha256": "114d9939037f8bdd1e62fd9c42d11dcb56ab53e413f2ea487fa86b958a096ed1"
+        },
+        {
+          "nevra": "systemd-udev-0:259.9-1.fc44.x86_64",
+          "path": "Packages/s/systemd-udev-259.9-1.fc44.x86_64.rpm",
+          "sha256": "ccd4e09a7ccc249bcfc56928b28943d2c4ef02f5cc22a8524f504c1e61157e79"
+        },
+        {
+          "nevra": "taglib-0:2.3-2.fc44.x86_64",
+          "path": "Packages/t/taglib-2.3-2.fc44.x86_64.rpm",
+          "sha256": "dd859b7bf9ae3539804d791e45904890f1c3604c51f3a92ff9b971dd978b8284"
+        },
+        {
+          "nevra": "tzdata-0:2026e-1.fc44.noarch",
+          "path": "Packages/t/tzdata-2026e-1.fc44.noarch.rpm",
+          "sha256": "c834a815040bdc1419764dcf81ca2d6ed5818c5625e07476b7923cf0e1b8f45c"
+        },
+        {
+          "nevra": "util-linux-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/u/util-linux-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "b02ace204e78425e41c9abb33fd3f3f91794f42a13aac28310dae6fb02cc39e1"
+        },
+        {
+          "nevra": "util-linux-core-0:2.41.5-1.fc44.x86_64",
+          "path": "Packages/u/util-linux-core-2.41.5-1.fc44.x86_64.rpm",
+          "sha256": "a3e4e4994216ced856b71153b9311135c5cde9d00b66c0f61a492916a51f5f7d"
+        },
+        {
+          "nevra": "vim-filesystem-2:9.2.1129-1.fc44.noarch",
+          "path": "Packages/v/vim-filesystem-9.2.1129-1.fc44.noarch.rpm",
+          "sha256": "31d1dc3fbbb005f8962e1754b8fad92a5932d8bc5a8c8b9fe389808486c3c29c"
+        },
+        {
+          "nevra": "wayland-devel-0:1.26.0-1.fc44.x86_64",
+          "path": "Packages/w/wayland-devel-1.26.0-1.fc44.x86_64.rpm",
+          "sha256": "3b51e0fe13dbe9543b33ac8ad6464ce1babec92fa189b8126bbc57e2524659d5"
+        },
+        {
+          "nevra": "xxhash-libs-0:0.8.4-1.fc44.x86_64",
+          "path": "Packages/x/xxhash-libs-0.8.4-1.fc44.x86_64.rpm",
+          "sha256": "2f0630730ee3a20b00edf6b801bca86dcbdd7a3a72d5add8e6a247a0bb1e53be"
+        }
+      ],
+      "primary": "repodata/065b5a46363494d86c1500dd823bbd643887bc1c73f982455b2f274a837b5a0c-primary.xml.zst",
+      "repomd_sha256": "f1902ee7042cbf18bc9372ec8148a01c935c7a779b2314f09ceb07734b10d9fa"
+    }
+  },
+  "independent_production_attestor": "UNVERIFIED",
+  "publishable": false,
+  "scope": "v3-real-upstream-acquisition-test-only",
+  "solver": {
+    "assist-current": "PASS",
+    "assist-previous": "PASS",
+    "dolphin": "PASS",
+    "installer": "PASS",
+    "noarch": "PASS"
+  }
+}

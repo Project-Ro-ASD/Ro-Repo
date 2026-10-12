@@ -75,6 +75,15 @@ class PinnedUpstream:
             raise PlanningError("pinned upstream changed")
 
 
+def trusted_rpm_status(output):
+    """Parse rpmkeys' single-file summary, excluding the untrusted filename."""
+    lines = output.strip().splitlines()
+    if len(lines) != 1:
+        return False
+    _, separator, status = lines[0].rpartition(": ")
+    return bool(separator and re.fullmatch(r"digests signatures OK", status, re.I))
+
+
 def primary_inventory(root, metadata_path, packages):
     """DNF RPM locations/checksums must not escape the independently pinned cache."""
     file = member(root, metadata_path)
@@ -192,8 +201,7 @@ def verify_upstream(root, manifest, pin, *, rpm_key, rpm_key_sha256, now):
             if nevra != package["nevra"] or nevra.rsplit(".", 1)[-1] not in {manifest["architecture"], "noarch"}:
                 raise PlanningError("upstream NEVRA/architecture substitution")
             check = run(["rpmkeys", "--dbpath", str(db), "--checksig", str(file)])
-            if (not re.search(r"\bsignatures?\b", check, re.I) or not re.search(r"\bOK\b", check) or
-                    re.search(r"NOKEY|NOT OK|BAD|unsigned", check, re.I)):
+            if not trusted_rpm_status(check):
                 raise PlanningError("upstream RPM signature absent/untrusted")
         if {p.relative_to(frozen).as_posix() for p in frozen.rglob("*.rpm")} != paths:
             raise PlanningError("upstream RPM outside approved inventory")

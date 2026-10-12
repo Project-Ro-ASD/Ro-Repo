@@ -246,6 +246,11 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
         evidence.mkdir()
         validate(first, None, beta1, first_plan, "x86_64", evidence / "bootstrap", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
                  metadata_key=meta_key, metadata_key_sha256=meta_sha)
+        # Component promotion adds a genuinely new group to an existing
+        # stable set; DNF must upgrade installed names and install new names.
+        retained_plan = json.loads((retained_comp / "promotion-plan-v3.json").read_bytes())
+        validate(retained, first, beta2, retained_plan, "x86_64", evidence / "new-group-install",
+                 rpm_key=rpm_key, rpm_key_sha256=rpm_sha, metadata_key=meta_key, metadata_key_sha256=meta_sha)
         validate(second, retained, beta3, second_plan, "x86_64", evidence / "upgrade", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
                  metadata_key=meta_key, metadata_key_sha256=meta_sha, config_paths=["/etc/ro-assist.conf"])
         # Exercise the backend's real signing/composition adapter with the same

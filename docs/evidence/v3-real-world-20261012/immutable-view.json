@@ -1,0 +1,14 @@
+{
+  "byte_identity": "PASS",
+  "dnf_query": "PASS",
+  "https_pages_deployment": "UNVERIFIED",
+  "packages": [
+    "ro-asd-keyring",
+    "ro-assist"
+  ],
+  "protected_authorization": "BLOCKED",
+  "publishable": false,
+  "result_tree_sha256": "16f2295c732e970303da714e1f121b5f1e64ef1ea01c0a49e5fdaadadf6c8f15",
+  "scope": "v3-real-immutable-layout-dnf-observation",
+  "view_path": "v3/views/16f2295c732e970303da714e1f121b5f1e64ef1ea01c0a49e5fdaadadf6c8f15"
+}

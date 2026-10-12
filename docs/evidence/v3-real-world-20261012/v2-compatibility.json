@@ -1,0 +1,35 @@
+{
+  "digest": "8bdfda8a1524d22ab7105deae130e0521dfaa40d849619a9bac45e3d33321da0",
+  "reference": "snapshot:repo-f44-20260908-001/repository-snapshot-v1.json",
+  "result": "pass",
+  "schema_version": 1,
+  "scope": "phase1-local-fixture",
+  "snapshot_id": "repo-f44-20260908-001",
+  "tests": [
+    {
+      "name": "dependency-solve",
+      "result": "pass"
+    },
+    {
+      "name": "clean-install",
+      "result": "pass"
+    },
+    {
+      "name": "upgrade",
+      "result": "pass"
+    },
+    {
+      "name": "file-conflict",
+      "result": "pass"
+    },
+    {
+      "name": "rpmlint",
+      "result": "pass"
+    },
+    {
+      "name": "smoke",
+      "result": "pass"
+    }
+  ],
+  "timestamp": "2026-10-12T11:26:26Z"
+}
