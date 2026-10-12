@@ -1,0 +1,92 @@
+{
+  "scope": "v3-signed-beta-archive-bundle-untrusted",
+  "promotion_group": "ro-assist",
+  "signed_publications": [
+    {
+      "publication_run": "35530066972",
+      "published_at": "2026-09-20T18:45:39Z",
+      "snapshot_id": "repo-f44-20260920-001",
+      "store_tree_sha256": null,
+      "candidate_sha256": "e3d89ea5f606f812f2269a34a503f596547f19d1d3015203c1c67fd2b0d54395"
+    },
+    {
+      "publication_run": "35586124137",
+      "published_at": "2026-09-21T09:58:44Z",
+      "snapshot_id": "repo-f44-20260920-001",
+      "store_tree_sha256": null,
+      "candidate_sha256": "e3d89ea5f606f812f2269a34a503f596547f19d1d3015203c1c67fd2b0d54395"
+    },
+    {
+      "publication_run": "35587617947",
+      "published_at": "2026-09-21T10:14:32Z",
+      "snapshot_id": "repo-f44-20260920-001",
+      "store_tree_sha256": null,
+      "candidate_sha256": "e3d89ea5f606f812f2269a34a503f596547f19d1d3015203c1c67fd2b0d54395"
+    },
+    {
+      "publication_run": "35599214422",
+      "published_at": "2026-09-21T12:23:47Z",
+      "snapshot_id": "repo-f44-20260921-001",
+      "store_tree_sha256": null,
+      "candidate_sha256": "8cf443a4564798a165ba570821ee67d9a62643167ad4ad68df9857386f7c8f4e"
+    },
+    {
+      "publication_run": "36123484599",
+      "published_at": "2026-09-25T10:22:40Z",
+      "snapshot_id": "repo-f44-20260921-001",
+      "store_tree_sha256": "cedebcfc862e8bd9c02e6819e7485b6b86408576b62e51f11bb7cfefdcec3fb8",
+      "candidate_sha256": "8cf443a4564798a165ba570821ee67d9a62643167ad4ad68df9857386f7c8f4e"
+    },
+    {
+      "publication_run": "37935890476",
+      "published_at": "2026-10-09T13:19:15Z",
+      "snapshot_id": "repo-f44-20261009-001",
+      "store_tree_sha256": "78f855ca3c7d9f37495baa633e119e535ced15e6738fc47e2401f02752e47531",
+      "candidate_sha256": "8cf443a4564798a165ba570821ee67d9a62643167ad4ad68df9857386f7c8f4e"
+    }
+  ],
+  "candidate_history": [],
+  "legacy_observations": [
+    {
+      "publication_run": "35530066972",
+      "published_at": "2026-09-20T18:45:39Z",
+      "promotion_group": "ro-assist",
+      "candidate_sha256": "e3d89ea5f606f812f2269a34a503f596547f19d1d3015203c1c67fd2b0d54395"
+    },
+    {
+      "publication_run": "35586124137",
+      "published_at": "2026-09-21T09:58:44Z",
+      "promotion_group": "ro-assist",
+      "candidate_sha256": "e3d89ea5f606f812f2269a34a503f596547f19d1d3015203c1c67fd2b0d54395"
+    },
+    {
+      "publication_run": "35587617947",
+      "published_at": "2026-09-21T10:14:32Z",
+      "promotion_group": "ro-assist",
+      "candidate_sha256": "e3d89ea5f606f812f2269a34a503f596547f19d1d3015203c1c67fd2b0d54395"
+    },
+    {
+      "publication_run": "35599214422",
+      "published_at": "2026-09-21T12:23:47Z",
+      "promotion_group": "ro-assist",
+      "candidate_sha256": "8cf443a4564798a165ba570821ee67d9a62643167ad4ad68df9857386f7c8f4e"
+    },
+    {
+      "publication_run": "36123484599",
+      "published_at": "2026-09-25T10:22:40Z",
+      "promotion_group": "ro-assist",
+      "candidate_sha256": "8cf443a4564798a165ba570821ee67d9a62643167ad4ad68df9857386f7c8f4e"
+    },
+    {
+      "publication_run": "37935890476",
+      "published_at": "2026-10-09T13:19:15Z",
+      "promotion_group": "ro-assist",
+      "candidate_sha256": "8cf443a4564798a165ba570821ee67d9a62643167ad4ad68df9857386f7c8f4e"
+    }
+  ],
+  "historical_dwell_credit": "REJECTED",
+  "fresh_authenticated_genesis_required": true,
+  "archive_completeness_verified": false,
+  "trusted_publication_times_verified": false,
+  "publishable": false
+}

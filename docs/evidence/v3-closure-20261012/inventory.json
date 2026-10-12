@@ -1,0 +1,82 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "32a826fa761f1ddff29e6c06ac1afe63690d2a4b5e51649c3126b1f3d8117143"
+  },
+  {
+    "path": "ci-1ec6376.json",
+    "sha256": "4351bfcf6f643d848d265b1748a7e72b28e1eea8cc0aecaa5c48e7a82cfab3ce"
+  },
+  {
+    "path": "ci-2619629.json",
+    "sha256": "3817a2e124cfe427574bd1c05979ef23772a20720d1912f4cd2be71dbc02fe79"
+  },
+  {
+    "path": "client-discovery-dnf.json",
+    "sha256": "e043e52192301d953930f24e991ad7c618924c70e0e93cc4c7f532c3e05c4e8d"
+  },
+  {
+    "path": "fedora44-acceptance.json",
+    "sha256": "d3159dd2c3852f3d6bb8610b6aaad900ab5bb2d00f75e9e90682bb84413eb7d6"
+  },
+  {
+    "path": "fedora44-final.log.gz",
+    "sha256": "a62866a29b1b1d6c37d69ea6e7d62b0c8aff93c917039fcfe8fd0b3799287566"
+  },
+  {
+    "path": "git-backend-final.log.gz",
+    "sha256": "fca33200f5480691a1a354982d8d3d5d27a38a370b60acc429834a44988224d4"
+  },
+  {
+    "path": "git-rehearsal.json",
+    "sha256": "24161f99ad8712e11e1b1ea5c80f8b5e8e69b81dfd221cefcd73dc2a5011b624"
+  },
+  {
+    "path": "legacy-compatibility.json",
+    "sha256": "2310f5ca82e5b5f6dde981a6c8ca06330d1ea09e380b8032be9a0a1a2c2f4417"
+  },
+  {
+    "path": "legacy-inventory.json",
+    "sha256": "35faa72456256801497a008e3a60d2d554e81d523f3348f1f9bca7026dba9ca0"
+  },
+  {
+    "path": "pages-ref-final.txt",
+    "sha256": "4bbe875e2827bead08b136d090e3a6347aed0a843aee75a8cf6b7ab94b5dc6a7"
+  },
+  {
+    "path": "postgres.json",
+    "sha256": "c628639ffd454d8822c2a83e8894531375178219783a513199430a5f8f890a4a"
+  },
+  {
+    "path": "postgresql-source-final.log.gz",
+    "sha256": "6e6298a294bb143cd8691d13543f874ff2c5944994e7ef5a8b7cce3ae8e0e3f5"
+  },
+  {
+    "path": "safety-final.json",
+    "sha256": "984573408acc36dcb629e235e6b74d525e4650bf61e4085b6624863082be15d4"
+  },
+  {
+    "path": "source-inventory.json",
+    "sha256": "5811888ba229b54a81c77904ac8e1b91ee2d098f3c425ed085bfa16935bfe8eb"
+  },
+  {
+    "path": "static-final.json",
+    "sha256": "1536194023a789872cf31aff3a02f7395bceeed7d52df8c0c9222cebb50da2af"
+  },
+  {
+    "path": "tls-postgres.json",
+    "sha256": "c8fe72a902815bb448115205ae277aafb30f7d52b36ec09fc143ff44f3ebf746"
+  },
+  {
+    "path": "unit-writable-final.log.gz",
+    "sha256": "15805f9f0c8285e75ff965261cbe2577dcbdf1f0d817c5bf7f38a0f79c0b86fe"
+  },
+  {
+    "path": "upstream-url-final.log.gz",
+    "sha256": "c9c8244bcde04e3e18628c3e57f5e9647b9e351ca1dfc8255590eaa64ef6f12f"
+  },
+  {
+    "path": "v2-complete-final.log.gz",
+    "sha256": "eb6e758230522fb421ac419fbc35500a70c2d70973c33543b16c941108c48732"
+  }
+]

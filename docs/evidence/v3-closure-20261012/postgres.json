@@ -1,0 +1,26 @@
+{
+  "audit_integrity": "PASS",
+  "cas": "PASS",
+  "checkpoint": {
+    "seq": 46,
+    "sha256": "d598f07b914e075de8ed4a893bac22e7a13fd124e0757e8ce14478120c1f91ae"
+  },
+  "checkpoint_substitution": "PASS",
+  "concurrent_recovery_promotion": "PASS",
+  "consumption_audit_crash_boundaries": "PASS",
+  "corruption_and_truncation": "PASS",
+  "expiry_atomic_rollback": "PASS",
+  "external_ha_durability": "UNVERIFIED",
+  "independent_processes": "PASS",
+  "invalid_signer_atomic_rollback": "PASS",
+  "post_verification": "PASS",
+  "process_death": "PASS",
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "replay_consumptions": 16,
+  "replay_rejection": "PASS",
+  "scope": "v3-postgresql-isolated-acceptance",
+  "server_version": "18.6",
+  "valid_old_backup_with_external_checkpoint": "PASS",
+  "valid_old_backup_without_external_checkpoint": "UNDETECTABLE"
+}

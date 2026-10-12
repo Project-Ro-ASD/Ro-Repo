@@ -132,9 +132,9 @@ class Fixture:
             if to == state:
                 return
 
-    def stage(self):
+    def stage(self, origin="https://test.invalid"):
         self.view = IsolatedStore(self.root).stage(self.result, self.approval, self.keys.signers["publication"],
-                    origin="https://test.invalid", audit_key_sha256=self.keys.signers["audit"].key_sha256, now=NOW)
+                    origin=origin, audit_key_sha256=self.keys.signers["audit"].key_sha256, now=NOW)
         self.backend.signed(self.attempt, self.view)
         self.backend.staged(self.attempt, self.view)
         self.deployment = self.keys.attestation("deployment", {"result_stable_sha256": self.result.sha256,
@@ -142,9 +142,9 @@ class Fixture:
         self.remote = verify_remote(self.view, DirectoryReader(self.view), self.deployment, now=NOW)
         self.backend.remotely_verified(self.attempt, self.remote)
 
-    def complete(self):
+    def complete(self, origin="https://test.invalid"):
         self.advance("AUTHORIZED")
-        self.stage()
+        self.stage(origin)
         self.backend.publish(self.attempt, self.approval)
         self.remote = self.verify_post()
         self.backend.post_verified(self.attempt, self.remote)

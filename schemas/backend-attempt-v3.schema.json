@@ -605,6 +605,89 @@
               }
             }
           }
+        },
+        "OUTBOX": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "immutable",
+            "fence",
+            "owner",
+            "lease_until",
+            "status",
+            "receipts"
+          ],
+          "properties": {
+            "immutable": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "result_sha256",
+                "publication_sha256",
+                "authorization_sha256",
+                "expected_git"
+              ],
+              "properties": {
+                "result_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "publication_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "authorization_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "expected_git": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[0-9a-f]{40}$"
+                }
+              }
+            },
+            "fence": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "owner": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "lease_until": {
+              "type": "number",
+              "minimum": 0
+            },
+            "status": {
+              "enum": [
+                "PENDING",
+                "ADVERTISED",
+                "COMPLETE",
+                "FAILED"
+              ]
+            },
+            "receipts": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "stage": {
+                  "type": "object"
+                },
+                "advertisement": {
+                  "type": "object"
+                },
+                "post": {
+                  "type": "object"
+                }
+              }
+            }
+          }
         }
       }
     },

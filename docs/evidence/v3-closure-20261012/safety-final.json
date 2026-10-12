@@ -1,0 +1,21 @@
+{
+  "baseline": "d65aa82b2e7cf5ac4188abbf0c969dddeb7ec8c0",
+  "v2_workflows": "BYTE_IDENTICAL",
+  "v2_files": [
+    ".github/workflows/accept-component.yml",
+    ".github/workflows/build-candidate-snapshot.yml",
+    ".github/workflows/fedora-compatibility.yml",
+    ".github/workflows/promote-remote-stable.yml",
+    ".github/workflows/publish-pages-snapshot.yml",
+    ".github/workflows/publish-remote-beta.yml",
+    ".github/workflows/rollback-remote-beta.yml",
+    ".github/workflows/test.yml",
+    ".github/workflows/update-repo.yml",
+    ".github/workflows/validate-remote-beta-promotion.yml",
+    ".github/workflows/verify-pages-domain.yml"
+  ],
+  "v3_disabled_workflow": "BYTE_IDENTICAL",
+  "unconditional_disabled_jobs": 11,
+  "new_private_key_or_token_material": [],
+  "production_activation": "BLOCKED"
+}

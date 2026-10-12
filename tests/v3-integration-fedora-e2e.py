@@ -351,11 +351,14 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             shutil.rmtree(test_root)
         if source_inventory() != tested_sources:
             raise RuntimeError("tested source tree changed during acceptance run")
+        from v3_client_native_support import exercise as exercise_client
+        exercise_client(first, second, rpm_key, meta_key, work, evidence)
         (evidence / "acceptance.json").write_bytes(canonical({"scope": "v3-fedora44-fixture-acceptance",
             "source_code_sha256": sha(tested_sources),
             "gates": {"signed-bootstrap": "PASS", "unchanged-candidate-dwell": "PASS", "retained-signed-bytes": "PASS",
                       "backend-real-rpm-adapter": "PASS", "migration-fixture": "PASS", "pinned-upstream-fixture": "PASS",
                       "recovery-historical-signed-parent": "PASS",
+                      "https-client-discovery-dnf-fixture": "PASS",
                       "unapproved-group-exclusion": "PASS", "full-set-upgrade": "PASS", "rpmnew": "PASS", "reproducible-metadata": "PASS",
                       "missing-dependency-rejection": "PASS", "retained-group-conflict-rejection": "PASS",
                       "aarch64": "UNVERIFIED", "real-producer-applications": "UNVERIFIED", "plasma-login": "UNVERIFIED",

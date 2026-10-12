@@ -1,0 +1,90 @@
+[
+  {
+    "path": "publications/fedora/44/beta/35530066972/publication-v1.json",
+    "sha256": "3e83a30341c7c73b4d51b41afdaf30def5b0601e1772c7e2d9bf00ac189a1de0"
+  },
+  {
+    "path": "publications/fedora/44/beta/35530066972/publication-v1.json.asc",
+    "sha256": "ba92ea2cf46fe0a712c9d418bfe4d6ba09443f1103d3beeeec372bc145023805"
+  },
+  {
+    "path": "publications/fedora/44/beta/35586124137/publication-v1.json",
+    "sha256": "3ce5316e4f9827531286728530f1e582396ed6fa60a6cc63617d06bab35e27c5"
+  },
+  {
+    "path": "publications/fedora/44/beta/35586124137/publication-v1.json.asc",
+    "sha256": "c6785f6697ed363b3d9ae8a24cf0368bbc6f45411624248a3ace9517848c7044"
+  },
+  {
+    "path": "publications/fedora/44/beta/35587617947/publication-v1.json",
+    "sha256": "072a26d9fd72b4d2df084c94e229e25a3a7aa3b4e8daa421fb38a21fb30f1c2c"
+  },
+  {
+    "path": "publications/fedora/44/beta/35587617947/publication-v1.json.asc",
+    "sha256": "c0d40bf6712b8a374e67669a5fa138fe783626bff169bcea8e486a2d88e9ea67"
+  },
+  {
+    "path": "publications/fedora/44/beta/35599214422/publication-v1.json",
+    "sha256": "9df3d76ada327cb9b32e794a9f7d225bf4515cdb1485c931ad1566fd0f741d9d"
+  },
+  {
+    "path": "publications/fedora/44/beta/35599214422/publication-v1.json.asc",
+    "sha256": "21f2c0b9f162bcc7feb32200fb4f8b37e5d1b443033e24de3cc7d63b48639541"
+  },
+  {
+    "path": "publications/fedora/44/beta/36123484599/publication-v1.json",
+    "sha256": "ff673585f13458a466e02c4360aa659f98689ff666dcb78bbab157d51c300603"
+  },
+  {
+    "path": "publications/fedora/44/beta/36123484599/publication-v1.json.asc",
+    "sha256": "c92c8b27aff69952c9ab624f570dbd5297be2731133cae2dfabcfb5d718d35a0"
+  },
+  {
+    "path": "publications/fedora/44/beta/37935890476/publication-v1.json",
+    "sha256": "e939e05867ee73e29c4167cd1a97924d76545e2e823c30bca4104b15f4a3716f"
+  },
+  {
+    "path": "publications/fedora/44/beta/37935890476/publication-v1.json.asc",
+    "sha256": "1eee73043fb89afbcd6ad0e7938b76003ccfd92f37f24beffe93ef196213fe81"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20260920-001/repository-snapshot-v1.json",
+    "sha256": "7edd4af6914d63937deb42d2f733a6568378d17b6aeaf1a633b16db086187d71"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20260920-001/repository-snapshot-v1.json.asc",
+    "sha256": "e071e847ec3d7145521180b2b116536d2b5ad1224bf55c7d29cfef296147efa6"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20260921-001/repository-snapshot-v1.json",
+    "sha256": "20889abf076cd9fd30cefe825746cbc39b70e0022afa7159fed52ca16691fa13"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20260921-001/repository-snapshot-v1.json.asc",
+    "sha256": "070450af00addb0b3420adf8820c02ac41535cf253ef336415cb2a03ed88da1c"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20260929-001/repository-snapshot-v1.json",
+    "sha256": "f57c3605af5dad81c86ffe856a38488a5d052b3a29ef7db4639a30ad4246ef23"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20260929-001/repository-snapshot-v1.json.asc",
+    "sha256": "c3bbff743c10ff09e2610ccda31754557a1d89f778981a1f310ead190d9f0c6f"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20261006-001/repository-snapshot-v1.json",
+    "sha256": "96ebbabe14d406bbf1de4efc43232012bd631be0b68a074e4333d1d090297031"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20261006-001/repository-snapshot-v1.json.asc",
+    "sha256": "1401a82d317de000f77a8dd2afbb320173420b962ef8e662fd21a224eb600e28"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20261009-001/repository-snapshot-v1.json",
+    "sha256": "c2afc6d079537ddc6576c643e2d49445d3ba47b310ef4a3faf03789b336bbfd7"
+  },
+  {
+    "path": "snapshots/fedora/44/repo-f44-20261009-001/repository-snapshot-v1.json.asc",
+    "sha256": "46973d8ba8699ee60bb8f4269837c3d121d666d7af696bf2d5549818fb46a7f6"
+  }
+]

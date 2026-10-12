@@ -1,0 +1,16 @@
+{
+  "scope": "v3-isolated-tls-postgresql",
+  "publishable": false,
+  "tls_verify_full": "PASS",
+  "wrong_ca_rejection": "PASS",
+  "wrong_hostname_rejection": "PASS",
+  "restricted_role_denials": "PASS",
+  "two_process_cas": "PASS",
+  "transaction_rollback": "PASS",
+  "external_ha_restore": "UNVERIFIED",
+  "production_activation": "BLOCKED",
+  "checkpoint": {
+    "seq": 20,
+    "sha256": "f80aa4d5639e8a5275c4ad946d7b3cec2cd2b5358afac04beb13d538c417e845"
+  }
+}

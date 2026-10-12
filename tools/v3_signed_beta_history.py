@@ -84,7 +84,7 @@ def _keyring(public_key, expected_hash, tmp):
     return ring
 
 
-def signed_archive_bundle(beta_publications, snapshots, registry, candidate_group, key_path, key_sha256, now):
+def signed_archive_bundle(beta_publications, snapshots, registry, candidate_group, key_path, key_sha256, now, *, legacy_compatibility=False):
     """Read ALL supplied archive entries, fail closed on malformed entries.
 
     The caller must source complete immutable archives independently.
@@ -111,14 +111,15 @@ def signed_archive_bundle(beta_publications, snapshots, registry, candidate_grou
             if directory.is_symlink() or not directory.is_dir() or not RUN.fullmatch(directory.name):
                 raise PlanningError("unexpected beta history entry")
             pub = _signature(directory, "publication-v1.json", keyring)
-            if not isinstance(pub, dict) or set(pub) != {"schema_version", "channel", "publication_run", "published_at", "snapshot_id", "store_tree_sha256"}:
+            required = {"schema_version", "channel", "publication_run", "published_at", "snapshot_id"}
+            if not isinstance(pub, dict) or set(pub) not in ([required, required | {"store_tree_sha256"}] if legacy_compatibility else [required | {"store_tree_sha256"}]):
                 raise PlanningError("unexpected signed publication fields")
             if pub["schema_version"] != 1 or pub["channel"] != "beta" or pub["publication_run"] != directory.name:
                 raise PlanningError("publication identity mismatch")
             _time(pub["published_at"])
             if _time(pub["published_at"]) > _time(now):
                 raise PlanningError("future-dated publication")
-            if not isinstance(pub["store_tree_sha256"], str) or not SHA.fullmatch(pub["store_tree_sha256"]):
+            if "store_tree_sha256" in pub and (not isinstance(pub["store_tree_sha256"], str) or not SHA.fullmatch(pub["store_tree_sha256"])):
                 raise PlanningError("invalid publication store digest")
             snap_id = pub["snapshot_id"]
             if not isinstance(snap_id, str) or not SNAP.fullmatch(snap_id):
@@ -138,7 +139,7 @@ def signed_archive_bundle(beta_publications, snapshots, registry, candidate_grou
             publications.append({"publication_run":directory.name,
                                  "published_at":pub["published_at"],
                                  "snapshot_id":snap_id,
-                                 "store_tree_sha256":pub["store_tree_sha256"],
+                                 "store_tree_sha256":pub.get("store_tree_sha256"),
                                  "candidate_sha256":digest})
             if digest is not None:
                 rows.append({"publication_run":directory.name,
@@ -148,7 +149,11 @@ def signed_archive_bundle(beta_publications, snapshots, registry, candidate_grou
     return {"scope":"v3-signed-beta-archive-bundle-untrusted",
             "promotion_group":candidate_group,
             "signed_publications":publications,
-            "candidate_history":rows,
+            # Compatibility verifies original signed bytes, but never converts
+            # legacy timestamps into V3 dwell authority. Use observer genesis.
+            "candidate_history":[] if legacy_compatibility else rows,
+            **({"legacy_observations": rows, "historical_dwell_credit": "REJECTED",
+                "fresh_authenticated_genesis_required": True} if legacy_compatibility else {}),
             "archive_completeness_verified":False,
             "trusted_publication_times_verified":False,
             "publishable":False}
