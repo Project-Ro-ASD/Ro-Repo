@@ -1,0 +1,378 @@
+Package               Arch   Version            Repository                 Size
+Installing:
+ ro-installer         x86_64 0:2.4.4-1.fc44     ro-stable              25.7 MiB
+Installing dependencies:
+ NetworkManager       x86_64 1:1.56.1-2.fc44    pinned-fedora-updates   6.1 MiB
+ NetworkManager-libnm x86_64 1:1.56.1-2.fc44    pinned-fedora-updates  10.2 MiB
+ authselect           x86_64 0:1.7.1-1.fc44     pinned-fedora-release 202.0 KiB
+ authselect-libs      x86_64 0:1.7.1-1.fc44     pinned-fedora-release 889.7 KiB
+ btrfs-progs          x86_64 0:7.1-1.fc44       pinned-fedora-updates   6.5 MiB
+ cpio                 x86_64 0:2.15-9.fc44      pinned-fedora-release   1.1 MiB
+ cracklib             x86_64 0:2.10.3-1.fc44    pinned-fedora-updates 234.6 KiB
+ cryptsetup-libs      x86_64 0:2.8.8-1.fc44     pinned-fedora-updates   3.0 MiB
+ dbus-broker          x86_64 0:37-8.fc44        pinned-fedora-release 394.9 KiB
+ dbus-common          noarch 1:1.16.2-1.fc44    pinned-fedora-release  11.2 KiB
+ device-mapper        x86_64 0:1.02.212-2.fc44  pinned-fedora-release 346.8 KiB
+ device-mapper-libs   x86_64 0:1.02.212-2.fc44  pinned-fedora-release 430.1 KiB
+ dosfstools           x86_64 0:4.2-18.fc44      pinned-fedora-release 236.1 KiB
+ dracut               x86_64 0:108-8.fc44       pinned-fedora-updates   1.6 MiB
+ e2fsprogs-libs       x86_64 0:1.47.3-4.fc44    pinned-fedora-release 555.0 KiB
+ efi-filesystem       noarch 0:6-6.fc44         pinned-fedora-release   0.0   B
+ efibootmgr           x86_64 0:18-11.fc44       pinned-fedora-release  94.4 KiB
+ efivar-libs          x86_64 0:39-12.fc44       pinned-fedora-release 396.8 KiB
+ file                 x86_64 0:5.46-10.fc44     pinned-fedora-updates 100.1 KiB
+ file-libs            x86_64 0:5.46-10.fc44     pinned-fedora-updates  11.9 MiB
+ fuse3-libs           x86_64 0:3.18.3-1.fc44    pinned-fedora-updates 297.8 KiB
+ gdbm                 x86_64 1:1.23-11.fc44     pinned-fedora-release 459.8 KiB
+ gdisk                x86_64 0:1.0.10-5.fc44    pinned-fedora-release 790.2 KiB
+ gettext-envsubst     x86_64 0:0.26-5.fc44      pinned-fedora-updates  87.5 KiB
+ gettext-libs         x86_64 0:0.26-5.fc44      pinned-fedora-updates   2.4 MiB
+ gettext-runtime      x86_64 0:0.26-5.fc44      pinned-fedora-updates 738.3 KiB
+ grub2-common         noarch 1:2.12-66.fc44     pinned-fedora-updates   6.2 MiB
+ grub2-efi-x64        x86_64 1:2.12-66.fc44     pinned-fedora-updates   6.2 MiB
+ grub2-tools          x86_64 1:2.12-66.fc44     pinned-fedora-updates   7.8 MiB
+ grub2-tools-minimal  x86_64 1:2.12-66.fc44     pinned-fedora-updates   4.1 MiB
+ gzip                 x86_64 0:1.14-2.fc44      pinned-fedora-release 401.6 KiB
+ json-c               x86_64 0:0.18-8.fc44      pinned-fedora-release  82.6 KiB
+ kbd                  x86_64 0:2.9.0-4.fc44     pinned-fedora-updates   1.4 MiB
+ kbd-legacy           noarch 0:2.9.0-4.fc44     pinned-fedora-updates 559.6 KiB
+ kbd-misc             noarch 0:2.9.0-4.fc44     pinned-fedora-updates   2.4 MiB
+ kmod                 x86_64 0:34.2-4.fc44      pinned-fedora-release 251.0 KiB
+ kmod-libs            x86_64 0:34.2-4.fc44      pinned-fedora-release 139.0 KiB
+ libfdisk             x86_64 0:2.41.5-1.fc44    pinned-fedora-updates 388.3 KiB
+ libgcrypt            x86_64 0:1.12.2-1.fc44    pinned-fedora-updates   1.7 MiB
+ libgpg-error         x86_64 0:1.58-2.fc44      pinned-fedora-release 941.6 KiB
+ libkcapi             x86_64 0:1.5.0-7.fc44     pinned-fedora-release  98.7 KiB
+ libkcapi-hasher      x86_64 0:1.5.0-7.fc44     pinned-fedora-release  37.4 KiB
+ libkcapi-hmaccalc    x86_64 0:1.5.0-7.fc44     pinned-fedora-release 175.0   B
+ liblastlog2          x86_64 0:2.41.5-1.fc44    pinned-fedora-updates  41.6 KiB
+ libndp               x86_64 0:1.9-5.fc44       pinned-fedora-release  85.7 KiB
+ libnsl2              x86_64 0:2.0.1-5.fc44     pinned-fedora-release  57.7 KiB
+ libpkgconf           x86_64 0:2.5.1-1.fc44     pinned-fedora-release  90.1 KiB
+ libpwquality         x86_64 0:1.4.5-15.fc44    pinned-fedora-release 408.7 KiB
+ libsmartcols         x86_64 0:2.41.5-1.fc44    pinned-fedora-updates 188.3 KiB
+ libtextstyle         x86_64 0:0.26-5.fc44      pinned-fedora-updates 382.0 KiB
+ libtirpc             x86_64 0:1.3.8-0.fc44     pinned-fedora-updates 208.3 KiB
+ lz4-libs             x86_64 0:1.10.0-4.fc44    pinned-fedora-release 157.3 KiB
+ mokutil              x86_64 2:0.7.2-3.fc44     pinned-fedora-release  98.5 KiB
+ ntfs-3g-libs         x86_64 2:2026.2.25-1.fc44 pinned-fedora-updates 384.7 KiB
+ ntfsprogs            x86_64 2:2026.2.25-1.fc44 pinned-fedora-updates   1.0 MiB
+ os-prober            x86_64 0:1.81-11.fc44     pinned-fedora-release 110.7 KiB
+ pam                  x86_64 0:1.7.2-2.fc44     pinned-fedora-updates   1.6 MiB
+ parted               x86_64 0:3.6-15.fc44      pinned-fedora-updates   2.5 MiB
+ pkgconf              x86_64 0:2.5.1-1.fc44     pinned-fedora-release  92.7 KiB
+ pkgconf-m4           noarch 0:2.5.1-1.fc44     pinned-fedora-release  14.3 KiB
+ pkgconf-pkg-config   x86_64 0:2.5.1-1.fc44     pinned-fedora-release 989.0   B
+ polkit               x86_64 0:127-2.fc44.2     pinned-fedora-release 493.8 KiB
+ polkit-libs          x86_64 0:127-2.fc44.2     pinned-fedora-release 220.4 KiB
+ popt                 x86_64 0:1.19-10.fc44     pinned-fedora-release 132.6 KiB
+ procps-ng            x86_64 0:4.0.6-1.fc44     pinned-fedora-release   1.1 MiB
+ rsync                x86_64 0:3.5.1-1.fc44     pinned-fedora-updates 913.8 KiB
+ shim-x64             x86_64 0:16.1-7           pinned-fedora-updates   1.9 MiB
+ systemd              x86_64 0:259.9-1.fc44     pinned-fedora-updates  12.9 MiB
+ systemd-shared       x86_64 0:259.9-1.fc44     pinned-fedora-updates   5.4 MiB
+ systemd-sysusers     x86_64 0:259.9-1.fc44     pinned-fedora-updates  79.7 KiB
+ systemd-udev         x86_64 0:259.9-1.fc44     pinned-fedora-updates  13.1 MiB
+ util-linux           x86_64 0:2.41.5-1.fc44    pinned-fedora-updates   3.5 MiB
+ util-linux-core      x86_64 0:2.41.5-1.fc44    pinned-fedora-updates   1.5 MiB
+ xxhash-libs          x86_64 0:0.8.4-1.fc44     pinned-fedora-updates  94.0 KiB
+ xz                   x86_64 1:5.8.2-2.fc44     pinned-fedora-release   1.3 MiB
+ zstd                 x86_64 0:1.5.7-5.fc44     pinned-fedora-release 502.4 KiB
+
+Transaction Summary:
+ Installing:        77 packages
+
+Updating and loading repositories:
+Repositories loaded.
+Total size of inbound packages is 46 MiB. Need to download 46 MiB.
+After this operation, 158 MiB extra will be used (install 158 MiB, remove 0 B).
+[ 1/77] ro-installer-0:2.4.4-1.fc44.x86 100% | 256.6 MiB/s |  10.0 MiB |  00m00s
+[ 2/77] dosfstools-0:4.2-18.fc44.x86_64 100% |   3.4 MiB/s | 105.0 KiB |  00m00s
+[ 3/77] efibootmgr-0:18-11.fc44.x86_64  100% |   1.5 MiB/s |  47.2 KiB |  00m00s
+[ 4/77] gdisk-0:1.0.10-5.fc44.x86_64    100% | 270.8 MiB/s | 277.3 KiB |  00m00s
+[ 5/77] polkit-0:127-2.fc44.2.x86_64    100% |  83.9 MiB/s | 171.8 KiB |  00m00s
+[ 6/77] efi-filesystem-0:6-6.fc44.noarc 100% |   2.6 MiB/s |   8.1 KiB |  00m00s
+[ 7/77] efivar-libs-0:39-12.fc44.x86_64 100% | 133.6 MiB/s | 136.8 KiB |  00m00s
+[ 8/77] popt-0:1.19-10.fc44.x86_64      100% |  65.4 MiB/s |  66.9 KiB |  00m00s
+[ 9/77] polkit-libs-0:127-2.fc44.2.x86_ 100% |  35.5 MiB/s |  72.8 KiB |  00m00s
+[10/77] NetworkManager-1:1.56.1-2.fc44. 100% | 255.5 MiB/s |   2.3 MiB |  00m00s
+[11/77] libndp-0:1.9-5.fc44.x86_64      100% |   6.1 MiB/s |  37.4 KiB |  00m00s
+[12/77] NetworkManager-libnm-1:1.56.1-2 100% | 192.9 MiB/s |   1.9 MiB |  00m00s
+[13/77] btrfs-progs-0:7.1-1.fc44.x86_64 100% | 261.0 MiB/s |   1.3 MiB |  00m00s
+[14/77] e2fsprogs-libs-0:1.47.3-4.fc44. 100% |  58.5 MiB/s | 239.6 KiB |  00m00s
+[15/77] dracut-0:108-8.fc44.x86_64      100% |  88.2 MiB/s | 632.3 KiB |  00m00s
+[16/77] cpio-0:2.15-9.fc44.x86_64       100% | 286.5 MiB/s | 293.3 KiB |  00m00s
+[17/77] kmod-0:34.2-4.fc44.x86_64       100% |  66.4 MiB/s | 136.1 KiB |  00m00s
+[18/77] kmod-libs-0:34.2-4.fc44.x86_64  100% |  22.9 MiB/s |  70.4 KiB |  00m00s
+[19/77] libkcapi-hmaccalc-0:1.5.0-7.fc4 100% |   4.3 MiB/s |   8.9 KiB |  00m00s
+[20/77] xz-1:5.8.2-2.fc44.x86_64        100% | 197.7 MiB/s | 607.2 KiB |  00m00s
+[21/77] zstd-0:1.5.7-5.fc44.x86_64      100% |  62.7 MiB/s | 192.5 KiB |  00m00s
+[22/77] libkcapi-hasher-0:1.5.0-7.fc44. 100% |  12.7 MiB/s |  26.1 KiB |  00m00s
+[23/77] libkcapi-0:1.5.0-7.fc44.x86_64  100% |  23.1 MiB/s |  47.4 KiB |  00m00s
+[24/77] grub2-common-1:2.12-66.fc44.noa 100% | 249.4 MiB/s |   1.0 MiB |  00m00s
+[25/77] grub2-efi-x64-1:2.12-66.fc44.x8 100% | 235.6 MiB/s |   2.1 MiB |  00m00s
+[26/77] grub2-tools-1:2.12-66.fc44.x86_ 100% | 183.9 MiB/s |   1.8 MiB |  00m00s
+[27/77] grub2-tools-minimal-1:2.12-66.f 100% |  61.4 MiB/s | 691.6 KiB |  00m00s
+[28/77] device-mapper-libs-0:1.02.212-2 100% | 182.3 MiB/s | 186.6 KiB |  00m00s
+[29/77] os-prober-0:1.81-11.fc44.x86_64 100% |  24.5 MiB/s |  50.1 KiB |  00m00s
+[30/77] device-mapper-0:1.02.212-2.fc44 100% |  45.9 MiB/s | 141.1 KiB |  00m00s
+[31/77] ntfsprogs-2:2026.2.25-1.fc44.x8 100% | 188.0 MiB/s | 385.0 KiB |  00m00s
+[32/77] ntfs-3g-libs-2:2026.2.25-1.fc44 100% |  60.0 MiB/s | 184.3 KiB |  00m00s
+[33/77] parted-0:3.6-15.fc44.x86_64     100% | 145.9 MiB/s | 597.8 KiB |  00m00s
+[34/77] rsync-0:3.5.1-1.fc44.x86_64     100% | 237.9 MiB/s | 487.2 KiB |  00m00s
+[35/77] lz4-libs-0:1.10.0-4.fc44.x86_64 100% |  37.9 MiB/s |  77.7 KiB |  00m00s
+[36/77] shim-x64-0:16.1-7.x86_64        100% | 118.7 MiB/s | 486.1 KiB |  00m00s
+[37/77] mokutil-2:0.7.2-3.fc44.x86_64   100% |   6.0 MiB/s |  49.3 KiB |  00m00s
+[38/77] systemd-udev-0:259.9-1.fc44.x86 100% | 204.4 MiB/s |   2.7 MiB |  00m00s
+[39/77] systemd-0:259.9-1.fc44.x86_64   100% | 225.3 MiB/s |   4.3 MiB |  00m00s
+[40/77] systemd-shared-0:259.9-1.fc44.x 100% | 251.3 MiB/s |   2.0 MiB |  00m00s
+[41/77] util-linux-0:2.41.5-1.fc44.x86_ 100% | 133.8 MiB/s |   1.2 MiB |  00m00s
+[42/77] util-linux-core-0:2.41.5-1.fc44 100% |  60.6 MiB/s | 558.1 KiB |  00m00s
+[43/77] libsmartcols-0:2.41.5-1.fc44.x8 100% |  85.3 MiB/s |  87.4 KiB |  00m00s
+[44/77] authselect-libs-0:1.7.1-1.fc44. 100% | 115.9 MiB/s | 237.5 KiB |  00m00s
+[45/77] pam-0:1.7.2-2.fc44.x86_64       100% | 135.0 MiB/s | 553.1 KiB |  00m00s
+[46/77] authselect-0:1.7.1-1.fc44.x86_6 100% | 191.6 MiB/s | 196.2 KiB |  00m00s
+[47/77] libnsl2-0:2.0.1-5.fc44.x86_64   100% |  29.3 MiB/s |  30.0 KiB |  00m00s
+[48/77] libpwquality-0:1.4.5-15.fc44.x8 100% |  57.7 MiB/s | 118.3 KiB |  00m00s
+[49/77] libfdisk-0:2.41.5-1.fc44.x86_64 100% | 164.7 MiB/s | 168.6 KiB |  00m00s
+[50/77] liblastlog2-0:2.41.5-1.fc44.x86 100% |  11.8 MiB/s |  24.2 KiB |  00m00s
+[51/77] cryptsetup-libs-0:2.8.8-1.fc44. 100% | 204.8 MiB/s | 629.3 KiB |  00m00s
+[52/77] json-c-0:0.18-8.fc44.x86_64     100% |  45.2 MiB/s |  46.3 KiB |  00m00s
+[53/77] kbd-0:2.9.0-4.fc44.x86_64       100% | 126.6 MiB/s | 389.0 KiB |  00m00s
+[54/77] kbd-legacy-0:2.9.0-4.fc44.noarc 100% | 113.5 MiB/s | 581.3 KiB |  00m00s
+[55/77] kbd-misc-0:2.9.0-4.fc44.noarch  100% | 275.3 MiB/s |   1.7 MiB |  00m00s
+[56/77] systemd-sysusers-0:259.9-1.fc44 100% |   9.6 MiB/s |  49.4 KiB |  00m00s
+[57/77] xxhash-libs-0:0.8.4-1.fc44.x86_ 100% |   8.1 MiB/s |  41.2 KiB |  00m00s
+[58/77] gdbm-1:1.23-11.fc44.x86_64      100% |  74.7 MiB/s | 153.0 KiB |  00m00s
+[59/77] libtirpc-0:1.3.8-0.fc44.x86_64  100% |  48.4 MiB/s |  99.2 KiB |  00m00s
+[60/77] libgcrypt-0:1.12.2-1.fc44.x86_6 100% | 153.8 MiB/s | 629.8 KiB |  00m00s
+[61/77] libgpg-error-0:1.58-2.fc44.x86_ 100% | 248.1 MiB/s | 254.1 KiB |  00m00s
+[62/77] fuse3-libs-0:3.18.3-1.fc44.x86_ 100% |  49.9 MiB/s | 102.2 KiB |  00m00s
+[63/77] gettext-runtime-0:0.26-5.fc44.x 100% |  56.8 MiB/s | 174.3 KiB |  00m00s
+[64/77] gettext-envsubst-0:0.26-5.fc44. 100% |  44.3 MiB/s |  45.3 KiB |  00m00s
+[65/77] gettext-libs-0:0.26-5.fc44.x86_ 100% | 256.9 MiB/s | 789.3 KiB |  00m00s
+[66/77] libtextstyle-0:0.26-5.fc44.x86_ 100% |  45.8 MiB/s | 140.7 KiB |  00m00s
+[67/77] file-0:5.46-10.fc44.x86_64      100% |  23.8 MiB/s |  48.7 KiB |  00m00s
+[68/77] file-libs-0:5.46-10.fc44.x86_64 100% | 277.9 MiB/s | 853.6 KiB |  00m00s
+[69/77] procps-ng-0:4.0.6-1.fc44.x86_64 100% |  97.4 MiB/s | 398.9 KiB |  00m00s
+[70/77] cracklib-0:2.10.3-1.fc44.x86_64 100% |  93.7 MiB/s |  95.9 KiB |  00m00s
+[71/77] gzip-0:1.14-2.fc44.x86_64       100% |  87.4 MiB/s | 179.1 KiB |  00m00s
+[72/77] pkgconf-pkg-config-0:2.5.1-1.fc 100% |   4.6 MiB/s |   9.5 KiB |  00m00s
+[73/77] pkgconf-0:2.5.1-1.fc44.x86_64   100% |   0.0   B/s |  48.7 KiB |  00m00s
+[74/77] pkgconf-m4-0:2.5.1-1.fc44.noarc 100% |  13.4 MiB/s |  13.8 KiB |  00m00s
+[75/77] libpkgconf-0:2.5.1-1.fc44.x86_6 100% |  20.8 MiB/s |  42.7 KiB |  00m00s
+[76/77] dbus-broker-0:37-8.fc44.x86_64  100% | 174.6 MiB/s | 178.8 KiB |  00m00s
+[77/77] dbus-common-1:1.16.2-1.fc44.noa 100% |  13.8 MiB/s |  14.2 KiB |  00m00s
+--------------------------------------------------------------------------------
+[77/77] Total                           100% | 218.1 MiB/s |  46.5 MiB |  00m00s
+Running transaction
+[ 1/79] Verify package files            100% | 513.0   B/s |  77.0   B |  00m00s
+[ 2/79] Prepare transaction             100% |   1.2 KiB/s |  77.0   B |  00m00s
+[ 3/79] Installing grub2-common-1:2.12- 100% | 181.5 MiB/s |   6.2 MiB |  00m00s
+[ 4/79] Installing popt-0:1.19-10.fc44. 100% |  27.2 MiB/s | 139.3 KiB |  00m00s
+[ 5/79] Installing libfdisk-0:2.41.5-1. 100% |  76.1 MiB/s | 389.4 KiB |  00m00s
+[ 6/79] Installing systemd-shared-0:259 100% | 302.8 MiB/s |   5.5 MiB |  00m00s
+[ 7/79] Installing efi-filesystem-0:6-6 100% | 312.5 KiB/s | 640.0   B |  00m00s
+[ 8/79] Installing libtirpc-0:1.3.8-0.f 100% |  41.1 MiB/s | 210.3 KiB |  00m00s
+[ 9/79] Installing authselect-libs-0:1. 100% |   2.3 MiB/s | 906.2 KiB |  00m00s
+[10/79] Installing libsmartcols-0:2.41. 100% |   6.9 MiB/s | 189.5 KiB |  00m00s
+[11/79] Installing util-linux-core-0:2. 100% |  43.5 MiB/s |   1.5 MiB |  00m00s
+[12/79] Installing kmod-libs-0:34.2-4.f 100% |  34.2 MiB/s | 140.1 KiB |  00m00s
+[13/79] Installing efivar-libs-0:39-12. 100% |  77.9 MiB/s | 399.1 KiB |  00m00s
+[14/79] Installing efibootmgr-0:18-11.f 100% |   6.3 MiB/s |  96.3 KiB |  00m00s
+[15/79] Installing mokutil-2:0.7.2-3.fc 100% |   5.7 MiB/s | 100.1 KiB |  00m00s
+[16/79] Installing libnsl2-0:2.0.1-5.fc 100% |  14.4 MiB/s |  58.8 KiB |  00m00s
+[17/79] Installing systemd-sysusers-0:2 100% |   5.3 MiB/s |  80.8 KiB |  00m00s
+[18/79] Installing gdisk-0:1.0.10-5.fc4 100% |  20.4 MiB/s | 793.4 KiB |  00m00s
+>>> Running sysusers scriptlet: dbus-common-1:1.16.2-1.fc44.noarch
+>>> Finished sysusers scriptlet: dbus-common-1:1.16.2-1.fc44.noarch
+>>> Scriptlet output:
+>>> Creating group 'dbus' with GID 81.
+>>> Creating user 'dbus' (System Message Bus) with UID 81 and GID 81.
+>>> 
+[19/79] Installing dbus-common-1:1.16.2 100% |  36.9 KiB/s |  13.6 KiB |  00m00s
+[20/79] Installing libpkgconf-0:2.5.1-1 100% |   3.3 MiB/s |  91.3 KiB |  00m00s
+[21/79] Installing pkgconf-0:2.5.1-1.fc 100% |   5.8 MiB/s |  95.2 KiB |  00m00s
+[22/79] Installing pkgconf-m4-0:2.5.1-1 100% |   7.2 MiB/s |  14.7 KiB |  00m00s
+[23/79] Installing pkgconf-pkg-config-0 100% | 136.4 KiB/s |   1.8 KiB |  00m00s
+[24/79] Installing kmod-0:34.2-4.fc44.x 100% |  13.2 MiB/s | 256.9 KiB |  00m00s
+[25/79] Installing gzip-0:1.14-2.fc44.x 100% |  23.4 MiB/s | 407.1 KiB |  00m00s
+[26/79] Installing cracklib-0:2.10.3-1. 100% |  12.7 MiB/s | 246.7 KiB |  00m00s
+[27/79] Installing libpwquality-0:1.4.5 100% |  19.6 MiB/s | 421.0 KiB |  00m00s
+[28/79] Installing procps-ng-0:4.0.6-1. 100% |  44.0 MiB/s |   1.1 MiB |  00m00s
+[29/79] Installing file-libs-0:5.46-10. 100% | 515.9 MiB/s |  11.9 MiB |  00m00s
+[30/79] Installing file-0:5.46-10.fc44. 100% |   7.1 MiB/s | 101.6 KiB |  00m00s
+[31/79] Installing libtextstyle-0:0.26- 100% |  74.8 MiB/s | 382.8 KiB |  00m00s
+[32/79] Installing gettext-libs-0:0.26- 100% | 214.9 MiB/s |   2.4 MiB |  00m00s
+[33/79] Installing gettext-envsubst-0:0 100% |   5.4 MiB/s |  88.9 KiB |  00m00s
+[34/79] Installing gettext-runtime-0:0. 100% |  36.6 MiB/s | 748.8 KiB |  00m00s
+[35/79] Installing fuse3-libs-0:3.18.3- 100% |  58.4 MiB/s | 298.9 KiB |  00m00s
+[36/79] Installing libgpg-error-0:1.58- 100% |  48.7 MiB/s | 947.5 KiB |  00m00s
+[37/79] Installing libgcrypt-0:1.12.2-1 100% | 207.3 MiB/s |   1.7 MiB |  00m00s
+[38/79] Installing gdbm-1:1.23-11.fc44. 100% |  25.2 MiB/s | 464.7 KiB |  00m00s
+[39/79] Installing pam-0:1.7.2-2.fc44.x 100% |  43.2 MiB/s |   1.7 MiB |  00m00s
+[40/79] Installing xxhash-libs-0:0.8.4- 100% |  15.5 MiB/s |  95.4 KiB |  00m00s
+[41/79] Installing kbd-misc-0:2.9.0-4.f 100% |  35.2 MiB/s |   2.5 MiB |  00m00s
+[42/79] Installing kbd-legacy-0:2.9.0-4 100% |  18.1 MiB/s | 610.1 KiB |  00m00s
+[43/79] Installing kbd-0:2.9.0-4.fc44.x 100% |  52.5 MiB/s |   1.5 MiB |  00m00s
+[44/79] Installing json-c-0:0.18-8.fc44 100% |  20.5 MiB/s |  83.9 KiB |  00m00s
+[45/79] Installing liblastlog2-0:2.41.5 100% | 114.9 KiB/s |  43.7 KiB |  00m00s
+[46/79] Installing util-linux-0:2.41.5- 100% |   8.2 MiB/s |   3.6 MiB |  00m00s
+[47/79] Installing device-mapper-libs-0 100% |  18.3 MiB/s | 431.3 KiB |  00m00s
+[48/79] Installing cryptsetup-libs-0:2. 100% |  44.5 MiB/s |   3.0 MiB |  00m00s
+>>> Running sysusers scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Finished sysusers scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Creating group 'empower' with GID 999.
+>>> 
+>>> Running sysusers scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Finished sysusers scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Creating group 'systemd-journal' with GID 190.
+>>> 
+>>> Running sysusers scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Finished sysusers scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Creating group 'systemd-oom' with GID 998.
+>>> Creating user 'systemd-oom' (systemd Userspace OOM Killer) with UID 998 and GID 998.
+>>> 
+[49/79] Installing systemd-0:259.9-1.fc 100% |  21.1 MiB/s |  13.1 MiB |  00m01s
+>>> Running %post scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Finished %post scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Failed to open file /usr/lib/systemd/catalog/systemd.be.catalog: No such file or directory
+>>> Failed to import file '/usr/lib/systemd/catalog/systemd.be.catalog': No such file or directory
+>>> Failed to update catalog: No such file or directory
+>>> Failed to connect to audit log, ignoring: Invalid argument
+>>> 
+[50/79] Installing device-mapper-0:1.02 100% |   4.2 MiB/s | 350.3 KiB |  00m00s
+>>> Running sysusers scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Finished sysusers scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Creating group 'systemd-coredump' with GID 997.
+>>> Creating user 'systemd-coredump' (systemd Core Dumper) with UID 997 and GID 997.
+>>> 
+>>> Running sysusers scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Finished sysusers scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Creating group 'systemd-timesync' with GID 996.
+>>> Creating user 'systemd-timesync' (systemd Time Synchronization) with UID 996 and GID 996.
+>>> 
+[51/79] Installing systemd-udev-0:259.9 100% |  24.4 MiB/s |  13.2 MiB |  00m01s
+>>> Running %post scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Finished %post scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> /proc/ is not mounted. This is not a supported mode of operation. Please fix
+>>> your invocation environment to mount /proc/ and /sys/ properly. Proceeding anyway.
+>>> Your mileage may vary.
+>>> Failed to preset unit: Unit systemd-tmpfiles-clear.service does not exist
+>>> Created symlink '/etc/systemd/system/multi-user.target.wants/remote-cryptsetup.target' → '/usr/lib/systemd/system/remote-cryptsetup.target'.
+>>> Created symlink '/etc/systemd/system/multi-user.target.wants/remote-veritysetup.target' → '/usr/lib/systemd/system/remote-veritysetup.target'.
+>>> Created symlink '/etc/systemd/system/systemd-homed.service.wants/systemd-homed-activate.service' → '/usr/lib/systemd/system/systemd-homed-activate.service'.
+>>> Created symlink '/etc/systemd/system/dbus-org.freedesktop.home1.service' → '/usr/lib/systemd/system/systemd-homed.service'.
+>>> Created symlink '/etc/systemd/system/multi-user.target.wants/systemd-homed.service' → '/usr/lib/systemd/system/systemd-homed.service'.
+>>> Created symlink '/etc/systemd/system/sysinit.target.wants/systemd-network-generator.service' → '/usr/lib/systemd/system/systemd-network-generator.service'.
+>>> Created symlink '/etc/systemd/system/dbus-org.freedesktop.oom1.service' → '/usr/lib/systemd/system/systemd-oomd.service'.
+>>> Created symlink '/etc/systemd/system/multi-user.target.wants/systemd-oomd.service' → '/usr/lib/systemd/system/systemd-oomd.service'.
+>>> Created symlink '/etc/systemd/system/sockets.target.wants/systemd-oomd.socket' → '/usr/lib/systemd/system/systemd-oomd.socket'.
+>>> Created symlink '/etc/systemd/system/sysinit.target.wants/systemd-pstore.service' → '/usr/lib/systemd/system/systemd-pstore.service'.
+>>> 
+[52/79] Installing grub2-tools-minimal- 100% | 163.4 MiB/s |   4.1 MiB |  00m00s
+[53/79] Installing os-prober-0:1.81-11. 100% |   6.4 MiB/s | 117.3 KiB |  00m00s
+[54/79] Installing libkcapi-0:1.5.0-7.f 100% |  19.7 MiB/s | 101.0 KiB |  00m00s
+[55/79] Installing libkcapi-hasher-0:1. 100% |   2.6 MiB/s |  40.6 KiB |  00m00s
+[56/79] Installing libkcapi-hmaccalc-0: 100% |  76.5 KiB/s |   1.1 KiB |  00m00s
+[57/79] Installing parted-0:3.6-15.fc44 100% | 119.2 MiB/s |   2.5 MiB |  00m00s
+[58/79] Installing lz4-libs-0:1.10.0-4. 100% |  51.5 MiB/s | 158.4 KiB |  00m00s
+[59/79] Installing rsync-0:3.5.1-1.fc44 100% |  47.3 MiB/s | 919.5 KiB |  00m00s
+[60/79] Installing ntfs-3g-libs-2:2026. 100% |  75.4 MiB/s | 385.9 KiB |  00m00s
+[61/79] Installing ntfsprogs-2:2026.2.2 100% |  39.6 MiB/s |   1.0 MiB |  00m00s
+[62/79] Installing zstd-0:1.5.7-5.fc44. 100% |  29.1 MiB/s | 506.0 KiB |  00m00s
+[63/79] Installing xz-1:5.8.2-2.fc44.x8 100% |  72.1 MiB/s |   1.4 MiB |  00m00s
+[64/79] Installing cpio-0:2.15-9.fc44.x 100% |  61.3 MiB/s |   1.1 MiB |  00m00s
+[65/79] Installing dracut-0:108-8.fc44. 100% |   3.8 MiB/s |   1.6 MiB |  00m00s
+[66/79] Installing grub2-tools-1:2.12-6 100% |  18.6 MiB/s |   7.8 MiB |  00m00s
+>>> Running %post scriptlet: grub2-tools-1:2.12-66.fc44.x86_64
+>>> Finished %post scriptlet: grub2-tools-1:2.12-66.fc44.x86_64
+>>> Scriptlet output:
+>>> /proc/ is not mounted. This is not a supported mode of operation. Please fix
+>>> your invocation environment to mount /proc/ and /sys/ properly. Proceeding anyway.
+>>> Your mileage may vary.
+>>> Created symlink '/etc/systemd/user/timers.target.wants/grub-boot-success.timer' → '/usr/lib/systemd/user/grub-boot-success.timer'.
+>>> 
+[67/79] Installing grub2-efi-x64-1:2.12 100% | 138.8 MiB/s |   6.2 MiB |  00m00s
+[68/79] Installing shim-x64-0:16.1-7.x8 100% | 276.7 MiB/s |   1.9 MiB |  00m00s
+[69/79] Installing e2fsprogs-libs-0:1.4 100% |  90.6 MiB/s | 556.7 KiB |  00m00s
+[70/79] Installing btrfs-progs-0:7.1-1. 100% | 216.2 MiB/s |   6.5 MiB |  00m00s
+[71/79] Installing NetworkManager-libnm 100% | 570.0 MiB/s |  10.3 MiB |  00m00s
+[72/79] Installing libndp-0:1.9-5.fc44. 100% | 230.5 KiB/s |  87.4 KiB |  00m00s
+[73/79] Installing NetworkManager-1:1.5 100% |  14.1 MiB/s |   6.1 MiB |  00m00s
+>>> Running %post scriptlet: NetworkManager-1:1.56.1-2.fc44.x86_64
+>>> Finished %post scriptlet: NetworkManager-1:1.56.1-2.fc44.x86_64
+>>> Scriptlet output:
+>>> /proc/ is not mounted. This is not a supported mode of operation. Please fix
+>>> your invocation environment to mount /proc/ and /sys/ properly. Proceeding anyway.
+>>> Your mileage may vary.
+>>> Created symlink '/etc/systemd/system/multi-user.target.wants/NetworkManager.service' → '/usr/lib/systemd/system/NetworkManager.service'.
+>>> Created symlink '/etc/systemd/system/dbus-org.freedesktop.nm-dispatcher.service' → '/usr/lib/systemd/system/NetworkManager-dispatcher.service'.
+>>> Created symlink '/etc/systemd/system/network-online.target.wants/NetworkManager-wait-online.service' → '/usr/lib/systemd/system/NetworkManager-wait-online.service'.
+>>> 
+[74/79] Installing polkit-libs-0:127-2. 100% |   4.8 MiB/s | 222.2 KiB |  00m00s
+>>> Running sysusers scriptlet: polkit-0:127-2.fc44.2.x86_64
+>>> Finished sysusers scriptlet: polkit-0:127-2.fc44.2.x86_64
+>>> Scriptlet output:
+>>> Creating group 'polkitd' with GID 114.
+>>> Creating user 'polkitd' (User for polkitd) with UID 114 and GID 114.
+>>> 
+[75/79] Installing polkit-0:127-2.fc44. 100% |   1.3 MiB/s | 504.9 KiB |  00m00s
+>>> Running %post scriptlet: polkit-0:127-2.fc44.2.x86_64
+>>> Finished %post scriptlet: polkit-0:127-2.fc44.2.x86_64
+>>> Scriptlet output:
+>>> /proc/ is not mounted. This is not a supported mode of operation. Please fix
+>>> your invocation environment to mount /proc/ and /sys/ properly. Proceeding anyway.
+>>> Your mileage may vary.
+>>> 
+[76/79] Installing dosfstools-0:4.2-18. 100% |   6.2 MiB/s | 240.7 KiB |  00m00s
+[77/79] Installing ro-installer-0:2.4.4 100% | 270.3 MiB/s |  25.7 MiB |  00m00s
+[78/79] Installing dbus-broker-0:37-8.f 100% |   1.0 MiB/s | 397.5 KiB |  00m00s
+>>> Running %post scriptlet: dbus-broker-0:37-8.fc44.x86_64
+>>> Finished %post scriptlet: dbus-broker-0:37-8.fc44.x86_64
+>>> Scriptlet output:
+>>> /proc/ is not mounted. This is not a supported mode of operation. Please fix
+>>> your invocation environment to mount /proc/ and /sys/ properly. Proceeding anyway.
+>>> Your mileage may vary.
+>>> Created symlink '/etc/systemd/system/dbus.service' → '/usr/lib/systemd/system/dbus-broker.service'.
+>>> /proc/ is not mounted. This is not a supported mode of operation. Please fix
+>>> your invocation environment to mount /proc/ and /sys/ properly. Proceeding anyway.
+>>> Your mileage may vary.
+>>> Created symlink '/etc/systemd/user/dbus.service' → '/usr/lib/systemd/user/dbus-broker.service'.
+>>> 
+[79/79] Installing authselect-0:1.7.1-1 100% |  28.6 KiB/s | 207.9 KiB |  00m07s
+>>> Running %posttrans scriptlet: grub2-common-1:2.12-66.fc44.noarch
+>>> Finished %posttrans scriptlet: grub2-common-1:2.12-66.fc44.noarch
+>>> Scriptlet output:
+>>> /usr/bin/grub2-probe: error: cannot find a device for / (is /dev mounted?).
+>>> 
+>>> Running %posttrans scriptlet: grub2-efi-x64-1:2.12-66.fc44.x86_64
+>>> Finished %posttrans scriptlet: grub2-efi-x64-1:2.12-66.fc44.x86_64
+>>> Scriptlet output:
+>>> grub2-probe: error: cannot find a device for /boot/grub2 (is /dev mounted?).
+>>> 
+>>> Running %triggerin scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Finished %triggerin scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Failed to connect to audit log, ignoring: Invalid argument
+>>> 
+>>> Running %triggerin scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Finished %triggerin scriptlet: systemd-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Failed to open file /usr/lib/systemd/catalog/dbus-broker-launch.catalog: No such file or directory
+>>> Failed to import file '/usr/lib/systemd/catalog/dbus-broker-launch.catalog': No such file or directory
+>>> Failed to update catalog: No such file or directory
+>>> 
+>>> Running %triggerin scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Finished %triggerin scriptlet: systemd-udev-0:259.9-1.fc44.x86_64
+>>> Scriptlet output:
+>>> Failed to write database /etc/udev/hwdb.bin: Function not implemented
+>>> 
+Complete!

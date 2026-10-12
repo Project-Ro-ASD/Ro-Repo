@@ -1,0 +1,10 @@
+Usage: /usr/bin/../libexec/ro-assist/ro-assist [options]
+Fedora KDE desktop assistant for system maintenance
+
+Options:
+  -h, --help       Displays help on commandline options.
+  --help-all       Displays help, including generic Qt options.
+  -v, --version    Displays version information.
+  --autostart      Launch from the desktop autostart entry.
+  --smoke-test     Create the UI and exit immediately.
+  --reset-welcome  Show the first-run welcome flow again on the next launch.

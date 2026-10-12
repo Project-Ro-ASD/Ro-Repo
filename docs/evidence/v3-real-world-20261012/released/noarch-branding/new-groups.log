@@ -1,0 +1,19 @@
+Package          Arch   Version        Repository      Size
+Installing:
+ ro-asd-branding noarch 0:0.1.0-1.fc44 ro-stable   42.5 KiB
+
+Transaction Summary:
+ Installing:         1 package
+
+Updating and loading repositories:
+Repositories loaded.
+Total size of inbound packages is 22 KiB. Need to download 22 KiB.
+After this operation, 43 KiB extra will be used (install 43 KiB, remove 0 B).
+[1/1] ro-asd-branding-0:0.1.0-1.fc44.no 100% |   1.1 MiB/s |  22.4 KiB |  00m00s
+--------------------------------------------------------------------------------
+[1/1] Total                             100% |   1.0 MiB/s |  22.4 KiB |  00m00s
+Running transaction
+[1/3] Verify package files              100% |   0.0   B/s |   1.0   B |  00m00s
+[2/3] Prepare transaction               100% | 142.0   B/s |   1.0   B |  00m00s
+[3/3] Installing ro-asd-branding-0:0.1. 100% | 600.7 KiB/s |  43.9 KiB |  00m00s
+Complete!

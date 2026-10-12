@@ -1,0 +1,16 @@
+ro-asd-keyring
+ro-assist
+Updating and loading repositories:
+ V3 isolated stable                     100% |   0.0   B/s |   2.0 KiB |  00m00s
+Importing OpenPGP key 0x2FD84CB3:
+ UserID     : "Ro-ASD Repository Signing <contact@roasd.org>"
+ Fingerprint: 9A66A082D96374DA27D7538FB2186A6F2FD84CB3
+ From       : file:///tmp/real-final-acceptance/.v3-full-dnf-cc68ugmv/dnf-merged-public.asc
+The key was successfully imported.
+Importing OpenPGP key 0x8F1D10B0:
+ UserID     : "REAL ACCEPTANCE TEST ONLY <test@invalid>"
+ Fingerprint: 71BC07738BA08E0B03AE7618662E62298F1D10B0
+ From       : file:///tmp/real-final-acceptance/.v3-full-dnf-cc68ugmv/dnf-merged-public.asc
+The key was successfully imported.
+ V3 isolated stable                     100% | 834.5 KiB/s |   3.3 KiB |  00m00s
+Repositories loaded.

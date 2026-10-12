@@ -1,0 +1,22 @@
+Package                Arch   Version        Repository       Size
+Upgrading:
+ ro-assist             x86_64 0:0.2.5-1.fc44 ro-stable   964.0 KiB
+   replacing ro-assist x86_64 0:0.2.4-1.fc44 ro-baseline 963.8 KiB
+
+Transaction Summary:
+ Upgrading:          1 package
+ Replacing:          1 package
+
+Updating and loading repositories:
+Repositories loaded.
+Total size of inbound packages is 352 KiB. Need to download 352 KiB.
+After this operation, 184 B extra will be used (install 964 KiB, remove 964 KiB).
+[1/1] ro-assist-0:0.2.5-1.fc44.x86_64   100% | 172.0 MiB/s | 352.2 KiB |  00m00s
+--------------------------------------------------------------------------------
+[1/1] Total                             100% | 114.7 MiB/s | 352.2 KiB |  00m00s
+Running transaction
+[1/4] Verify package files              100% |   1.0 KiB/s |   1.0   B |  00m00s
+[2/4] Prepare transaction               100% | 285.0   B/s |   2.0   B |  00m00s
+[3/4] Upgrading ro-assist-0:0.2.5-1.fc4 100% |  31.4 MiB/s | 965.0 KiB |  00m00s
+[4/4] Removing ro-assist-0:0.2.4-1.fc44 100% |   3.0   B/s |   6.0   B |  00m02s
+Complete!

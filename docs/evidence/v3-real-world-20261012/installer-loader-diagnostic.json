@@ -1,0 +1,21 @@
+{
+  "bundled_flutter_library": true,
+  "chroot_proc_mounted": false,
+  "elf_runpath": "$ORIGIN/lib",
+  "gui_acceptance": "UNVERIFIED",
+  "probes": [
+    {
+      "environment": "bare-chroot",
+      "exit_code": 127,
+      "stderr": "/usr/bin/ro-installer: error while loading shared libraries: libflutter_linux_gtk.so: cannot open shared object file: No such file or directory\n"
+    },
+    {
+      "environment": "explicit-origin",
+      "exit_code": 1,
+      "stderr": "\n(org.roasd.installer:107909): Gtk-WARNING **: 11:42:23.450: cannot open display: \n"
+    }
+  ],
+  "publishable": false,
+  "scope": "v3-installer-loader-diagnostic-test-only",
+  "version": "2.4.4-1.fc44"
+}

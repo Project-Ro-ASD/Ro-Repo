@@ -1,0 +1,105 @@
+{
+  "environments": [
+    {
+      "can_admins_bypass": true,
+      "deployment_branch_policy": null,
+      "name": "copilot",
+      "protection_rules": []
+    },
+    {
+      "can_admins_bypass": true,
+      "deployment_branch_policy": {
+        "custom_branch_policies": true,
+        "protected_branches": false
+      },
+      "name": "github-pages",
+      "protection_rules": [
+        {
+          "prevent_self_review": null,
+          "reviewers": [],
+          "type": "branch_policy"
+        }
+      ]
+    },
+    {
+      "can_admins_bypass": false,
+      "deployment_branch_policy": {
+        "custom_branch_policies": true,
+        "protected_branches": false
+      },
+      "name": "repo-beta",
+      "protection_rules": [
+        {
+          "prevent_self_review": null,
+          "reviewers": [],
+          "type": "branch_policy"
+        },
+        {
+          "prevent_self_review": false,
+          "reviewers": [
+            {
+              "id": 19418500,
+              "name": "release-engineering",
+              "type": "Team"
+            }
+          ],
+          "type": "required_reviewers"
+        }
+      ]
+    },
+    {
+      "can_admins_bypass": false,
+      "deployment_branch_policy": {
+        "custom_branch_policies": true,
+        "protected_branches": false
+      },
+      "name": "repo-production-signing",
+      "protection_rules": [
+        {
+          "prevent_self_review": null,
+          "reviewers": [],
+          "type": "branch_policy"
+        },
+        {
+          "prevent_self_review": false,
+          "reviewers": [
+            {
+              "id": 19418500,
+              "name": "release-engineering",
+              "type": "Team"
+            }
+          ],
+          "type": "required_reviewers"
+        }
+      ]
+    },
+    {
+      "can_admins_bypass": false,
+      "deployment_branch_policy": {
+        "custom_branch_policies": true,
+        "protected_branches": false
+      },
+      "name": "repo-stable",
+      "protection_rules": [
+        {
+          "prevent_self_review": null,
+          "reviewers": [],
+          "type": "branch_policy"
+        },
+        {
+          "prevent_self_review": false,
+          "reviewers": [
+            {
+              "id": 19418500,
+              "name": "release-engineering",
+              "type": "Team"
+            }
+          ],
+          "type": "required_reviewers"
+        }
+      ]
+    }
+  ],
+  "production_activation": "BLOCKED",
+  "scope": "read-only-configuration-observation"
+}

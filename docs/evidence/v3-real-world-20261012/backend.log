@@ -1,0 +1,2 @@
+PASS: real PostgreSQL CAS, independent runners, process death, signed audit; production BLOCKED
+PASS: isolated signed backend and Git CAS rehearsal; production BLOCKED
