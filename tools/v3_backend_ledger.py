@@ -98,9 +98,17 @@ class Ledger:
         if signer.key_sha256 != audit_key_sha256:
             raise PlanningError("audit signer differs from independent audit root")
         with adapter.transaction() as db:
+            names = {"head", "attempts", "consumed", "views", "events"}
+            query = ("SELECT table_name FROM information_schema.tables WHERE table_schema=current_schema()"
+                     if db.postgres else "SELECT name FROM sqlite_master WHERE type='table'")
+            existing = {row[0] for row in db.execute(query).fetchall()} & names
+            if existing and existing != names:
+                raise PlanningError("partial existing ledger schema; authenticated recovery required")
             for sql in DDL:
                 db.execute(sql)
             if db.execute("SELECT body FROM head WHERE id=1").fetchone() is None:
+                if existing:
+                    raise PlanningError("missing existing stable head; refusing to reinitialize authenticated history")
                 db.execute("INSERT INTO head(id,body) VALUES(1,?)", (canonical({"digest": None, "generation": 0, "last_verified": None}).decode(),))
                 self._append(db, "initialize", None)
             self._integrity(db)

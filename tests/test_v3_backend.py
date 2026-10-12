@@ -231,6 +231,21 @@ class BackendTests(unittest.TestCase):
             db.execute("DELETE FROM consumed")
         self.reject(lambda: self.fx.ledger.inspect())
 
+    def test_missing_stable_head_cannot_be_resigned_as_initialization(self):
+        self.fx.advance("AUTHORIZED")
+        with self.fx.ledger.adapter.transaction() as db:
+            db.execute("DELETE FROM head")
+        self.reject(lambda: Ledger(self.fx.ledger.adapter, self.keys.signers["audit"],
+                    audit_key=self.keys.signers["audit"].public, audit_key_sha256=self.keys.signers["audit"].key_sha256,
+                    clock=lambda: NOW))
+
+    def test_partial_schema_cannot_be_silently_repaired_and_resigned(self):
+        with self.fx.ledger.adapter.transaction() as db:
+            db.execute("DROP TABLE consumed")
+        self.reject(lambda: Ledger(self.fx.ledger.adapter, self.keys.signers["audit"],
+                    audit_key=self.keys.signers["audit"].public, audit_key_sha256=self.keys.signers["audit"].key_sha256,
+                    clock=lambda: NOW))
+
     def test_independent_checkpoint_detects_valid_old_database(self):
         old = self.fx.ledger.inspect()["checkpoint"]
         self.fx.advance()
