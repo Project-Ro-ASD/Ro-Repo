@@ -1,7 +1,5 @@
 # V3 closure evidence
 
-Production activation BLOCKED. Receipts/logs are bound to source inventory SHA256 3ba19ca0f7a4d091ada777fdbb573b9af2dba5ca5784cdaa62dd5b90412c9f1f. Native Fedora HTTPS/DNF runs use actual signed synthetic fixtures; PostgreSQL/Git/service writes are disposable; no hardware/GUI/aarch64 PASS is inferred. Legacy metadata is actual public signed data from the pinned storage commit; no dwell credit is granted. Compressed logs preserve raw bytes with deterministic gzip headers. No private keys, JWTs, credentials or DB backups are included.
+Production activation BLOCKED. Final source inventory SHA256 is 3ba19ca0f7a4d091ada777fdbb573b9af2dba5ca5784cdaa62dd5b90412c9f1f. Local full suite: 542 tests / 398 V3; actual native Fedora HTTPS/DNF, isolated PostgreSQL/TLS, Git/backend recovery and complete V2 E2E pass. No hardware/GUI/aarch64 PASS is inferred. Legacy metadata is original public signed data; no historical dwell is credited. Deterministic gzip preserves raw log bytes; no private keys, JWTs, credentials or DB backups are included.
 
-CI evidence records 8/8 SUCCESS for implementation head 2619629569e1c3386cf98b53397f6cf45663d918. The collection spans October 12–13, 2026 in Europe/Istanbul.
-
-Observer-assigned real-clock genesis updates the local suite to 542 tests / 398 V3. The complete local V2 run also passes; its raw log is preserved.
+ci-1ec6376.json records 8/8 SUCCESS on the final implementation head 1ec63761119084d39f2891b83d40c0cf825db739. ci-2619629.json is explicitly prior-head evidence before the observer-clock correction. Collection spans October 12–13, 2026 in Europe/Istanbul.

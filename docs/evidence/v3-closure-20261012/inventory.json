@@ -1,7 +1,11 @@
 [
   {
     "path": "README.md",
-    "sha256": "2ac83f6139a8db41d163d221409afca9ba01a116bf269c0929a3eb028191294c"
+    "sha256": "32a826fa761f1ddff29e6c06ac1afe63690d2a4b5e51649c3126b1f3d8117143"
+  },
+  {
+    "path": "ci-1ec6376.json",
+    "sha256": "4351bfcf6f643d848d265b1748a7e72b28e1eea8cc0aecaa5c48e7a82cfab3ce"
   },
   {
     "path": "ci-2619629.json",

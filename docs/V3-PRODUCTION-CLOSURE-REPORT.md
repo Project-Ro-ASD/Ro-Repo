@@ -20,7 +20,7 @@ Read-only audit captured 22 public metadata/signature files at Pages commit `097
 
 ## Exact remaining code blockers
 
-1. **Live fenced provider wiring — BLOCKED:** `Coordinator` deliberately accepts disposable Git only. Production GitHub storage CAS, provider-enforced fence handling for delayed requests, live idempotent deployment transport and independently witnessed deployment reconciliation must be supplied/reviewed against the new interfaces. No live storage/deploy credential path exists in this PR.
+1. **Live fenced provider wiring — BLOCKED:** `Coordinator` deliberately accepts disposable Git only. Production GitHub storage CAS, provider-enforced fence handling for delayed requests, live idempotent deployment transport and independently witnessed deployment reconciliation must be supplied/reviewed against the new interfaces. The production publication/signing/staging factories remain blocked or test-only; authenticated live signing/staging and storage/deploy provider adapters require review. No live storage/deploy credential path exists in this PR.
 2. **Activated protected import/bootstrap — BLOCKED:** rehearsal seeding, inventory assessment and unapplied retirement patch are implemented. Consuming a real protected V2 import or empty-stable cutover through activated common authority still needs the separately reviewed activation adapter. A missing historical head cannot be reinitialized. Coordinator resumption retains the original authorization deadline and 60-second pre-verification freshness. After those bounds, a fresh protected recovery/reconciliation adapter is required; the first-bootstrap case has no previously POST_VERIFIED target and must remain BLOCKED until an explicit current-state authorization contract is reviewed. No expired approval is silently renewed or pending view relabelled as verified history.
 3. **Real client integration outside this repository — BLOCKED:** package/update GUI/CLI routing, trusted-root installation and host-client rollout belong to a separately authorized Ro-ASD client change. The current client executes only in private disposable roots. The discovery signer must be independently operated and serve only current POST_VERIFIED state.
 4. **Feed-specific zchunk-only decoder — BLOCKED if selected:** existing gzip/bzip2/xz/Zstandard support is preserved; a zchunk-only primary feed still requires a decoder and real acceptance. The previously captured Fedora feed has a supported Zstandard primary path, so this is not a reason to weaken verification.
@@ -59,7 +59,7 @@ Final implementation inventory SHA256: `3ba19ca0f7a4d091ada777fdbb573b9af2dba5ca
 | Existing V2 compatibility | PASS: complete local V2 E2E exit 0, including single/multi-subpackage native install/upgrade, catalog/publication/recovery and rpmlint 0 errors / 4 synthetic fixture warnings; complete V2 CI also passes. |
 | Static checks | PASS: 102 Python files, 10 shell files, all schemas/YAML and diff whitespace |
 | Safety audit | PASS: eleven V2 workflows byte-identical; disabled V3 workflow byte-identical and eleven unconditional false jobs; no new private signing keys/tokens in changed artifacts |
-| GitHub CI | Earlier head `2619629` has 8/8 SUCCESS (541/397); observer-clock correction has local 542/398 PASS and its new head-specific CI is pending |
+| GitHub CI | PASS: 8/8 SUCCESS on `1ec63761119084d39f2891b83d40c0cf825db739`; actual job logs confirm 542 full tests and 398 V3 tests |
 
 No private key, JWT, production credential or database backup is committed. Test passwords are explicitly disposable. Real Pages storage ref is independently checked read-only; no write is attempted. Local service/deployment fixtures cannot satisfy actual production acceptance.
 
@@ -71,17 +71,17 @@ Bu PR yalnız **NON-PRODUCTION** entegrasyon içindir. Production **BLOCKED**, o
 
 ## Head-specific public CI and merge recommendation
 
-[Draft PR #74](https://github.com/Project-Ro-ASD/Ro-Repo/pull/74) targets main and remains unmerged. All three workflow runs explicitly report head `2619629569e1c3386cf98b53397f6cf45663d918`, covering the implementation before the observer-clock correction; the updated inventory above has local 542/398 PASS and fresh CI is pending. Later documentation-only commits preserve that source inventory; their own checks are verified separately at handoff. No older head's result is attributed to a different implementation.
+[Draft PR #74](https://github.com/Project-Ro-ASD/Ro-Repo/pull/74) targets main and remains unmerged. All three workflow runs explicitly report head `1ec63761119084d39f2891b83d40c0cf825db739`, matching the final implementation inventory above and actual 542/398 test logs. Later documentation-only commits preserve that source inventory; their own checks are verified separately at handoff. No older head's result is attributed to a different implementation.
 
 | Check | Result | Public job |
 | --- | --- | --- |
-| acceptance-runtime-contract | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908521/job/115009575670) |
-| backend-security | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908523/job/115009575558) |
-| closure-tls-postgresql | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908523/job/115009575706) |
-| fedora44-e2e | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908521/job/115009575650) |
-| fedora44-full-stable-set | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908508/job/115009576100) |
-| postgres-transactions | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908523/job/115009575583) |
-| security-contracts | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908508/job/115009575863) |
-| unit-policy | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908521/job/115009575257) |
+| acceptance-runtime-contract | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632623/job/115015211679) |
+| backend-security | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632616/job/115015211350) |
+| closure-tls-postgresql | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632616/job/115015211311) |
+| fedora44-e2e | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632623/job/115015212049) |
+| fedora44-full-stable-set | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632613/job/115015211558) |
+| postgres-transactions | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632616/job/115015210944) |
+| security-contracts | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632613/job/115015211318) |
+| unit-policy | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38310632623/job/115015211592) |
 
 The code is suitable for a **NON-PRODUCTION merge**, subject to normal maintainer review. It is **not suitable for first real stable publication**: live fenced provider/protected import wiring, independently operated trust/checkpoint/observer/witness/discovery/deployment services, external TLS/HA/restore and Pages/CDN acceptance, genuine application/hardware/GUI/aarch64 evidence, and reviewed V2 writer/client cutover remain mandatory. No activation or merge was performed.
