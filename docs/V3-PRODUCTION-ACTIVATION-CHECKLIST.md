@@ -30,6 +30,8 @@ maintainer-approved PR, actual independent acceptance and a reviewed writer cuto
    a separate immutable monotonic checkpoint service and audit signing custody.
    Perform external failover/restore and multi-runner tests. This PR connects only
    to loopback `ro_v3_test_*` databases; extending that guard needs explicit review.
+   Supply a trusted UTC clock to every verifier/ledger; test clocks are injected
+   deliberately and cannot be used as production time authority.
 5. Implement the live durable deployment outbox/lease, idempotent staging upload,
    Git CAS, deployment identity witness and recovery reconciliation. Resolve a
    crash after DB advertisement intent but before external Git/deployment completion.

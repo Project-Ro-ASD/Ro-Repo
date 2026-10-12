@@ -35,6 +35,23 @@ point `v3_immutable_view.production_publish` always raises BLOCKED.
 
 ## Publication protocol
 
+The disabled workflow's future stage contracts map to these implementations;
+this PR does not replace its unconditional false guards or wire live credentials.
+
+| Disabled production job | Implemented contract / activation boundary |
+| --- | --- |
+| proposal | Existing `v3_integration.prepare/prepare_live`, planner and `Backend.create` |
+| pinned-beta-evidence | Existing signed archive bridge plus cryptographic source/history envelopes in `verify_evidence` |
+| component-policy | Existing registry-derived policy/closure and new authenticated retained-group test floors |
+| compose-and-validate | Existing composer/RPM preflight, `verify_result`, pinned upstream and complete-set DNF |
+| deterministic-result | Existing deterministic metadata/signed preview; exact resulting tree inventory |
+| protected-authorization | `verify_oidc`, `authorization_request`, `verify_protected`, atomic `Backend.authorized` |
+| sign-publication | External result-bound publication envelope in `IsolatedStore.stage`; live signing BLOCKED |
+| immutable-staging | `IsolatedStore` and `IsolatedGitStore.stage`; live upload/deploy BLOCKED |
+| controlled-publication | Ledger digest/generation CAS and isolated Git advertisement; live outbox/lease BLOCKED |
+| independent-remote-verification | Complete byte/deployment checks and signed advertisement in `verify_remote` |
+| audit-receipt | Independently pinned signed ledger events, state digests and checkpoint verification |
+
 The approved result digest covers the **complete already-signed snapshot tree**.
 Stable promotion copies signed RPMs/SRPMs unchanged. Existing metadata generation,
 snapshot signature verification and RPM preflight are reused. After approval,
@@ -70,6 +87,12 @@ providers leaves PUBLISHED or FAILED, preserves last-known-good history and
 requires explicit recovery/reconciliation. A live durable outbox/lease and
 GitHub deployment reconciliation service are **not implemented** here and are
 BLOCKED before activation. Local database restoration is never remote rollback.
+
+Preparation currently uses the existing test-only signed preview. A future live
+metadata-preparation signing policy must be independently protected and reviewed;
+this PR does not grant production signing authority before human approval. OIDC
+and approval expiry are checked at consumption and advertisement. Large deployments
+must exercise these deadlines and any separately reviewed identity renewal design.
 
 Recovery names an existing POST_VERIFIED immutable digest, requires fresh signed
 human approval and protected witness, binds the current base and attempt, consumes
