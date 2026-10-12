@@ -254,6 +254,24 @@ class ClosureTests(unittest.TestCase):
             availability_sha256="a" * 64, now="2026-10-18T12:00:00Z", result_sha256=p["result_stable_sha256"])
         self.assertTrue(later["dwell_met"])
 
+    def test_history_genesis_assigns_real_observer_time_and_preserves_it(self):
+        import time
+        root = test_workspace()
+        self.addCleanup(shutil.rmtree, root)
+        audit = self.keys.signers["audit"]
+        authority = LocalAuthority(root, self.checkpoint_signer, audit.public, audit.key_sha256, time.time)
+        client = AuthorityClient(authority.exchange, public_key=self.checkpoint_signer.public,
+            key_sha256=self.checkpoint_signer.key_sha256, clock=time.time, updater=audit)
+        row = {"candidate_sha256": self.fx.proposal["candidate_sha256"], "promotion_group": "ro-assist",
+            "publication_run": "101", "availability_sha256": "a"*64, "published_at": None}
+        before = time.time()
+        actual = client.advance("history/" + row["candidate_sha256"], None, row)
+        after = time.time()
+        from v3_promotion_policy import _time
+        self.assertLessEqual(before, _time(actual["published_at"]).timestamp())
+        self.assertLessEqual(_time(actual["published_at"]).timestamp(), after)
+        self.assertEqual(client.read("history/" + row["candidate_sha256"]), actual)
+
     def test_jwks_lifecycle_revocation_expiry_and_epoch(self):
         raw, pins = self.keys.oidc()
         expected = {"issuer": "https://token.actions.githubusercontent.com", "jwks_sha256": digest(self.keys.jwks),

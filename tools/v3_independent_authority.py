@@ -72,9 +72,13 @@ class LocalAuthority:
                         raise PlanningError("history genesis is immutable")
                     import datetime as dt
                     stamp = dt.datetime.fromtimestamp(self.clock(), dt.timezone.utc).isoformat().replace("+00:00", "Z")
-                    if (value["published_at"] != stamp or name != "history/" + value["candidate_sha256"] or
+                    if (value["published_at"] not in {None, stamp} or name != "history/" + value["candidate_sha256"] or
                             not re.fullmatch(r"[0-9a-f]{64}", value["availability_sha256"]) or not re.fullmatch(r"[1-9][0-9]*", value["publication_run"])):
                         raise PlanningError("fresh independently observed history genesis required")
+                    # A real network client cannot predict the server's exact
+                    # fractional UTC clock. Null requests a fresh server-assigned
+                    # timestamp; signed output freezes it without backdating.
+                    value = {**value, "published_at": stamp}
                 elif name.startswith("checkpoint/"):
                     if (not isinstance(value, dict) or set(value) != {"seq", "sha256"} or type(value["seq"]) is not int or value["seq"] < 1 or
                             not isinstance(value["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", value["sha256"]) or

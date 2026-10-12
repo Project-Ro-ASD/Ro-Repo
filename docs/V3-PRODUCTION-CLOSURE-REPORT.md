@@ -21,7 +21,7 @@ Read-only audit captured 22 public metadata/signature files at Pages commit `097
 ## Exact remaining code blockers
 
 1. **Live fenced provider wiring — BLOCKED:** `Coordinator` deliberately accepts disposable Git only. Production GitHub storage CAS, provider-enforced fence handling for delayed requests, live idempotent deployment transport and independently witnessed deployment reconciliation must be supplied/reviewed against the new interfaces. No live storage/deploy credential path exists in this PR.
-2. **Activated protected import/bootstrap — BLOCKED:** rehearsal seeding, inventory assessment and unapplied retirement patch are implemented. Consuming a real protected V2 import or empty-stable cutover through activated common authority still needs the separately reviewed activation adapter. A missing historical head cannot be reinitialized.
+2. **Activated protected import/bootstrap — BLOCKED:** rehearsal seeding, inventory assessment and unapplied retirement patch are implemented. Consuming a real protected V2 import or empty-stable cutover through activated common authority still needs the separately reviewed activation adapter. A missing historical head cannot be reinitialized. Coordinator resumption retains the original authorization deadline and 60-second pre-verification freshness. After those bounds, a fresh protected recovery/reconciliation adapter is required; the first-bootstrap case has no previously POST_VERIFIED target and must remain BLOCKED until an explicit current-state authorization contract is reviewed. No expired approval is silently renewed or pending view relabelled as verified history.
 3. **Real client integration outside this repository — BLOCKED:** package/update GUI/CLI routing, trusted-root installation and host-client rollout belong to a separately authorized Ro-ASD client change. The current client executes only in private disposable roots. The discovery signer must be independently operated and serve only current POST_VERIFIED state.
 4. **Feed-specific zchunk-only decoder — BLOCKED if selected:** existing gzip/bzip2/xz/Zstandard support is preserved; a zchunk-only primary feed still requires a decoder and real acceptance. The previously captured Fedora feed has a supported Zstandard primary path, so this is not a reason to weaken verification.
 
@@ -45,21 +45,21 @@ Use the updated [activation checklist](V3-PRODUCTION-ACTIVATION-CHECKLIST.md), e
 
 ## Verification and evidence
 
-Final implementation inventory SHA256: `eb0a01732282eac29f0c54ab6030f73c0dbff1e467fc6badcdefafc363731921` (132 Python/shell/schema/config files). [Evidence inventory, receipts and compressed raw logs](evidence/v3-closure-20261012/) bind the final implementation.
+Final implementation inventory SHA256: `3ba19ca0f7a4d091ada777fdbb573b9af2dba5ca5784cdaa62dd5b90412c9f1f` (132 Python/shell/schema/config files). [Evidence inventory, receipts and compressed raw logs](evidence/v3-closure-20261012/) bind the final implementation.
 
 | Test | Result |
 | --- | --- |
-| Full Python unit/security suite | PASS: 541 tests, including 397 V3; 0 failures/errors/skips. Earlier read-only run had eight existing scratch-directory errors, resolved by the writable disposable copy. |
-| Closure protocol regression suite | 20 cases included in full suite; independent reservations, replay/expiry/config/signature failures, stale leases, provider response loss and client consistency |
+| Full Python unit/security suite | PASS: 542 tests, including 398 V3; 0 failures/errors/skips. Earlier read-only run had eight existing scratch-directory errors, resolved by the writable disposable copy. |
+| Closure protocol regression suite | 21 cases included in full suite; independent reservations, replay/expiry/config/signature failures, stale leases, provider response loss and client consistency |
 | Fedora44 native signed fixture integration | PASS, exit 0; real signed RPM/SRPM, full-set install/upgrade/config/conflict negatives and HTTPS discovery-driven DNF 1.0 → 2.0 |
 | PostgreSQL existing adversarial suite | PASS, exit 0; independent writer/recovery races, process death, replay, signed audit corruption and restored old backup/checkpoint rejection |
 | PostgreSQL verify-full/restricted roles | PASS, exit 0; actual correct TLS, wrong CA/hostname rejection, permission denials, two-process CAS and rollback |
 | Actual disposable Git/backend recovery | PASS, exit 0; existing complete signed rehearsal plus new durable outbox crash/response-loss reconciliation |
 | Native DNF metadata URL override | PASS, exit 0; existing xml:base negative |
-| Existing V2 compatibility | PASS: complete unchanged V2 E2E in head-specific Fedora CI. Local native clean/baseline/upgrade cases also ran; the duplicate complete local run encountered slow/partial mirror downloads and earlier disposable-copy setup errors. |
+| Existing V2 compatibility | PASS: complete local V2 E2E exit 0, including single/multi-subpackage native install/upgrade, catalog/publication/recovery and rpmlint 0 errors / 4 synthetic fixture warnings; complete V2 CI also passes. |
 | Static checks | PASS: 102 Python files, 10 shell files, all schemas/YAML and diff whitespace |
 | Safety audit | PASS: eleven V2 workflows byte-identical; disabled V3 workflow byte-identical and eleven unconditional false jobs; no new private signing keys/tokens in changed artifacts |
-| GitHub CI | PASS: 8/8 checks on `2619629569e1c3386cf98b53397f6cf45663d918`; unit log confirms 541 tests and security log confirms 397 V3 tests |
+| GitHub CI | Earlier head `2619629` has 8/8 SUCCESS (541/397); observer-clock correction has local 542/398 PASS and its new head-specific CI is pending |
 
 No private key, JWT, production credential or database backup is committed. Test passwords are explicitly disposable. Real Pages storage ref is independently checked read-only; no write is attempted. Local service/deployment fixtures cannot satisfy actual production acceptance.
 
@@ -71,7 +71,7 @@ Bu PR yalnız **NON-PRODUCTION** entegrasyon içindir. Production **BLOCKED**, o
 
 ## Head-specific public CI and merge recommendation
 
-[Draft PR #74](https://github.com/Project-Ro-ASD/Ro-Repo/pull/74) targets main and remains unmerged. All three workflow runs explicitly report head `2619629569e1c3386cf98b53397f6cf45663d918`, matching the final implementation inventory above. Later documentation-only commits preserve that source inventory; their own checks are verified separately at handoff. No older head's result is attributed to a different implementation.
+[Draft PR #74](https://github.com/Project-Ro-ASD/Ro-Repo/pull/74) targets main and remains unmerged. All three workflow runs explicitly report head `2619629569e1c3386cf98b53397f6cf45663d918`, covering the implementation before the observer-clock correction; the updated inventory above has local 542/398 PASS and fresh CI is pending. Later documentation-only commits preserve that source inventory; their own checks are verified separately at handoff. No older head's result is attributed to a different implementation.
 
 | Check | Result | Public job |
 | --- | --- | --- |
