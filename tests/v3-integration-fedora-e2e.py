@@ -255,6 +255,18 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                     registry=registry, rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
                     metadata_key=meta_key, metadata_key_sha256=meta_sha)
         assert backend_result.sha256 == sha(tree_inventory(second))
+        # Recovery preserves the historical snapshot's original signed parent;
+        # its new publication envelope binds the CURRENT base independently.
+        recovery_plan = copy.deepcopy(first_plan)
+        recovery_plan["stable_base_snapshot_id"] = second.name
+        recovery_proposal = copy.deepcopy(first_proposal)
+        recovery_proposal["previous_stable_snapshot_id"] = second.name
+        recovery_proposal["previous_stable_sha256"] = sha(tree_inventory(second))
+        recovery_proposal["proposal_sha256"] = sha({k: v for k, v in recovery_proposal.items() if k != "proposal_sha256"})
+        recovered = verify_result(first, recovery_proposal, recovery_plan, beta=beta1, baseline=second,
+                    registry=registry, rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
+                    metadata_key=meta_key, metadata_key_sha256=meta_sha, operation="recover")
+        assert recovered.sha256 == first_proposal["result_stable_sha256"]
         from v3_migration import rehearse
         migration = rehearse(retained, registry, metadata_key=meta_key, metadata_key_sha256=meta_sha,
                     rpm_key=rpm_key, rpm_key_sha256=rpm_sha, storage_commit="a" * 40,
@@ -338,6 +350,7 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             "source_code_sha256": sha(tested_sources),
             "gates": {"signed-bootstrap": "PASS", "unchanged-candidate-dwell": "PASS", "retained-signed-bytes": "PASS",
                       "backend-real-rpm-adapter": "PASS", "migration-fixture": "PASS", "pinned-upstream-fixture": "PASS",
+                      "recovery-historical-signed-parent": "PASS",
                       "unapproved-group-exclusion": "PASS", "full-set-upgrade": "PASS", "rpmnew": "PASS", "reproducible-metadata": "PASS",
                       "missing-dependency-rejection": "PASS", "retained-group-conflict-rejection": "PASS",
                       "aarch64": "UNVERIFIED", "real-producer-applications": "UNVERIFIED", "plasma-login": "UNVERIFIED",

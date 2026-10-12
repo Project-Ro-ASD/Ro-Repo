@@ -131,7 +131,7 @@ schemas before a trusted worker can sign a new initialization event. Every backe
 envelope now passes its strict outer schema and its exact role-specific payload
 contract. No existing security test was weakened.
 
-Signed audit chains detect altered state or rewritten unsigned history. A fully
+Signed audit chains detect altered state or rewritten unsigned history. A
 verified negative test also exposed an offline ledger integrity defect: a signer
 returning a real signature from the wrong key could commit an invalid audit event
 and authorization consumption before the next integrity check stopped progress.
@@ -140,6 +140,12 @@ path was involved. `Ledger._append` now verifies each new event signature agains
 the independent audit root before insertion/commit. The failing regression is
 `test_audit_signature_failure_rolls_back_authority`, and the minimum correction
 rolls back state, replay consumption and audit together.
+
+The native recovery adapter also preserves a historical snapshot's original
+signed parent instead of requiring it to name the new current stable base. That
+current base is verified separately against the protected request and publication
+envelope. Otherwise recovery would require changing approved historical bytes.
+The real Fedora signature fixture now covers this case without re-signing.
 
 A fully
 deleted database or restoration to an older valid signed database still needs an

@@ -86,7 +86,7 @@ def verify_result(source, proposal, plan, *, beta, baseline, registry, rpm_key, 
             recomputed = canonical_plan(inputs[pathlib.Path(beta)], None if baseline is None else inputs[pathlib.Path(baseline)], registry, plan["promotion_group"])
             if recomputed != plan:
                 raise PlanningError("plan changed unrelated groups or signed baseline bytes")
-        if (manifest["parent_snapshot"] != plan["stable_base_snapshot_id"] or
+        if ((operation == "promote" and manifest["parent_snapshot"] != plan["stable_base_snapshot_id"]) or
                 sorted(manifest["packages"], key=lambda p: p["nevra"]) != sorted(plan["resulting_stable_packages"], key=lambda p: p["nevra"])):
             raise PlanningError("result differs from complete approved plan")
         receipt = _rpm_set_preflight(frozen, manifest, rpm_key, rpm_key_sha256, work / "preflight")
