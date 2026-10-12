@@ -91,6 +91,8 @@ class IsolatedGitStore:
             files[path] = blob
         tree = self._tree(files)
         if expected is not None and self._run(["rev-parse", expected + "^{tree}"]).decode().strip() == tree:
+            # Even an exact retry must linearize against concurrent ref writers.
+            self._run(["update-ref", "refs/heads/isolated-storage", expected, expected])
             return expected
         commit = self._run(["commit-tree", tree, *([] if expected is None else ["-p", expected])], data=b"V3 isolated immutable view\n").decode().strip()
         self._run(["update-ref", "refs/heads/isolated-storage", commit, expected or "0" * 40])
