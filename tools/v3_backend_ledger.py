@@ -104,8 +104,11 @@ class Ledger:
             existing = {row[0] for row in db.execute(query).fetchall()} & names
             if existing and existing != names:
                 raise PlanningError("partial existing ledger schema; authenticated recovery required")
-            for sql in DDL:
-                db.execute(sql)
+            if not getattr(adapter, "managed_schema", False):
+                for sql in DDL:
+                    db.execute(sql)
+            elif existing != names:
+                raise PlanningError("provisioned ledger schema missing; owner must install reviewed DDL")
             if db.execute("SELECT body FROM head WHERE id=1").fetchone() is None:
                 if existing:
                     raise PlanningError("missing existing stable head; refusing to reinitialize authenticated history")
@@ -182,7 +185,7 @@ class Ledger:
             raise PlanningError("ledger rollback violates independent checkpoint")
         return {"seq": len(rows), "sha256": previous}
 
-    def execute(self, operation, attempt, change, *, checkpoint=None, inject=None, guard=None):
+    def execute(self, operation, attempt, change, *, checkpoint=None, inject=None, guard=None, before_commit=None):
         with self.adapter.transaction() as db:
             self._lock(db)
             self._integrity(db, checkpoint)
@@ -197,6 +200,10 @@ class Ledger:
             receipt = self._append(db, operation, attempt)
             if inject:
                 inject("after-audit")
+            if guard:
+                guard()
+            if before_commit:
+                before_commit(receipt)
             if guard:
                 guard()
             return result, receipt

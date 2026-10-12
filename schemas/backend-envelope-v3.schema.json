@@ -26,7 +26,13 @@
         "upstream-pin",
         "acceptance-inputs",
         "vm-inputs",
-        "stable-advertisement"
+        "stable-advertisement",
+        "independent-state",
+        "independent-update",
+        "restore-observation",
+        "jwks-lifecycle",
+        "client-discovery",
+        "empty-stable"
       ]
     },
     "payload": {

@@ -28,23 +28,30 @@ maintainer-approved PR, actual independent acceptance and a reviewed writer cuto
    TLS/server identity, restricted credentials, serializable transactions,
    append-only audit permissions, durable backups and restore procedures. Operate
    a separate immutable monotonic checkpoint service and audit signing custody.
-   Perform external failover/restore and multi-runner tests. This PR connects only
-   to loopback `ro_v3_test_*` databases; extending that guard needs explicit review.
+   Perform external failover/restore and multi-runner tests. The separately configured
+   `ProductionPostgreSQLAdapter` implements verify-full/restricted-role sessions;
+   its production route remains blocked. Only its loopback `ro_v3_test_*` factory
+   executes. See [closure provisioning](V3-CLOSURE-PROVISIONING.md) for exact grants,
+   independent precommit reservations and authenticated abort/restore contracts.
    Supply a trusted UTC clock to every verifier/ledger; test clocks are injected
    deliberately and cannot be used as production time authority.
-5. Implement the live durable deployment outbox/lease, idempotent staging upload,
+5. Provision and accept the live durable deployment outbox/lease, idempotent staging upload,
    Git CAS, deployment identity witness and recovery reconciliation. Resolve a
    crash after DB advertisement intent but before external Git/deployment completion.
-   Preserve PUBLISHED/FAILED and last-known-good history until independent post
+   `v3_publication_outbox` implements durable audited jobs and response-loss
+   reconciliation against disposable Git/simulated deployment; live provider
+   fencing and external acceptance are still required. Preserve PUBLISHED/FAILED and last-known-good history until independent post
    verification; never report a local CAS as a successful remote rollback.
 6. Verify Pages storage/domain ownership and enforce HTTPS. Stage immutable views
    and publication records without replacing historical bytes. Perform independent
    HTTPS reads of every approved path, signed advertisement and deployment binding
    before and after advertisement. Test partial visibility and multiple CDN PoPs.
    Do not assert atomic mutable Pages/CDN updates.
-7. Prepare a separately reviewed client `.repo` migration to exact
+7. Package and deploy the separately reviewed client discovery/update wrapper and `.repo` migration to exact
    `https://repo.ro-asd.org/v3/views/<digest>/rpm/$basearch` URLs. Preserve beta's
-   production behavior and the two-channel model. Existing mutable stable URLs
+   production behavior and the two-channel model. `v3_client_update` verifies fresh
+   nonce-bound discovery, complete signed views and pins one URL across a DNF
+   transaction; actual client/service adoption is still UNVERIFIED. Existing mutable stable URLs
    cannot be used as proof that versioned-view consistency is active.
 8. Independently pin official Fedora 44 repomd/metadata provenance, RPM public
    root, complete immutable package cache and exact NEVRAs. If repomd is unsigned,
@@ -76,10 +83,10 @@ maintainer-approved PR, actual independent acceptance and a reviewed writer cuto
 | Reference | Acceptance | Required work |
 | --- | --- | --- |
 | `v3_immutable_view.production_publish` | BLOCKED | Intentionally unconditional rejection; no live publisher exists |
-| `v3_backend_ledger.PostgreSQLAdapter.__init__/transaction` | UNVERIFIED | External TLS/HA configuration and independently checkpointed provider deployment; current connections are test-only |
+| `v3_postgresql_production.ProductionPostgreSQLAdapter`, `v3_independent_authority.CheckpointedLedger` | UNVERIFIED | Guarded TLS/role/serializable sessions and independent reservation/recovery implemented; real provisioned HA/checkpoint/restore deployment missing |
 | `v3_backend_evidence.verify_protected` | BLOCKED | Real protected-environment witness service and provisioned exact-result approval roots |
 | `v3_backend_trust.verify_oidc` | UNVERIFIED | Real publisher/reusable workflow identity, JWKS lifecycle and workload execution |
-| `v3_publication_backend.Backend.publish`, `v3_pages_backend.IsolatedGitStore.advertise` | BLOCKED | Production outbox/lease and cross-provider deployment/reconciliation; these are isolated implementations |
+| `v3_publication_outbox.Coordinator`, `v3_pages_backend.IsolatedGitStore.advertise` | BLOCKED | Audited outbox/lease/reconciliation implemented; authenticated live fenced transport and independently witnessed deployment acceptance missing |
 | `v3_immutable_view.HTTPSReader/verify_remote` | UNVERIFIED | Real authenticated Pages deployments, advertisement and CDN probes; transport implements read-only verification |
 | `v3_migration.rehearse/writer_gate` | BLOCKED | Authenticated live V2 import and reviewed writer/client cutover; no live adoption operation is supplied |
 | `v3_real_acceptance.execute` | UNVERIFIED | Actual released applications and independently pinned official upstream inputs |

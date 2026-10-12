@@ -101,5 +101,25 @@ class SignedHistoryTests(unittest.TestCase):
         with self.assertRaisesRegex(PlanningError,"pin mismatch"):
             _keyring(key,"f"*64,self.root)
 
+    def test_explicit_legacy_compatibility_preserves_missing_digest_without_dwell(self):
+        del self.pubs["10"]["store_tree_sha256"]
+        with self.assertRaisesRegex(PlanningError,"unexpected signed publication fields"):
+            self.history()
+        with patch("v3_signed_beta_history._keyring",return_value=self.root/"keyring"),patch("v3_signed_beta_history._signature",side_effect=self.read):
+            result=signed_archive_bundle(self.p,self.s,REG,"ro-assist","key",A,N,legacy_compatibility=True)
+        self.assertEqual(result["candidate_history"],[])
+        self.assertIsNone(result["signed_publications"][0]["store_tree_sha256"])
+        self.assertEqual(result["historical_dwell_credit"],"REJECTED")
+        self.assertNotIn("store_tree_sha256",self.pubs["10"])
+
+    def test_legacy_compatibility_does_not_accept_unknown_fields_or_wrong_signatures(self):
+        self.pubs["10"]["forged_provenance"]=A
+        with patch("v3_signed_beta_history._keyring",return_value=self.root/"keyring"),patch("v3_signed_beta_history._signature",side_effect=self.read):
+            with self.assertRaisesRegex(PlanningError,"unexpected signed publication fields"):
+                signed_archive_bundle(self.p,self.s,REG,"ro-assist","key",A,N,legacy_compatibility=True)
+        with patch("v3_signed_beta_history._keyring",return_value=self.root/"keyring"),patch("v3_signed_beta_history._signature",side_effect=PlanningError("invalid signature")):
+            with self.assertRaises(PlanningError):
+                signed_archive_bundle(self.p,self.s,REG,"ro-assist","key",A,N,legacy_compatibility=True)
+
 if __name__=="__main__":
     unittest.main()
