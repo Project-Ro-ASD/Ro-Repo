@@ -8,6 +8,7 @@ import base64
 import copy
 import hashlib
 import json
+import math
 import os
 import pathlib
 import re
@@ -19,6 +20,9 @@ from types import MappingProxyType
 from v3_policy_profile import canonical, sha
 from v3_promotion_planner import PlanningError
 
+# In-process API misuse guard, not an isolation boundary against Python code.
+# All application code is trusted. Untrusted inputs enter only the closed JSON
+# and cryptographic verifiers; never deserialize arbitrary Python capabilities.
 TOKEN = object()
 HEX = re.compile(r"^[0-9a-f]{64}$")
 
@@ -28,6 +32,11 @@ def digest(data):
 
 
 def strict_json(raw):
+    def finite_float(value):
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise PlanningError("non-finite JSON number")
+        return parsed
     def pairs(values):
         result = {}
         for key, value in values:
@@ -36,7 +45,7 @@ def strict_json(raw):
             result[key] = value
         return result
     try:
-        return json.loads(raw, object_pairs_hook=pairs,
+        return json.loads(raw, object_pairs_hook=pairs, parse_float=finite_float,
                           parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
     except (ValueError, UnicodeError, TypeError) as exc:
         raise PlanningError("invalid JSON") from exc

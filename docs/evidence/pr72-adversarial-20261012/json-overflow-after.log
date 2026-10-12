@@ -1,0 +1,6 @@
+test_numeric_overflow_cannot_enter_strict_json (test_v3_backend_adversarial_review.AdversarialBackendTests.test_numeric_overflow_cannot_enter_strict_json) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.826s
+
+OK
