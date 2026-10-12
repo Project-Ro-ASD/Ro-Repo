@@ -13,6 +13,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import os
+from unittest import mock
 
 sys.path.insert(0, str(pathlib.Path(__file__).parents[1] / "tools"))
 from ro_repo import export_role_public_key
@@ -22,6 +24,9 @@ from v3_integration import tree_inventory
 from v3_pinned_upstream import verify_upstream
 from v3_policy_profile import sha, canonical
 from v3_promotion_planner import PlanningError
+from v3_promotion_planner import plan as canonical_plan
+from v3_policy_profile import require_complete
+from v3_rpm_preflight import verify as verify_rpms
 from v3_signed_beta_history import _keyring, _signature, signed_archive_bundle
 from v3_signed_stable_preview import create_preview
 from v3_stable_composer import compose
@@ -85,6 +90,42 @@ def execute(pages, upstream_root, output, tree):
         except PlanningError as exc:
             result["history_contract"] = {"status": "BLOCKED", "reason": str(exc)}
         result["stable_state"] = "ABSENT_IN_PINNED_GIT_TREE" if not any(p["path"].startswith(("rpm/fedora/44/stable/", "publications/fedora/44/stable/")) for p in blobs) else "UNVERIFIED"
+        result["negative_results"] = {}
+        import copy
+        latest_manifest = json.loads((originals[2] / "repository-snapshot-v1.json").read_bytes())
+        for name, group, remove in (("missing-assist-aarch64", "ro-assist", lambda p: p["nevra"].startswith("ro-assist-") and p["architecture"] == "aarch64"),
+                                    ("missing-dolphin-libs", "ro-kde-dolphin", lambda p: p["nevra"].startswith("dolphin-libs-"))):
+            broken = copy.deepcopy(latest_manifest)
+            broken["packages"] = [p for p in broken["packages"] if not remove(p)]
+            try:
+                require_complete(canonical_plan(broken, None, registry, group), registry)
+            except PlanningError as exc:
+                result["negative_results"][name] = {"status": "PASS", "rejection": str(exc)}
+            else:
+                raise PlanningError("incomplete actual group unexpectedly accepted")
+        unsigned = root / "unsigned-actual-source"
+        compose(originals[2], None, registry, "ro-assist", unsigned)
+        srpm = next((unsigned / "rpm/source").glob("ro-assist-*.rpm"))
+        run(["rpmsign", "--delsign", str(srpm)])
+        unsigned_plan = json.loads((unsigned / "promotion-plan-v3.json").read_bytes())
+        unsigned_inventory = json.loads((unsigned / "composition-v3.json").read_bytes())
+        for packages in (unsigned_plan["resulting_stable_packages"], unsigned_plan["selected_group_packages"]):
+            for p in packages:
+                if p["architecture"] == "src":
+                    p["published_signed_artifact_sha256"] = digest(srpm)
+        for p in unsigned_inventory["files"]:
+            if p["path"] == srpm.relative_to(unsigned).as_posix():
+                p["sha256"] = digest(srpm)
+        (unsigned / "promotion-plan-v3.json").write_bytes(canonical(unsigned_plan))
+        (unsigned / "composition-v3.json").write_bytes(canonical(unsigned_inventory))
+        try:
+            verify_rpms(unsigned, rpm_key, digest(rpm_key))
+        except PlanningError as exc:
+            if "signature" not in str(exc):
+                raise PlanningError("unsigned actual source rejected for unrelated reason: " + str(exc)) from exc
+            result["negative_results"]["unsigned-actual-srpm"] = {"status": "PASS", "rejection": str(exc)}
+        else:
+            raise PlanningError("unsigned actual source unexpectedly accepted")
         cache = json.loads((upstream_root / "acquisition.json").read_bytes())
         fedora_key = root / "fedora44-public.asc"
         fedora_key.write_bytes(pathlib.Path("/etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-primary").read_bytes())
@@ -111,7 +152,7 @@ def execute(pages, upstream_root, output, tree):
         (output / "upstream-observation-public.pem").write_bytes(pin_signer.public)
         home = root / "test-signing-gnupg"
         home.mkdir(mode=0o700)
-        env = dict(__import__("os").environ, GNUPGHOME=str(home))
+        env = dict(os.environ, GNUPGHOME=str(home))
         run(["gpg", "--batch", "--pinentry-mode", "loopback", "--passphrase", "", "--quick-generate-key",
              "REAL ACCEPTANCE TEST ONLY <test@invalid>", "rsa2048", "cert", "1d"], env=env)
         primary = next(line.split(":")[9] for line in run(["gpg", "--with-colons", "--list-keys"], env=env).splitlines() if line.startswith("fpr:"))
@@ -131,7 +172,13 @@ def execute(pages, upstream_root, output, tree):
                  ("keyring-retained", originals[2], "assist-bootstrap", "ro-asd-keyring", "002"),
                  ("assist-upgrade", originals[2], "keyring-retained", "ro-assist", "003"),
                  ("dolphin-full-group", originals[2], "assist-upgrade", "ro-kde-dolphin", "004"),
-                 ("installer-full-group", originals[2], "assist-upgrade", "ro-installer", "005")]
+                 ("installer-full-group", originals[2], "assist-upgrade", "ro-installer", "005"),
+                 ("noarch-release", originals[2], "assist-upgrade", "ro-asd-release", "006"),
+                 ("noarch-repos", originals[2], "noarch-release", "ro-asd-repos", "007"),
+                 ("noarch-defaults", originals[2], "noarch-repos", "ro-asd-defaults", "008"),
+                 ("noarch-branding", originals[2], "noarch-defaults", "ro-asd-branding", "009"),
+                 ("noarch-desktop", originals[2], "noarch-branding", "ro-asd-desktop-standard", "010"),
+                 ("noarch-kernel", originals[2], "noarch-desktop", "ro-asd-kernel-policy", "011")]
         for name, beta, previous, group, suffix in cases:
             baseline = None if previous is None else previews[previous]
             composition = root / (name + "-composition")
@@ -147,15 +194,48 @@ def execute(pages, upstream_root, output, tree):
             record = {"promotion_group": group, "packages": plan["resulting_stable_packages"],
                       "plan_sha256": sha(plan), "result_tree_sha256": sha(tree_inventory(snapshot)),
                       "production_authorization": "BLOCKED", "composition_sha256": sha(composition_receipt)}
+            # Observe a real installed binary while validate's installroot is
+            # alive. The hook calls the actual RPMDB verifier first; neither
+            # transaction results nor GUI observations are mocked into PASS.
+            import v3_full_set_dnf
+            original_rpmdb = v3_full_set_dnf._rpmdb
+            observations = []
+            def observed_rpmdb(installroot, targets):
+                actual = original_rpmdb(installroot, targets)
+                probes = {"assist-bootstrap": ("/usr/bin/ro-assist", "--help"),
+                          "assist-upgrade": ("/usr/bin/ro-assist", "--help"),
+                          "dolphin-full-group": ("/usr/bin/dolphin", "--version"),
+                          "installer-full-group": ("/usr/bin/ro-installer", "--help")}
+                if name in probes and installroot.name in {"clean", "upgrade"}:
+                    (installroot / "tmp").mkdir(exist_ok=True)
+                    environment = {"PATH": "/usr/bin:/bin", "HOME": "/tmp", "QT_QPA_PLATFORM": "offscreen", "LANG": "C.UTF-8"}
+                    log = output / (name + "-cli-" + str(len(observations)) + ".log")
+                    try:
+                        with log.open("wb") as stream:
+                            process = subprocess.run(["chroot", str(installroot), *probes[name]], env=environment,
+                                                     stdout=stream, stderr=subprocess.STDOUT, timeout=8)
+                        status = "PASS" if process.returncode == 0 else "UNVERIFIED"
+                        outcome = {"status": status, "exit_code": process.returncode}
+                    except subprocess.TimeoutExpired:
+                        outcome = {"status": "UNVERIFIED", "reason": "CLI probe did not terminate within 8 seconds"}
+                    observations.append({**outcome, "kind": "offscreen-cli-only", "gui_acceptance": "UNVERIFIED",
+                                         "installed_ro_nevra": actual, "log_sha256": digest(log)})
+                return actual
             try:
-                receipt = validate(snapshot, baseline, beta, plan, "x86_64", output / name,
-                      rpm_key=rpm_key, rpm_key_sha256=digest(rpm_key), metadata_key=combined,
-                      metadata_key_sha256=digest(combined), upstream=upstream)
+                with mock.patch.object(v3_full_set_dnf, "_rpmdb", side_effect=observed_rpmdb):
+                    receipt = validate(snapshot, baseline, beta, plan, "x86_64", output / name,
+                          rpm_key=rpm_key, rpm_key_sha256=digest(rpm_key), metadata_key=combined,
+                          metadata_key_sha256=digest(combined), upstream=upstream,
+                          config_paths=["/etc/xdg/autostart/ro-assist-autostart.desktop"] if name == "assist-upgrade" else [])
                 record.update(status="PASS", dnf_receipt_sha256=sha(receipt))
             except PlanningError as exc:
                 record.update(status="FAIL", reason=str(exc))
+            record["cli_observations"] = observations
             result["cases"][name] = record
+            (output / (name + "-observation.json")).write_bytes(canonical(record) + b"\n")
             print("Released RPM transaction:", name, record["status"], flush=True)
+            if record["status"] == "FAIL":
+                print(record["reason"], flush=True)
         # Byte and deterministic-metadata checks use actual released artifacts.
         for name in ("assist-bootstrap", "keyring-retained", "assist-upgrade"):
             snapshot = previews[name]
