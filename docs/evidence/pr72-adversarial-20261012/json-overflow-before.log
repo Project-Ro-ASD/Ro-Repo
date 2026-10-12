@@ -1,0 +1,26 @@
+test_numeric_overflow_cannot_enter_strict_json (test_v3_backend_adversarial_review.AdversarialBackendTests.test_numeric_overflow_cannot_enter_strict_json) ... 
+  test_numeric_overflow_cannot_enter_strict_json (test_v3_backend_adversarial_review.AdversarialBackendTests.test_numeric_overflow_cannot_enter_strict_json) (raw=b'{"x":1e999}') ... FAIL
+  test_numeric_overflow_cannot_enter_strict_json (test_v3_backend_adversarial_review.AdversarialBackendTests.test_numeric_overflow_cannot_enter_strict_json) (raw=b'{"x":-1e999}') ... FAIL
+
+======================================================================
+FAIL: test_numeric_overflow_cannot_enter_strict_json (test_v3_backend_adversarial_review.AdversarialBackendTests.test_numeric_overflow_cannot_enter_strict_json) (raw=b'{"x":1e999}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 76, in test_numeric_overflow_cannot_enter_strict_json
+    with self.subTest(raw=raw), self.assertRaises(PlanningError):
+                                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_numeric_overflow_cannot_enter_strict_json (test_v3_backend_adversarial_review.AdversarialBackendTests.test_numeric_overflow_cannot_enter_strict_json) (raw=b'{"x":-1e999}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 76, in test_numeric_overflow_cannot_enter_strict_json
+    with self.subTest(raw=raw), self.assertRaises(PlanningError):
+                                ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.861s
+
+FAILED (failures=2)

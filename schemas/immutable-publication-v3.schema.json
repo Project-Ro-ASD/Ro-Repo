@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "immutable-publication-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "publishable",
+    "result_stable_sha256",
+    "inventory",
+    "authorization_sha256",
+    "request",
+    "preflight_sha256",
+    "signing_key_sha256",
+    "baseurls",
+    "issued_at",
+    "expires_at",
+    "signing_key_identity"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "scope": {
+      "const": "v3-immutable-publication-test-only"
+    },
+    "publishable": {
+      "const": false
+    },
+    "result_stable_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "authorization_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_sha256",
+        "candidate_sha256",
+        "promotion_group",
+        "mode",
+        "reason",
+        "previous_stable_snapshot_id",
+        "previous_stable_sha256",
+        "result_stable_sha256",
+        "stable_set_sha256",
+        "policy_version",
+        "policy_sha256",
+        "evidence_sha256",
+        "first_seen",
+        "schema_version",
+        "scope",
+        "attempt_id",
+        "operation",
+        "target_verified_sha256"
+      ],
+      "properties": {
+        "proposal_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "candidate_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "promotion_group": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "enum": [
+            "normal",
+            "fast-track"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "previous_stable_snapshot_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+        },
+        "previous_stable_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_stable_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "stable_set_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidence_sha256": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "first_seen": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "published_at",
+            "publication_run"
+          ],
+          "properties": {
+            "published_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "publication_run": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          }
+        },
+        "schema_version": {
+          "const": 3
+        },
+        "scope": {
+          "const": "v3-local-authorization-request"
+        },
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+        },
+        "operation": {
+          "enum": [
+            "promote",
+            "recover"
+          ]
+        },
+        "target_verified_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "preflight_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "signing_key_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "baseurls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x86_64",
+        "aarch64",
+        "source"
+      ],
+      "properties": {
+        "x86_64": {
+          "type": "string",
+          "pattern": "^https://[^/]+/v3/views/[0-9a-f]{64}/rpm/x86_64$"
+        },
+        "aarch64": {
+          "type": "string",
+          "pattern": "^https://[^/]+/v3/views/[0-9a-f]{64}/rpm/aarch64$"
+        },
+        "source": {
+          "type": "string",
+          "pattern": "^https://[^/]+/v3/views/[0-9a-f]{64}/rpm/source$"
+        }
+      }
+    },
+    "issued_at": {
+      "type": "integer"
+    },
+    "expires_at": {
+      "type": "integer"
+    },
+    "signing_key_identity": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

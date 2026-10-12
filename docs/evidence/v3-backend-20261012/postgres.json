@@ -1,0 +1,17 @@
+{
+  "audit_integrity": "PASS",
+  "cas": "PASS",
+  "checkpoint": {
+    "seq": 21,
+    "sha256": "721eccb577ab58397a440b41326e6231d6b2ff4077228c85bc704a657c2c55fb"
+  },
+  "external_ha_durability": "UNVERIFIED",
+  "independent_processes": "PASS",
+  "post_verification": "PASS",
+  "process_death": "PASS",
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "replay_consumptions": 8,
+  "scope": "v3-postgresql-isolated-acceptance",
+  "server_version": "18.6"
+}

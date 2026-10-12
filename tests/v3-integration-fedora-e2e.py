@@ -90,7 +90,8 @@ def main(output):
                 if policy["promotion_group"] in {"ro-assist", "ro-control"}:
                     policy["architectures"] = ["x86_64"]
         for name, version in (("ro-assist", "1.0"), ("ro-assist", "2.0"), ("ro-control", "1.0"),
-                              ("ro-control", "2.0"), ("ro-control", "3.0"), ("ro-installer", "1.0")):
+                              ("ro-control", "2.0"), ("ro-control", "3.0"), ("ro-installer", "1.0"),
+                              ("ro-v3-impossible-dependency", "1.0")):
             spec = top / "SPECS" / (name + "-" + version + ".spec")
             config = f"install -Dm0644 /dev/null %{{buildroot}}/etc/{name}.conf\nprintf 'version={version}\\n' > %{{buildroot}}/etc/{name}.conf"
             spec.write_text(f"""%global debug_package %{{nil}}
@@ -247,6 +248,31 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                  metadata_key=meta_key, metadata_key_sha256=meta_sha)
         validate(second, retained, beta3, second_plan, "x86_64", evidence / "upgrade", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
                  metadata_key=meta_key, metadata_key_sha256=meta_sha, config_paths=["/etc/ro-assist.conf"])
+        # Exercise the backend's real signing/composition adapter with the same
+        # approved payload, rather than a second mock repository implementation.
+        from v3_immutable_view import verify_result
+        backend_result = verify_result(second, second_proposal, second_plan, beta=beta3, baseline=retained,
+                    registry=registry, rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
+                    metadata_key=meta_key, metadata_key_sha256=meta_sha)
+        assert backend_result.sha256 == sha(tree_inventory(second))
+        # Recovery preserves the historical snapshot's original signed parent;
+        # its new publication envelope binds the CURRENT base independently.
+        recovery_plan = copy.deepcopy(first_plan)
+        recovery_plan["stable_base_snapshot_id"] = second.name
+        recovery_proposal = copy.deepcopy(first_proposal)
+        recovery_proposal["previous_stable_snapshot_id"] = second.name
+        recovery_proposal["previous_stable_sha256"] = sha(tree_inventory(second))
+        recovery_proposal["proposal_sha256"] = sha({k: v for k, v in recovery_proposal.items() if k != "proposal_sha256"})
+        recovered = verify_result(first, recovery_proposal, recovery_plan, beta=beta1, baseline=second,
+                    registry=registry, rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
+                    metadata_key=meta_key, metadata_key_sha256=meta_sha, operation="recover")
+        assert recovered.sha256 == first_proposal["result_stable_sha256"]
+        from v3_migration import rehearse
+        migration = rehearse(retained, registry, metadata_key=meta_key, metadata_key_sha256=meta_sha,
+                    rpm_key=rpm_key, rpm_key_sha256=rpm_sha, storage_commit="a" * 40,
+                    workflow=ROOT / ".github/workflows/promote-remote-stable.yml")
+        assert migration["canonical_closure"] == "PASS" and migration["activation"] == "BLOCKED"
+        (evidence / "migration-fixture.json").write_bytes(canonical(migration) + b"\n")
         # A metadata signature cannot replace the independent RPM signing role.
         unsigned_root = work / "unsigned-source" / first.name
         shutil.copytree(first, unsigned_root)
@@ -273,6 +299,8 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             reason = fail_closed(lambda: validate(broken, second, broken, broken_plan, "x86_64", work / ("negative-" + version),
                                  rpm_key=rpm_key, rpm_key_sha256=rpm_sha, metadata_key=meta_key, metadata_key_sha256=meta_sha), expected)
             negative_results[version] = {"status": "PASS", "rejection": reason, "snapshot_tree_sha256": sha(tree_inventory(broken))}
+            if version == "2.0":
+                dependency_snapshot, dependency_plan = broken, broken_plan
         # Metadata reproducibility excludes GPG signatures whose creation time
         # is intentionally separate; compare all unsigned repodata bytes.
         from v3_repository_metadata import generate
@@ -285,11 +313,44 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
             generate(copyroot, 1791676800)
             copies.append(tree_inventory(copyroot / "repodata"))
         assert copies[0] == copies[1], "non-reproducible unsigned metadata"
+        # Actual RPM/header/signature/repodata verification for the independently
+        # signed cache contract. This is a fixture upstream, not Fedora's feed.
+        from v3_backend_trust import TestSigner, test_workspace, verify_envelope
+        from v3_pinned_upstream import verify_upstream
+        test_root = test_workspace()
+        try:
+            cache = test_root / "upstream"
+            cache.mkdir()
+            binary = next(p for p in packages["ro-v3-impossible-dependency", "1.0"] if p["architecture"] == "x86_64")
+            shutil.copyfile(signed["ro-v3-impossible-dependency", "1.0"] / binary["filename"], cache / binary["filename"])
+            generate(cache, 1791676800)
+            upstream_manifest = {"schema_version": 3, "scope": "v3-pinned-fedora-upstream", "fedora_release": 44,
+                "architecture": "x86_64", "repo_id": "pinned-fedora-fixture", "tree_sha256": sha(tree_inventory(cache)),
+                "repomd_sha256": hashlib.sha256((cache / "repodata/repomd.xml").read_bytes()).hexdigest(),
+                "metadata_authentication": "signed-pin", "rpm_key_sha256": rpm_sha,
+                "packages": [{"path": binary["filename"], "nevra": binary["nevra"], "sha256": binary["published_signed_artifact_sha256"]}]}
+            pin_signer = TestSigner(test_root, "upstream-pin")
+            tick = int(now.timestamp())
+            raw = pin_signer.envelope("upstream-pin", {"manifest": upstream_manifest, "issued_at": tick, "expires_at": tick+300})
+            pin = verify_envelope(raw, role="upstream-pin", public_key=pin_signer.public, key_sha256=pin_signer.key_sha256,
+                                  expected={"manifest": upstream_manifest}, now=tick)
+            upstream = verify_upstream(cache, upstream_manifest, pin, rpm_key=rpm_key, rpm_key_sha256=rpm_sha, now=tick)
+            upstream.check()
+            closure = validate(dependency_snapshot, second, dependency_snapshot, dependency_plan, "x86_64",
+                     evidence / "pinned-dependency-closure", rpm_key=rpm_key, rpm_key_sha256=rpm_sha,
+                     metadata_key=meta_key, metadata_key_sha256=meta_sha, upstream=[upstream])
+            assert binary["nevra"] in closure["installed_dependency_closure"]
+            (evidence / "upstream-fixture.json").write_bytes(canonical({"manifest": upstream_manifest,
+                  "signature_and_metadata": "PASS", "official_fedora_upstream": "UNVERIFIED", "publishable": False}) + b"\n")
+        finally:
+            shutil.rmtree(test_root)
         if source_inventory() != tested_sources:
             raise RuntimeError("tested source tree changed during acceptance run")
         (evidence / "acceptance.json").write_bytes(canonical({"scope": "v3-fedora44-fixture-acceptance",
             "source_code_sha256": sha(tested_sources),
             "gates": {"signed-bootstrap": "PASS", "unchanged-candidate-dwell": "PASS", "retained-signed-bytes": "PASS",
+                      "backend-real-rpm-adapter": "PASS", "migration-fixture": "PASS", "pinned-upstream-fixture": "PASS",
+                      "recovery-historical-signed-parent": "PASS",
                       "unapproved-group-exclusion": "PASS", "full-set-upgrade": "PASS", "rpmnew": "PASS", "reproducible-metadata": "PASS",
                       "missing-dependency-rejection": "PASS", "retained-group-conflict-rejection": "PASS",
                       "aarch64": "UNVERIFIED", "real-producer-applications": "UNVERIFIED", "plasma-login": "UNVERIFIED",

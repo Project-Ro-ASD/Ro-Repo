@@ -1,0 +1,85 @@
+test_advertisement_signer_failure_cannot_move_ref (test_v3_backend_adversarial_review.AdversarialBackendTests.test_advertisement_signer_failure_cannot_move_ref) ... FAIL
+test_audit_key_cannot_also_authorize_human_approval (test_v3_backend_adversarial_review.AdversarialBackendTests.test_audit_key_cannot_also_authorize_human_approval) ... FAIL
+test_deployment_commit_must_match_git_reader (test_v3_backend_adversarial_review.AdversarialBackendTests.test_deployment_commit_must_match_git_reader) ... FAIL
+test_expired_authorization_cannot_advance_staging (test_v3_backend_adversarial_review.AdversarialBackendTests.test_expired_authorization_cannot_advance_staging) ... FAIL
+test_expiry_during_audit_signing_rolls_back_consumption (test_v3_backend_adversarial_review.AdversarialBackendTests.test_expiry_during_audit_signing_rolls_back_consumption) ... FAIL
+test_noop_staging_retry_still_performs_ref_cas (test_v3_backend_adversarial_review.AdversarialBackendTests.test_noop_staging_retry_still_performs_ref_cas) ... FAIL
+test_ref_change_during_remote_read_is_rejected (test_v3_backend_adversarial_review.AdversarialBackendTests.test_ref_change_during_remote_read_is_rejected) ... FAIL
+test_stale_pre_verification_cannot_publish (test_v3_backend_adversarial_review.AdversarialBackendTests.test_stale_pre_verification_cannot_publish) ... FAIL
+
+======================================================================
+FAIL: test_advertisement_signer_failure_cannot_move_ref (test_v3_backend_adversarial_review.AdversarialBackendTests.test_advertisement_signer_failure_cannot_move_ref)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 101, in test_advertisement_signer_failure_cannot_move_ref
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_audit_key_cannot_also_authorize_human_approval (test_v3_backend_adversarial_review.AdversarialBackendTests.test_audit_key_cannot_also_authorize_human_approval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 140, in test_audit_key_cannot_also_authorize_human_approval
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_deployment_commit_must_match_git_reader (test_v3_backend_adversarial_review.AdversarialBackendTests.test_deployment_commit_must_match_git_reader)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 111, in test_deployment_commit_must_match_git_reader
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_expired_authorization_cannot_advance_staging (test_v3_backend_adversarial_review.AdversarialBackendTests.test_expired_authorization_cannot_advance_staging)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 63, in test_expired_authorization_cannot_advance_staging
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_expiry_during_audit_signing_rolls_back_consumption (test_v3_backend_adversarial_review.AdversarialBackendTests.test_expiry_during_audit_signing_rolls_back_consumption)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 77, in test_expiry_during_audit_signing_rolls_back_consumption
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_noop_staging_retry_still_performs_ref_cas (test_v3_backend_adversarial_review.AdversarialBackendTests.test_noop_staging_retry_still_performs_ref_cas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 92, in test_noop_staging_retry_still_performs_ref_cas
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_ref_change_during_remote_read_is_rejected (test_v3_backend_adversarial_review.AdversarialBackendTests.test_ref_change_during_remote_read_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 123, in test_ref_change_during_remote_read_is_rejected
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+======================================================================
+FAIL: test_stale_pre_verification_cannot_publish (test_v3_backend_adversarial_review.AdversarialBackendTests.test_stale_pre_verification_cannot_publish)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend_adversarial_review.py", line 53, in test_stale_pre_verification_cannot_publish
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+----------------------------------------------------------------------
+Ran 8 tests in 8.988s
+
+FAILED (failures=8)

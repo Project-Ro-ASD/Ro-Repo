@@ -1,0 +1,18 @@
+test_audit_signature_failure_rolls_back_authority (test_v3_backend.BackendTests.test_audit_signature_failure_rolls_back_authority) ... FAIL
+
+======================================================================
+FAIL: test_audit_signature_failure_rolls_back_authority (test_v3_backend.BackendTests.test_audit_signature_failure_rolls_back_authority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/test_v3_backend.py", line 246, in test_audit_signature_failure_rolls_back_authority
+    self.reject(lambda: self.fx.backend.authorized(self.fx.attempt, self.fx.approval))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/tests/test_v3_backend.py", line 38, in reject
+    with self.assertRaises(PlanningError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: PlanningError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.856s
+
+FAILED (failures=1)

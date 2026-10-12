@@ -1,0 +1,8 @@
+test_reopen_requires_exact_authorized_request_and_preflight (test_v3_backend_adversarial_review.AdversarialBackendTests.test_reopen_requires_exact_authorized_request_and_preflight) ... ok
+test_reopen_cannot_import_a_publishable_descriptor (test_v3_backend_adversarial_review.AdversarialBackendTests.test_reopen_cannot_import_a_publishable_descriptor) ... ok
+test_after_stage_rename_can_resume_exact_envelope (test_v3_backend.BackendTests.test_after_stage_rename_can_resume_exact_envelope) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.786s
+
+OK

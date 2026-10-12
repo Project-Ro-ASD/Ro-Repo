@@ -1,0 +1,27 @@
+Package                      Arch   Version      Repository                 Size
+Upgrading:
+ ro-control                  x86_64 0:2.0-1.fc44 ro-stable              12.0   B
+   replacing ro-control      x86_64 0:1.0-1.fc44 ro-baseline            12.0   B
+Installing dependencies:
+ ro-v3-impossible-dependency x86_64 0:1.0-1.fc44 pinned-fedora-fixture  12.0   B
+
+Transaction Summary:
+ Installing:         1 package
+ Upgrading:          1 package
+ Replacing:          1 package
+
+Updating and loading repositories:
+Repositories loaded.
+Total size of inbound packages is 14 KiB. Need to download 14 KiB.
+After this operation, 12 B extra will be used (install 24 B, remove 12 B).
+[1/2] ro-v3-impossible-dependency-0:1.0 100% |   6.9 MiB/s |   7.0 KiB |  00m00s
+[2/2] ro-control-0:2.0-1.fc44.x86_64    100% |   3.4 MiB/s |   6.9 KiB |  00m00s
+--------------------------------------------------------------------------------
+[2/2] Total                             100% |   4.5 MiB/s |  13.9 KiB |  00m00s
+Running transaction
+[1/5] Verify package files              100% |   0.0   B/s |   2.0   B |  00m00s
+[2/5] Prepare transaction               100% |   0.0   B/s |   3.0   B |  00m00s
+[3/5] Installing ro-v3-impossible-depen 100% | 437.5 KiB/s | 448.0   B |  00m00s
+[4/5] Upgrading ro-control-0:2.0-1.fc44 100% | 402.3 KiB/s | 412.0   B |  00m00s
+[5/5] Removing ro-control-0:1.0-1.fc44. 100% | 181.0   B/s |   2.0   B |  00m00s
+Complete!

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "pinned-upstream-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "fedora_release",
+    "architecture",
+    "repo_id",
+    "tree_sha256",
+    "repomd_sha256",
+    "metadata_authentication",
+    "rpm_key_sha256",
+    "packages"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "scope": {
+      "const": "v3-pinned-fedora-upstream"
+    },
+    "fedora_release": {
+      "const": 44
+    },
+    "architecture": {
+      "enum": [
+        "x86_64",
+        "aarch64"
+      ]
+    },
+    "repo_id": {
+      "type": "string",
+      "pattern": "^pinned-fedora-[a-z0-9-]+$"
+    },
+    "tree_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "repomd_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "metadata_authentication": {
+      "enum": [
+        "gpg",
+        "signed-pin"
+      ]
+    },
+    "rpm_key_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "nevra",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nevra": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  }
+}

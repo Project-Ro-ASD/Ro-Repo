@@ -1,0 +1,34 @@
+Package     Arch   Version      Repository       Size
+Installing:
+ ro-assist  x86_64 0:2.0-1.fc44 ro-baseline  12.0   B
+ ro-control x86_64 0:1.0-1.fc44 ro-baseline  12.0   B
+
+Transaction Summary:
+ Installing:         2 packages
+
+Updating and loading repositories:
+ V3 isolated baseline                   100% |   0.0   B/s |   2.0 KiB |  00m00s
+Importing OpenPGP key 0x5889BD22:
+ UserID     : "V3 INTEGRATION TEST ONLY <test@invalid>"
+ Fingerprint: 38E20E191DF9C1A914DB65867992505D5889BD22
+ From       : file:///tmp/v3-fedora-integration-nunwbdky/evidence/.v3-full-dnf-xswyrplx/dnf-merged-public.asc
+The key was successfully imported.
+ V3 isolated baseline                   100% |   2.7 MiB/s |   2.7 KiB |  00m00s
+Repositories loaded.
+Total size of inbound packages is 14 KiB. Need to download 14 KiB.
+After this operation, 24 B extra will be used (install 24 B, remove 0 B).
+[1/2] ro-assist-0:2.0-1.fc44.x86_64     100% |   0.0   B/s |   6.9 KiB |  00m00s
+[2/2] ro-control-0:1.0-1.fc44.x86_64    100% |   6.7 MiB/s |   6.9 KiB |  00m00s
+--------------------------------------------------------------------------------
+[2/2] Total                             100% |  13.4 MiB/s |  13.8 KiB |  00m00s
+Running transaction
+Importing OpenPGP key 0x5889BD22:
+ UserID     : "V3 INTEGRATION TEST ONLY <test@invalid>"
+ Fingerprint: 38E20E191DF9C1A914DB65867992505D5889BD22
+ From       : file:///tmp/v3-fedora-integration-nunwbdky/evidence/.v3-full-dnf-xswyrplx/dnf-merged-public.asc
+The key was successfully imported.
+[1/4] Verify package files              100% |   0.0   B/s |   2.0   B |  00m00s
+[2/4] Prepare transaction               100% |   0.0   B/s |   2.0   B |  00m00s
+[3/4] Installing ro-control-0:1.0-1.fc4 100% | 402.3 KiB/s | 412.0   B |  00m00s
+[4/4] Installing ro-assist-0:2.0-1.fc44 100% |  33.2 KiB/s | 408.0   B |  00m00s
+Complete!

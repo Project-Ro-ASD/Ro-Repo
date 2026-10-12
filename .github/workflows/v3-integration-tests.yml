@@ -22,9 +22,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - run: dnf -y --setopt=install_weak_deps=False install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c gnupg2 rpmlint
+      - run: dnf -y --setopt=install_weak_deps=False install python3 python3-jsonschema python3-yaml openssl rpm rpm-build rpm-sign createrepo_c gnupg2 rpmlint
       - name: Real signed fixture stable bootstrap and full-set upgrade
         run: bash tests/v3-integration-e2e.sh v3-integration-evidence
+      - name: Native DNF5 rejects metadata URL overrides
+        run: python3 tests/v3-upstream-url-e2e.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:

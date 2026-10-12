@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "vm-acceptance-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "architecture",
+    "image_sha256",
+    "qemu_sha256",
+    "media_sha256",
+    "firmware_sha256",
+    "result_stable_sha256",
+    "cases",
+    "boot_timeout_seconds",
+    "case_timeout_seconds"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "scope": {
+      "const": "v3-vm-inputs"
+    },
+    "architecture": {
+      "enum": [
+        "x86_64",
+        "aarch64"
+      ]
+    },
+    "image_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "qemu_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "media_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "firmware_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "result_stable_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "login-session",
+          "plasma-integration",
+          "boot",
+          "reboot",
+          "recovery",
+          "qemu",
+          "ro-store-gui",
+          "upgrade"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "boot_timeout_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 900
+    },
+    "case_timeout_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1800
+    }
+  }
+}

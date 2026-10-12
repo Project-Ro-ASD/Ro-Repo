@@ -1,0 +1,641 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "backend-attempt-v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "publishable",
+    "attempt_id",
+    "state",
+    "immutable",
+    "base_generation",
+    "proofs",
+    "failure"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 3
+    },
+    "scope": {
+      "const": "v3-backend-isolated-attempt"
+    },
+    "publishable": {
+      "const": false
+    },
+    "attempt_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+    },
+    "state": {
+      "enum": [
+        "PROPOSED",
+        "VERIFIED",
+        "COMPOSED",
+        "TESTED",
+        "AWAITING_APPROVAL",
+        "AUTHORIZED",
+        "SIGNED",
+        "STAGED",
+        "PUBLISHED",
+        "REMOTE_VERIFIED",
+        "POST_VERIFIED",
+        "FAILED"
+      ]
+    },
+    "immutable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal",
+        "plan_sha256",
+        "operation"
+      ],
+      "properties": {
+        "proposal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "scope",
+            "candidate_sha256",
+            "artifact_set_sha256",
+            "candidate_identity",
+            "promotion_group",
+            "mode",
+            "reason",
+            "policy_version",
+            "policy_sha256",
+            "previous_stable_snapshot_id",
+            "previous_stable_sha256",
+            "result_stable_sha256",
+            "stable_set_sha256",
+            "first_seen",
+            "dwell_met",
+            "minimum_beta_days",
+            "evidence_sha256",
+            "approval_granted",
+            "publishable",
+            "proposal_sha256"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": 3
+            },
+            "scope": {
+              "const": "v3-integrated-proposal-untrusted"
+            },
+            "candidate_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "artifact_set_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "candidate_identity": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "promotion_group",
+                "fedora_release",
+                "policy",
+                "packages",
+                "source_provenance"
+              ],
+              "properties": {
+                "promotion_group": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "fedora_release": {
+                  "const": 44
+                },
+                "policy": {
+                  "type": "object"
+                },
+                "packages": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "nevra",
+                      "architecture",
+                      "filename",
+                      "producer_artifact_sha256",
+                      "published_signed_artifact_sha256",
+                      "producer_manifest_digest"
+                    ],
+                    "properties": {
+                      "nevra": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "architecture": {
+                        "enum": [
+                          "x86_64",
+                          "aarch64",
+                          "noarch",
+                          "src",
+                          "nosrc"
+                        ]
+                      },
+                      "filename": {
+                        "type": "string",
+                        "pattern": "^[^/]+\\.rpm$"
+                      },
+                      "producer_artifact_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "published_signed_artifact_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "producer_manifest_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    }
+                  }
+                },
+                "source_provenance": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "promotion_group": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "enum": [
+                "normal",
+                "fast-track"
+              ]
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "policy_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policy_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "previous_stable_snapshot_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^repo-f44-[0-9]{8}-[0-9]{3}$"
+            },
+            "previous_stable_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "result_stable_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "stable_set_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "first_seen": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "published_at",
+                "publication_run"
+              ],
+              "properties": {
+                "published_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "publication_run": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*$"
+                }
+              }
+            },
+            "dwell_met": {
+              "type": "boolean"
+            },
+            "minimum_beta_days": {
+              "enum": [
+                7,
+                14
+              ]
+            },
+            "evidence_sha256": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "approval_granted": {
+              "const": false
+            },
+            "publishable": {
+              "const": false
+            },
+            "proposal_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "plan_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operation": {
+          "enum": [
+            "promote",
+            "recover"
+          ]
+        }
+      }
+    },
+    "base_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "proofs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "VERIFIED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evidence_sha256"
+          ],
+          "properties": {
+            "evidence_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "COMPOSED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "result_stable_sha256",
+            "preflight_sha256"
+          ],
+          "properties": {
+            "result_stable_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "preflight_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "TESTED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evidence_sha256"
+          ],
+          "properties": {
+            "evidence_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "AWAITING_APPROVAL": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gate"
+          ],
+          "properties": {
+            "gate": {
+              "const": "exact-protected-approval"
+            }
+          }
+        },
+        "AUTHORIZED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "authorization_sha256",
+            "expires_at"
+          ],
+          "properties": {
+            "authorization_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "expires_at": {
+              "type": "number"
+            }
+          }
+        },
+        "SIGNED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "publication_sha256",
+            "signing_key_sha256"
+          ],
+          "properties": {
+            "publication_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "signing_key_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "STAGED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "publication_sha256",
+            "result_stable_sha256"
+          ],
+          "properties": {
+            "publication_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "result_stable_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "PUBLISHED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "authorization_sha256"
+          ],
+          "properties": {
+            "authorization_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "REMOTE_VERIFIED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verification"
+          ],
+          "properties": {
+            "verification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "result_stable_sha256",
+                "publication_sha256",
+                "deployment_sha256",
+                "deployment_id",
+                "git_commit",
+                "verified_at",
+                "coverage",
+                "publishable",
+                "phase",
+                "advertised_generation",
+                "advertisement_checkpoint"
+              ],
+              "properties": {
+                "result_stable_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "publication_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "deployment_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "deployment_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "git_commit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verified_at": {
+                  "type": "integer"
+                },
+                "coverage": {
+                  "const": "all-approved-paths"
+                },
+                "publishable": {
+                  "const": false
+                },
+                "phase": {
+                  "enum": [
+                    "pre",
+                    "post"
+                  ]
+                },
+                "advertised_generation": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1
+                },
+                "advertisement_checkpoint": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "seq",
+                        "sha256"
+                      ],
+                      "properties": {
+                        "seq": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "POST_VERIFIED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verification"
+          ],
+          "properties": {
+            "verification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "result_stable_sha256",
+                "publication_sha256",
+                "deployment_sha256",
+                "deployment_id",
+                "git_commit",
+                "verified_at",
+                "coverage",
+                "publishable",
+                "phase",
+                "advertised_generation",
+                "advertisement_checkpoint"
+              ],
+              "properties": {
+                "result_stable_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "publication_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "deployment_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "deployment_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "git_commit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "verified_at": {
+                  "type": "integer"
+                },
+                "coverage": {
+                  "const": "all-approved-paths"
+                },
+                "publishable": {
+                  "const": false
+                },
+                "phase": {
+                  "enum": [
+                    "pre",
+                    "post"
+                  ]
+                },
+                "advertised_generation": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1
+                },
+                "advertisement_checkpoint": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "seq",
+                        "sha256"
+                      ],
+                      "properties": {
+                        "seq": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "failure": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "reason",
+            "needs_fresh_recovery"
+          ],
+          "properties": {
+            "stage": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "needs_fresh_recovery": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

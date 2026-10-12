@@ -1,0 +1,54 @@
+name: V3 isolated backend rehearsal
+"on":
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  backend-security:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y python3-jsonschema python3-yaml openssl git
+      - run: python3 -m unittest discover -s tests -p 'test_v3_backend*.py' -v
+      - run: python3 -m unittest discover -s tests -p 'test_v3_pages_backend.py' -v
+      - run: python3 tests/v3-backend-rehearsal.py --output v3-backend-evidence
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: v3-backend-test-only-${{ github.run_id }}-${{ github.run_attempt }}
+          path: v3-backend-evidence/
+          if-no-files-found: error
+          retention-days: 14
+  postgres-transactions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336 # official PostgreSQL 18
+        env:
+          POSTGRES_DB: ro_v3_test_backend
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: disposable-v3-test-only
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ro_v3_test_backend"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y python3-jsonschema python3-yaml python3-psycopg openssl git
+      - run: python3 tests/v3-backend-postgres-e2e.py --password disposable-v3-test-only --output v3-postgres-test-only.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: v3-postgres-test-only-${{ github.run_id }}-${{ github.run_attempt }}
+          path: v3-postgres-test-only.json
+          if-no-files-found: error
+          retention-days: 14

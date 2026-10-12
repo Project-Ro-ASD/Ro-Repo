@@ -1,0 +1,2 @@
+Native DNF5 location: file:///v3-outside-pinned-cache/probe.rpm
+PASS: pinned upstream rejects DNF xml:base override: upstream package base URL overrides pinned cache

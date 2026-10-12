@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557830/job/114735382717",
+      "name": "security-contracts",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557821/job/114735383654",
+      "name": "fedora44-e2e",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557906/job/114735383141",
+      "name": "postgres-transactions",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557821/job/114735383359",
+      "name": "unit-policy",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557906/job/114735382679",
+      "name": "backend-security",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557830/job/114735383039",
+      "name": "fedora44-full-stable-set",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38226557821/job/114735383792",
+      "name": "acceptance-runtime-contract",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    }
+  ],
+  "ci": "PASS",
+  "head_commit": "491ccd21d17c2cf9adc7bc2203b99224a2c168eb",
+  "pr": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/72",
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "scope": "v3-ci-review-observation-untrusted",
+  "source_inventory_sha256": "19677b69e466f2298999dd72ff821f1ece3564b3b3614cb0c42b9498adc43c5c"
+}
