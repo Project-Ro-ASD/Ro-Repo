@@ -176,6 +176,11 @@ def verify_envelope(raw, *, role, public_key, key_sha256, expected, now):
     envelope = strict_json(raw)
     if not isinstance(envelope, dict) or set(envelope) != {"domain", "role", "payload", "signature"} or envelope["domain"] != "ro-repo-v3-backend-1" or envelope["role"] != role:
         raise PlanningError("attestation domain/role substitution")
+    from ro_repo import validate_schema, ContractError
+    try:
+        validate_schema(envelope, "backend-envelope-v3")
+    except ContractError as exc:
+        raise PlanningError("invalid signed backend envelope schema") from exc
     unsigned = {k: envelope[k] for k in ("domain", "role", "payload")}
     verify_bytes(public_key, key_sha256, canonical(unsigned), b64(envelope["signature"]))
     payload = envelope["payload"]

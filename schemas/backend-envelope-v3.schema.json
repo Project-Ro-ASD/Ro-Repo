@@ -25,7 +25,8 @@
         "deployment",
         "upstream-pin",
         "acceptance-inputs",
-        "vm-inputs"
+        "vm-inputs",
+        "stable-advertisement"
       ]
     },
     "payload": {
