@@ -28,9 +28,12 @@ V2 workflow definitions are byte-identical to main.
 | `v3_vm_acceptance.run` | PASS: protocol rejection tests; implementation pins/copies disk, executor, firmware and media, disables network/host sharing and records guest logs | UNVERIFIED: actual pinned VM execution, Plasma login, boot/reboot/recovery and Ro-Store GUI; image-specific guest cases are unavailable |
 
 No external approval, application or VM gate is marked PASS from a synthetic
-fixture. A verified Python capability is constructed only by the cryptographic
-verifier. Untrusted JSON, API success, actor strings and green CI cannot construct
-one. Test outputs always contain `publishable=false`; the live publication entry
+fixture. Application code and capability factories execute in one trusted Python
+process. The exported `TOKEN` sentinel guards accidental API misuse; it cannot
+isolate malicious imported Python code. No JSON/API deserializer, eval, pickle
+or plugin route constructs these capabilities from untrusted data. Untrusted
+JSON, API success, actor strings and green CI cannot construct one through the
+implemented entry points. Test outputs always contain `publishable=false`; the live publication entry
 point `v3_immutable_view.production_publish` always raises BLOCKED.
 
 ## Publication protocol
