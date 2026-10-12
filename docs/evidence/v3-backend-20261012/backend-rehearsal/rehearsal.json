@@ -1,0 +1,673 @@
+{
+  "advertisement": {
+    "advertisement_sha256": "a697388f639216a791e134f5903c6daf60116216fbda2926630dada264fe3826",
+    "git_commit": "ad92de98b3e3ae14854e5b0d35424fdda6bdfc8b",
+    "production_activation": "BLOCKED",
+    "publishable": false,
+    "remote_post_verification": "UNVERIFIED"
+  },
+  "cryptographic_protocol": "PASS",
+  "git_cas": "PASS",
+  "git_staging": {
+    "cdn_atomicity": "UNVERIFIED",
+    "git_commit": "7477b3665854902e2111f08b32979ee7bddc221f",
+    "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+    "publishable": false,
+    "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
+    "scope": "v3-pages-isolated-staging"
+  },
+  "github_pages_cdn": "UNVERIFIED",
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "real_application_acceptance": "UNVERIFIED",
+  "real_protected_approval": "UNVERIFIED",
+  "scope": "v3-backend-rehearsal-test-only",
+  "source_code_sha256": "e123885f9fb0750b55729e84984e4a5defc4e074828a45a7a1163620e9180200",
+  "source_inventory": [
+    {
+      "path": "tools/ro_repo.py",
+      "sha256": "6ef67377258f9eb4e19594a9312eede99d972fa9b51a5503dcb1116feae3b416"
+    },
+    {
+      "path": "tools/v3_actions_run_context.py",
+      "sha256": "d068bace2908692d540ba27f88d3d4238d8176db1b389ceb279d0646258da751"
+    },
+    {
+      "path": "tools/v3_actions_zip_receipt.py",
+      "sha256": "799e9d927aa8e4b1fe006dc232712e2fbc7c80fc4f3ccc80c71526159f384690"
+    },
+    {
+      "path": "tools/v3_authorization.py",
+      "sha256": "e8b3ae261de4753f88b144f3505870139777255de1f71bd85c6678e80b2fc083"
+    },
+    {
+      "path": "tools/v3_backend_evidence.py",
+      "sha256": "eda1c9b4e696c2d1789a4c7cdaacd3e93940cb5de0fba0baa3fb2f6056a0cfb2"
+    },
+    {
+      "path": "tools/v3_backend_ledger.py",
+      "sha256": "4ec132560533497d389cc064ce5e6f34fadf92b6e9ef9a9c0368a9ab8f70ca3e"
+    },
+    {
+      "path": "tools/v3_backend_trust.py",
+      "sha256": "a0c135b9deaa251e70d00f00bbd677f11e3651c817e31ec8f8829ba50caf5f9a"
+    },
+    {
+      "path": "tools/v3_beta_evidence_bridge.py",
+      "sha256": "ef4e59f9844fe0e30d65e9d8594dfbf3ff6e0f4917fd368b3bcc6de6400b08a8"
+    },
+    {
+      "path": "tools/v3_completed_runtime_receipt.py",
+      "sha256": "920381f3445a07df4d1170e76ce082327fa40ed2c42da2589d69c96e9128fd9f"
+    },
+    {
+      "path": "tools/v3_dnf_bundle_verify.py",
+      "sha256": "fd6d395fdb535c470caae3d3ef534b047ce005be684f12a8c0d8de4a2c1854fa"
+    },
+    {
+      "path": "tools/v3_dnf_group_matrix.py",
+      "sha256": "8ee970b2d45e1fb3118302634b9283df368a94ab0d4fdc278806547c4a1567b6"
+    },
+    {
+      "path": "tools/v3_dnf_receipt.py",
+      "sha256": "b2d47a4616941846f0b472a3006356d90dcf4bf4ecf984de29a69a239de37ea0"
+    },
+    {
+      "path": "tools/v3_dnf_transaction_inputs.py",
+      "sha256": "eac8c77c3872584d8b4f6b273322f781075210eefdca36774615f5e2559cc8b5"
+    },
+    {
+      "path": "tools/v3_full_set_dnf.py",
+      "sha256": "60aec5929b131e215d01d9fa8a4bf428a427813b329ea7941d064251c9352a5d"
+    },
+    {
+      "path": "tools/v3_github_beta_api.py",
+      "sha256": "c5908caa947a2ba76285d208cd9e8ca2abf40945c7830070a311979ff2311632"
+    },
+    {
+      "path": "tools/v3_github_beta_audit.py",
+      "sha256": "b7c96316f458ebc90d2009ff2511a83d0f1bd51770afe88f530295d014cb9495"
+    },
+    {
+      "path": "tools/v3_github_source_pins.py",
+      "sha256": "1955906fe864d330c406e825f3bb039130ad707f7b160ca81f459e4e192e42ba"
+    },
+    {
+      "path": "tools/v3_group_validation.py",
+      "sha256": "a872a470ee0457eaabcec8755adddea8b8e3ed66a936a3451e1806f79bc7848a"
+    },
+    {
+      "path": "tools/v3_immutable_view.py",
+      "sha256": "4c75a4307f3d2b8f83515ed622b0ab79e95f6ef62ea7c8e0f753efeeb4d14f0e"
+    },
+    {
+      "path": "tools/v3_integration.py",
+      "sha256": "2bb428e11938b1d70bb1887c468b471940e63bc8eabbd8bb78d055ad0afbc4e8"
+    },
+    {
+      "path": "tools/v3_live_receipt_audit.py",
+      "sha256": "b77e3dafede5e377a86d5f5745c7c6908e3838ea00257560f1a924de70e0a7c7"
+    },
+    {
+      "path": "tools/v3_migration.py",
+      "sha256": "b5cc4e01a118b3126136325616d62be46ec0102e9fa179cab3e008c6640f13ae"
+    },
+    {
+      "path": "tools/v3_pages_archive_provenance.py",
+      "sha256": "0abdde2003ea0ab2e7e303a2a341085843a950554bed1fef6bc266dbcc8823dd"
+    },
+    {
+      "path": "tools/v3_pages_backend.py",
+      "sha256": "4c94cd4267a6832c976231864a8d75ae5e2a30aa5f70a8867c21d9fc86a6ea02"
+    },
+    {
+      "path": "tools/v3_pinned_upstream.py",
+      "sha256": "86399ec7b3e1655c11fc2afac82ae8fc3a35e291aa3106defef3d9cf12b043d6"
+    },
+    {
+      "path": "tools/v3_policy_profile.py",
+      "sha256": "f5cc7bd101499ed6a51ee09a71141b67a9a57930027eca7849dd5699f44084f5"
+    },
+    {
+      "path": "tools/v3_promotion_planner.py",
+      "sha256": "3dbf7cc2d33220dd357e8f93189cc0e527619b1ecc9a952e058dad64a8640b1d"
+    },
+    {
+      "path": "tools/v3_promotion_policy.py",
+      "sha256": "e8e0204d451dd66a7ab1acab7c1c7b84940666fe0a03b946d0ed51b602096986"
+    },
+    {
+      "path": "tools/v3_publication_backend.py",
+      "sha256": "d3a3b35bfe6cfd90e949bc9d231e0ee885d719b52c25de6c74fee2d0d2d8c3ce"
+    },
+    {
+      "path": "tools/v3_publication_rehearsal.py",
+      "sha256": "c734e5191ae169dc1fb1a6c040d57ff0c9a402e51c0d4d9c34a153c0864e373e"
+    },
+    {
+      "path": "tools/v3_real_acceptance.py",
+      "sha256": "96c90129f3131d5a8303011909e8bd995e59b8b66d4bfb6079775c72fe977062"
+    },
+    {
+      "path": "tools/v3_remote_beta_tree.py",
+      "sha256": "c4633ead95c3785f3b605e5851591389cf8d55ef8454628ee6f1b8e7e9415d97"
+    },
+    {
+      "path": "tools/v3_repository_metadata.py",
+      "sha256": "f40bb92c051eadd7fca5db87d9582e32fe8b917a2a236a3233e8022811bd5f9d"
+    },
+    {
+      "path": "tools/v3_rpm_preflight.py",
+      "sha256": "e0bbf13fe1f346dec276a93a085cf14781210c6b180ed53f25375066b7117e42"
+    },
+    {
+      "path": "tools/v3_signed_beta_history.py",
+      "sha256": "6f1c9c1095aea816382ceee1d009a9ddad9600404d68b8f58293fc93e499dcc8"
+    },
+    {
+      "path": "tools/v3_signed_stable_preview.py",
+      "sha256": "0812661c055ed3965b745be5d29f19297cf2e6147a44e0ddf97dc03080f0fb00"
+    },
+    {
+      "path": "tools/v3_stable_composer.py",
+      "sha256": "4fe8d3df3278afd71d2db43427697ca84aa2ff013f7ef835ea123340167c6f2b"
+    },
+    {
+      "path": "tools/v3_vm_acceptance.py",
+      "sha256": "98eb5c302df8814f157870472bb481daff7c9c96645f0ababb60c0a60f3d439a"
+    },
+    {
+      "path": "tests/e2e-local.sh",
+      "sha256": "51725e34e5cf39a037c4ccb046eea4f9afda618bc1e7ae1add58fc3afeb32902"
+    },
+    {
+      "path": "tests/full-set-validation.sh",
+      "sha256": "335b5fce21afeeedbde78562f0be804e581d182621e044fa43242c28fe95e91b"
+    },
+    {
+      "path": "tests/remote-promotion-validation.sh",
+      "sha256": "fd5686803b62f1ee4782419c2b14f2e17607a975d71575fcb7bc28f420c2dd98"
+    },
+    {
+      "path": "tests/test_acceptance_report.py",
+      "sha256": "884353104f92947b5ba146bc5fd2eb48857fbe978e950fa419b7f1cda1b01167"
+    },
+    {
+      "path": "tests/test_acceptance_runtime.py",
+      "sha256": "a6de36ca166ceef23939bd9b53bf5126d5c408a1ba4d6fa6b7585a9eeda78714"
+    },
+    {
+      "path": "tests/test_custom_domain.py",
+      "sha256": "a788e0bf01f99365c07ff81982ddd0941d5d8e08e4086bce03f5c12ec31c86fa"
+    },
+    {
+      "path": "tests/test_pages_publication.py",
+      "sha256": "f6f38e8b52e64865765bf8f021aa98f85995682cc3b2290d1b5d40db9dafebc2"
+    },
+    {
+      "path": "tests/test_policy.py",
+      "sha256": "bda91f7ce2fbb21abb5a19489f2fd6ff56734124e67a6df85e935202a3e4235a"
+    },
+    {
+      "path": "tests/test_producer_registry_v2.py",
+      "sha256": "364ec63ad1403812ec8aae186f3e42e149e3c3d3463e1b1e33d8642580d16257"
+    },
+    {
+      "path": "tests/test_production_signing.py",
+      "sha256": "5e0623e6f38073f8870118cf0d93c4036cb1875f5f9cfc87c06523dda456dc37"
+    },
+    {
+      "path": "tests/test_production_snapshot.py",
+      "sha256": "991444b6b9051c0627ffd122dc299232fce93165fe5130bcb93cc34a955db9e4"
+    },
+    {
+      "path": "tests/test_promotion.py",
+      "sha256": "3ee668e6bc5c77356cc2750670025003753d4535ae4519278defa89308382727"
+    },
+    {
+      "path": "tests/test_remote_beta.py",
+      "sha256": "c8705c225ac2171c8014804622742d4866d571e18a7530902f6e1592db4d9fcf"
+    },
+    {
+      "path": "tests/test_remote_beta_rollback.py",
+      "sha256": "29faf75c9c21ed4717c94fde04aa93accd6388c0161e1b1974006739537cc0ec"
+    },
+    {
+      "path": "tests/test_remote_stable_promotion.py",
+      "sha256": "5941c5ce2079fc32663a16cf8d74bbe91bb3cc4e14e7bfa3dc1bacb75a903cd2"
+    },
+    {
+      "path": "tests/test_ro_repo.py",
+      "sha256": "e92523c402b9ffff0f50abbb526e740d74a3f77b15b50cb6f5306e26cdb3eb83"
+    },
+    {
+      "path": "tests/test_schema.py",
+      "sha256": "a64d6d18115188fc70cf13d870db02ac294644b6121507409c3207beed8d2381"
+    },
+    {
+      "path": "tests/test_store_publication.py",
+      "sha256": "d308713673b7c2840aafbab858dc806bde06c715a9bd4b65a96c28deec6366f6"
+    },
+    {
+      "path": "tests/test_v3_actions_run_context.py",
+      "sha256": "e3a00b7f36e65f6d9f96ab737d1af61918dc23a2027a9335123f4eae03d47997"
+    },
+    {
+      "path": "tests/test_v3_actions_zip_receipt.py",
+      "sha256": "539e384d2367b2a7332467d223bea68cda4c8517a53be4ec1318d3b430500a33"
+    },
+    {
+      "path": "tests/test_v3_adversarial_review.py",
+      "sha256": "75703eb26f8a87c9b47fd005b299e1ccb0c08aa31bd4c16855b36fc4ab8435ab"
+    },
+    {
+      "path": "tests/test_v3_backend.py",
+      "sha256": "e0604e38d7f9330074c1160e83da3d42cee855b9202e8987323d72ea85a33aa6"
+    },
+    {
+      "path": "tests/test_v3_backend_inputs.py",
+      "sha256": "b2643816ccfd9715357a5a26087155124ad4324b86ac6f077b27716e40e9ae22"
+    },
+    {
+      "path": "tests/test_v3_backend_workflows.py",
+      "sha256": "7b5c9b4b37c1e57ef34903a6418753a6ec5f36782856f12a2872beb15012b3e5"
+    },
+    {
+      "path": "tests/test_v3_beta_evidence_bridge.py",
+      "sha256": "7f9071f5f7dd7a2e390984e54a3dd00be7e33b3fd6bac1290d883d9c73944abd"
+    },
+    {
+      "path": "tests/test_v3_completed_runtime_receipt.py",
+      "sha256": "0132b4313b10e794fd6de6ae265b0e944320fa571aab25358cd7a3530377a2c3"
+    },
+    {
+      "path": "tests/test_v3_dnf_bundle_verify.py",
+      "sha256": "e6dd8c471d14092ed21c6aad540b62685cc044a43794433bc67cf00493eaea62"
+    },
+    {
+      "path": "tests/test_v3_dnf_group_matrix.py",
+      "sha256": "c073a1f560c8e2de58c6a56e69072b4058d83d1a5d5a2cac45f3fffd9ed811ca"
+    },
+    {
+      "path": "tests/test_v3_dnf_receipt.py",
+      "sha256": "5bbcbf3ca8c817e071d5bf397a18e5e26602e9b7207ce987cfd490a5d10cf963"
+    },
+    {
+      "path": "tests/test_v3_dnf_transaction_inputs.py",
+      "sha256": "6af94c5c77f1f3c8a9ac658fbe18fbfce35a428c18170a7f3759502a76705d52"
+    },
+    {
+      "path": "tests/test_v3_github_beta_api.py",
+      "sha256": "212f37a469def72aff4af3801e47109876740268febe7cbe3284373fb0beedd2"
+    },
+    {
+      "path": "tests/test_v3_github_beta_audit.py",
+      "sha256": "a8eadbdd2238083cc1a1458d37b7b7fd6c71ccbdcb708f53e615064fc715c1f6"
+    },
+    {
+      "path": "tests/test_v3_github_source_pins.py",
+      "sha256": "80c5aed08660ecf8b1022fef02851042613e82e91ecf64a469690c80db98f38f"
+    },
+    {
+      "path": "tests/test_v3_group_validation.py",
+      "sha256": "d5bd1e23029e06fa45aaa73af565d602044eebcf2e0c65d0bb5a616cc4d873d2"
+    },
+    {
+      "path": "tests/test_v3_integration.py",
+      "sha256": "61becff58881d3546354414de15b93a3f928972a9fdd1b88659c777aa9500299"
+    },
+    {
+      "path": "tests/test_v3_integration_live.py",
+      "sha256": "82af4aeab75542b1d7efe44ed4cd0ee772910674a61244923e7cb0866ed7e1e0"
+    },
+    {
+      "path": "tests/test_v3_integration_workflows.py",
+      "sha256": "7aeee582bbb1aeaaaa6e8736c387d4542fd0d9c4cd65baccbaef4f9e975d5e00"
+    },
+    {
+      "path": "tests/test_v3_live_receipt_audit.py",
+      "sha256": "ae716024def5adc2d5b142e288e24f0bc160767777dfcdf687ec24362c451da9"
+    },
+    {
+      "path": "tests/test_v3_pages_archive_provenance.py",
+      "sha256": "b76d2258f4060af54670464d26a16728e3dab38c4308c37eda0f7cdec37dbba2"
+    },
+    {
+      "path": "tests/test_v3_pages_backend.py",
+      "sha256": "f31e1475cbdb266d5f72aa9320b50490f57567ac95e4a4f273a8f8b33ab83dcd"
+    },
+    {
+      "path": "tests/test_v3_promotion_planner.py",
+      "sha256": "c37be5725091a00b6cd9e3029f535418627ccad5b428afbeb671260bac16be12"
+    },
+    {
+      "path": "tests/test_v3_promotion_policy.py",
+      "sha256": "d3577c155f1829df81ba2def32e7e7ecb32ffcfb79a4e78489d2bd6a451f79f7"
+    },
+    {
+      "path": "tests/test_v3_remote_beta_tree.py",
+      "sha256": "5ff7f7ac0e8ab0e78515b2dfca98ef380ce2808fc261d7a6a74870353e77dfa2"
+    },
+    {
+      "path": "tests/test_v3_rpm_preflight.py",
+      "sha256": "c32dc942a2b29d6060c6b0a55c071de44c5bb79ae6f71cd2338d1351ef6aa16e"
+    },
+    {
+      "path": "tests/test_v3_signed_beta_history.py",
+      "sha256": "207c34b484f0d948235a93a0cde6045e31b521531efc3d3d06a8fc79c19e8389"
+    },
+    {
+      "path": "tests/test_v3_signed_stable_preview.py",
+      "sha256": "03f0cc82e06d99add4c3e79dd6ff01c2d8c683cb46eb1b475d2e53d88fe1189c"
+    },
+    {
+      "path": "tests/test_v3_stable_composer.py",
+      "sha256": "2803eec4784675fcfa742a8ff0d936b483f1dbcc0493c87b2ffddf075bd729bb"
+    },
+    {
+      "path": "tests/v3-atomic-multipackage-e2e.sh",
+      "sha256": "2d45e6f5cf44a7d814c5efe783468b9ac1152eac0b5303b9718f08a59065f23f"
+    },
+    {
+      "path": "tests/v3-backend-postgres-e2e.py",
+      "sha256": "741d94e448807ec816c5ebdaa395f5a196b1e10a936c44ed29ac4efb1e956bbd"
+    },
+    {
+      "path": "tests/v3-backend-rehearsal.py",
+      "sha256": "5c6ca208f6ac19decd62a55a89e862072fa076c209ad23529961150512f13494"
+    },
+    {
+      "path": "tests/v3-dnf5-local-e2e.sh",
+      "sha256": "be9aa42a878bcd1917d6bd5da322b2583168172ff6c7bd645fc0f2d84620f28d"
+    },
+    {
+      "path": "tests/v3-integration-e2e.sh",
+      "sha256": "ec8b773b095f8f9696de01105088198020a7530c462e232621033b785c98e56e"
+    },
+    {
+      "path": "tests/v3-integration-fedora-e2e.py",
+      "sha256": "4c43e6697cbbce76d96a5df2030ba50651a48c82a8a1d102dad3d1ce506ed3b3"
+    },
+    {
+      "path": "tests/v3-signed-rpm-real-e2e.py",
+      "sha256": "4ad5f48580d992d9e75dc5d50098076eb3f77fba9b299f90f5c0860c63e766e9"
+    },
+    {
+      "path": "tests/v3_backend_support.py",
+      "sha256": "ae4aee2b6f106305d32f54eedeb85db6685cdfe7d9ce04010718bf98d9b99de6"
+    },
+    {
+      "path": "schemas/acceptance-report-v1.schema.json",
+      "sha256": "4acce310d53443e63e98aa1c085b791a64c347c4333553241b9cf891a9b2b1f9"
+    },
+    {
+      "path": "schemas/authorization-v3.schema.json",
+      "sha256": "ef267bc92238d79bac069351f1fc46485b54bd985a9162cfaa54d8d96c509fc4"
+    },
+    {
+      "path": "schemas/backend-attempt-v3.schema.json",
+      "sha256": "6d51390ceb5201dc296adfdcc183729c53384e8498df4b428380b0b86ec81863"
+    },
+    {
+      "path": "schemas/backend-envelope-v3.schema.json",
+      "sha256": "d0fc584ec4ec577efe61f53b3ec518a2159fad6d0f21f8b5e1cd092e87fbb702"
+    },
+    {
+      "path": "schemas/component-artifact-manifest-v1.schema.json",
+      "sha256": "b27410a861a5eff69d7053e0b4e10898f607963106ac930e1efb679d769b9b1e"
+    },
+    {
+      "path": "schemas/group-validation-v3.schema.json",
+      "sha256": "0242a99b419a85fb897f9d0b2d106d31807d685077d48fab9a387283218188a2"
+    },
+    {
+      "path": "schemas/immutable-publication-v3.schema.json",
+      "sha256": "2f254427a94938b93c2db0defbd5cde678ef52fab7606bcffb2d2cabb935c9bb"
+    },
+    {
+      "path": "schemas/integration-acceptance-v3.schema.json",
+      "sha256": "b9b9c9948d44bc73cb2d85f2c8e0ceda421fa0de9ed6e140ae3258d67ab117e2"
+    },
+    {
+      "path": "schemas/integration-proposal-v3.schema.json",
+      "sha256": "453b229055e28885c509889f1b59565393229cc7d91739d61315dbcf66e0d4be"
+    },
+    {
+      "path": "schemas/pinned-upstream-v3.schema.json",
+      "sha256": "ae9d364c745880fc65e6072e6c6ca5b8acfa1b8ae7030617c7eb2b1b830a23db"
+    },
+    {
+      "path": "schemas/producers-v2.schema.json",
+      "sha256": "f0d97ad31087401057fde3ffb16b52cc58d8c10285f79d420484d8c0776f560d"
+    },
+    {
+      "path": "schemas/promotion-manifest-v1.schema.json",
+      "sha256": "6ad9579071784e98dc52cd7f88dd656087afbc4e80b892c6c63b66a0b8821873"
+    },
+    {
+      "path": "schemas/promotion-validation-v1.schema.json",
+      "sha256": "9277ffad48c47e36be0b38e02c88ba510e4e565c7fed51c6db8cae34e3b63ebb"
+    },
+    {
+      "path": "schemas/publication-v1.schema.json",
+      "sha256": "858c2f44cd1e7899db592a2f9cc17dd1f25500d61c85a898ef998cfcb7cbe71f"
+    },
+    {
+      "path": "schemas/real-acceptance-v3.schema.json",
+      "sha256": "ee4dfb27ccc40ff8013cdaca8fe04dd2b43c428f867512af4cf06c38158889bf"
+    },
+    {
+      "path": "schemas/repository-snapshot-v1.schema.json",
+      "sha256": "1684516bcf3a74d768ac2d233e4dc8421610e35ceec0c7029ba3d410181a85e6"
+    },
+    {
+      "path": "schemas/rollback-evidence-v1.schema.json",
+      "sha256": "f731913b99c4fe2421c957c0146e9e90d55702b33ad5d9f164fa94362fb23dc7"
+    },
+    {
+      "path": "schemas/rpm-signing-evidence-v1.schema.json",
+      "sha256": "9198e50de29ef5ed86db5be6b6ceb450e559ffb215cc11644a5649a020b7adf6"
+    },
+    {
+      "path": "schemas/snapshot-build-evidence-v1.schema.json",
+      "sha256": "4a0404c1a2b6dc538eaa93f154b1965420d51a359e53c4373487801a6b424568"
+    },
+    {
+      "path": "schemas/snapshot-input-v1.schema.json",
+      "sha256": "469de1a2e4bdbd1650ba13982d47c18bc7de00e193aea13f0c8ee23100247077"
+    },
+    {
+      "path": "schemas/vm-acceptance-v3.schema.json",
+      "sha256": "0f5352519ab7a779debbee19a2f26987691e18c6699a81ca52a3bb57fd8c6822"
+    },
+    {
+      "path": "config/producers-v2.json",
+      "sha256": "b011cd414d690f715572bed88054b0acf2fc18695dfebf2aef2e85cc9ba289c8"
+    },
+    {
+      "path": "config/promotion-baselines-v1.json",
+      "sha256": "0ae0cbd66aa89736b923e8809229886e9b41f0eaee96a479e14a791109825e9e"
+    }
+  ],
+  "state": {
+    "attempt": {
+      "attempt_id": "attempt-1",
+      "base_generation": 0,
+      "failure": null,
+      "immutable": {
+        "operation": "promote",
+        "plan_sha256": "d23d6078700cf3452ad40fca274ec77872eb6b1ecb1e21e26d6bf052238ddf77",
+        "proposal": {
+          "approval_granted": false,
+          "artifact_set_sha256": "cd0ded7b984992c363131f151d95cc346bb9ffebdaf1834e87dd14298f6624a6",
+          "candidate_identity": {
+            "fedora_release": 44,
+            "packages": [
+              {
+                "architecture": "aarch64",
+                "filename": "ro-assist-0.2.5-1.fc44.aarch64.rpm",
+                "nevra": "ro-assist-0:0.2.5-1.fc44.aarch64",
+                "producer_artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                "producer_manifest_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "published_signed_artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              {
+                "architecture": "src",
+                "filename": "ro-assist-0.2.5-1.fc44.src.rpm",
+                "nevra": "ro-assist-0:0.2.5-1.fc44.src",
+                "producer_artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                "producer_manifest_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "published_signed_artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              {
+                "architecture": "x86_64",
+                "filename": "ro-assist-0.2.5-1.fc44.x86_64.rpm",
+                "nevra": "ro-assist-0:0.2.5-1.fc44.x86_64",
+                "producer_artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                "producer_manifest_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "published_signed_artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              }
+            ],
+            "policy": {
+              "architectures": [
+                "aarch64",
+                "x86_64"
+              ],
+              "component": "ro-assist",
+              "fedora_release": 44,
+              "minimum_beta_days": 7,
+              "package_names": [
+                "ro-assist"
+              ],
+              "promotion_group": "ro-assist",
+              "registry_sha256": "34d3a08c9b30b3e42d521ceff242ae1a8332bbbe057d4f49cf6bff7e802db262",
+              "repository": "Project-Ro-ASD/test-only",
+              "required_tests": [
+                "clean-install",
+                "dependency-solve",
+                "file-conflict",
+                "rpmlint",
+                "smoke",
+                "upgrade"
+              ],
+              "risk_class": "normal-app",
+              "srpm_required": true,
+              "trusted_signer_workflow": "Project-Ro-ASD/test-only/.github/workflows/release.yml",
+              "version": "ro-repo-v3-policy-1"
+            },
+            "promotion_group": "ro-assist",
+            "source_provenance": [
+              {
+                "release_id": 123,
+                "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "source_repository": "Project-Ro-ASD/test-only"
+              }
+            ]
+          },
+          "candidate_sha256": "f196c711db8104d805066c3bab1a692d08ac51ba69e22c0bf377ad2f3bcdc1ff",
+          "dwell_met": true,
+          "evidence_sha256": {
+            "group-validation-claim": "deadd8c99d6fc46188b0a352b311b1f3769f8b0c4fd0fc6b6a7d2d51b1d59369"
+          },
+          "first_seen": {
+            "publication_run": "101",
+            "published_at": "2026-10-01T12:00:00Z"
+          },
+          "minimum_beta_days": 7,
+          "mode": "normal",
+          "policy_sha256": "036bd938144f396041ae539be0bf73ebd064defdf0460623c35229e8d44ca4a8",
+          "policy_version": "ro-repo-v3-policy-1",
+          "previous_stable_sha256": null,
+          "previous_stable_snapshot_id": null,
+          "promotion_group": "ro-assist",
+          "proposal_sha256": "8c2d3807760ba93a071aa2875de13d47f5a602542a8566f7fe496b48059efab1",
+          "publishable": false,
+          "reason": null,
+          "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
+          "schema_version": 3,
+          "scope": "v3-integrated-proposal-untrusted",
+          "stable_set_sha256": "cd0ded7b984992c363131f151d95cc346bb9ffebdaf1834e87dd14298f6624a6"
+        }
+      },
+      "proofs": {
+        "AUTHORIZED": {
+          "authorization_sha256": "7dbab8222bfe6c57e7333e894581d401568d415f82ebd185b87925c003541f27",
+          "expires_at": 1791720300
+        },
+        "AWAITING_APPROVAL": {
+          "gate": "exact-protected-approval"
+        },
+        "COMPOSED": {
+          "preflight_sha256": "0173612de1d610fd2a5430dd20f0e66723240598d9b6655836165103f77404bc",
+          "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1"
+        },
+        "POST_VERIFIED": {
+          "verification": {
+            "advertised_generation": 1,
+            "advertisement_checkpoint": {
+              "seq": 11,
+              "sha256": "1f86b7c7d1ab129ef261f22a24003ff733eabb8e0b538f4bfa50dc28b464c991"
+            },
+            "coverage": "all-approved-paths",
+            "deployment_id": "isolated-git-post-test",
+            "deployment_sha256": "b8d7c03628de25d331e37c56725b10d3eac0dc021a0e04379f542fbc858cceb1",
+            "git_commit": "ad92de98b3e3ae14854e5b0d35424fdda6bdfc8b",
+            "phase": "post",
+            "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+            "publishable": false,
+            "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
+            "verified_at": 1791720000
+          }
+        },
+        "PUBLISHED": {
+          "authorization_sha256": "7dbab8222bfe6c57e7333e894581d401568d415f82ebd185b87925c003541f27"
+        },
+        "REMOTE_VERIFIED": {
+          "verification": {
+            "advertised_generation": null,
+            "advertisement_checkpoint": null,
+            "coverage": "all-approved-paths",
+            "deployment_id": "isolated-git-test",
+            "deployment_sha256": "7838b0701c18f055130a504832a4f956c772f4e58d3f92e2c318eaecdef45f49",
+            "git_commit": "7477b3665854902e2111f08b32979ee7bddc221f",
+            "phase": "pre",
+            "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+            "publishable": false,
+            "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
+            "verified_at": 1791720000
+          }
+        },
+        "SIGNED": {
+          "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+          "signing_key_sha256": "daf379a6f5d3aadcf0c77ff1ea0a48541e1d5ee90fe4c016cd1bbe762ee7c13a"
+        },
+        "STAGED": {
+          "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+          "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1"
+        },
+        "TESTED": {
+          "evidence_sha256": "40f0575458f8466d9cc0f7fd594e9b15dd5bc683f7f802693ba8b9c62d54c6ae"
+        },
+        "VERIFIED": {
+          "evidence_sha256": "40f0575458f8466d9cc0f7fd594e9b15dd5bc683f7f802693ba8b9c62d54c6ae"
+        }
+      },
+      "publishable": false,
+      "schema_version": 3,
+      "scope": "v3-backend-isolated-attempt",
+      "state": "POST_VERIFIED"
+    },
+    "checkpoint": {
+      "seq": 12,
+      "sha256": "a428b49696d11f8e2bb03c0ab6f3cd8c4d818c65aab5a40423a9b8aa1ccaaa53"
+    },
+    "head": {
+      "digest": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
+      "generation": 1,
+      "last_verified": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1"
+    },
+    "publishable": false,
+    "scope": "isolated-sqlite"
+  },
+  "transactional_state_machine": "PASS"
+}
