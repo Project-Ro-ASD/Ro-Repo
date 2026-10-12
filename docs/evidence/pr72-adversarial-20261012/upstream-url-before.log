@@ -1,0 +1,8 @@
+Native DNF5 location: file:///v3-outside-pinned-cache/probe.rpm
+Traceback (most recent call last):
+  File "/repo/tests/v3-upstream-url-e2e.py", line 55, in <module>
+    main()
+    ~~~~^^
+  File "/repo/tests/v3-upstream-url-e2e.py", line 51, in main
+    raise AssertionError("unsafe external package base URL accepted by pinned validator")
+AssertionError: unsafe external package base URL accepted by pinned validator

@@ -23,7 +23,7 @@ from v3_stable_composer import _sha256
 
 
 def member(root, relative):
-    if not isinstance(relative, str) or "\\" in relative:
+    if not isinstance(relative, str) or any(c in relative for c in ("\\", "%", ":", "?", "#", "\n", "\r", "\0")):
         raise PlanningError("invalid upstream member")
     path = pathlib.PurePosixPath(relative)
     if path.is_absolute() or ".." in path.parts or path.as_posix() != relative or not path.parts:
@@ -40,12 +40,14 @@ def repomd_members(root, expected):
         raise PlanningError("unpinned/unsafe upstream repomd")
     try:
         xml = ET.fromstring(raw)
+        if any("{http://www.w3.org/XML/1998/namespace}base" in element.attrib for element in xml.iter()):
+            raise PlanningError("upstream metadata base URL overrides pinned cache")
         namespace = "{http://linux.duke.edu/metadata/repo}"
         seen, types = set(), {}
         for entry in xml.findall(namespace + "data"):
             location = entry.find(namespace + "location")
             checksum = entry.find(namespace + "checksum")
-            if location is None or checksum is None or checksum.get("type") != "sha256":
+            if location is None or set(location.attrib) != {"href"} or checksum is None or checksum.get("type") != "sha256":
                 raise PlanningError("upstream metadata requires SHA256 references")
             relative = location.get("href")
             kind = entry.get("type")
@@ -102,13 +104,15 @@ def primary_inventory(root, metadata_path, packages):
         if len(raw) > limit or b"<!DOCTYPE" in raw or b"<!ENTITY" in raw:
             raise PlanningError("unsafe/bounded upstream primary XML")
         document = ET.fromstring(raw)
+        if any("{http://www.w3.org/XML/1998/namespace}base" in element.attrib for element in document.iter()):
+            raise PlanningError("upstream package base URL overrides pinned cache")
         namespace = "{http://linux.duke.edu/metadata/common}"
         approved = {p["nevra"]: p for p in packages}
         found = set()
         for entry in document.findall(namespace + "package"):
             location, checksum = entry.find(namespace + "location"), entry.find(namespace + "checksum")
             version = entry.find(namespace + "version")
-            if location is None or checksum is None or version is None or checksum.get("type") != "sha256":
+            if location is None or set(location.attrib) != {"href"} or checksum is None or version is None or checksum.get("type") != "sha256":
                 raise PlanningError("invalid upstream primary package references")
             path = location.get("href", "")
             relative = pathlib.PurePosixPath(path)
