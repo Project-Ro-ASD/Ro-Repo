@@ -19,14 +19,14 @@ After this operation, 36 B extra will be used (install 36 B, remove 0 B).
 --------------------------------------------------------------------------------
 [3/3] Total                             100% |  10.2 MiB/s |  20.8 KiB |  00m00s
 Running transaction
-Importing OpenPGP key 0x0B3C52BC:
+Importing OpenPGP key 0x5889BD22:
  UserID     : "V3 INTEGRATION TEST ONLY <test@invalid>"
- Fingerprint: 401CB5D46DF8003CE24AEAAE06DA1ABB0B3C52BC
- From       : file:///tmp/v3-fedora-integration-_xaqwblj/evidence/.v3-full-dnf-z45s_d1v/dnf-merged-public.asc
+ Fingerprint: 38E20E191DF9C1A914DB65867992505D5889BD22
+ From       : file:///tmp/v3-fedora-integration-nunwbdky/evidence/.v3-full-dnf-xswyrplx/dnf-merged-public.asc
 The key was successfully imported.
 [1/5] Verify package files              100% |   0.0   B/s |   3.0   B |  00m00s
 [2/5] Prepare transaction               100% |   0.0   B/s |   3.0   B |  00m00s
-[3/5] Installing ro-v3-impossible-depen 100% | 218.8 KiB/s | 448.0   B |  00m00s
+[3/5] Installing ro-v3-impossible-depen 100% | 437.5 KiB/s | 448.0   B |  00m00s
 [4/5] Installing ro-control-0:2.0-1.fc4 100% | 402.3 KiB/s | 412.0   B |  00m00s
-[5/5] Installing ro-assist-0:2.0-1.fc44 100% |   9.7 KiB/s | 408.0   B |  00m00s
+[5/5] Installing ro-assist-0:2.0-1.fc44 100% |  17.3 KiB/s | 408.0   B |  00m00s
 Complete!

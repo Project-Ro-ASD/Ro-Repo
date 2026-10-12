@@ -1,4 +1,4 @@
-/tmp/ro-v3-final-dc671ed/tests/test_remote_stable_promotion.py:218: SyntaxWarning: "\(" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\("? A raw string is also an option.
+/tmp/ro-v3-audit-final-source/tests/test_remote_stable_promotion.py:218: SyntaxWarning: "\(" is an invalid escape sequence. Such sequences will not work in the future. Did you mean "\\("? A raw string is also an option.
   "schema validation failed \(promotion-validation-v1\)",
 test_architecture_denied_code (test_acceptance_report.AcceptanceReportTests.test_architecture_denied_code) ... ok
 test_caller_verified_identity_is_not_overwritten_by_manifest (test_acceptance_report.AcceptanceReportTests.test_caller_verified_identity_is_not_overwritten_by_manifest) ... error: manifest source_repository mismatch
@@ -191,6 +191,7 @@ test_pinned_key_cannot_be_replaced_between_hash_and_import (test_v3_adversarial_
 test_result_signature_toctou_cannot_bind_unsigned_manifest (test_v3_adversarial_review.SignedBoundaryReviewTests.test_result_signature_toctou_cannot_bind_unsigned_manifest) ... ok
 test_after_stage_rename_can_resume_exact_envelope (test_v3_backend.BackendTests.test_after_stage_rename_can_resume_exact_envelope) ... ok
 test_audit_signature_detects_full_chain_rewrite (test_v3_backend.BackendTests.test_audit_signature_detects_full_chain_rewrite) ... ok
+test_audit_signature_failure_rolls_back_authority (test_v3_backend.BackendTests.test_audit_signature_failure_rolls_back_authority) ... ok
 test_complete_signed_rehearsal (test_v3_backend.BackendTests.test_complete_signed_rehearsal) ... ok
 test_concurrent_base_publication_conflict (test_v3_backend.BackendTests.test_concurrent_base_publication_conflict) ... ok
 test_conflicting_attempt_replay (test_v3_backend.BackendTests.test_conflicting_attempt_replay) ... ok
@@ -501,6 +502,6 @@ test_preserve_previous_stable_and_add_dolphin (test_v3_stable_composer.ComposerT
 test_symlinked_input_rpm_is_rejected (test_v3_stable_composer.ComposerTests.test_symlinked_input_rpm_is_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 493 tests in 52.006s
+Ran 494 tests in 57.631s
 
 OK

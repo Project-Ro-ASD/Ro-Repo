@@ -140,6 +140,7 @@ path was involved. `Ledger._append` now verifies each new event signature agains
 the independent audit root before insertion/commit. The failing regression is
 `test_audit_signature_failure_rolls_back_authority`, and the minimum correction
 rolls back state, replay consumption and audit together.
+The corrected call is `tools/v3_backend_ledger.py:162`.
 
 The native recovery adapter also preserves a historical snapshot's original
 signed parent instead of requiring it to name the new current stable base. That
@@ -178,6 +179,10 @@ PostgreSQL, Git CAS, migration/recovery, schemas and workflow safety checks are
 recorded in the evidence README. Native aarch64, real released applications,
 official upstream closure, graphical/system VMs and real protected approval remain
 UNVERIFIED. All eleven production jobs remain BLOCKED.
+
+Final acceptance: 494 unit tests and 350 V3 tests passed, including 117 additional
+tests beyond the preserved baseline. All seven GitHub CI checks passed on the
+implementation head; public job links and exact SHA are in `ci-checks.json`.
 
 ## Maintainer handoff
 

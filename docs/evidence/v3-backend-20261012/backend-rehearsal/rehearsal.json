@@ -1,7 +1,7 @@
 {
   "advertisement": {
-    "advertisement_sha256": "a697388f639216a791e134f5903c6daf60116216fbda2926630dada264fe3826",
-    "git_commit": "ad92de98b3e3ae14854e5b0d35424fdda6bdfc8b",
+    "advertisement_sha256": "d44428ed7afec46d1caac6ec1069b4a30af9dde4912be15ae955f1747ae3a63f",
+    "git_commit": "1d12cbbeebcb3462c4d82fc80a7fb2c943aa9e0b",
     "production_activation": "BLOCKED",
     "publishable": false,
     "remote_post_verification": "UNVERIFIED"
@@ -10,8 +10,8 @@
   "git_cas": "PASS",
   "git_staging": {
     "cdn_atomicity": "UNVERIFIED",
-    "git_commit": "7477b3665854902e2111f08b32979ee7bddc221f",
-    "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+    "git_commit": "391c388bb0c5cb2398ac79be2976f237bb1f4566",
+    "publication_sha256": "d157c763d835125bc9ad776df2462675314dbefab2d0306eeef0e4fc343ebc1b",
     "publishable": false,
     "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
     "scope": "v3-pages-isolated-staging"
@@ -22,7 +22,7 @@
   "real_application_acceptance": "UNVERIFIED",
   "real_protected_approval": "UNVERIFIED",
   "scope": "v3-backend-rehearsal-test-only",
-  "source_code_sha256": "e123885f9fb0750b55729e84984e4a5defc4e074828a45a7a1163620e9180200",
+  "source_code_sha256": "19677b69e466f2298999dd72ff821f1ece3564b3b3614cb0c42b9498adc43c5c",
   "source_inventory": [
     {
       "path": "tools/ro_repo.py",
@@ -46,7 +46,7 @@
     },
     {
       "path": "tools/v3_backend_ledger.py",
-      "sha256": "4ec132560533497d389cc064ce5e6f34fadf92b6e9ef9a9c0368a9ab8f70ca3e"
+      "sha256": "7cd88a460ca6d5cbdb34c533648be7811c22cd83357a56a8f82778a7476d1db6"
     },
     {
       "path": "tools/v3_backend_trust.py",
@@ -98,7 +98,7 @@
     },
     {
       "path": "tools/v3_immutable_view.py",
-      "sha256": "4c75a4307f3d2b8f83515ed622b0ab79e95f6ef62ea7c8e0f753efeeb4d14f0e"
+      "sha256": "5e898bd6eed9ceabd18e0fbc1d74c76d4fc2639c8a7b9f1b1b271024964d14df"
     },
     {
       "path": "tools/v3_integration.py",
@@ -262,7 +262,7 @@
     },
     {
       "path": "tests/test_v3_backend.py",
-      "sha256": "e0604e38d7f9330074c1160e83da3d42cee855b9202e8987323d72ea85a33aa6"
+      "sha256": "24a8b3e254ae9c930dcd108943f55d281763f36e8ad8c818b6e0631c9bd94abf"
     },
     {
       "path": "tests/test_v3_backend_inputs.py",
@@ -386,7 +386,7 @@
     },
     {
       "path": "tests/v3-integration-fedora-e2e.py",
-      "sha256": "4c43e6697cbbce76d96a5df2030ba50651a48c82a8a1d102dad3d1ce506ed3b3"
+      "sha256": "8440656e0bfa525c7d32110f251c5efae365a62776d7376f0ae1f682e1cfed04"
     },
     {
       "path": "tests/v3-signed-rpm-real-e2e.py",
@@ -591,14 +591,14 @@
       },
       "proofs": {
         "AUTHORIZED": {
-          "authorization_sha256": "7dbab8222bfe6c57e7333e894581d401568d415f82ebd185b87925c003541f27",
+          "authorization_sha256": "3b13ef7b1906bb268cac9001bcf1f8c7ff9c4b1130e4d0a8500ab2a5d8f876c2",
           "expires_at": 1791720300
         },
         "AWAITING_APPROVAL": {
           "gate": "exact-protected-approval"
         },
         "COMPOSED": {
-          "preflight_sha256": "0173612de1d610fd2a5430dd20f0e66723240598d9b6655836165103f77404bc",
+          "preflight_sha256": "6e48ea3c90e48103973964ae0af201442abd4dd129b39955df9826f52b8366d4",
           "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1"
         },
         "POST_VERIFIED": {
@@ -606,21 +606,21 @@
             "advertised_generation": 1,
             "advertisement_checkpoint": {
               "seq": 11,
-              "sha256": "1f86b7c7d1ab129ef261f22a24003ff733eabb8e0b538f4bfa50dc28b464c991"
+              "sha256": "091d9631a400dfaedf66b32331c68cd8f4abbdf8d48b70c95990cf85933e11c4"
             },
             "coverage": "all-approved-paths",
             "deployment_id": "isolated-git-post-test",
-            "deployment_sha256": "b8d7c03628de25d331e37c56725b10d3eac0dc021a0e04379f542fbc858cceb1",
-            "git_commit": "ad92de98b3e3ae14854e5b0d35424fdda6bdfc8b",
+            "deployment_sha256": "2265d6e821cf9779c0cf034809421bf2c64ce25b92c89ef4e79daa4cb6376203",
+            "git_commit": "1d12cbbeebcb3462c4d82fc80a7fb2c943aa9e0b",
             "phase": "post",
-            "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+            "publication_sha256": "d157c763d835125bc9ad776df2462675314dbefab2d0306eeef0e4fc343ebc1b",
             "publishable": false,
             "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
             "verified_at": 1791720000
           }
         },
         "PUBLISHED": {
-          "authorization_sha256": "7dbab8222bfe6c57e7333e894581d401568d415f82ebd185b87925c003541f27"
+          "authorization_sha256": "3b13ef7b1906bb268cac9001bcf1f8c7ff9c4b1130e4d0a8500ab2a5d8f876c2"
         },
         "REMOTE_VERIFIED": {
           "verification": {
@@ -628,28 +628,28 @@
             "advertisement_checkpoint": null,
             "coverage": "all-approved-paths",
             "deployment_id": "isolated-git-test",
-            "deployment_sha256": "7838b0701c18f055130a504832a4f956c772f4e58d3f92e2c318eaecdef45f49",
-            "git_commit": "7477b3665854902e2111f08b32979ee7bddc221f",
+            "deployment_sha256": "e21b3b4765f40979761d0eed5bfe697b615cebaeca19d524b345631e5e6d0474",
+            "git_commit": "391c388bb0c5cb2398ac79be2976f237bb1f4566",
             "phase": "pre",
-            "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+            "publication_sha256": "d157c763d835125bc9ad776df2462675314dbefab2d0306eeef0e4fc343ebc1b",
             "publishable": false,
             "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",
             "verified_at": 1791720000
           }
         },
         "SIGNED": {
-          "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
-          "signing_key_sha256": "daf379a6f5d3aadcf0c77ff1ea0a48541e1d5ee90fe4c016cd1bbe762ee7c13a"
+          "publication_sha256": "d157c763d835125bc9ad776df2462675314dbefab2d0306eeef0e4fc343ebc1b",
+          "signing_key_sha256": "82fb1f1ed75f771142d5474bfd5775c57a8ea192e276ff2558cf711fd159c699"
         },
         "STAGED": {
-          "publication_sha256": "1be97efdf35bbbf8042b3f04bc1262933f4bfdfa7832cef7e2fbe5d52e8ad716",
+          "publication_sha256": "d157c763d835125bc9ad776df2462675314dbefab2d0306eeef0e4fc343ebc1b",
           "result_stable_sha256": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1"
         },
         "TESTED": {
-          "evidence_sha256": "40f0575458f8466d9cc0f7fd594e9b15dd5bc683f7f802693ba8b9c62d54c6ae"
+          "evidence_sha256": "67c88708f5b77c986146928625e4b8938d02ff917e8fa23841b134cc1315e3bc"
         },
         "VERIFIED": {
-          "evidence_sha256": "40f0575458f8466d9cc0f7fd594e9b15dd5bc683f7f802693ba8b9c62d54c6ae"
+          "evidence_sha256": "67c88708f5b77c986146928625e4b8938d02ff917e8fa23841b134cc1315e3bc"
         }
       },
       "publishable": false,
@@ -659,7 +659,7 @@
     },
     "checkpoint": {
       "seq": 12,
-      "sha256": "a428b49696d11f8e2bb03c0ab6f3cd8c4d818c65aab5a40423a9b8aa1ccaaa53"
+      "sha256": "d429dea28f84167e1d64451be3c1d16e0eed353b7be2d1a5a3ece79ac4b3250e"
     },
     "head": {
       "digest": "fcc4efbb1361cbc866511ea1f6b1cff6808612085d7d87a7663b2046d69285e1",

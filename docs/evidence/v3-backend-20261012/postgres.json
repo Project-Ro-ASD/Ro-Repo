@@ -3,7 +3,7 @@
   "cas": "PASS",
   "checkpoint": {
     "seq": 21,
-    "sha256": "9122c0257a159e5acdf0df876bda7ae8f6a7d0b389abd081cffa19215fc95a30"
+    "sha256": "721eccb577ab58397a440b41326e6231d6b2ff4077228c85bc704a657c2c55fb"
   },
   "external_ha_durability": "UNVERIFIED",
   "independent_processes": "PASS",

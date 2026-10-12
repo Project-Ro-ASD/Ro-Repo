@@ -1,19 +1,19 @@
 # V3 backend isolated acceptance evidence
 
 Acceptance date: 2026-10-12 (Europe/Istanbul). Tested implementation commit:
-`dc671edb0f1196720466025d53299efa72b88f80`.
+`491ccd21d17c2cf9adc7bc2203b99224a2c168eb`.
 
 Canonical source inventory digest for tools/tests/schemas/config:
-`e123885f9fb0750b55729e84984e4a5defc4e074828a45a7a1163620e9180200`.
+`19677b69e466f2298999dd72ff821f1ece3564b3b3614cb0c42b9498adc43c5c`.
 The complete inventory is in `backend-rehearsal/rehearsal.json`. Fedora acceptance
 and backend rehearsal independently record the same digest. Subsequent report/CI
 record commits do not modify implementation files.
 
 | Execution | Acceptance | Evidence |
 | --- | --- | --- |
-| Full Python suite | PASS: 493 tests, zero failures/errors/skips | `unit.log` |
-| V3 security suite | PASS: 349 tests (233 baseline + 116 new) | Full suite includes every `test_v3_*.py`; PR CI also runs the V3-only command |
-| Backend decisions | PASS: 79 state/crypto/crash tests, 28 input/migration tests, 7 Git tests, 2 workflow tests | Named tests and results in `unit.log` |
+| Full Python suite | PASS: 494 tests, zero failures/errors/skips | `unit.log` |
+| V3 security suite | PASS: 350 tests (233 baseline + 117 new) | Full suite includes every `test_v3_*.py`; PR CI also runs the V3-only command |
+| Backend decisions | PASS: 80 state/crypto/crash tests, 28 input/migration tests, 7 Git tests, 2 workflow tests | Named tests and results in `unit.log` |
 | Native x86_64 Fedora 44 real signed fixtures | PASS: bootstrap, complete retained upgrade, immutable RPM/SRPM/metadata validation, `.rpmnew`, channels, deterministic metadata, negative dependency/conflict/unsigned-source checks | `fedora44/acceptance.json`, `fedora44.log`, per-transaction receipts/logs |
 | Pinned upstream fixture | PASS: genuine RPM signing/header/checksum and primary-location checks, exact pinned dependency installed by real DNF5 | `fedora44/upstream-fixture.json`, `fedora44/pinned-dependency-closure/` |
 | Existing V2 compatibility E2E | PASS: existing script completed and wrote its final fixture receipt; signed single/multi-package real DNF scenarios preserved | `v2-compatibility.log`, `v2-compatibility.json` |
@@ -62,3 +62,5 @@ The first CI Fedora V3 run failed because its runtime lacked PyYAML for the new
 migration rehearsal. The existing isolated V3 test workflow now explicitly
 installs `python3-yaml` and `openssl`, matching the locally exercised runtime.
 This dependency fix does not change any production or V2 workflow.
+
+Final audit signature and historical-parent recovery corrections passed. `audit-regression-before.log` is the intentionally failing test that exposed the audit defect; `audit-regression-after.log` and the full final suite prove the correction. `fedora44/acceptance.json` includes actual `recovery-historical-signed-parent` PASS. `ci-checks.json` records all seven successful checks at the tested source head.
