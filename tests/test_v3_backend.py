@@ -239,6 +239,14 @@ class BackendTests(unittest.TestCase):
                     audit_key=self.keys.signers["audit"].public, audit_key_sha256=self.keys.signers["audit"].key_sha256,
                     clock=lambda: NOW))
 
+    def test_audit_signature_failure_rolls_back_authority(self):
+        self.fx.advance()
+        before = self.fx.ledger.inspect()
+        with mock.patch.object(self.fx.ledger.signer, "sign", side_effect=self.keys.signers["approval"].sign):
+            self.reject(lambda: self.fx.backend.authorized(self.fx.attempt, self.fx.approval))
+        self.assertEqual(self.fx.ledger.inspect(), before)
+        self.fx.backend.authorized(self.fx.attempt, self.fx.approval)
+
     def test_partial_schema_cannot_be_silently_repaired_and_resigned(self):
         with self.fx.ledger.adapter.transaction() as db:
             db.execute("DROP TABLE consumed")

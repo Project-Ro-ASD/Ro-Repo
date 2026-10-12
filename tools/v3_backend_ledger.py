@@ -159,6 +159,7 @@ class Ledger:
                  "at": dt.datetime.fromtimestamp(self.clock(), dt.timezone.utc).isoformat().replace("+00:00", "Z"),
                  "state_sha256": self.state_digest(db), "audit_key_sha256": self.audit_key_sha256}
         signature = encode(self.signer.sign(canonical(event)))
+        verify_bytes(self.audit_key, self.audit_key_sha256, canonical(event), b64(signature))
         db.execute("INSERT INTO events(seq,body,signature) VALUES(?,?,?)", (event["seq"], canonical(event).decode(), signature))
         return {"seq": event["seq"], "sha256": sha(event)}
 

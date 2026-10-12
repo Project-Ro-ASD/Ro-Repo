@@ -1,0 +1,6 @@
+test_audit_signature_failure_rolls_back_authority (test_v3_backend.BackendTests.test_audit_signature_failure_rolls_back_authority) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.942s
+
+OK

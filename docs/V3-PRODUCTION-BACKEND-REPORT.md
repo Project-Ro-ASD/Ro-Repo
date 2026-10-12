@@ -132,6 +132,16 @@ envelope now passes its strict outer schema and its exact role-specific payload
 contract. No existing security test was weakened.
 
 Signed audit chains detect altered state or rewritten unsigned history. A fully
+verified negative test also exposed an offline ledger integrity defect: a signer
+returning a real signature from the wrong key could commit an invalid audit event
+and authorization consumption before the next integrity check stopped progress.
+Severity MEDIUM, isolated persistence availability/integrity impact; no live write
+path was involved. `Ledger._append` now verifies each new event signature against
+the independent audit root before insertion/commit. The failing regression is
+`test_audit_signature_failure_rolls_back_authority`, and the minimum correction
+rolls back state, replay consumption and audit together.
+
+A fully
 deleted database or restoration to an older valid signed database still needs an
 independent monotonic checkpoint. Tests demonstrate this limitation explicitly;
 the hash chain is not represented as independent anti-rollback storage.
