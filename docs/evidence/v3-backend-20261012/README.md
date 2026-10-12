@@ -20,7 +20,7 @@ record commits do not modify implementation files.
 | Actual PostgreSQL provider | PASS: PostgreSQL 18.6, independent processes, one CAS winner, interrupted transaction, eight consumed identities, signed audit/post verification | `postgres.json`, `providers.log` |
 | Combined backend and actual Git CAS | PASS: state reaches POST_VERIFIED after independently rereading the signed Git advertisement | `backend-rehearsal/rehearsal.json`, `providers.log` |
 | Migration fixture / fresh-authorized recovery / every-state crash | PASS | `fedora44/migration-fixture.json` and corresponding named unit tests |
-| Strict schemas / disabled jobs / read-only workflow | PASS | Named schema/workflow tests in `unit.log`; existing workflow diff is empty |
+| Strict schemas / disabled jobs / read-only workflow | PASS | Named schema/workflow tests in `unit.log`; existing production and V2 workflow diffs are empty |
 | Native aarch64 / real released applications / official pinned Fedora upstream / Plasma, boot and Ro-Store VMs | UNVERIFIED | Explicit acceptance gates in Fedora/backend JSON and activation checklist |
 | Real protected authorization, external provider durability/checkpoints, live Pages deployment/CDN and V2/client cutover | BLOCKED | No live execution, production keys or activation |
 
@@ -57,3 +57,8 @@ corrected with a Git archive in disposable storage; tests were not weakened.
 
 GitHub CI results are recorded separately after the draft PR is opened. CI success
 is a review check, not a publication or protected approval.
+
+The first CI Fedora V3 run failed because its runtime lacked PyYAML for the new
+migration rehearsal. The existing isolated V3 test workflow now explicitly
+installs `python3-yaml` and `openssl`, matching the locally exercised runtime.
+This dependency fix does not change any production or V2 workflow.
