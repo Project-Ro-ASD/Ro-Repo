@@ -142,6 +142,9 @@ class IsolatedGitStore:
                   "generation": 1 if old is None else old_payload["generation"] + 1,
                   "issued_at": now, "expires_at": int(approval.expiry)}
         raw = signer.envelope("stable-advertisement", record)
+        verify_envelope(raw, role="stable-advertisement", public_key=signer.public,
+                        key_sha256=signer.key_sha256,
+                        expected={k: v for k, v in record.items() if k not in {"issued_at", "expires_at"}}, now=now)
         commit = self._cas({pointer: raw}, expected, mutable=(pointer,))
         return {"git_commit": commit, "advertisement_sha256": digest(raw), "publishable": False,
                 "remote_post_verification": "UNVERIFIED", "production_activation": "BLOCKED"}
