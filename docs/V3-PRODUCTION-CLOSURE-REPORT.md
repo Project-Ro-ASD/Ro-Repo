@@ -56,10 +56,10 @@ Final implementation inventory SHA256: `eb0a01732282eac29f0c54ab6030f73c0dbff1e4
 | PostgreSQL verify-full/restricted roles | PASS, exit 0; actual correct TLS, wrong CA/hostname rejection, permission denials, two-process CAS and rollback |
 | Actual disposable Git/backend recovery | PASS, exit 0; existing complete signed rehearsal plus new durable outbox crash/response-loss reconciliation |
 | Native DNF metadata URL override | PASS, exit 0; existing xml:base negative |
-| Existing V2 compatibility | Final run pending; unchanged fixture explicitly permits Fedora dependency repositories. Offline attempts could not satisfy that legacy runner's repo contract. |
+| Existing V2 compatibility | PASS: complete unchanged V2 E2E in head-specific Fedora CI. Local native clean/baseline/upgrade cases also ran; the duplicate complete local run encountered slow/partial mirror downloads and earlier disposable-copy setup errors. |
 | Static checks | PASS: 102 Python files, 10 shell files, all schemas/YAML and diff whitespace |
 | Safety audit | PASS: eleven V2 workflows byte-identical; disabled V3 workflow byte-identical and eleven unconditional false jobs; no new private signing keys/tokens in changed artifacts |
-| GitHub CI | Pending draft PR push; actual head-specific job links will be recorded after completion |
+| GitHub CI | PASS: 8/8 checks on `2619629569e1c3386cf98b53397f6cf45663d918`; unit log confirms 541 tests and security log confirms 397 V3 tests |
 
 No private key, JWT, production credential or database backup is committed. Test passwords are explicitly disposable. Real Pages storage ref is independently checked read-only; no write is attempted. Local service/deployment fixtures cannot satisfy actual production acceptance.
 
@@ -68,3 +68,20 @@ No private key, JWT, production credential or database backup is committed. Test
 V3 mimarisi korunarak legacy imzalı geçmiş uyumluluğu, yeni authenticated first-seen, guarded TLS PostgreSQL, bağımsız checkpoint reservation/recovery, audited publication outbox, OIDC/JWKS entegrasyonu ve digest'i otomatik keşfeden güvenli DNF güncelleme akışı eklendi. Eski kayıtlara dwell/provenance uydurulmadı; normal 7/14 günlük bekleme ve protected fast-track şartları korunuyor.
 
 Bu PR yalnız **NON-PRODUCTION** entegrasyon içindir. Production **BLOCKED**, on bir job kapalı; V2, pages-storage, production anahtar/credential/environment/database ve gerçek yayın değiştirilmedi. İlk gerçek stable için bağımsız servis/root provisioning, gerçek hardware/GUI/aarch64 kabulü, live fenced provider ve protected import wiring, client rollout ve tek-writer V2→V3 cutover tamamlanıp ayrıca onaylanmalıdır. PR draft teslim edilir; merge/aktivasyon yapılmaz.
+
+## Head-specific public CI and merge recommendation
+
+[Draft PR #74](https://github.com/Project-Ro-ASD/Ro-Repo/pull/74) targets main and remains unmerged. All three workflow runs explicitly report head `2619629569e1c3386cf98b53397f6cf45663d918`, matching the final implementation inventory above. Later documentation-only commits preserve that source inventory; their own checks are verified separately at handoff. No older head's result is attributed to a different implementation.
+
+| Check | Result | Public job |
+| --- | --- | --- |
+| acceptance-runtime-contract | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908521/job/115009575670) |
+| backend-security | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908523/job/115009575558) |
+| closure-tls-postgresql | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908523/job/115009575706) |
+| fedora44-e2e | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908521/job/115009575650) |
+| fedora44-full-stable-set | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908508/job/115009576100) |
+| postgres-transactions | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908523/job/115009575583) |
+| security-contracts | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908508/job/115009575863) |
+| unit-policy | SUCCESS | [job](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38308908521/job/115009575257) |
+
+The code is suitable for a **NON-PRODUCTION merge**, subject to normal maintainer review. It is **not suitable for first real stable publication**: live fenced provider/protected import wiring, independently operated trust/checkpoint/observer/witness/discovery/deployment services, external TLS/HA/restore and Pages/CDN acceptance, genuine application/hardware/GUI/aarch64 evidence, and reviewed V2 writer/client cutover remain mandatory. No activation or merge was performed.
