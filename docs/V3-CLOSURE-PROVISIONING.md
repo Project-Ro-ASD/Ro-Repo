@@ -20,7 +20,7 @@ History genesis records bind the full V3 candidate identity, group, publication 
 
 ## Identities, approvals and JWKS
 
-Provision distinct public bytes/SHA256 pins for source, beta-history, tests, approval, witness, publication, audit, checkpoint, JWKS lifecycle, discovery and deployment. `verify_root_set` rejects missing pins and canonical key collisions. Private keys stay with their separate operators; this repository stores no production signing material.
+Provision distinct public bytes/SHA256 pins for source, beta-history, tests, approval, witness, publication, audit, checkpoint, JWKS lifecycle, discovery, deployment and restore-observation. `verify_root_set` rejects missing pins and canonical key collisions. The authority constructor separately rejects checkpoint/updater/abort key aliasing; the checkpointed ledger rejects a checkpoint root equal to its audit root. Private keys stay with their separate operators; this repository stores no production signing material.
 
 For both `repo-stable` and `repo-production-signing`: required reviewer team/IDs approved by the maintainer, prevent self-review enabled, main-only deployment branch policy, administrative bypass disabled and exact normalized configuration digest pinned by the independent witness. These settings require an external provisioner; no API environment change is made. GitHub documents required reviews and self-review prevention in [deployment protections](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
 

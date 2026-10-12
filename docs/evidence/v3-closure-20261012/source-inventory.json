@@ -81,7 +81,7 @@
   },
   {
     "path": "tools/v3_identity_integration.py",
-    "sha256": "c0c540e5ba1bd850e3d9f59ff6fc6624a57dc72fa67078e6536fb048c12e4a1c"
+    "sha256": "084709eee92cad856cf401e3d95095985db6efd663ac13d10e2122d6e2714fbd"
   },
   {
     "path": "tools/v3_immutable_view.py",
@@ -89,7 +89,7 @@
   },
   {
     "path": "tools/v3_independent_authority.py",
-    "sha256": "f14eb86eedaebaf68d8374d5c44a1ed10f1e922c27946bcd9fc3021a6e7efd87"
+    "sha256": "949eb59246e5061b17c517dfecc3e33d7083bb3f1fb41d501a4b45cf9719d319"
   },
   {
     "path": "tools/v3_integration.py",
@@ -341,7 +341,7 @@
   },
   {
     "path": "tests/test_v3_production_closure.py",
-    "sha256": "cad5c02a13046bea00152ec5afc2d8a8d5a44c8974aeb210df2a2c14612f8d5d"
+    "sha256": "a4a3f537bb2278436ddd9d7ac103c6b10f404afc9fdf5a11db0e52e60db50ccb"
   },
   {
     "path": "tests/test_v3_promotion_planner.py",

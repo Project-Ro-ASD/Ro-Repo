@@ -1,19 +1,19 @@
 [
   {
     "path": "README.md",
-    "sha256": "ac97884ae22918857364e7df1d12ed99ded1b2cd82ae4136156c8b92333b8d69"
+    "sha256": "1a2bd2dce7cf481f598321e7720edb1ec681657b32368ad42b514e6d8fc9749b"
   },
   {
     "path": "client-discovery-dnf.json",
-    "sha256": "00377159438820d7d897b68b935a85275c796043b9ef6c193735dc84e8a5e5fd"
+    "sha256": "04a9514eae5f1a435f63a1eb4ab5d04eacddbac4067393817de27d3252eb6fc8"
   },
   {
     "path": "fedora44-acceptance.json",
-    "sha256": "aeeae393a4045c0595c94c948d344edcbca54069ac06f5f8069fb22437b0ee72"
+    "sha256": "286d68c0673dc6df38cda950148fb2b801a2ca104bfea85456e777ffc5922e52"
   },
   {
     "path": "fedora44-final.log.gz",
-    "sha256": "6f26fa1b3d04102ae9989dd18047a951811b6802b29c30b8edcb155aeb9666c7"
+    "sha256": "f82df1e3dc80f4cb623a5ce48fd6f986c32d3f739a11a62fbafb4b38c51baa2e"
   },
   {
     "path": "git-backend-final.log.gz",
@@ -21,7 +21,7 @@
   },
   {
     "path": "git-rehearsal.json",
-    "sha256": "75ed07f543ff8fb47025ee3cbe002315320724c787e1fa7a2c06a269430039ad"
+    "sha256": "91397283b459bfed92b66511cfe9e29b21302accc0e3a05a9624672a04b21f41"
   },
   {
     "path": "legacy-compatibility.json",
@@ -37,7 +37,7 @@
   },
   {
     "path": "postgres.json",
-    "sha256": "ea30bcb320258b1556bfb43f509875560e2d4b44386288e3479389c3844eecf1"
+    "sha256": "e620167b7bcfc9daddcdf494f5391567b1b9c7a51f012539f8a53c0a2ca41e67"
   },
   {
     "path": "postgresql-source-final.log.gz",
@@ -49,7 +49,7 @@
   },
   {
     "path": "source-inventory.json",
-    "sha256": "d6c619d79580df570a8c43af1406f57a2c0a4b3d07481a5270a1944bb79e42d4"
+    "sha256": "5de0a4d71c859c25e5a9022e8fb42958fdc387d5a7c76bb1dfd54d2b3333b09b"
   },
   {
     "path": "static-final.json",
@@ -57,11 +57,11 @@
   },
   {
     "path": "tls-postgres.json",
-    "sha256": "29a32c8ed5270f83e546503b00ab43ee18035dc56b23a93a38b93015cb80f272"
+    "sha256": "2c3ca85419aeded00ed27721acb9db9f96b621ca1c266a1ace2a6018cad92a2a"
   },
   {
     "path": "unit-writable-final.log.gz",
-    "sha256": "e66f2106d3b46365c10d998dbd539ee0bfdf051cdecddb1034e45cc3d19ccfe5"
+    "sha256": "4249ff6612859362cc9262d3b55da75a2f658293bc3042ff724a075ef13b5f00"
   },
   {
     "path": "upstream-url-final.log.gz",

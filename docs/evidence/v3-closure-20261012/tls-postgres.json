@@ -11,6 +11,6 @@
   "production_activation": "BLOCKED",
   "checkpoint": {
     "seq": 20,
-    "sha256": "a23519895c606c8ea94c5278c7dc1ae636b846cc4c0f68cb6d571d39fffb414e"
+    "sha256": "f00dac080594f0c59843937ec92219dfe43b8f4760c6b9bb26404dcb2040799a"
   }
 }

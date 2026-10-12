@@ -11,7 +11,7 @@ from v3_promotion_planner import PlanningError
 
 
 def verify_root_set(roots):
-    required = {"source", "beta-history", "tests", "approval", "witness", "publication", "audit", "checkpoint", "jwks-lifecycle", "discovery", "deployment"}
+    required = {"source", "beta-history", "tests", "approval", "witness", "publication", "audit", "checkpoint", "jwks-lifecycle", "discovery", "deployment", "restore-observation"}
     if not isinstance(roots, dict) or set(roots) != required:
         raise PlanningError("provision every independent V3 public trust role")
     identities = []

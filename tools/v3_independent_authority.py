@@ -12,13 +12,17 @@ import secrets
 import sqlite3
 import urllib.request
 
-from v3_backend_trust import canonical, require_test_root, strict_json, verify_envelope, require_attestation
+from v3_backend_trust import canonical, digest, key_identity, require_test_root, strict_json, verify_envelope, require_attestation
 from v3_promotion_planner import PlanningError
 from v3_backend_ledger import Ledger
 
 
 class LocalAuthority:
     def __init__(self, root, signer, updater_key, updater_pin, clock, *, recovery_key=None, recovery_pin=None):
+        if digest(updater_key) != updater_pin or key_identity(updater_key) == key_identity(signer.public):
+            raise PlanningError("independent checkpoint and updater roots required")
+        if recovery_key is not None and (digest(recovery_key) != recovery_pin or key_identity(recovery_key) in {key_identity(updater_key), key_identity(signer.public)}):
+            raise PlanningError("independent restore/abort observer root required")
         self.root = require_test_root(root)
         self.path = self.root / "independent.sqlite"
         self.signer, self.updater_key, self.updater_pin, self.clock = signer, updater_key, updater_pin, clock
@@ -157,6 +161,8 @@ class CheckpointedLedger(Ledger):
     noncommit; a local old DB cannot silently clear the reservation.
     """
     def __init__(self, ledger, client, identity):
+        if key_identity(ledger.audit_key) == key_identity(client.public_key):
+            raise PlanningError("ledger audit and independent checkpoint roots must differ")
         if not re.fullmatch(r"[a-z0-9_-]{1,64}", identity):
             raise PlanningError("invalid independent ledger identity")
         self.ledger, self.client, self.name = ledger, client, "checkpoint/" + identity
@@ -228,9 +234,11 @@ class CheckpointedLedger(Ledger):
     def verify_restore(self, observation, *, now):
         payload = require_attestation(observation, "restore-observation")
         current = self.inspect()
-        if (not payload["issued_at"] <= now < payload["expires_at"] or
+        if (set(payload) != {"issued_at", "expires_at", "checkpoint", "ledger_identity", "failover", "restore", "logs_sha256"} or
+                not payload["issued_at"] <= now < payload["expires_at"] or
                 payload.get("checkpoint") != current["checkpoint"] or payload.get("ledger_identity") != self.name or
-                payload.get("failover") != "PASS" or payload.get("restore") != "PASS" or not payload.get("logs_sha256")):
+                payload.get("failover") != "PASS" or payload.get("restore") != "PASS" or
+                not isinstance(payload.get("logs_sha256"), str) or not re.fullmatch(r"[a-f0-9]{64}", payload["logs_sha256"])):
             raise PlanningError("independent restore/failover acceptance required")
         return {"scope": "v3-restore-observation", "observation_sha256": observation.sha256,
                 "production_activation": "BLOCKED", "checkpoint": current["checkpoint"]}

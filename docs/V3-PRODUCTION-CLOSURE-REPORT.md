@@ -45,12 +45,12 @@ Use the updated [activation checklist](V3-PRODUCTION-ACTIVATION-CHECKLIST.md), e
 
 ## Verification and evidence
 
-Final implementation inventory SHA256: `abecef7f816841ea9d2864c8c61f82190512cfeeaf0e58e7461d3d2325b1707a` (132 Python/shell/schema/config files). [Evidence inventory, receipts and compressed raw logs](evidence/v3-closure-20261012/) bind the final implementation.
+Final implementation inventory SHA256: `eb0a01732282eac29f0c54ab6030f73c0dbff1e467fc6badcdefafc363731921` (132 Python/shell/schema/config files). [Evidence inventory, receipts and compressed raw logs](evidence/v3-closure-20261012/) bind the final implementation.
 
 | Test | Result |
 | --- | --- |
-| Full Python unit/security suite | PASS: 540 tests, including 396 V3; 0 failures/errors/skips. Earlier read-only run had eight existing scratch-directory errors, resolved by the writable disposable copy. |
-| Closure protocol regression suite | 19 cases included in full suite; independent reservations, replay/expiry/config/signature failures, stale leases, provider response loss and client consistency |
+| Full Python unit/security suite | PASS: 541 tests, including 397 V3; 0 failures/errors/skips. Earlier read-only run had eight existing scratch-directory errors, resolved by the writable disposable copy. |
+| Closure protocol regression suite | 20 cases included in full suite; independent reservations, replay/expiry/config/signature failures, stale leases, provider response loss and client consistency |
 | Fedora44 native signed fixture integration | PASS, exit 0; real signed RPM/SRPM, full-set install/upgrade/config/conflict negatives and HTTPS discovery-driven DNF 1.0 → 2.0 |
 | PostgreSQL existing adversarial suite | PASS, exit 0; independent writer/recovery races, process death, replay, signed audit corruption and restored old backup/checkpoint rejection |
 | PostgreSQL verify-full/restricted roles | PASS, exit 0; actual correct TLS, wrong CA/hostname rejection, permission denials, two-process CAS and rollback |

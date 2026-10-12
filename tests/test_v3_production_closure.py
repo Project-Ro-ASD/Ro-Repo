@@ -58,9 +58,8 @@ class ClosureTests(unittest.TestCase):
         root = test_workspace()
         self.addCleanup(shutil.rmtree, root)
         update = self.keys.signers["audit"]
-        authority = LocalAuthority(root, self.checkpoint_signer, update.public, update.key_sha256, lambda: self.fx.now)
-        authority.recovery_key = self.keys.signers["witness"].public
-        authority.recovery_pin = self.keys.signers["witness"].key_sha256
+        authority = LocalAuthority(root, self.checkpoint_signer, update.public, update.key_sha256, lambda: self.fx.now,
+            recovery_key=self.keys.signers["witness"].public, recovery_pin=self.keys.signers["witness"].key_sha256)
         client = AuthorityClient(authority.exchange, public_key=self.checkpoint_signer.public,
             key_sha256=self.checkpoint_signer.key_sha256, clock=lambda: self.fx.now, updater=update)
         return authority, client
@@ -202,6 +201,17 @@ class ClosureTests(unittest.TestCase):
             key_sha256=self.keys.signers["witness"].key_sha256, clock=lambda: NOW)
         with self.assertRaises(PlanningError):
             wrong.read("checkpoint/test")
+
+    def test_checkpoint_and_abort_roots_cannot_alias_audit_key(self):
+        audit = self.keys.signers["audit"]
+        with self.assertRaises(PlanningError):
+            LocalAuthority(self.fx.root, audit, audit.public, audit.key_sha256, lambda: NOW)
+        with self.assertRaises(PlanningError):
+            LocalAuthority(self.fx.root, self.checkpoint_signer, audit.public, audit.key_sha256, lambda: NOW,
+                           recovery_key=audit.public, recovery_pin=audit.key_sha256)
+        client = AuthorityClient(lambda _: b"", public_key=audit.public, key_sha256=audit.key_sha256, clock=lambda: NOW)
+        with self.assertRaises(PlanningError):
+            CheckpointedLedger(self.fx.ledger, client, "test")
 
     def test_reproducible_independent_http_service(self):
         authority, client = self.authority()

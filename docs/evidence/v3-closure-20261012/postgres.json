@@ -3,7 +3,7 @@
   "cas": "PASS",
   "checkpoint": {
     "seq": 46,
-    "sha256": "22480f8229b8768ab2c41f2307361fc3a0caf536811b213d92c5326e23a3207e"
+    "sha256": "cc8da0f5e45c20bcd61f7124e471e036995d70028ae2c022b743f6eada62a015"
   },
   "checkpoint_substitution": "PASS",
   "concurrent_recovery_promotion": "PASS",
