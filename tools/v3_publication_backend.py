@@ -126,6 +126,8 @@ class Backend:
         def validate(db, value):
             from v3_authorization import request
             payload = approval.payload
+            if key_identity(self.ledger.audit_key) in {payload["approval_key_identity"], payload["witness_key_identity"]}:
+                raise PlanningError("canonical audit/authorization key role collision")
             proposal = value["immutable"]["proposal"]
             op = value["immutable"]["operation"]
             target = proposal["result_stable_sha256"] if op == "recover" else None
