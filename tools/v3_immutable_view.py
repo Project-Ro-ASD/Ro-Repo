@@ -255,6 +255,8 @@ def verify_remote(view, reader, deployment, *, now, post_ledger=None,
             not isinstance(payload.get("deployment_id"), str) or not payload["deployment_id"]):
         raise PlanningError("authenticated deployment identity required")
     try:
+        if hasattr(reader, "check_deployment"):
+            reader.check_deployment(payload["git_commit"])
         if reader.publication() != view.envelope:
             raise PlanningError("remote publication envelope differs")
         for item in view.result.inventory:
@@ -286,6 +288,8 @@ def verify_remote(view, reader, deployment, *, now, post_ledger=None,
                             key_sha256=advertisement_key_sha256, expected=expected, now=now)
         except (OSError, AttributeError) as exc:
             raise PlanningError("missing remote signed stable advertisement") from exc
+    if hasattr(reader, "check_deployment"):
+        reader.check_deployment(payload["git_commit"])
     return RemoteVerification({"result_stable_sha256": view.sha256, "publication_sha256": view.envelope_sha256,
                                "deployment_sha256": deployment.sha256, "deployment_id": payload["deployment_id"],
                                "git_commit": payload["git_commit"], "verified_at": now,

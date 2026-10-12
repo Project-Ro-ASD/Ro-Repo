@@ -154,9 +154,14 @@ class GitReader:
     """Read the actual isolated Git tree, including signed stable advertisement."""
     def __init__(self, store, view):
         self.store, self.view = store, view
+        self.commit = store.head()
+
+    def check_deployment(self, expected):
+        if self.commit is None or self.commit != expected or self.store.head() != self.commit:
+            raise PlanningError("Git deployment identity/ref changed during verification")
 
     def _read(self, path):
-        files = self.store._files(self.store.head())
+        files = self.store._files(self.commit)
         if path not in files:
             raise FileNotFoundError(path)
         return self.store._run(["cat-file", "blob", files[path]])
