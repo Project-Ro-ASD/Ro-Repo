@@ -169,13 +169,25 @@ class IsolatedStore:
 
     def reopen(self, result, authorization, signer, *, now):
         """Recover a rename completed before ledger commit; no new signing."""
+        from v3_backend_evidence import Authorization
+        if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not isinstance(signer, TestSigner) or now >= authorization.expiry:
+            raise PlanningError("fresh verified staging retry prerequisites required")
+        result.check()
         target = self.views / (result.sha256 + "-" + authorization.payload["request"]["attempt_id"])
         if target.is_symlink() or not target.is_dir() or (target / "publication.json").is_symlink():
             raise PlanningError("missing safe staged view")
         raw = (target / "publication.json").read_bytes()
         from v3_backend_trust import strict_json
         descriptor = strict_json(raw)["payload"]
-        if descriptor.get("authorization_sha256") != authorization.sha256 or descriptor.get("inventory") != result.inventory or descriptor.get("signing_key_sha256") != signer.key_sha256:
+        from ro_repo import validate_schema, ContractError
+        try:
+            validate_schema(descriptor, "immutable-publication-v3")
+        except ContractError as exc:
+            raise PlanningError("invalid staging retry publication schema") from exc
+        if (descriptor["authorization_sha256"] != authorization.sha256 or descriptor["inventory"] != result.inventory or
+                descriptor["signing_key_sha256"] != signer.key_sha256 or descriptor["signing_key_identity"] != key_identity(signer.public) or
+                descriptor["request"] != authorization.payload["request"] or descriptor["result_stable_sha256"] != result.sha256 or
+                descriptor["preflight_sha256"] != result.receipt or descriptor["expires_at"] != int(authorization.expiry)):
             raise PlanningError("conflicting staging retry")
         verify_envelope(raw, role="publication", public_key=signer.public, key_sha256=signer.key_sha256,
                         expected={k: v for k, v in descriptor.items() if k not in {"issued_at", "expires_at"}}, now=now)
