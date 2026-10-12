@@ -57,6 +57,11 @@ class InputsTests(unittest.TestCase):
         raw, pins = self.keys.oidc()
         self.reject(lambda: verify_oidc(raw, self.keys.jwks, jwks_sha256=digest(self.keys.jwks), pins=pins, now=NOW, fetched_at=NOW-3601))
 
+    def test_null_environment_pin_cannot_authenticate_a_workload(self):
+        raw, pins = self.keys.oidc(changes={"environment": None})
+        pins["environment"] = None
+        self.reject(lambda: verify_oidc(raw, self.keys.jwks, jwks_sha256=digest(self.keys.jwks), pins=pins, now=NOW, fetched_at=NOW))
+
     def test_attestation_signature_role_and_payload_changes(self):
         signer = self.keys.signers["evidence"]
         raw = signer.envelope("tests", {"test": "exact", "issued_at": NOW, "expires_at": NOW+100})

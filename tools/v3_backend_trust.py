@@ -148,6 +148,11 @@ def verify_oidc(raw, jwks_bytes, *, jwks_sha256, pins, now, fetched_at, max_cach
                 "event_name", "runner_environment", "run_id", "run_attempt", "actor_id"}
     if set(pins) != required or not isinstance(claims, dict):
         raise PlanningError("incomplete independent workload pins")
+    if (any(not isinstance(v, str) or not v for v in pins.values()) or
+            any(not re.fullmatch(r"[0-9a-f]{40}", pins[k]) for k in ("sha", "workflow_sha", "job_workflow_sha")) or
+            any(not re.fullmatch(r"[1-9][0-9]*", pins[k]) for k in
+                ("repository_id", "repository_owner_id", "run_id", "run_attempt", "actor_id"))):
+        raise PlanningError("independent workload pins must be explicit typed identities")
     if claims.get("iss") != "https://token.actions.githubusercontent.com" or any(claims.get(k) != v for k, v in pins.items()):
         raise PlanningError("wrong OIDC issuer/audience/workload claims")
     for name in ("iat", "nbf", "exp"):
