@@ -60,9 +60,10 @@ class Backend:
             return value
         return self.ledger.execute("create-" + operation, attempt, change)[0]
 
-    def _transition(self, attempt, target, proof, validate, *, inject=None):
+    def _transition(self, attempt, target, proof, validate, *, inject=None, guard=None):
         if target not in STATES[1:]:
             raise PlanningError("unsupported transition")
+        changed = []
         def change(db):
             value = self.ledger.attempt(db, attempt)
             if target in value["proofs"]:
@@ -76,8 +77,18 @@ class Backend:
             value["state"] = target
             value["proofs"][target] = copy.deepcopy(proof)
             self.ledger.put_attempt(db, value)
+            changed.append(value)
             return value
-        return self.ledger.execute(target, attempt, change, inject=inject)[0]
+        check = None if guard is None else lambda: guard(changed[0])
+        return self.ledger.execute(target, attempt, change, inject=inject, guard=check)[0]
+
+    def _fresh(self, expires_at):
+        if self.ledger.clock() >= expires_at:
+            raise PlanningError("authority expired before transaction completion")
+
+    def _fresh_remote(self, verification):
+        if not 0 <= self.ledger.clock() - verification["verified_at"] <= 60:
+            raise PlanningError("stale remote verification at advertisement")
 
     def verified(self, attempt, evidence):
         if not isinstance(evidence, Evidence) or self.ledger.clock() >= evidence.expiry:
@@ -85,7 +96,8 @@ class Backend:
         def validate(db, value):
             if evidence.data["bindings"] != bindings(value["immutable"]["proposal"]):
                 raise PlanningError("evidence substitution")
-        return self._transition(attempt, "VERIFIED", {"evidence_sha256": evidence.sha256}, validate)
+        return self._transition(attempt, "VERIFIED", {"evidence_sha256": evidence.sha256}, validate,
+                                guard=lambda value: self._fresh(evidence.expiry))
 
     def composed(self, attempt, result):
         if not isinstance(result, VerifiedResult):
@@ -102,7 +114,8 @@ class Backend:
         def validate(db, value):
             if value["proofs"]["VERIFIED"]["evidence_sha256"] != evidence.sha256:
                 raise PlanningError("test evidence substitution")
-        return self._transition(attempt, "TESTED", {"evidence_sha256": evidence.sha256}, validate)
+        return self._transition(attempt, "TESTED", {"evidence_sha256": evidence.sha256}, validate,
+                                guard=lambda value: self._fresh(evidence.expiry))
 
     def awaiting_approval(self, attempt):
         return self._transition(attempt, "AWAITING_APPROVAL", {"gate": "exact-protected-approval"}, lambda db, value: None)
@@ -127,7 +140,8 @@ class Backend:
                 self.ledger.consume(db, kind, identity, attempt)
             if inject:
                 inject("after-authorization-consumption")
-        return self._transition(attempt, "AUTHORIZED", {"authorization_sha256": approval.sha256, "expires_at": approval.expiry}, validate, inject=inject)
+        return self._transition(attempt, "AUTHORIZED", {"authorization_sha256": approval.sha256, "expires_at": approval.expiry}, validate, inject=inject,
+                                guard=lambda value: self._fresh(approval.expiry))
 
     def signed(self, attempt, view):
         if not isinstance(view, StagedView):
@@ -140,16 +154,19 @@ class Backend:
                     self.ledger.clock() >= value["proofs"]["AUTHORIZED"]["expires_at"]):
                 raise PlanningError("signing result/approval substitution or expiry")
         return self._transition(attempt, "SIGNED", {"publication_sha256": view.envelope_sha256,
-                                "signing_key_sha256": view.descriptor["signing_key_sha256"]}, validate)
+                                "signing_key_sha256": view.descriptor["signing_key_sha256"]}, validate,
+                                guard=lambda value: self._fresh(view.descriptor["expires_at"]))
 
     def staged(self, attempt, view):
         if not isinstance(view, StagedView):
             raise PlanningError("immutable staging capability required")
         view.check()
         def validate(db, value):
+            self._fresh(value["proofs"]["AUTHORIZED"]["expires_at"])
             if value["proofs"]["SIGNED"]["publication_sha256"] != view.envelope_sha256:
                 raise PlanningError("staged envelope substitution")
-        return self._transition(attempt, "STAGED", {"publication_sha256": view.envelope_sha256, "result_stable_sha256": view.sha256}, validate)
+        return self._transition(attempt, "STAGED", {"publication_sha256": view.envelope_sha256, "result_stable_sha256": view.sha256}, validate,
+                                guard=lambda value: self._fresh(view.descriptor["expires_at"]))
 
     def remotely_verified(self, attempt, remote):
         return self._remote(attempt, "REMOTE_VERIFIED", remote)
@@ -158,6 +175,7 @@ class Backend:
         if not isinstance(remote, RemoteVerification):
             raise PlanningError("independent remote byte verification required")
         def validate(db, value):
+            self._fresh(value["proofs"]["AUTHORIZED"]["expires_at"])
             if (remote.data["result_stable_sha256"] != value["immutable"]["proposal"]["result_stable_sha256"] or
                     remote.data["publication_sha256"] != value["proofs"]["SIGNED"]["publication_sha256"] or
                     not 0 <= self.ledger.clock() - remote.data["verified_at"] <= 60):
@@ -176,12 +194,16 @@ class Backend:
                 db.execute("UPDATE head SET body=? WHERE id=1", (canonical(head).decode(),))
             elif remote.data["phase"] != "pre":
                 raise PlanningError("pre-publication byte verification required")
-        return self._transition(attempt, target, {"verification": remote.data}, validate)
+        def guard(value):
+            self._fresh_remote(remote.data)
+            self._fresh(value["proofs"]["AUTHORIZED"]["expires_at"])
+        return self._transition(attempt, target, {"verification": remote.data}, validate, guard=guard)
 
     def publish(self, attempt, approval, *, inject=None):
         if not isinstance(approval, Authorization) or self.ledger.clock() >= approval.expiry:
             raise PlanningError("fresh protected authorization required at advertisement")
         def validate(db, value):
+            self._fresh_remote(value["proofs"]["REMOTE_VERIFIED"]["verification"])
             if approval.sha256 != value["proofs"]["AUTHORIZED"]["authorization_sha256"]:
                 raise PlanningError("publication approval substitution")
             head = self.ledger.head(db)
@@ -193,7 +215,10 @@ class Backend:
             db.execute("UPDATE head SET body=? WHERE id=1", (canonical(updated).decode(),))
             if inject:
                 inject("after-advertisement")
-        return self._transition(attempt, "PUBLISHED", {"authorization_sha256": approval.sha256}, validate, inject=inject)
+        def guard(value):
+            self._fresh(approval.expiry)
+            self._fresh_remote(value["proofs"]["REMOTE_VERIFIED"]["verification"])
+        return self._transition(attempt, "PUBLISHED", {"authorization_sha256": approval.sha256}, validate, inject=inject, guard=guard)
 
     def post_verified(self, attempt, remote):
         return self._remote(attempt, "POST_VERIFIED", remote)

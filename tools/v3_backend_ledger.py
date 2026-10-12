@@ -182,7 +182,7 @@ class Ledger:
             raise PlanningError("ledger rollback violates independent checkpoint")
         return {"seq": len(rows), "sha256": previous}
 
-    def execute(self, operation, attempt, change, *, checkpoint=None, inject=None):
+    def execute(self, operation, attempt, change, *, checkpoint=None, inject=None, guard=None):
         with self.adapter.transaction() as db:
             self._lock(db)
             self._integrity(db, checkpoint)
@@ -190,11 +190,15 @@ class Ledger:
             result = change(db)
             if self.state_digest(db) == before:
                 return result, self._integrity(db, checkpoint)
+            if guard:
+                guard()
             if inject:
                 inject("before-audit")
             receipt = self._append(db, operation, attempt)
             if inject:
                 inject("after-audit")
+            if guard:
+                guard()
             return result, receipt
 
     def inspect(self, attempt=None, *, checkpoint=None):
