@@ -99,8 +99,8 @@ def workload_from_services(raw, jwks, lifecycle_transport, *, lifecycle_key, lif
 
 def protected_authorization(proposal, attempt, evidence, workload, *, approval_transport,
                             witness_transport, approval_key, approval_pin, witness_key, witness_pin,
-                            allowed_reviewer_ids, environment_config_sha256, operation="promote", target=None):
-    expected = authorization_request(proposal, attempt, evidence, operation=operation, target=target)
+                            allowed_reviewer_ids, environment_config_sha256, operation="promote", target=None, resume=None):
+    expected = authorization_request(proposal, attempt, evidence, operation=operation, target=target, resume=resume)
     approved = approval_transport.request("POST", "/v1/approval", expected)
     approval_raw = canonical(approved)
     # Verify before forwarding to the witness. Approval is exact-result-bound;
@@ -118,21 +118,22 @@ def protected_authorization(proposal, attempt, evidence, workload, *, approval_t
     return verify_protected(proposal, attempt, evidence, workload, approval_raw=approval_raw,
         witness_raw=canonical(witness), approval_key=approval_key, approval_key_sha256=approval_pin,
         witness_key=witness_key, witness_key_sha256=witness_pin, allowed_reviewer_ids=allowed_reviewer_ids,
-        environment_config_sha256=environment_config_sha256, now=witness_transport.clock(), operation=operation, target=target)
+        environment_config_sha256=environment_config_sha256, now=witness_transport.clock(), operation=operation, target=target, resume=resume)
 
 
 class IndependentDeployment:
     def __init__(self, transport, *, public_key, key_sha256, origin):
         self.transport, self.public_key, self.pin, self.origin = transport, public_key, key_sha256, origin
 
-    def verify(self, view, commit, *, now, ledger=None, signer=None, reader_factory=HTTPSReader):
+    def verify(self, view, commit, *, now, ledger=None, signer=None, reader_factory=HTTPSReader, expected_deployment_id=None):
         from v3_github_provider import oid
         nonce = secrets.token_hex(32)
         expected = {"nonce": nonce, "origin": self.origin, "result_stable_sha256": view.sha256,
             "publication_sha256": view.envelope_sha256, "git_commit": oid(commit)}
         result = self.transport.request("POST", "/v1/deployment-observation", expected)
         deployment_id = result.get("payload", {}).get("deployment_id")
-        if not isinstance(deployment_id, str) or not deployment_id:
+        if (not isinstance(deployment_id, str) or not deployment_id or
+                expected_deployment_id is not None and deployment_id != expected_deployment_id):
             raise PlanningError("independent deployment not yet observed")
         deployment = verify_envelope(canonical(result), role="deployment", public_key=self.public_key,
             key_sha256=self.pin, expected={**expected, "deployment_id": deployment_id}, now=now)

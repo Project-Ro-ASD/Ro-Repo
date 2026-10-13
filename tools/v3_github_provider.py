@@ -62,6 +62,29 @@ class GitHubStorage:
             raise PlanningError("live GitHub mutation BLOCKED; provider fencing and separate cutover required")
         require_test_root(self.test_root)
 
+    @classmethod
+    def disposable_acceptance(cls, transport, *, root, operator_authorized, **pins):
+        """Explicit operator-only cloud TEST route; production remains blocked.
+
+        Never called by CI or this work item. The dedicated repository must be
+        precreated/marked by the operator and the broker must select ONLY it.
+        """
+        root = require_test_root(root)
+        if (operator_authorized is not True or
+                not re.fullmatch(r"[A-Za-z0-9_.-]+/ro-v3-disposable-[a-z0-9-]+", pins.get("repository", "")) or
+                pins.get("ref") != "refs/heads/disposable-pages"):
+            raise PlanningError("explicit dedicated disposable cloud repository authorization required")
+        value = cls(transport, **pins)
+        value.identity()
+        metadata = transport.request("GET", value.base)
+        installation = transport.request("GET", "/installation/repositories?per_page=100")
+        if (metadata.get("description") != "RO V3 DISPOSABLE PROVIDER ACCEPTANCE ONLY" or
+                installation.get("total_count") != 1 or
+                [r.get("id") for r in installation.get("repositories", [])] != [value.repository_id]):
+            raise PlanningError("dedicated test marker and single-repository GitHub App credential required")
+        value.test_root = root
+        return value
+
     def identity(self):
         value = self.transport.request("GET", self.base)
         if (value.get("id") != self.repository_id or value.get("node_id") != self.node_id or
@@ -146,7 +169,7 @@ class GitHubStorage:
         if self.head() != target:
             raise PlanningError("Git head changed after CAS; independent reconciliation required")
 
-    def stage(self, view, approval, *, expected, publication_key, publication_pin, now):
+    def stage(self, view, approval, *, expected, publication_key, publication_pin, now, before_cas=None):
         self._write_guard()
         oid(expected)
         if not isinstance(view, StagedView) or not isinstance(approval, Authorization):
@@ -169,6 +192,15 @@ class GitHubStorage:
         additions = {"v3/views/" + view.sha256 + "/" + member(i["path"]): (view.path / "payload" / i["path"]).read_bytes()
                      for i in view.result.inventory}
         additions["v3/publications/" + attempt + ".json"] = view.envelope
+        commit = self._append(additions, expected=expected, request_id=view.envelope_sha256,
+                              issued_at=view.descriptor["issued_at"], fresh=fresh, before_cas=before_cas)
+        return self._receipt(view, commit)
+
+    def _append(self, additions, *, expected, request_id, issued_at, fresh, before_cas=None):
+        self._write_guard()
+        oid(expected)
+        for path in additions:
+            member(path)
         original = self.files(expected)
         files = dict(original)
         for path, raw in additions.items():
@@ -184,8 +216,10 @@ class GitHubStorage:
             if current != expected:
                 raise PlanningError("stale Git staging base")
             fresh()
-            self._cas(expected, expected, view.envelope_sha256)
-            return self._receipt(view, expected)
+            if before_cas:
+                before_cas(expected, expected)
+            self._cas(expected, expected, request_id)
+            return expected
         # Immutable object POSTs can leave orphan objects after response loss.
         # They never advertise stable authority. Commit data is deterministic.
         for path, raw in sorted(additions.items()):
@@ -200,11 +234,11 @@ class GitHubStorage:
         tree = self.transport.request("POST", self.base + "/git/trees", {"tree": [
             {"path": p, "mode": "100644", "type": "blob", "sha": s} for p, s in sorted(files.items())]})
         tree_sha = oid(tree.get("sha"))
-        stamp = dt.datetime.fromtimestamp(view.descriptor["issued_at"], dt.timezone.utc).isoformat()
+        stamp = dt.datetime.fromtimestamp(issued_at, dt.timezone.utc).isoformat()
         author = {"name": "Ro V3 immutable staging", "email": "v3-staging@invalid", "date": stamp}
         fresh()
         commit = self.transport.request("POST", self.base + "/git/commits", {
-            "message": "V3 immutable staging " + view.envelope_sha256, "tree": tree_sha, "parents": [expected],
+            "message": "V3 immutable staging " + request_id, "tree": tree_sha, "parents": [expected],
             "author": author, "committer": author})
         target = oid(commit.get("sha"))
         stored_commit = self.transport.request("GET", self.base + "/git/commits/" + target)
@@ -222,12 +256,51 @@ class GitHubStorage:
         # clientMutationId alone is NOT a GitHub idempotency guarantee.
         current = self.head()
         if current == target:
-            self._cas(target, target, view.envelope_sha256)
+            if before_cas:
+                before_cas(target, target)
+            self._cas(target, target, request_id)
         elif current == expected:
-            self._cas(expected, target, view.envelope_sha256)
+            if before_cas:
+                before_cas(expected, target)
+            self._cas(expected, target, request_id)
         else:
             raise PlanningError("stale Git head; refusing blind staging replay")
-        return self._receipt(view, target)
+        return target
+
+    def advertise_immutable(self, view, approval, remote, signer, *, expected, generation, now, before_cas=None):
+        """Append a signed advertisement; never overwrite v3/stable.json."""
+        self._write_guard()
+        from v3_immutable_view import RemoteVerification
+        if (not isinstance(view, StagedView) or not isinstance(approval, Authorization) or not isinstance(remote, RemoteVerification) or
+                type(generation) is not int or generation < 1 or remote.data["phase"] != "pre" or remote.data["git_commit"] != expected or
+                remote.data["result_stable_sha256"] != view.sha256 or remote.data["publication_sha256"] != view.envelope_sha256 or
+                signer.key_sha256 != view.descriptor["signing_key_sha256"] or approval.sha256 != view.descriptor["authorization_sha256"]):
+            raise PlanningError("exact protected immutable advertisement prerequisites required")
+        def fresh():
+            view.check()
+            current = self.transport.clock()
+            if not now <= current < min(approval.expiry, view.descriptor["expires_at"]) or not 0 <= current-remote.data["verified_at"] <= 60:
+                raise PlanningError("immutable advertisement authority/observation expired")
+        fresh()
+        files = self.files(expected)
+        publication = "v3/publications/" + view.descriptor["request"]["attempt_id"] + ".json"
+        if publication not in files or self.blob(files[publication]) != view.envelope:
+            raise PlanningError("staged publication envelope missing")
+        for item in view.result.inventory:
+            path = "v3/views/" + view.sha256 + "/" + member(item["path"])
+            if path not in files or digest(self.blob(files[path])) != item["sha256"]:
+                raise PlanningError("staged immutable bytes differ")
+        payload = {"result_stable_sha256": view.sha256, "publication_sha256": view.envelope_sha256,
+            "authorization_sha256": approval.sha256, "previous_stable_sha256": approval.payload["request"]["previous_stable_sha256"],
+            "staged_git_commit": expected, "baseurls": view.descriptor["baseurls"], "publishable": False,
+            "generation": generation, "issued_at": now, "expires_at": int(approval.expiry)}
+        raw = signer.envelope("stable-advertisement", payload)
+        verify_envelope(raw, role="stable-advertisement", public_key=signer.public, key_sha256=signer.key_sha256,
+            expected={k:v for k,v in payload.items() if k not in {"issued_at", "expires_at"}}, now=now)
+        path = "v3/advertisements/" + approval.sha256 + ".json"
+        commit = self._append({path:raw}, expected=expected, request_id=digest(raw), issued_at=now, fresh=fresh, before_cas=before_cas)
+        return {"git_commit":commit, "advertisement_sha256":digest(raw), "advertisement_path":path,
+                "publishable":False, "deployment":"UNVERIFIED", "production_activation":"BLOCKED"}
 
     @staticmethod
     def _receipt(view, commit):

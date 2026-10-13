@@ -123,7 +123,8 @@
     "operation": {
       "enum": [
         "promote",
-        "recover"
+        "recover",
+        "resume-first"
       ]
     },
     "target_verified_sha256": {
@@ -148,6 +149,79 @@
     "expires_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "resume": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "predecessor",
+        "checkpoint",
+        "authorization_sha256",
+        "publication_sha256",
+        "storage_commit"
+      ],
+      "properties": {
+        "predecessor": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+        },
+        "checkpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "seq",
+            "sha256"
+          ],
+          "properties": {
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "authorization_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "publication_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "storage_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "resume-first"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "required": [
+          "resume"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "resume"
+          ]
+        }
+      }
+    }
+  ]
 }

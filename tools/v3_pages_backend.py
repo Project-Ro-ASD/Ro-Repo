@@ -109,7 +109,12 @@ class IsolatedGitStore:
         return {"scope": "v3-pages-isolated-staging", "publishable": False, "git_commit": self._cas(additions, expected),
                 "result_stable_sha256": view.sha256, "publication_sha256": view.envelope_sha256, "cdn_atomicity": "UNVERIFIED"}
 
-    def advertise(self, view, approval, remote, signer, *, expected, previous_digest, now):
+    immutable_advertisements = False
+
+    def advertisement_path(self, view):
+        return "v3/stable.json"
+
+    def advertise(self, view, approval, remote, signer, *, expected, previous_digest, now, generation=None):
         if (not isinstance(view, StagedView) or not isinstance(approval, Authorization) or
                 not isinstance(remote, RemoteVerification) or not isinstance(signer, TestSigner) or
                 now >= approval.expiry or approval.sha256 != view.descriptor["authorization_sha256"] or
@@ -118,7 +123,7 @@ class IsolatedGitStore:
                 not 0 <= now - remote.data["verified_at"] <= 60 or signer.key_sha256 != view.descriptor["signing_key_sha256"]):
             raise PlanningError("verified exact protected publication prerequisites required")
         files = self._files(expected)
-        pointer = "v3/stable.json"
+        pointer = self.advertisement_path(view)
         old = None
         if pointer in files:
             old_raw = self._run(["cat-file", "blob", files[pointer]])
@@ -128,6 +133,10 @@ class IsolatedGitStore:
             verify_envelope(old_raw, role="stable-advertisement", public_key=signer.public,
                             key_sha256=signer.key_sha256, expected={k: v for k, v in old_payload.items() if k not in {"issued_at", "expires_at"}}, now=old_payload["issued_at"])
             old = old_payload["result_stable_sha256"]
+        if self.immutable_advertisements:
+            if type(generation) is not int or generation < 1:
+                raise PlanningError("exact ledger intent generation required for immutable advertisement")
+            old = previous_digest
         if old != previous_digest or approval.payload["request"]["previous_stable_sha256"] != previous_digest:
             raise PlanningError("signed stable advertisement base conflict")
         # Independently verify staging bytes in this exact commit, before any
@@ -139,13 +148,13 @@ class IsolatedGitStore:
         record = {"result_stable_sha256": view.sha256, "publication_sha256": view.envelope_sha256,
                   "authorization_sha256": approval.sha256, "previous_stable_sha256": previous_digest,
                   "staged_git_commit": expected, "baseurls": view.descriptor["baseurls"], "publishable": False,
-                  "generation": 1 if old is None else old_payload["generation"] + 1,
+                  "generation": generation if self.immutable_advertisements else (1 if old is None else old_payload["generation"] + 1),
                   "issued_at": now, "expires_at": int(approval.expiry)}
         raw = signer.envelope("stable-advertisement", record)
         verify_envelope(raw, role="stable-advertisement", public_key=signer.public,
                         key_sha256=signer.key_sha256,
                         expected={k: v for k, v in record.items() if k not in {"issued_at", "expires_at"}}, now=now)
-        commit = self._cas({pointer: raw}, expected, mutable=(pointer,))
+        commit = self._cas({pointer: raw}, expected, mutable=() if self.immutable_advertisements else (pointer,))
         return {"git_commit": commit, "advertisement_sha256": digest(raw), "publishable": False,
                 "remote_post_verification": "UNVERIFIED", "production_activation": "BLOCKED"}
 
@@ -173,4 +182,16 @@ class GitReader:
         return self._read("v3/publications/" + self.view.descriptor["request"]["attempt_id"] + ".json")
 
     def advertisement(self):
-        return self._read("v3/stable.json")
+        return self._read(self.store.advertisement_path(self.view))
+
+
+class ImmutableBranchStore(IsolatedGitStore):
+    """Disposable branch protocol: signed intent records are append-only.
+
+    Only independent signed discovery selects a POST_VERIFIED generation.
+    No mutable stable pointer is added to the Pages tree.
+    """
+    immutable_advertisements = True
+
+    def advertisement_path(self, view):
+        return "v3/advertisements/" + view.descriptor["authorization_sha256"] + ".json"

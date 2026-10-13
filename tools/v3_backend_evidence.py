@@ -114,24 +114,24 @@ class Authorization:
         return copy.deepcopy(self._payload)
 
 
-def authorization_request(proposal, attempt, evidence, *, operation="promote", target=None):
+def authorization_request(proposal, attempt, evidence, *, operation="promote", target=None, resume=None):
     if not isinstance(evidence, Evidence) or evidence.data["bindings"] != bindings(proposal):
         raise PlanningError("authenticated evidence required before approval")
-    return {"request": request(proposal, attempt, operation=operation, target_verified_sha256=target),
+    return {"request": request(proposal, attempt, operation=operation, target_verified_sha256=target, resume=resume),
             "authenticated_evidence_sha256": evidence.sha256}
 
 
 def verify_protected(proposal, attempt, evidence, workload, *, approval_raw, witness_raw,
                      approval_key, approval_key_sha256, witness_key, witness_key_sha256,
                      allowed_reviewer_ids, environment_config_sha256, now,
-                     operation="promote", target=None):
+                     operation="promote", target=None, resume=None):
     if not isinstance(workload, Workload) or not isinstance(evidence, Evidence):
         raise PlanningError("verified workload and evidence required")
     if not now < min(evidence.expiry, workload.claims["exp"]):
         raise PlanningError("expired workload/evidence at authorization")
     if key_identity(approval_key) == key_identity(witness_key) or not HEX.fullmatch(environment_config_sha256):
         raise PlanningError("independent approval/witness trust roots required")
-    expected = authorization_request(proposal, attempt, evidence, operation=operation, target=target)
+    expected = authorization_request(proposal, attempt, evidence, operation=operation, target=target, resume=resume)
     from v3_backend_trust import strict_json
     parsed = strict_json(approval_raw)
     reviewer = parsed.get("payload", {}).get("reviewer_id") if isinstance(parsed, dict) else None

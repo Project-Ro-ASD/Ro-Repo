@@ -22,23 +22,37 @@ BINDINGS = ("proposal_sha256", "candidate_sha256", "promotion_group", "mode", "r
 ID = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$")
 
 
-def request(value, attempt, *, operation="promote", target_verified_sha256=None):
+def request(value, attempt, *, operation="promote", target_verified_sha256=None, resume=None):
     verify_proposal(value)
     if not isinstance(attempt, str) or not ID.fullmatch(attempt):
         raise PlanningError("invalid publication attempt identity")
-    if operation not in {"promote", "recover"}:
+    if operation not in {"promote", "recover", "resume-first"}:
         raise PlanningError("unsupported operation")
     if value["result_stable_sha256"] is None:
         raise PlanningError("approval requires exact complete resulting snapshot digest")
-    if operation == "promote" and value["mode"] == "normal" and not value["dwell_met"]:
+    if operation in {"promote", "resume-first"} and value["mode"] == "normal" and not value["dwell_met"]:
         raise PlanningError("insufficient normal dwell")
-    if operation == "promote" and "group-validation-claim" not in value["evidence_sha256"]:
+    if operation in {"promote", "resume-first"} and "group-validation-claim" not in value["evidence_sha256"]:
         raise PlanningError("mandatory component tests missing; fast-track waives only dwell")
     if operation == "recover" and target_verified_sha256 != value["result_stable_sha256"]:
         raise PlanningError("recovery target was not previously verified")
+    if operation == "resume-first":
+        required = {"predecessor", "checkpoint", "authorization_sha256", "publication_sha256", "storage_commit"}
+        if (value["previous_stable_sha256"] is not None or target_verified_sha256 is not None or
+                not isinstance(resume, dict) or set(resume) != required or
+                not isinstance(resume["predecessor"], str) or not ID.fullmatch(resume["predecessor"]) or resume["predecessor"] == attempt or
+                any(not isinstance(resume[k], str) or not re.fullmatch(r"[0-9a-f]{64}", resume[k]) for k in ("authorization_sha256", "publication_sha256")) or
+                not isinstance(resume["storage_commit"], str) or not re.fullmatch(r"[0-9a-f]{40}", resume["storage_commit"]) or
+                not isinstance(resume["checkpoint"], dict) or set(resume["checkpoint"]) != {"seq", "sha256"} or
+                type(resume["checkpoint"]["seq"]) is not int or resume["checkpoint"]["seq"] < 1 or
+                not isinstance(resume["checkpoint"]["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", resume["checkpoint"]["sha256"])):
+            raise PlanningError("exact first-publication predecessor/checkpoint required")
+    elif resume is not None:
+        raise PlanningError("resume binding is restricted to first-publication reauthorization")
     return {"schema_version": 3, "scope": "v3-local-authorization-request",
             **{field: value[field] for field in BINDINGS}, "attempt_id": attempt,
-            "operation": operation, "target_verified_sha256": target_verified_sha256}
+            "operation": operation, "target_verified_sha256": target_verified_sha256,
+            **({"resume": resume} if operation == "resume-first" else {})}
 
 
 def verify_signed(value, directory, attempt, key, key_sha256, *, now,

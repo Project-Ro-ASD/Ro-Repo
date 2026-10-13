@@ -66,6 +66,7 @@ class Outbox:
         Calls can succeed externally then lose their response. They must be
         repeatable by exact signed object identity; no blind pointer retry.
         """
+        checked = []
         def change(db):
             value = self.ledger.attempt(db, attempt)
             job = value["proofs"]["OUTBOX"]
@@ -73,8 +74,12 @@ class Outbox:
             result = call(db, value, job)
             self._guard(value, owner, fence, allow_complete=True)
             self.ledger.put_attempt(db, value)
+            checked.append(value)
             return result
-        return self.ledger.execute("outbox-" + operation, attempt, change)[0]
+        # Remote audit/checkpoint signing can itself outlast a lease. The ledger
+        # calls this guard again after signing and immediately before DB commit.
+        return self.ledger.execute("outbox-" + operation, attempt, change,
+            guard=lambda:self._guard(checked[0], owner, fence, allow_complete=True))[0]
 
     def deployment_identity(self, attempt, owner, fence, *, phase, git_commit):
         """Durably bind a deployment request BEFORE contacting any provider.
@@ -197,7 +202,7 @@ class Coordinator:
                 from v3_backend_trust import TOKEN
                 remote = RemoteVerification(copy.deepcopy(remote_data), TOKEN)
                 receipt = self.store.advertise(view, approval, remote, signer, expected=remote_data["git_commit"],
-                    previous_digest=view.descriptor["request"]["previous_stable_sha256"], now=now())
+                    previous_digest=view.descriptor["request"]["previous_stable_sha256"], now=now(), generation=head["generation"])
             inject("after-git-advertisement")
             job["receipts"]["advertisement"] = receipt
             job["status"] = "ADVERTISED"
