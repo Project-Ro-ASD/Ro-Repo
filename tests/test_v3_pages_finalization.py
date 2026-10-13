@@ -217,6 +217,47 @@ class PagesFinalizationTests(unittest.TestCase):
         self.assertIn("v3/advertisements/"+self.fx.approval.sha256+".json", after)
         self.assertNotIn("v3/stable.json", after)
 
+    def test_existing_coordinator_disposable_branch_factory_restarts_after_intent(self):
+        self.prepared()
+        storage,view=self.storage,self.view
+        class Reader:
+            def __init__(self):
+                self.commit=storage.head()
+            def check_deployment(self,expected):
+                if self.commit!=expected or storage.head()!=expected:
+                    raise PlanningError("test provider commit changed")
+            def read_member(self,path):
+                files=storage.files(self.commit)
+                if path not in files:
+                    raise FileNotFoundError(path)
+                return storage.blob(files[path])
+            def publication(self):
+                return self.read_member("v3/publications/"+self_outer.fx.attempt+".json")
+            def read(self,path):
+                return self.read_member("v3/views/"+view.sha256+"/"+path)
+            def advertisement(self):
+                return self.read_member("v3/advertisements/"+view.descriptor["authorization_sha256"]+".json")
+        self_outer=self
+        class Deployment:
+            def verify(self,v,commit,*,now,ledger=None,signer=None):
+                from v3_immutable_view import verify_remote
+                proof=self_outer.keys.attestation("deployment",{"result_stable_sha256":v.sha256,"publication_sha256":v.envelope_sha256,
+                    "git_commit":commit,"deployment_id":"explicit-model-not-cloud"})
+                return verify_remote(v,Reader(),proof,now=now,post_ledger=ledger,
+                    advertisement_key=None if signer is None else signer.public,
+                    advertisement_key_sha256=None if signer is None else signer.key_sha256)
+        coordinator=Coordinator.rehearsal_branch(self.fx.backend,self.publisher,Deployment())
+        def crash(at):
+            if at=="after-db-intent":
+                raise RuntimeError("restart after durable DB intent")
+        with self.assertRaises(RuntimeError):
+            coordinator.run(self.view,self.fx.approval,self.signer,owner="worker",fence=self.fence,inject=crash)
+        restarted=Coordinator.rehearsal_branch(self.fx.backend,FencedPublisher(self.fx.backend,self.storage),Deployment())
+        result=restarted.run(self.view,self.fx.approval,self.signer,owner="worker",fence=self.fence)
+        self.assertEqual(result["attempt"]["state"],"POST_VERIFIED")
+        self.assertEqual(result["attempt"]["proofs"]["OUTBOX"]["status"],"COMPLETE")
+        self.assertEqual(restarted.run(self.view,self.fx.approval,self.signer,owner="worker",fence=self.fence),result)
+
     def test_lost_advertisement_response_reconciles_without_resigning_or_ref_retry(self):
         self.prepared()
         staged=self.stage()

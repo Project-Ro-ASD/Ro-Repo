@@ -91,7 +91,11 @@ ordering garantisi değildir. Beta/legacy client davranışına müdahale edilme
   `advertise_immutable` aynı primitive üzerinden exact signed advertisement ekler.
 - `ImmutableBranchStore`, `GitReader`, mevcut `Coordinator`: disposable branch
   orchestration için aynı immutable advertisement path'i kullanır. Eski mutable
-  rehearsal yolu korunur; production Coordinator guard kaldırılmaz.
+  rehearsal yolu korunur; production Coordinator guard kaldırılmaz. `Coordinator.rehearsal_branch`
+  aynı Backend/outbox state machine'ini fenced GitHub adapter ve independent Pages
+  verifier ile bağlar; external CAS çağrıları DB transaction'ı dışındadır. Durable
+  provider reservation network response kaybıyla rollback edilmez. DB intent sonrası
+  restart, pre/post deployment identity ve COMPLETE reconciliation test edilmiştir.
 - `BranchPagesIdentity`: source settings, exact ref/commit, build/deployment/dynamic
   run ve latest status'un eşleşmesini kontrol eden read-only adapter.
   `BranchPagesDeployment/BranchHTTPSReader`: bağımsız deployment witness kimliğini
@@ -182,8 +186,8 @@ Kesin kalan koşullar:
   kanıtlayamazsa fresh reauthorization dahil recovery BLOCKED kalır.
 
 Kalan code wiring: production TLS/mTLS publisher daemon ve identity ingress;
-GitHub branch adapter ile bütün pre/intent/advertisement/post aşamalarını bağlayan
-production controller ve beta writer cutover adapter'ı. UNKNOWN için fresh signed
+mevcut disposable branch controller factory'sinin reviewed production scope/config
+activation wiring'i ve beta writer cutover adapter'ı. UNKNOWN için fresh signed
 `abort_noncommit` transition kodu vardır; kanıtın provider üzerinde gerçekten
 üretilmesi hâlâ dış kabul engelidir. Önce exact target CONFIRMED veya bağımsız
 ABORTED çözümü alınır, sonra güncel checkpoint ile resume-first onayı istenir.

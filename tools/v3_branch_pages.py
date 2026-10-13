@@ -58,6 +58,20 @@ class BranchPagesIdentity:
                 "witness_deployment_id":"github-pages:" + build_id + ":" + deployment_id + ":" + run_id,
                 "public_visibility":"UNVERIFIED", "production_activation":"BLOCKED"}
 
+    def resolve(self, commit):
+        """Bounded read; absence/pending build is an explicit retryable block."""
+        oid(commit)
+        transport,base=self.storage.transport,self.storage.base
+        builds=transport.request("GET",base+"/pages/builds?per_page=100",allow_list=True)
+        deployments=transport.request("GET",base+"/deployments?environment=github-pages&per_page=100",allow_list=True)
+        runs=transport.request("GET",base+"/actions/runs?branch="+self.branch+"&per_page=100").get("workflow_runs",[])
+        build=next((b for b in builds if b.get("commit")==commit and b.get("status")=="built"),None)
+        deployment=next((d for d in deployments if d.get("sha")==commit and d.get("environment")=="github-pages"),None)
+        run=next((r for r in runs if r.get("head_sha")==commit and r.get("path")=="dynamic/pages/pages-build-deployment" and r.get("conclusion")=="success"),None)
+        if not build or not deployment or not run:
+            raise PlanningError("exact branch Pages deployment not yet independently identifiable")
+        return self.identify(commit,build_id=build["url"].rsplit("/",1)[1],deployment_id=str(deployment["id"]),run_id=str(run["id"]))
+
 
 class BranchHTTPSReader(HTTPSReader):
     def __init__(self, origin, result_digest, attempt, *, authorization_sha256, check_deployment=lambda _:None):
@@ -69,6 +83,17 @@ class BranchHTTPSReader(HTTPSReader):
 
 
 class BranchPagesDeployment(IndependentDeployment):
+    def __init__(self, *args, identity=None, **kwargs):
+        super().__init__(*args,**kwargs)
+        self.identity=identity
+
+    def verify(self, view, commit, *, now, ledger=None, signer=None):
+        if self.identity is None:
+            raise PlanningError("independently pinned branch Pages identity adapter required")
+        facts=self.identity.resolve(commit)
+        return self.verify_branch(self.identity,view,commit,build_id=facts["build_id"],deployment_id=facts["deployment_id"],
+                                  run_id=facts["run_id"],now=now,ledger=ledger,signer=signer)
+
     def verify_branch(self, identity, view, commit, *, build_id, deployment_id, run_id, now, ledger=None, signer=None):
         facts = identity.identify(commit, build_id=build_id, deployment_id=deployment_id, run_id=run_id)
         def check(expected):

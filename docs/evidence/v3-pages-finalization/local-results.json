@@ -10,7 +10,7 @@
   },
   "final_new_contract_tests": {
     "result": "PASS",
-    "scope": "23-case suite plus targeted final guard/abort cases (two 2-case runs); final CI verifies all 26 cases together; NOT cloud integration PASS"
+    "scope": "23-case suite + two final guard cases + two independent abort cases + one Coordinator crash/restart case; final CI verifies all 27 new cases together. NOT cloud integration PASS."
   },
   "postgresql_tls_restricted_role_first_reauthorization": "PASS",
   "fedora44_signed_full_set_bootstrap_upgrade": "PASS",
@@ -22,17 +22,17 @@
   "source_sha256": {
     "tools/v3_pages_archive_provenance.py": "0abdde2003ea0ab2e7e303a2a341085843a950554bed1fef6bc266dbcc8823dd",
     "tools/v3_pages_backend.py": "48b193d0591be420794ba520432f834dae820b46b5d51a5df3d2e0ef922abf6c",
-    "tools/v3_branch_pages.py": "d6deb52a59256248b51551e4fe251be4c3ebba91c73ff8a5a498a9e74301e6ce",
+    "tools/v3_branch_pages.py": "6ddcbdacfa4ad40a97b14fa23e9b33a6200c3c3710af6c24a57d8964a867d85f",
     "tools/v3_fenced_publisher.py": "11ff9cd9b1355bdb770c686a40346cd9f214ce7f2ecff35570ec49330a4c0371",
     "tools/v3_github_provider.py": "0329fc8655e590ae10d3ee449d0ccacf3b17c3c589fd9dce335c13f96f5c35c8",
     "tools/v3_publication_backend.py": "8ee2cccb00f687bb86fd2e15b2cb2e3c7a864de83157852249dbc1b18e4036a7",
-    "tools/v3_publication_outbox.py": "4871133d30c2562595874431575b82d779be6a541207455ccdee940b5389b8a8",
+    "tools/v3_publication_outbox.py": "411af864b2cf8f5120624f8f05706faf72680a696bea8aa1ab321ab043930e2f",
     "tools/v3_authorization.py": "99c3e71ef604249f4f484215285f3b48759e98eb42909db8516c63eb2e0b6dcf",
     "tools/v3_backend_evidence.py": "5c4b2399f060f2637077474e85085d39d4850a124c10786cceae5ca5fd06faa6",
     "tools/v3_protected_provider.py": "be6a6337d26040cdfee4fcc0c5a1407ef51146b257986652cbbe714b76a229af",
     "tools/v3_client_update.py": "dea11f939f02be41bb727163d280a3774d14c383c53aa7fa651f27f60e7b566f",
     "tools/v3_provider_transport.py": "436ead225b2140c8f61b2dd0b4c6ab8b93b70b007630916565ff6b90b50d80e0",
-    "tests/test_v3_pages_finalization.py": "7111f499a97348f6b0a02e3270758cf510923ee1df09438fcd88693dc93643ce",
+    "tests/test_v3_pages_finalization.py": "8ef4644b8eaae9c39b716d47185742f7388d728d3ed0a22afeeba266cfb8e0c8",
     "tests/v3_pages_finalization_support.py": "3c081c0a95b18494595add6b72e1be33003196f66aa31afe3e841c38deab6b8b",
     "tests/v3-pages-disposable-acceptance.py": "266435affc33c6dc57df92ffcacfdc396045f4513508130602221d102011ce20",
     "tests/v3-pages-readonly-acceptance.py": "7cd0d117e5b3ddbfb16965c8117f7a5207198dd9b70a4e85293364d9d192ce02",
@@ -50,8 +50,10 @@
     "ci-unit-initial.log.gz": "742b9ee0c2e67e1dfbe5d1c104b4e52dfc045dd3184ba1f0c0660e99aad38523",
     "ci-security-initial.log.gz": "5d88171c6f9a46cb3b5618b151d5d2b2ade511b07f0e3cc5d66648aafd6113da",
     "local-last-guards.log.gz": "4a16554b9488336bb7067281c5b072b15a35e1b0cf7fdc78a9920545394ad876",
-    "local-abort.log.gz": "7ec96fb19f351b7bfd09d38bfc7ead6fc5aca57f47c1daf6268fb28fdf8aec3f"
+    "local-abort.log.gz": "7ec96fb19f351b7bfd09d38bfc7ead6fc5aca57f47c1daf6268fb28fdf8aec3f",
+    "local-coordinator.log.gz": "1b34a871ebff9c8220ea4be7f0b26b3b83d366cebf0ae9eb5c32541eb472e1da"
   },
   "ci": "ci-initial-results.json: 8/8 SUCCESS at initial implementation; final draft PR checks bind final exact code.",
-  "independent_noncommit_abort": "Fresh signed exact checkpoint/intent, drained/fenced/noncommit contract PASS locally; actual provider proof UNVERIFIED"
+  "independent_noncommit_abort": "Fresh signed exact checkpoint/intent, drained/fenced/noncommit contract PASS locally; actual provider proof UNVERIFIED",
+  "existing_coordinator_branch_factory": "PASS: actual HTTP/Git + signed backend/outbox, DB-intent crash/restart through POST_VERIFIED/COMPLETE; simulated deployment witness, NOT cloud acceptance"
 }

@@ -131,7 +131,80 @@ class Coordinator:
         self.backend, self.store, self.deployment = backend, store, deployment
         self.outbox = Outbox(backend)
 
+    @classmethod
+    def rehearsal_branch(cls, backend, publisher, deployment):
+        """External-I/O orchestration only for explicit disposable providers.
+
+        Keep the production constructor guard. Provider admission is committed
+        independently BEFORE external CAS, outside the local transaction, so a
+        crash cannot roll its reservation back with a lost network response.
+        """
+        from v3_backend_trust import require_test_root
+        from v3_fenced_publisher import FencedPublisher
+        if not isinstance(publisher,FencedPublisher) or publisher.backend is not backend:
+            raise PlanningError("exact existing backend/fenced publisher required")
+        require_test_root(publisher.storage.test_root)
+        value=cls.__new__(cls)
+        value.backend,value.publisher,value.deployment=backend,publisher,deployment
+        value.store,value.outbox=publisher.storage,publisher.outbox
+        return value
+
+    def _run_branch(self, view, approval, signer, *, owner, fence, inject):
+        attempt=view.descriptor["request"]["attempt_id"]
+        clock=self.backend.ledger.clock
+        if approval.sha256!=view.descriptor["authorization_sha256"]:
+            raise PlanningError("branch publication authorization substitution")
+        def state():
+            return self.backend.ledger.inspect(attempt)["attempt"]
+        def guard():
+            self.outbox.locked(attempt,owner,fence,"branch-check",lambda db,value,job:None)
+        value=state()
+        if value["state"]=="POST_VERIFIED":
+            if value["proofs"]["OUTBOX"]["status"]!="COMPLETE":
+                self._complete_branch(attempt,owner,fence,value["proofs"]["POST_VERIFIED"]["verification"])
+            return self.backend.ledger.inspect(attempt)
+        if value["state"] not in {"STAGED","REMOTE_VERIFIED","PUBLISHED"}:
+            raise PlanningError("branch outbox cannot skip existing publication states")
+        guard()
+        pending=value["proofs"]["OUTBOX"]["receipts"].get("provider_intent")
+        if pending and pending["status"]=="IN_FLIGHT":
+            self.publisher.reconcile(attempt)
+        if state()["state"]=="STAGED":
+            inject("before-git-stage")
+            staged=self.publisher.stage(view,approval,signer,owner=owner,fence=fence)
+            inject("after-git-stage")
+            self.outbox.deployment_identity(attempt,owner,fence,phase="pre",git_commit=staged["git_commit"])
+            remote=self.deployment.verify(view,staged["git_commit"],now=clock())
+            self.backend.remotely_verified(attempt,remote)
+            inject("after-pre-verification")
+        if state()["state"]=="REMOTE_VERIFIED":
+            guard()
+            self.backend.publish(attempt,approval)
+            inject("after-db-intent")
+        value=state()
+        from v3_backend_trust import TOKEN
+        from v3_immutable_view import RemoteVerification
+        # Persisted remote proof comes from the authenticated signed ledger;
+        # the public bytes are independently checked again in the post phase.
+        remote=RemoteVerification(copy.deepcopy(value["proofs"]["REMOTE_VERIFIED"]["verification"]),TOKEN)
+        advertised=self.publisher.advertise(view,approval,remote,signer,owner=owner,fence=fence)
+        inject("after-git-advertisement")
+        self.outbox.deployment_identity(attempt,owner,fence,phase="post",git_commit=advertised["git_commit"])
+        post=self.deployment.verify(view,advertised["git_commit"],now=clock(),ledger=self.backend.ledger,signer=signer)
+        inject("after-post-verification")
+        self.backend.post_verified(attempt,post)
+        self._complete_branch(attempt,owner,fence,post.data)
+        return self.backend.ledger.inspect(attempt)
+
+    def _complete_branch(self, attempt, owner, fence, proof):
+        def complete(db,value,job):
+            job["status"]="COMPLETE"
+            job["receipts"]["post"]=copy.deepcopy(proof)
+        self.outbox.locked(attempt,owner,fence,"branch-complete",complete)
+
     def run(self, view, approval, signer, *, owner, fence, inject=lambda _: None):
+        if hasattr(self,"publisher"):
+            return self._run_branch(view,approval,signer,owner=owner,fence=fence,inject=inject)
         attempt = view.descriptor["request"]["attempt_id"]
         now = self.backend.ledger.clock
         # Never reconstruct authorization from persisted JSON. The caller must
