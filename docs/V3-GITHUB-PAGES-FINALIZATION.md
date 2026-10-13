@@ -156,6 +156,9 @@ ve test signers production acceptance kanıtı değildir.
 
 ## Sağlayıcı garantisi ve hâlâ BLOCKED olan koşullar
 
+[Yerel adversarial provider test envanteri, senaryo sonuçları ve mimari engeller](V3-PROVIDER-FAULT-INJECTION.md)
+deadline/build ordering korumasını provider garantisinden ayrı değerlendirir.
+
 **Tam uçtan uca GitHub Pages güvenli yayın tasarımı henüz kanıtlanmadı.**
 Git ref CAS güvenli expected-head primitive'idir ([GitHub GraphQL Git](https://docs.github.com/en/graphql/reference/git)).
 Incoming expired/stale worker yeni intent kabul ettiremez; local/disposable testte
