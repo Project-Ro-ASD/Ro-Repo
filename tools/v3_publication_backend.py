@@ -210,9 +210,13 @@ class Backend:
                 raise PlanningError("publication approval substitution")
             head = self.ledger.head(db)
             proposal = value["immutable"]["proposal"]
-            if head["digest"] != proposal["previous_stable_sha256"] or head["generation"] != value["base_generation"]:
+            resumed = value["immutable"]["operation"] == "resume-first"
+            if resumed and (head["digest"] != proposal["result_stable_sha256"] or
+                    head["generation"] != value["base_generation"] + 1 or head["last_verified"] is not None):
+                raise PlanningError("first-publication intent changed before authorized resume")
+            if not resumed and (head["digest"] != proposal["previous_stable_sha256"] or head["generation"] != value["base_generation"]):
                 raise PlanningError("stable CAS conflict at advertisement")
-            updated = {"digest": proposal["result_stable_sha256"], "generation": head["generation"] + 1,
+            updated = {"digest": proposal["result_stable_sha256"], "generation": head["generation"] if resumed else head["generation"] + 1,
                        "last_verified": head["last_verified"]}
             db.execute("UPDATE head SET body=? WHERE id=1", (canonical(updated).decode(),))
             if inject:
@@ -224,6 +228,94 @@ class Backend:
 
     def post_verified(self, attempt, remote):
         return self._remote(attempt, "POST_VERIFIED", remote)
+
+    def first_resume_binding(self, predecessor):
+        state = self.ledger.inspect(predecessor)
+        value = state["attempt"]
+        return self._first_resume_binding(value, state["head"], state["checkpoint"])
+
+    @staticmethod
+    def _first_resume_binding(value, head, checkpoint):
+        inherited = value["immutable"].get("resume") if value["immutable"]["operation"] == "resume-first" else None
+        resumable = value["state"] in {"AUTHORIZED", "SIGNED", "STAGED", "REMOTE_VERIFIED", "PUBLISHED", "FAILED"}
+        # An ordinary losing attempt cannot adopt another publisher's equal
+        # digest. It must itself have committed PUBLISHED. A child can inherit
+        # that same proven intent even if it expires before its first signature.
+        owns_intent = "PUBLISHED" in value["proofs"] if inherited is None else "REAUTHORIZED" in value["proofs"]
+        if (value["immutable"]["proposal"]["previous_stable_sha256"] is not None or
+                not resumable or not owns_intent or
+                head != {"digest": value["immutable"]["proposal"]["result_stable_sha256"],
+                                  "generation": value["base_generation"] + 1, "last_verified": None}):
+            raise PlanningError("only an unfinished first-publication intent can be reauthorized")
+        return {"predecessor": value["attempt_id"], "checkpoint": checkpoint,
+            "authorization_sha256": value["proofs"]["AUTHORIZED"]["authorization_sha256"],
+            "publication_sha256": value["proofs"].get("SIGNED", {}).get("publication_sha256") or inherited["publication_sha256"],
+            "storage_commit": value["proofs"].get("REMOTE_VERIFIED", {}).get("verification", {}).get("git_commit") or inherited["storage_commit"]}
+
+    def reauthorize_first(self, attempt, evidence, result, approval, *, observation_raw, observation_key, observation_pin):
+        """Append a fresh child attempt; never rewrite original signed proofs.
+
+        A drained/fenced independent observer must authorize the exact old audit
+        tip. Fresh human/witness authorization explicitly binds resume-first.
+        The existing intent generation is adopted, never reset or made verified.
+        """
+        from v3_backend_evidence import authorization_request
+        from v3_backend_trust import canonical, verify_envelope
+        if (not isinstance(evidence, Evidence) or not isinstance(result, VerifiedResult) or
+                not isinstance(approval, Authorization) or not isinstance(attempt, str) or not ID.fullmatch(attempt)):
+            raise PlanningError("fresh verified first-publication reauthorization prerequisites required")
+        self._fresh(min(evidence.expiry, approval.expiry))
+        resume = approval.payload["request"].get("resume")
+        if not isinstance(resume, dict):
+            raise PlanningError("explicit resume-first protected authorization required")
+        old_state = self.ledger.inspect(resume.get("predecessor"))
+        old = old_state["attempt"]
+        proposal = old["immutable"]["proposal"]
+        expected = authorization_request(proposal, attempt, evidence, operation="resume-first", resume=resume)
+        if (any(approval.payload.get(k) != v for k,v in expected.items()) or
+                result.sha256 != proposal["result_stable_sha256"] or result.plan_sha256 != old["immutable"]["plan_sha256"]):
+            raise PlanningError("reauthorization changed exact tested result")
+        identities = {approval.payload["approval_key_identity"], approval.payload["witness_key_identity"], key_identity(self.ledger.audit_key)}
+        if len(identities) != 3 or key_identity(observation_key) in identities:
+            raise PlanningError("independent recovery observer/approval/witness/audit roots required")
+        observation = verify_envelope(observation_raw, role="restore-observation", public_key=observation_key,
+            key_sha256=observation_pin, expected={"resume": resume, "writers_fenced": True, "requests_drained": True}, now=self.ledger.clock())
+        if not 0 <= self.ledger.clock() - observation.payload["issued_at"] <= 60:
+            raise PlanningError("stale first-publication recovery observation")
+        result.check()
+        immutable = {"proposal": copy.deepcopy(proposal), "plan_sha256": result.plan_sha256,
+                     "operation": "resume-first", "resume": copy.deepcopy(resume)}
+        def change(db):
+            existing = db.execute("SELECT body FROM attempts WHERE id=?", (attempt,)).fetchone()
+            if existing is not None:
+                value = strict_json(existing[0])
+                if value["immutable"] != immutable or value["proofs"]["AUTHORIZED"]["authorization_sha256"] != approval.sha256:
+                    raise PlanningError("conflicting reauthorization replay")
+                return value
+            predecessor = self.ledger.attempt(db, resume["predecessor"])
+            checkpoint = self.ledger._integrity(db)
+            if checkpoint != resume["checkpoint"] or self._first_resume_binding(predecessor, self.ledger.head(db), checkpoint) != resume:
+                raise PlanningError("stale/substituted recovery checkpoint")
+            if self.ledger.clock() < predecessor["proofs"]["AUTHORIZED"]["expires_at"]:
+                raise PlanningError("original authority still active; do not fork publication authority")
+            for kind, identity in (("approval", approval.payload["approval_sha256"]), ("witness", approval.payload["witness_sha256"]),
+                    ("jwt-jti", approval.payload["jti"]), ("authorization", approval.sha256), ("first-resume-parent", resume["predecessor"])):
+                self.ledger.consume(db, kind, identity, attempt)
+            value = {"schema_version": 3, "scope": "v3-backend-isolated-attempt", "publishable": False,
+                "attempt_id": attempt, "state": "AUTHORIZED", "immutable": immutable, "base_generation": predecessor["base_generation"],
+                "proofs": {"VERIFIED": {"evidence_sha256": evidence.sha256},
+                    "COMPOSED": {"result_stable_sha256": result.sha256, "preflight_sha256": result.receipt},
+                    "TESTED": {"evidence_sha256": evidence.sha256}, "AWAITING_APPROVAL": {"gate": "exact-protected-approval"},
+                    "AUTHORIZED": {"authorization_sha256": approval.sha256, "expires_at": approval.expiry},
+                    "REAUTHORIZED": {"observation_sha256": observation.sha256, "resume": resume}}, "failure": None}
+            from ro_repo import validate_schema
+            validate_schema(value, "backend-attempt-v3")
+            db.execute("INSERT INTO attempts(id,body) VALUES(?,?)", (attempt, canonical(value).decode()))
+            return value
+        def guard():
+            self._fresh(min(evidence.expiry, approval.expiry, observation.payload["expires_at"]))
+            result.check()
+        return self.ledger.execute("reauthorize-first", attempt, change, guard=guard)[0]
 
     def fail(self, attempt, reason):
         if not isinstance(reason, str) or not reason.strip() or len(reason) > 1024:

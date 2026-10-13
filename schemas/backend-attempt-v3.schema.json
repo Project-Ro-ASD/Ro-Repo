@@ -281,10 +281,84 @@
         "operation": {
           "enum": [
             "promote",
-            "recover"
+            "recover",
+            "resume-first"
           ]
+        },
+        "resume": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "predecessor",
+            "checkpoint",
+            "authorization_sha256",
+            "publication_sha256",
+            "storage_commit"
+          ],
+          "properties": {
+            "predecessor": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+            },
+            "checkpoint": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "seq",
+                "sha256"
+              ],
+              "properties": {
+                "seq": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            },
+            "authorization_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "publication_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "storage_commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            }
+          }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "resume-first"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "required": [
+              "resume"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "resume"
+              ]
+            }
+          }
+        }
+      ]
     },
     "base_generation": {
       "type": "integer",
@@ -798,8 +872,178 @@
                       }
                     }
                   }
+                },
+                "provider_intent": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "binding",
+                    "idempotency_key",
+                    "status",
+                    "phase",
+                    "worker_fence",
+                    "worker_owner",
+                    "admitted_at",
+                    "lease_until"
+                  ],
+                  "properties": {
+                    "binding": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "attempt_id",
+                        "phase",
+                        "expected_git",
+                        "target_git",
+                        "publication_sha256",
+                        "authorization_sha256"
+                      ],
+                      "properties": {
+                        "attempt_id": {
+                          "type": "string"
+                        },
+                        "phase": {
+                          "enum": [
+                            "stage",
+                            "advertisement"
+                          ]
+                        },
+                        "expected_git": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{40}$"
+                        },
+                        "target_git": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{40}$"
+                        },
+                        "publication_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "authorization_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    },
+                    "idempotency_key": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "status": {
+                      "enum": [
+                        "IN_FLIGHT",
+                        "CONFIRMED",
+                        "ABORTED"
+                      ]
+                    },
+                    "phase": {
+                      "enum": [
+                        "stage",
+                        "advertisement"
+                      ]
+                    },
+                    "worker_fence": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "worker_owner": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]{1,64}$"
+                    },
+                    "admitted_at": {
+                      "type": "number"
+                    },
+                    "lease_until": {
+                      "type": "number"
+                    },
+                    "abort_observation_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "status": {
+                            "const": "ABORTED"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "abort_observation_sha256"
+                        ]
+                      }
+                    }
+                  ]
                 }
               }
+            }
+          }
+        },
+        "REAUTHORIZED": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resume",
+            "observation_sha256"
+          ],
+          "properties": {
+            "resume": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "predecessor",
+                "checkpoint",
+                "authorization_sha256",
+                "publication_sha256",
+                "storage_commit"
+              ],
+              "properties": {
+                "predecessor": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+                },
+                "checkpoint": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "seq",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "seq": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  }
+                },
+                "authorization_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "publication_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "storage_commit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                }
+              }
+            },
+            "observation_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           }
         }

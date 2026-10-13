@@ -126,7 +126,8 @@ def interrupted_first_publication(backend, attempt, approval, *, now):
 
     Same fresh envelopes can resume the existing outbox. An expired first
     advertisement cannot use Backend's 'recover' route (no POST_VERIFIED view).
-    A separate reviewed reauthorization transition is still a CODE BLOCKER.
+    Backend.reauthorize_first requires a fresh protected resume-first child and
+    an independent drained/fenced observer; this helper never renews old proof.
     """
     from v3_backend_evidence import Authorization
     if not isinstance(approval, Authorization):
@@ -137,7 +138,7 @@ def interrupted_first_publication(backend, attempt, approval, *, now):
         raise PlanningError("not a first-stable publication")
     signed = value["proofs"].get("AUTHORIZED", {})
     if now >= min(approval.expiry, signed.get("expires_at", 0)):
-        raise PlanningError("expired first publication BLOCKED; fresh exact-result reauthorization transition required")
+        raise PlanningError("expired original publication BLOCKED; fresh protected resume-first child required")
     if signed.get("authorization_sha256") != approval.sha256:
         raise PlanningError("stale/substituted first-publication recovery evidence")
     if value["state"] not in {"STAGED", "REMOTE_VERIFIED", "PUBLISHED", "POST_VERIFIED"}:

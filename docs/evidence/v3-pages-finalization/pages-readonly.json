@@ -1,0 +1,48 @@
+{
+  "scope": "read-only-current-pages-observation",
+  "publishable": false,
+  "observed_at": 1791902400,
+  "settings": {
+    "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pages",
+    "status": "built",
+    "cname": "repo.ro-asd.org",
+    "custom_404": false,
+    "html_url": "http://repo.ro-asd.org/",
+    "build_type": "legacy",
+    "source": {
+      "branch": "pages-storage",
+      "path": "/"
+    },
+    "public": true,
+    "protected_domain_state": "verified",
+    "pending_domain_unverified_at": null,
+    "https_certificate": {
+      "state": "approved",
+      "description": "The certificate has been approved.",
+      "domains": [
+        "repo.ro-asd.org"
+      ],
+      "expires_at": "2026-12-19"
+    },
+    "https_enforced": false
+  },
+  "provider": {
+    "git_commit": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+    "build_id": "1271809147",
+    "deployment_id": "6961700285",
+    "run_id": "37936111310",
+    "witness_deployment_id": "github-pages:1271809147:6961700285:37936111310",
+    "public_visibility": "UNVERIFIED",
+    "production_activation": "BLOCKED"
+  },
+  "tree_entries": 268,
+  "current_stable_paths": [],
+  "beta_publication_https_sha256": {
+    "rpm/fedora/44/beta/publication-v1.json": "e939e05867ee73e29c4167cd1a97924d76545e2e823c30bca4104b15f4a3716f",
+    "rpm/fedora/44/beta/publication-v1.json.asc": "1eee73043fb89afbcd6ad0e7938b76003ccfd92f37f24beffe93ef196213fe81"
+  },
+  "full_beta_rpm_visibility": "UNVERIFIED",
+  "app_push_trigger": "UNVERIFIED",
+  "late_build_ordering": "UNVERIFIED",
+  "historical_empty_stable": "UNVERIFIED"
+}

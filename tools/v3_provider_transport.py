@@ -55,7 +55,7 @@ class ProviderTransport:
         value.origin, value.test_root = origin.rstrip("/"), root
         return value
 
-    def request(self, method, path, body=None):
+    def request(self, method, path, body=None, *, allow_list=False):
         if self.test_root is not None:
             require_test_root(self.test_root)
         parsed = urllib.parse.urlsplit(path)
@@ -88,6 +88,6 @@ class ProviderTransport:
         if not self.clock() < expires_at:
             raise ProviderUnavailable("credential expired during request; reconcile before retry")
         value = strict_json(raw)
-        if not isinstance(value, dict):
+        if not isinstance(value, dict) and not (allow_list and isinstance(value, list)):
             raise PlanningError("provider response must be a JSON object")
         return value

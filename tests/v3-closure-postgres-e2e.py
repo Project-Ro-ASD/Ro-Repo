@@ -10,7 +10,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from v3_backend_support import Keys, Fixture, NOW
 from v3_backend_ledger import Ledger
 from v3_postgresql_production import ProductionPostgreSQLAdapter, initialize_empty_rehearsal
-from v3_backend_trust import digest
+from v3_backend_trust import digest, TestSigner
+from v3_pages_finalization_support import fresh_authority
 from v3_publication_backend import Backend
 from v3_promotion_planner import PlanningError
 
@@ -33,8 +34,9 @@ def main():
             "inventory_sha256": "b"*64, "remote_sha256": "c"*64, "stable_absent": True, "writer_exclusive": True})
         initialize_empty_rehearsal(adapter, keys.signers["audit"], empty, audit_key=keys.signers["audit"].public,
             audit_key_sha256=keys.signers["audit"].key_sha256, now=NOW)
+        clock = {"now": NOW}
         ledger = Ledger(adapter, keys.signers["audit"], audit_key=keys.signers["audit"].public,
-                        audit_key_sha256=keys.signers["audit"].key_sha256, clock=lambda: NOW)
+                        audit_key_sha256=keys.signers["audit"].key_sha256, clock=lambda: clock["now"])
         fixtures = [Fixture(keys, attempt="tls-writer-one"), Fixture(keys, attempt="tls-writer-two", version="0.2.6")]
         for fx in fixtures:
             fx.ledger, fx.backend = ledger, Backend(ledger)
@@ -69,6 +71,22 @@ def main():
             pass
         if ledger.inspect() != before:
             raise AssertionError("TLS rollback did not preserve audit state")
+        # The winning first intent has no prior POST_VERIFIED stable. Exercise
+        # genuine new authorization and append-only child under real restricted
+        # PostgreSQL permissions; never reset or replace the original attempt.
+        winner = next(fx for fx in fixtures if fx.result.sha256 == before["head"]["digest"])
+        original = ledger.inspect(winner.attempt)["attempt"]
+        clock["now"] = NOW + 301
+        winner.now = clock["now"]
+        resume = winner.backend.first_resume_binding(winner.attempt)
+        evidence, result, approval = fresh_authority(winner, "tls-fresh-first", operation="resume-first", resume=resume)
+        observer = TestSigner(keys.root, "tls-first-recovery")
+        raw = observer.envelope("restore-observation", {"resume":resume, "writers_fenced":True, "requests_drained":True,
+            "issued_at":clock["now"], "expires_at":clock["now"]+60})
+        child = winner.backend.reauthorize_first("tls-fresh-first", evidence, result, approval,
+            observation_raw=raw, observation_key=observer.public, observation_pin=observer.key_sha256)
+        if child["state"] != "AUTHORIZED" or ledger.inspect(winner.attempt)["attempt"] != original or ledger.inspect()["head"] != before["head"]:
+            raise AssertionError("fresh PostgreSQL first recovery changed original signed history or intent generation")
         # Verify permissions independently with actual denied operations.
         import psycopg
         for statement in ("DELETE FROM events", "UPDATE consumed SET attempt='forged'", "TRUNCATE views", "CREATE TABLE unauthorized(id int)"):
@@ -105,9 +123,9 @@ def main():
                 raise AssertionError("server identity verification weakened")
         output.write_text(json.dumps({"scope": "v3-isolated-tls-postgresql", "publishable": False,
             "tls_verify_full": "PASS", "wrong_ca_rejection": "PASS", "wrong_hostname_rejection": "PASS", "restricted_role_denials": "PASS", "two_process_cas": "PASS",
-            "transaction_rollback": "PASS", "external_ha_restore": "UNVERIFIED", "production_activation": "BLOCKED",
+            "transaction_rollback": "PASS", "fresh_first_reauthorization": "PASS", "external_ha_restore": "UNVERIFIED", "production_activation": "BLOCKED",
             "checkpoint": ledger.inspect()["checkpoint"]}, indent=2) + "\n")
-        print("PASS: real TLS verify-full, restricted roles, signed ledger, independent process CAS")
+        print("PASS: real TLS verify-full, restricted roles, signed ledger, independent process CAS, fresh first-publication reauthorization")
     finally:
         for fx in fixtures:
             fx.close()

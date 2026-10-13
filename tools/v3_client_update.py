@@ -92,7 +92,11 @@ class Client:
                 path = pathlib.PurePosixPath(item["path"])
                 if path.is_absolute() or ".." in path.parts or path.as_posix() != item["path"] or "\\" in item["path"]:
                     raise PlanningError("unsafe immutable client member")
-                if digest(reader.read(item["path"])) != item["sha256"]:
+                try:
+                    raw = reader.read(item["path"])
+                except OSError as exc:
+                    raise PlanningError("selected immutable public view unavailable; client transaction blocked") from exc
+                if digest(raw) != item["sha256"]:
                     raise PlanningError("incomplete/mixed client view")
             if self.clock() >= payload["expires_at"]:
                 raise PlanningError("discovery expired during complete-view verification")
