@@ -210,8 +210,9 @@ Pages POST guard korunur. Mevcut production constructor hiçbir live mutation ya
    GitHub token vermeyin. Production daemon/identity packaging ve production
    coordinator wiring hâlâ ayrı code/cutover işidir; loopback server production
    deployment gibi açılmamalıdır.
-3. **Ayrı açık operatör yetkisiyle** önceden disposable repo oluşturun; ad
-   `<owner>/ro-v3-disposable-<name>`, description tam olarak
+3. **Ayrı açık operatör yetkisiyle** önceden disposable repo oluşturun. Proje yolu
+   kullanan cloud acceptance runner yalnız `minitheguitarist/ro-v3-disposable-pages`
+   deposuna yetkilidir; description tam olarak
    `RO V3 DISPOSABLE PROVIDER ACCEPTANCE ONLY`. `disposable-pages` ref'ini `.nojekyll`
    ve korunacak test beta/history dosyalarıyla seed edin; Pages source'ını o test
    dalının `/` köküne ayarlayın. Gerçek `pages-storage` veya production domain kullanılmaz.
@@ -222,18 +223,36 @@ Pages POST guard korunur. Mevcut production constructor hiçbir live mutation ya
    `RO_V3_DISPOSABLE_APP_TOKEN_EXPIRY` olarak verilir; dosyaya veya log'a yazılmaz.
    [Token repository scope sözleşmesi](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)
    uygulanır; runner `/installation/repositories` ile yalnız bir test repo kontrolü yapar.
-5. Test repo numeric ID/node ID ve HTTPS origin'i bağımsız doğrulayın; ardından,
+5. Test repo numeric ID/node ID ve HTTPS Pages base URL'sini bağımsız doğrulayın; ardından,
    yalnız yetkilendirilmiş disposable ortamda hazırlanan komutu çalıştırın:
 
    ```bash
    python3 tests/v3-pages-disposable-acceptance.py --operator-authorized \
-     --repository '<owner>/ro-v3-disposable-<name>' --repository-id '<id>' \
-     --node-id '<node-id>' --origin 'https://<test-pages-host>' --output cloud-test.json
+     --repository 'minitheguitarist/ro-v3-disposable-pages' --repository-id 1417967787 \
+     --node-id 'R_kgDOVIR4qw' \
+     --origin 'https://minitheguitarist.github.io/ro-v3-disposable-pages' \
+     --output cloud-test.json
    ```
 
    Runner repo/setting/credential oluşturmaz. App CAS sonrası exact commit/build/
    deployment/run ve synthetic immutable public byte'larını arar. Pozitif sonucuyla
    deadline fencing, build ordering veya real RPM/application acceptance PASS olmaz.
+   Komut bu URL uyumluluğu düzeltmesi sırasında çalıştırılmaz; test deposuna gerçek
+   GitHub yazmaları yaptığı için sonraki çalıştırma ayrı operatör yetkisi gerektirir.
+   Output dosyası önceden mevcut olmamalıdır.
+
+   Proje URL'si yalnız açık `DisposablePagesProject` test kapsamıyla kabul edilir:
+   tam repo adı, `operator_authorized is True` ve işaretli özel `/tmp` test kökü
+   zorunludur. Runner aynı kapsamı `IsolatedStore.stage` ve `HTTPSReader` ile paylaşır;
+   `reopen` için de aynı test kökü/kapsam gerekir. URL yalnız yukarıdaki tam adres
+   veya tek trailing slash olabilir. Host/repo değişimi, credential/port, traversal,
+   percent encoding, query/fragment (boş olanlar dahil) ve kontrol karakterleri
+   provider erişiminden önce reddedilir. İmzalı descriptor'daki üç baseurl tam
+   proje/digest/architecture eşleşmesiyle doğrulanır; diğer alanlar değişmeyen
+   root-origin schema ile doğrulanır. Test kapsamı verilmezse mevcut kök HTTPS
+   origin kuralı ve `repo.ro-asd.org` adresleri değişmez; production schema/client/
+   activation yolları bu proje URL'sini kabul etmez. Scope ve `publishable:false`
+   sözleşmesi korunur.
 6. Bağımsız fault-injection staging kabulünde iki publisher, late expired request,
    lost response, changed head, old/new deployment reordering ve CDN gecikmesini
    uygulayın. Parent-expiry sonrası fresh child recovery'yi gerçek DB/checkpoint/

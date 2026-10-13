@@ -15,7 +15,7 @@ from v3_backend_support import Keys, Fixture, NOW
 from v3_backend_trust import canonical
 from v3_branch_pages import BranchPagesIdentity
 from v3_github_provider import GitHubStorage
-from v3_immutable_view import IsolatedStore, HTTPSReader
+from v3_immutable_view import DisposablePagesProject, IsolatedStore, HTTPSReader
 from v3_provider_transport import ProviderTransport
 from v3_promotion_planner import PlanningError
 from v3_pages_finalization_support import fresh_authority
@@ -39,6 +39,10 @@ def main():
     keys = Keys()
     fx = None
     try:
+        fx = Fixture(keys)
+        project = DisposablePagesProject(root=fx.root, repository=args.repository,
+                                         operator_authorized=args.operator_authorized)
+        project.base_url(args.origin)
         transport = ProviderTransport("https://api.github.com", lambda:(token, expiry), time.time)
         storage = GitHubStorage.disposable_acceptance(transport, root=keys.root, operator_authorized=True,
             repository=args.repository, repository_id=args.repository_id, node_id=args.node_id, ref="refs/heads/disposable-pages")
@@ -50,12 +54,12 @@ def main():
             raise PlanningError("operator must seed static-file branch source with .nojekyll")
         # Synthetic fixture capabilities use their explicit TEST clock; provider
         # credentials and actual network observations use real UTC separately.
-        fx = Fixture(keys)
         fx.now = int(time.time())
         fx.evidence, fx.result, fx.approval = fresh_authority(fx, fx.attempt)
         fx.advance("AUTHORIZED")
         view = IsolatedStore(fx.root).stage(fx.result, fx.approval, keys.signers["publication"],
-            origin=args.origin, audit_key_sha256=keys.signers["audit"].key_sha256, now=fx.now)
+            origin=args.origin, audit_key_sha256=keys.signers["audit"].key_sha256, now=fx.now,
+            disposable_project=project)
         receipt = storage.stage(view, fx.approval, expected=base, publication_key=keys.signers["publication"].public,
                                 publication_pin=keys.signers["publication"].key_sha256, now=fx.now)
         commit = receipt["git_commit"]
@@ -77,7 +81,7 @@ def main():
             time.sleep(3)
         if facts is None:
             raise PlanningError("App CAS did not yield exact branch Pages deployment within acceptance bound")
-        reader = HTTPSReader(args.origin, view.sha256, fx.attempt)
+        reader = HTTPSReader(args.origin, view.sha256, fx.attempt, disposable_project=project)
         if reader.publication()!=view.envelope or any(reader.read(i["path"])!=(view.path/"payload"/i["path"]).read_bytes() for i in view.result.inventory):
             raise PlanningError("build success without exact public immutable bytes")
         args.output.write_bytes(canonical({"scope":"disposable-cloud-branch-positive-acceptance", "publishable":False,
