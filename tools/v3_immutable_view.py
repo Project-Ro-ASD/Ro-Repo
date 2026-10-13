@@ -10,12 +10,16 @@ import shutil
 import tempfile
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 
 from v3_backend_trust import (TOKEN, TestSigner, canonical, digest, require_attestation,
                               require_test_root, verify_envelope, key_identity)
 from v3_integration import tree_inventory
 from v3_policy_profile import sha
 from v3_promotion_planner import PlanningError
+
+_DISPOSABLE_REPOSITORY = "minitheguitarist/ro-v3-disposable-pages"
+_DISPOSABLE_PAGES_BASE = "https://minitheguitarist.github.io/ro-v3-disposable-pages"
 
 
 class VerifiedResult:
@@ -95,14 +99,68 @@ def verify_result(source, proposal, plan, *, beta, baseline, registry, rpm_key, 
     return VerifiedResult(source, before, sha(receipt), sha(plan), TOKEN)
 
 
-def immutable_url(origin, result_digest, arch):
+@dataclass(frozen=True)
+class DisposablePagesProject:
+    """Explicit test-only URL scope; never inferred from a supplied URL.
+
+    Repository identity, marker and single-repository App credential checks
+    remain the cloud runner's responsibility before any GitHub mutation.
+    """
+    root: pathlib.Path
+    repository: str
+    operator_authorized: bool
+
+    def __post_init__(self):
+        if (self.operator_authorized is not True or
+                self.repository != _DISPOSABLE_REPOSITORY):
+            raise PlanningError("explicit exact disposable Pages repository authorization required")
+        object.__setattr__(self, "root", require_test_root(self.root))
+
+    def base_url(self, origin):
+        require_test_root(self.root)
+        base = _DISPOSABLE_PAGES_BASE
+        # Match raw input before parsing/normalizing: encoded separators,
+        # dot segments, credentials, ports, query/fragment (even empty) and
+        # control characters must never turn into an authorized URL.
+        if origin not in (base, base + "/"):
+            raise PlanningError("exact authorized disposable Pages project URL required")
+        return base
+
+
+def _publication_base(origin, *, disposable_project=None):
+    if disposable_project is not None:
+        if not isinstance(disposable_project, DisposablePagesProject):
+            raise PlanningError("explicit disposable Pages project scope required")
+        return disposable_project.base_url(origin)
     parsed = urllib.parse.urlsplit(origin)
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in {"", "/"} or parsed.port not in {None, 443}:
         raise PlanningError("independently pinned HTTPS origin required")
+    return origin.rstrip("/")
+
+
+def immutable_url(origin, result_digest, arch, *, disposable_project=None):
+    base = _publication_base(origin, disposable_project=disposable_project)
     from v3_backend_trust import HEX
     if not HEX.fullmatch(result_digest) or arch not in {"x86_64", "aarch64", "source"}:
         raise PlanningError("invalid immutable view identity")
-    return origin.rstrip("/") + "/v3/views/" + result_digest + "/rpm/" + arch
+    return base + "/v3/views/" + result_digest + "/rpm/" + arch
+
+
+def _validate_publication_descriptor(descriptor, *, disposable_project=None):
+    from ro_repo import validate_schema
+    if disposable_project is not None:
+        # The production schema still only permits root origins. Validate the
+        # exact project URLs first, then validate the remaining contract using
+        # their root-origin projection. Never alter the signed descriptor.
+        arches = ("x86_64", "aarch64", "source")
+        result = descriptor["result_stable_sha256"]
+        expected = {arch: immutable_url(_DISPOSABLE_PAGES_BASE, result, arch,
+                                       disposable_project=disposable_project) for arch in arches}
+        if descriptor.get("baseurls") != expected:
+            raise PlanningError("disposable publication project URL identity differs")
+        descriptor = {**descriptor, "baseurls": {
+            arch: immutable_url("https://minitheguitarist.github.io", result, arch) for arch in arches}}
+    validate_schema(descriptor, "immutable-publication-v3")
 
 
 class StagedView:
@@ -126,12 +184,16 @@ class IsolatedStore:
         if self.views.is_symlink():
             raise PlanningError("unsafe view store")
 
-    def stage(self, result, authorization, signer, *, origin, audit_key_sha256, now, inject=None):
+    def stage(self, result, authorization, signer, *, origin, audit_key_sha256, now, inject=None,
+              disposable_project=None):
         from v3_backend_evidence import Authorization
         from v3_protected_provider import ProtectedSigner
         valid_signer = isinstance(signer, TestSigner) or isinstance(signer, ProtectedSigner) and signer.purpose == "publication"
         if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not valid_signer:
             raise PlanningError("verified result, protected approval and isolated signer required")
+        if disposable_project is not None and (not isinstance(disposable_project, DisposablePagesProject) or
+                                               disposable_project.root != self.root):
+            raise PlanningError("disposable Pages project must belong to this isolated store")
         payload = authorization.payload
         if (now >= authorization.expiry or payload["request"]["result_stable_sha256"] != result.sha256 or
                 signer.key_sha256 in {audit_key_sha256, payload["approval_key_sha256"], payload["witness_key_sha256"]}):
@@ -144,10 +206,10 @@ class IsolatedStore:
                       "authorization_sha256": authorization.sha256, "request": payload["request"],
                       "preflight_sha256": result.receipt, "signing_key_sha256": signer.key_sha256,
                       "signing_key_identity": key_identity(signer.public),
-                      "baseurls": {arch: immutable_url(origin, result.sha256, arch) for arch in ("x86_64", "aarch64", "source")},
+                      "baseurls": {arch: immutable_url(origin, result.sha256, arch, disposable_project=disposable_project)
+                                   for arch in ("x86_64", "aarch64", "source")},
                       "issued_at": now, "expires_at": int(authorization.expiry)}
-        from ro_repo import validate_schema
-        validate_schema(descriptor, "immutable-publication-v3")
+        _validate_publication_descriptor(descriptor, disposable_project=disposable_project)
         envelope = signer.envelope("publication", descriptor)
         verify_envelope(envelope, role="publication", public_key=signer.public, key_sha256=signer.key_sha256,
                         expected={k: v for k, v in descriptor.items() if k not in {"issued_at", "expires_at"}}, now=now)
@@ -169,13 +231,16 @@ class IsolatedStore:
                 inject("after-stage-rename")
         return StagedView(target, result, envelope, descriptor, TOKEN)
 
-    def reopen(self, result, authorization, signer, *, now):
+    def reopen(self, result, authorization, signer, *, now, disposable_project=None):
         """Recover a rename completed before ledger commit; no new signing."""
         from v3_backend_evidence import Authorization
         from v3_protected_provider import ProtectedSigner
         valid_signer = isinstance(signer, TestSigner) or isinstance(signer, ProtectedSigner) and signer.purpose == "publication"
         if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not valid_signer or now >= authorization.expiry:
             raise PlanningError("fresh verified staging retry prerequisites required")
+        if disposable_project is not None and (not isinstance(disposable_project, DisposablePagesProject) or
+                                               disposable_project.root != self.root):
+            raise PlanningError("disposable Pages project must belong to this isolated store")
         result.check()
         target = self.views / (result.sha256 + "-" + authorization.payload["request"]["attempt_id"])
         if target.is_symlink() or not target.is_dir() or (target / "publication.json").is_symlink():
@@ -183,9 +248,9 @@ class IsolatedStore:
         raw = (target / "publication.json").read_bytes()
         from v3_backend_trust import strict_json
         descriptor = strict_json(raw)["payload"]
-        from ro_repo import validate_schema, ContractError
+        from ro_repo import ContractError
         try:
-            validate_schema(descriptor, "immutable-publication-v3")
+            _validate_publication_descriptor(descriptor, disposable_project=disposable_project)
         except ContractError as exc:
             raise PlanningError("invalid staging retry publication schema") from exc
         if (descriptor["authorization_sha256"] != authorization.sha256 or descriptor["inventory"] != result.inventory or
@@ -220,14 +285,16 @@ class DirectoryReader:
 
 class HTTPSReader:
     """Read-only bounded HTTPS transport, no redirects or implicit credentials."""
-    def __init__(self, origin, result_digest, attempt, *, max_bytes=512 * 1024 * 1024):
-        immutable_url(origin, result_digest, "x86_64")
+    def __init__(self, origin, result_digest, attempt, *, max_bytes=512 * 1024 * 1024,
+                 disposable_project=None):
+        immutable_url(origin, result_digest, "x86_64", disposable_project=disposable_project)
+        base = _publication_base(origin, disposable_project=disposable_project)
         from v3_authorization import ID
         if not isinstance(attempt, str) or not ID.fullmatch(attempt):
             raise PlanningError("invalid publication identity")
-        self.base = origin.rstrip("/") + "/v3/views/" + result_digest + "/"
-        self.publication_url = origin.rstrip("/") + "/v3/publications/" + attempt + ".json"
-        self.advertisement_url = origin.rstrip("/") + "/v3/stable.json"
+        self.base = base + "/v3/views/" + result_digest + "/"
+        self.publication_url = base + "/v3/publications/" + attempt + ".json"
+        self.advertisement_url = base + "/v3/stable.json"
         self.max_bytes = max_bytes
 
     def _get(self, path, url=None):
