@@ -19,7 +19,7 @@
   "postgresql_cas_process_death_signed_audit": "PASS",
   "postgresql_tls_verify_full_restricted_roles": "PASS",
   "external_acceptance": "UNVERIFIED",
-  "ci": "See the draft PR checks for exact final commit; no production workflow enabled.",
+  "ci": "Implementation commit: ci-results.json (8/8 SUCCESS, full unit 567, V3 security 423); final documentation commit: draft PR checks.",
   "harness_notes": [
     "Initial read-only unit fixture errors were resolved by executing in a disposable in-container repository copy.",
     "V2 dependency download requires official Fedora network access; rerun succeeded in a disposable credential-free container."
