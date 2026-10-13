@@ -76,6 +76,27 @@ class Outbox:
             return result
         return self.ledger.execute("outbox-" + operation, attempt, change)[0]
 
+    def deployment_identity(self, attempt, owner, fence, *, phase, git_commit):
+        """Durably bind a deployment request BEFORE contacting any provider.
+
+        This identity survives lease turnover; it supplies no deployment proof
+        and does not imply the Pages API implements idempotency or fencing.
+        """
+        if phase not in {"pre", "post"} or not isinstance(git_commit, str) or not re.fullmatch(r"[a-f0-9]{40}", git_commit):
+            raise PlanningError("exact deployment phase/commit required")
+        def save(db, value, job):
+            binding = {"attempt_id": attempt, "phase": phase, "git_commit": git_commit,
+                "result_stable_sha256": job["immutable"]["result_sha256"],
+                "publication_sha256": job["immutable"]["publication_sha256"],
+                "authorization_sha256": job["immutable"]["authorization_sha256"]}
+            request = {"idempotency_key": digest(canonical(binding)), "binding": binding}
+            records = job["receipts"].setdefault("deployment_requests", {})
+            if phase in records and records[phase] != request:
+                raise PlanningError("conflicting durable deployment request identity")
+            records[phase] = request
+            return copy.deepcopy(request)
+        return self.locked(attempt, owner, fence, "deployment-identity", save)
+
     def _guard(self, value, owner, fence, allow_complete=False):
         job = value["proofs"]["OUTBOX"]
         if (job["owner"] != owner or job["fence"] != fence or self.ledger.clock() >= job["lease_until"] or
@@ -114,6 +135,7 @@ class Coordinator:
             raise PlanningError("outbox authorization substitution")
         def stage(db, value, job):
             view.check()
+            inject("before-git-stage")
             files = self.store._files(self.store.head())
             path = "v3/publications/" + attempt + ".json"
             if path in files:

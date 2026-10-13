@@ -128,7 +128,9 @@ class IsolatedStore:
 
     def stage(self, result, authorization, signer, *, origin, audit_key_sha256, now, inject=None):
         from v3_backend_evidence import Authorization
-        if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not isinstance(signer, TestSigner):
+        from v3_protected_provider import ProtectedSigner
+        valid_signer = isinstance(signer, TestSigner) or isinstance(signer, ProtectedSigner) and signer.purpose == "publication"
+        if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not valid_signer:
             raise PlanningError("verified result, protected approval and isolated signer required")
         payload = authorization.payload
         if (now >= authorization.expiry or payload["request"]["result_stable_sha256"] != result.sha256 or
@@ -170,7 +172,9 @@ class IsolatedStore:
     def reopen(self, result, authorization, signer, *, now):
         """Recover a rename completed before ledger commit; no new signing."""
         from v3_backend_evidence import Authorization
-        if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not isinstance(signer, TestSigner) or now >= authorization.expiry:
+        from v3_protected_provider import ProtectedSigner
+        valid_signer = isinstance(signer, TestSigner) or isinstance(signer, ProtectedSigner) and signer.purpose == "publication"
+        if not isinstance(result, VerifiedResult) or not isinstance(authorization, Authorization) or not valid_signer or now >= authorization.expiry:
             raise PlanningError("fresh verified staging retry prerequisites required")
         result.check()
         target = self.views / (result.sha256 + "-" + authorization.payload["request"]["attempt_id"])

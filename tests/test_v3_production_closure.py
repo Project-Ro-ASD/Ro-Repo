@@ -73,7 +73,7 @@ class ClosureTests(unittest.TestCase):
         self.assertFalse(receipt["publishable"])
 
     def test_all_provider_response_loss_boundaries_reconcile(self):
-        for boundary in ("after-git-stage", "after-pre-verification", "after-db-intent", "after-git-advertisement", "after-post-verification"):
+        for boundary in ("before-git-stage", "after-git-stage", "after-pre-verification", "after-db-intent", "after-git-advertisement", "after-post-verification"):
             with self.subTest(boundary=boundary):
                 if hasattr(self, "store"):
                     self.fx = Fixture(self.keys)

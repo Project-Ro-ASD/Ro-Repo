@@ -1,0 +1,48 @@
+{
+  "scope": "v3-live-provider-disposable-tests",
+  "publishable": false,
+  "production_activation": "BLOCKED",
+  "baseline": "e49abd19b75a784c2a1bd375b23f33147c92ac24",
+  "client_date": "2026-10-13",
+  "local_unit": {
+    "result": "PASS",
+    "tests": 565,
+    "note": "Disposable repository copy; final provider hardening independently rerun below. Final exact-commit full regression is required in PR CI."
+  },
+  "local_provider": {
+    "result": "PASS",
+    "tests": 25,
+    "note": "Final code, HTTP loopback protocol doubles backed by real Git; not GitHub/Pages cloud acceptance."
+  },
+  "fedora44_signed_bootstrap_full_set_upgrade": "PASS",
+  "v2_fedora44_e2e": "PASS (rpmlint: 0 errors, 4 existing fixture warnings)",
+  "postgresql_cas_process_death_signed_audit": "PASS",
+  "postgresql_tls_verify_full_restricted_roles": "PASS",
+  "external_acceptance": "UNVERIFIED",
+  "ci": "See the draft PR checks for exact final commit; no production workflow enabled.",
+  "harness_notes": [
+    "Initial read-only unit fixture errors were resolved by executing in a disposable in-container repository copy.",
+    "V2 dependency download requires official Fedora network access; rerun succeeded in a disposable credential-free container."
+  ],
+  "source_sha256": {
+    "tools/v3_provider_transport.py": "561a97b4f328e02f2b3e8b97e616fa2c565f22b5adb1dc7c7973ff72104a5cd8",
+    "tools/v3_github_provider.py": "51bfd256820d48640242321fc10092b6c087b5ad57e6cdf31d048769a5fc58aa",
+    "tools/v3_protected_provider.py": "2d43925ba37dbc572b1f7462403bd6d95a197221819fc0a6cbdf71f553b7ddd5",
+    "tools/v3_bootstrap_provider.py": "0215aedcc244e5785bf2d85b1960c3afb8e38c3edcfdad1fa576d6e7254e53f1",
+    "tools/v3_identity_integration.py": "4937c10634df5d155c060f19fa7ba926099e01560e7ec7036dbc068e3d2c083b",
+    "tools/v3_immutable_view.py": "f5018aac236a72c98878a9c55986eac215ca1e1decb2b1d390bba7e2b5fba5a8",
+    "tools/v3_postgresql_production.py": "0f17b197db0f6f6612951da5f85a0dbaf249498065eeb9f71d40f3106d5993e6",
+    "tools/v3_publication_outbox.py": "e1ad796c19cbef56c2fcac5bde7522ed6072a18891900e216a57630a86484d43",
+    "schemas/backend-attempt-v3.schema.json": "b958558e707ed506957f198c6a9fa51147c466a2333fb5515ad6001a7df0429c",
+    "tests/test_v3_live_provider.py": "9c3661a07a489f223e3a2fc3f0aaa8a5728f2f20634d4ad32521e701b3f5a67a",
+    "tests/test_v3_production_closure.py": "d6621bd7ef836b44f4ee6bf225021b5b24013345ab48c8b360c36d1b73bd3a9b",
+    "tests/v3_provider_support.py": "4db2f12fdd468be47d5ae36e6b89e52493ccee0be7f0c981ffb4489eee72c02f"
+  },
+  "log_sha256": {
+    "local-unit.log.gz": "9287ebe98ad93c4073611a49f6939e3d167da55b455207e626925ae3dff4824f",
+    "local-provider.log.gz": "b8250a21d04800eca39cf77bf0808dea00639e5da01744476b3ca0d64d029092",
+    "local-fedora44.log.gz": "f68fe138eaf3bb99592d220ae7d3bd89348725141ec84c37519d692adc7163f2",
+    "local-postgresql.log.gz": "6e6298a294bb143cd8691d13543f874ff2c5944994e7ef5a8b7cce3ae8e0e3f5",
+    "local-v2-fedora44.log.gz": "d168b1e8cebc823d92e8b1d57c9570a52988be236ef9dd93551f694a8831b743"
+  }
+}
