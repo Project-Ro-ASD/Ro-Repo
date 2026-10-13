@@ -67,7 +67,7 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps({"scope":"read-only-current-pages-observation", "publishable":False,
         "observed_at":int(time.time()), "settings":settings, "provider":facts,
-        "tree_entries":len(files), "current_stable_paths":[p for p in files if p=="v3/stable.json" or p.startswith(("rpm/fedora/44/stable/", "publications/fedora/44/stable/"))],
+        "tree_entries":len(files), "current_stable_paths":[p for p in files if p=="v3/stable.json" or p.startswith(("v3/advertisements/", "rpm/fedora/44/stable/", "publications/fedora/44/stable/"))],
         "beta_publication_https_sha256":public, "full_beta_rpm_visibility":"UNVERIFIED",
         "app_push_trigger":"UNVERIFIED", "late_build_ordering":"UNVERIFIED", "historical_empty_stable":"UNVERIFIED"}, indent=2)+"\n")
     print("PASS: read-only actual Pages identities and two beta publication HTTPS byte comparisons; production BLOCKED")

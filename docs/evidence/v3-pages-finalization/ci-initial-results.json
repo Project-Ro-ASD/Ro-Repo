@@ -1,0 +1,60 @@
+{
+  "scope": "initial-pages-finalization-implementation-ci",
+  "tested_commit": "bda908fbf8824606d895432359ff1ddf0286d2d2",
+  "pull_request": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/76",
+  "unit_tests": 589,
+  "v3_security_tests": 445,
+  "checks": [
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664387/job/115373337637",
+      "name": "unit-policy",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664135/job/115373336458",
+      "name": "backend-security",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664135/job/115373336575",
+      "name": "closure-tls-postgresql",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664190/job/115373336542",
+      "name": "fedora44-full-stable-set",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664387/job/115373336678",
+      "name": "acceptance-runtime-contract",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664190/job/115373337216",
+      "name": "security-contracts",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664387/job/115373337336",
+      "name": "fedora44-e2e",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38419664135/job/115373336337",
+      "name": "postgres-transactions",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    }
+  ],
+  "publishable": false,
+  "production_activation": "BLOCKED",
+  "note": "Final advertisement-loss/bootstrap-guard/independent-abort additions require final exact-commit CI. No cloud write acceptance performed."
+}

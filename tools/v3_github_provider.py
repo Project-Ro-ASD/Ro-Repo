@@ -71,6 +71,7 @@ class GitHubStorage:
         """
         root = require_test_root(root)
         if (operator_authorized is not True or
+                pins.get("repository_id") == 1159460821 or
                 not re.fullmatch(r"[A-Za-z0-9_.-]+/ro-v3-disposable-[a-z0-9-]+", pins.get("repository", "")) or
                 pins.get("ref") != "refs/heads/disposable-pages"):
             raise PlanningError("explicit dedicated disposable cloud repository authorization required")
@@ -147,7 +148,7 @@ class GitHubStorage:
                 raise PlanningError("storage ancestry exceeds complete bootstrap scan bound")
             files = self.files(current)
             for path in files:
-                if (path == "v3/stable.json" or path.startswith(("rpm/fedora/44/stable/",
+                if (path == "v3/stable.json" or path.startswith(("v3/advertisements/", "rpm/fedora/44/stable/",
                         "publications/fedora/44/stable/", "channels/stable/"))):
                     raise PlanningError("real stable history exists; protected import required")
             visited[current] = files
@@ -301,6 +302,28 @@ class GitHubStorage:
         commit = self._append({path:raw}, expected=expected, request_id=digest(raw), issued_at=now, fresh=fresh, before_cas=before_cas)
         return {"git_commit":commit, "advertisement_sha256":digest(raw), "advertisement_path":path,
                 "publishable":False, "deployment":"UNVERIFIED", "production_activation":"BLOCKED"}
+
+    def advertisement_receipt(self, view, approval, remote, signer, *, commit, generation, now):
+        """Read an exact confirmed advertisement after response loss; no write."""
+        view.check()
+        if (approval.sha256 != view.descriptor["authorization_sha256"] or now >= approval.expiry or
+                self.head() != oid(commit) or remote.data["publication_sha256"] != view.envelope_sha256 or
+                remote.data["phase"] != "pre" or signer.key_sha256 != view.descriptor["signing_key_sha256"]):
+            raise PlanningError("exact fresh advertisement reconciliation prerequisites required")
+        path = "v3/advertisements/"+approval.sha256+".json"
+        files = self.files(commit)
+        if path not in files:
+            raise PlanningError("confirmed immutable advertisement missing")
+        raw = self.blob(files[path])
+        expected = {"result_stable_sha256":view.sha256,"publication_sha256":view.envelope_sha256,
+            "authorization_sha256":approval.sha256,"previous_stable_sha256":approval.payload["request"]["previous_stable_sha256"],
+            "staged_git_commit":remote.data["git_commit"],"baseurls":view.descriptor["baseurls"],"publishable":False,"generation":generation}
+        attestation = verify_envelope(raw, role="stable-advertisement", public_key=signer.public,
+            key_sha256=signer.key_sha256, expected=expected, now=now)
+        if attestation.payload["expires_at"] != int(approval.expiry) or self.head() != commit:
+            raise PlanningError("advertisement authority/head changed during reconciliation")
+        return {"git_commit":commit,"advertisement_sha256":digest(raw),"advertisement_path":path,
+                "publishable":False,"deployment":"UNVERIFIED","production_activation":"BLOCKED"}
 
     @staticmethod
     def _receipt(view, commit):

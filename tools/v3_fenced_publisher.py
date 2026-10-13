@@ -67,6 +67,10 @@ class FencedPublisher:
                 raise PlanningError("exact publication intent required at sole writer boundary")
             return head["generation"]
         generation = self.outbox.locked(attempt, owner, fence, "provider-intent-check", check)
+        prior = self.backend.ledger.inspect(attempt)["attempt"]["proofs"]["OUTBOX"]["receipts"].get("provider_intent")
+        if prior and prior["phase"] == "advertisement" and prior["status"] == "CONFIRMED":
+            return self.storage.advertisement_receipt(view, approval, remote, signer,
+                commit=prior["binding"]["target_git"], generation=generation, now=self.backend.ledger.clock())
         receipt = self.storage.advertise_immutable(view, approval, remote, signer, expected=remote.data["git_commit"],
             generation=generation, now=self.backend.ledger.clock(),
             before_cas=lambda old,new:self._admit(attempt, owner, fence, "advertisement", old, new))
@@ -93,6 +97,51 @@ class FencedPublisher:
             self.backend.ledger.put_attempt(db, value)
             return value["proofs"]["OUTBOX"]["receipts"]["provider_intent"]
         return self.backend.ledger.execute("provider-confirm", attempt, change)[0]
+
+    def abort_noncommit(self, view, approval, *, observation_raw, observation_key, observation_pin):
+        """Resolve UNKNOWN only with a fresh independently proven drained abort.
+
+        This verifier does not create drain evidence. Native GitHub lacks that
+        guarantee; an observer unable to prove it must refuse to sign.
+        """
+        from v3_backend_evidence import Authorization
+        from v3_backend_trust import key_identity, verify_envelope
+        from v3_immutable_view import StagedView
+        if not isinstance(view, StagedView) or not isinstance(approval, Authorization):
+            raise PlanningError("original verified publication capabilities required for abort binding")
+        view.check()
+        attempt=view.descriptor["request"]["attempt_id"]
+        state=self.backend.ledger.inspect(attempt)
+        intent=state["attempt"]["proofs"]["OUTBOX"]["receipts"].get("provider_intent")
+        if (not intent or intent["status"]!="IN_FLIGHT" or approval.sha256!=intent["binding"]["authorization_sha256"] or
+                view.envelope_sha256!=intent["binding"]["publication_sha256"] or self.backend.ledger.clock()<intent["lease_until"]):
+            raise PlanningError("only an expired, unresolved exact provider intent can be independently aborted")
+        roots={key_identity(self.backend.ledger.audit_key),view.descriptor["signing_key_identity"],
+               approval.payload["approval_key_identity"],approval.payload["witness_key_identity"]}
+        if key_identity(observation_key) in roots:
+            raise PlanningError("independent provider abort observer required")
+        expected={"provider_intent":intent["binding"],"checkpoint":state["checkpoint"],
+            "writers_fenced":True,"requests_drained":True,"transaction_not_committed":True}
+        observation=verify_envelope(observation_raw,role="restore-observation",public_key=observation_key,
+            key_sha256=observation_pin,expected=expected,now=self.backend.ledger.clock())
+        if not 0<=self.backend.ledger.clock()-observation.payload["issued_at"]<=60:
+            raise PlanningError("stale provider abort evidence")
+        def guard():
+            if (self.backend.ledger.clock()>=observation.payload["expires_at"] or
+                    self.storage.head()!=intent["binding"]["expected_git"] or
+                    intent["binding"]["expected_git"]==intent["binding"]["target_git"]):
+                raise PlanningError("provider abort cannot discard committed/changed/undrained work")
+        guard()
+        def change(db):
+            value=self.backend.ledger.attempt(db,attempt)
+            current=value["proofs"]["OUTBOX"]["receipts"]["provider_intent"]
+            if current!=intent or self.backend.ledger._integrity(db)!=state["checkpoint"]:
+                raise PlanningError("stale provider abort checkpoint/intent")
+            current["status"]="ABORTED"
+            current["abort_observation_sha256"]=observation.sha256
+            self.backend.ledger.put_attempt(db,value)
+            return current
+        return self.backend.ledger.execute("provider-independent-abort",attempt,change,guard=guard)[0]
 
     def activate_production(self):
         raise PlanningError("production BLOCKED: independent writer custody/cutover, request drain and Pages ordering acceptance required")

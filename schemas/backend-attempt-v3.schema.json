@@ -933,7 +933,8 @@
                     "status": {
                       "enum": [
                         "IN_FLIGHT",
-                        "CONFIRMED"
+                        "CONFIRMED",
+                        "ABORTED"
                       ]
                     },
                     "phase": {
@@ -955,8 +956,31 @@
                     },
                     "lease_until": {
                       "type": "number"
+                    },
+                    "abort_observation_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
                     }
-                  }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "status": {
+                            "const": "ABORTED"
+                          }
+                        },
+                        "required": [
+                          "status"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "abort_observation_sha256"
+                        ]
+                      }
+                    }
+                  ]
                 }
               }
             }

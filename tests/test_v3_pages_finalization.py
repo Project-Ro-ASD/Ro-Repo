@@ -160,12 +160,46 @@ class PagesFinalizationTests(unittest.TestCase):
             self.publisher.stage(self.view, self.fx.approval, self.signer, owner="other", fence=fence)
         self.assertEqual(self.storage.head(), self.api.initial)
 
+    def abort_evidence(self, *, drained=True):
+        self.publisher._admit(self.fx.attempt,"worker",self.fence,"stage",self.api.initial,"a"*40)
+        self.fx.now += 31
+        state=self.fx.ledger.inspect(self.fx.attempt)
+        intent=state["attempt"]["proofs"]["OUTBOX"]["receipts"]["provider_intent"]
+        return self.observer.envelope("restore-observation", {"provider_intent":intent["binding"],"checkpoint":state["checkpoint"],
+            "writers_fenced":True,"requests_drained":drained,"transaction_not_committed":True,
+            "issued_at":self.fx.now,"expires_at":self.fx.now+60})
+
+    def test_unknown_noncommit_requires_independent_drained_abort_before_successor(self):
+        self.prepared()
+        raw=self.abort_evidence()
+        receipt=self.publisher.abort_noncommit(self.view,self.fx.approval,observation_raw=raw,
+            observation_key=self.observer.public,observation_pin=self.observer.key_sha256)
+        self.assertEqual(receipt["status"],"ABORTED")
+        self.assertEqual(self.storage.head(),self.api.initial)
+        self.assertEqual(self.fx.ledger.inspect()["head"]["digest"],None)
+
+    def test_noncommit_abort_rejects_undrained_or_stale_evidence(self):
+        self.prepared()
+        raw=self.abort_evidence(drained=False)
+        with self.assertRaises(PlanningError):
+            self.publisher.abort_noncommit(self.view,self.fx.approval,observation_raw=raw,
+                observation_key=self.observer.public,observation_pin=self.observer.key_sha256)
+        self.fx.now += 61
+        with self.assertRaises(PlanningError):
+            self.publisher.abort_noncommit(self.view,self.fx.approval,observation_raw=raw,
+                observation_key=self.observer.public,observation_pin=self.observer.key_sha256)
+
     def test_changed_git_head_leaves_unknown_intent_blocked(self):
         self.prepared()
         self.publisher._admit(self.fx.attempt, "worker", self.fence, "stage", self.api.initial, "a"*40)
         self.api.store._cas({"external-beta-history.asc":b"external signed history"}, self.api.initial)
         with self.assertRaises(PlanningError):
             self.publisher.reconcile(self.fx.attempt)
+
+    def test_empty_bootstrap_refuses_unsigned_immutable_advertisement_history(self):
+        head=self.api.store._cas({"v3/advertisements/"+"a"*64+".json":b"unauthenticated stable intent"},self.api.initial)
+        with self.assertRaises(PlanningError):
+            self.storage.empty_history(head)
 
     def test_branch_staging_and_signed_records_preserve_all_previous_bytes(self):
         self.prepared()
@@ -182,6 +216,27 @@ class PagesFinalizationTests(unittest.TestCase):
         self.assertEqual({p:after[p] for p in before}, before)
         self.assertIn("v3/advertisements/"+self.fx.approval.sha256+".json", after)
         self.assertNotIn("v3/stable.json", after)
+
+    def test_lost_advertisement_response_reconciles_without_resigning_or_ref_retry(self):
+        self.prepared()
+        staged=self.stage()
+        from v3_immutable_view import verify_remote,DirectoryReader
+        witness=self.keys.attestation("deployment", {"result_stable_sha256":self.view.sha256,"publication_sha256":self.view.envelope_sha256,
+            "git_commit":staged["git_commit"],"deployment_id":"test-only"})
+        remote=verify_remote(self.view,DirectoryReader(self.view),witness,now=NOW)
+        self.fx.backend.remotely_verified(self.fx.attempt,remote)
+        self.fx.backend.publish(self.fx.attempt,self.fx.approval)
+        self.api.lose_cas=True
+        with self.assertRaises(ProviderUnavailable):
+            self.publisher.advertise(self.view,self.fx.approval,remote,self.signer,owner="worker",fence=self.fence)
+        head=self.storage.head()
+        self.fx.now += 5
+        self.publisher.reconcile(self.fx.attempt)
+        before=len([p for m,p,b in self.api.calls if p=="/graphql"])
+        with patch.object(self.signer,"envelope",side_effect=AssertionError("must preserve original signed bytes")):
+            receipt=self.publisher.advertise(self.view,self.fx.approval,remote,self.signer,owner="worker",fence=self.fence)
+        self.assertEqual(receipt["git_commit"],head)
+        self.assertEqual(len([p for m,p,b in self.api.calls if p=="/graphql"]),before)
 
     def branch_job(self, crash=None):
         self.prepared()
@@ -376,6 +431,9 @@ class PagesFinalizationTests(unittest.TestCase):
             with self.assertRaises(PlanningError):
                 GitHubStorage.disposable_acceptance(transport, root=self.fx.root,operator_authorized=authorized,
                     repository=repo,repository_id=123,node_id="R_test",ref="refs/heads/disposable-pages")
+        with self.assertRaises(PlanningError):
+            GitHubStorage.disposable_acceptance(transport,root=self.fx.root,operator_authorized=True,
+                repository="test/ro-v3-disposable-renamed",repository_id=1159460821,node_id="R_test",ref="refs/heads/disposable-pages")
 
 
 if __name__=="__main__":

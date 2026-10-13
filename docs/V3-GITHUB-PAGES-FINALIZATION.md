@@ -175,17 +175,20 @@ Kesin kalan koşullar:
   yazabiliyorsa exclusive publisher değildir. Beta/stable bütün writers ortak
   boundary'ye alınmadan ve bypass credential yolları kapatılmadan production açılmaz.
 - Sonucu belirsiz request için head hâlâ base ise native API noncommit/drain kanıtı
-  sağlamıyor. Successor otomatik açılmaz. Bağımsız observer gerçek drain'i
+  sağlamıyor. Successor otomatik açılmaz. `abort_noncommit` yalnız ayrı root ile
+  imzalanmış exact intent/checkpoint + fenced/drained/noncommit kanıtını tüketir;
+  expire olmuş lease, unchanged base ve fresh audit/observation gerekir. Bu verifier
+  kanıt üretmez; committed target'ı veya changed head'i abort etmez. Bağımsız observer gerçek drain'i
   kanıtlayamazsa fresh reauthorization dahil recovery BLOCKED kalır.
 
 Kalan code wiring: production TLS/mTLS publisher daemon ve identity ingress;
 GitHub branch adapter ile bütün pre/intent/advertisement/post aşamalarını bağlayan
-production controller; beta writer cutover adapter'ı; independently proven
-noncommit için UNKNOWN intent abort transition. Sonuncusu henüz yoktur:
-`FencedPublisher` yalnız exact target gözlenince CONFIRMED yapar. Recovery
-observer'ın drained kanıtı Backend child oluşturmayı yetkilendirir ama eski
-IN_FLIGHT gate'ini otomatik temizlemez. Target gözlenmiyorsa yayın devamı BLOCKED
-kalır; signed drain claim'i tek başına native provider deadline garantisi yapmaz.
+production controller ve beta writer cutover adapter'ı. UNKNOWN için fresh signed
+`abort_noncommit` transition kodu vardır; kanıtın provider üzerinde gerçekten
+üretilmesi hâlâ dış kabul engelidir. Önce exact target CONFIRMED veya bağımsız
+ABORTED çözümü alınır, sonra güncel checkpoint ile resume-first onayı istenir.
+Root, drain/noncommit'i ispatlayamıyorsa imza vermez ve gate kapalı kalır.
+Signed drain claim tek başına native provider deadline garantisi yapmaz.
 
 Production DB/backend/coordinator/client/schema guards, live import guard ve native
 Pages POST guard korunur. Mevcut production constructor hiçbir live mutation yapmaz.
