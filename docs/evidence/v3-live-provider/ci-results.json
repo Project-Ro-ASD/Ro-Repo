@@ -1,0 +1,64 @@
+{
+  "scope": "v3-live-provider-implementation-ci",
+  "publishable": false,
+  "production_activation": "BLOCKED",
+  "pull_request": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/75",
+  "tested_implementation_commit": "57c74e978762586789b826326f50c6f2c546b9c0",
+  "unit_tests": 567,
+  "v3_security_tests": 423,
+  "checks": [
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408840843/job/115335506032",
+      "name": "unit-policy",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408840909/job/115335505821",
+      "name": "backend-security",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408840843/job/115335506035",
+      "name": "fedora44-e2e",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408840909/job/115335505090",
+      "name": "closure-tls-postgresql",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408840843/job/115335505311",
+      "name": "acceptance-runtime-contract",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408840909/job/115335505742",
+      "name": "postgres-transactions",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408839915/job/115335501839",
+      "name": "security-contracts",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38408839915/job/115335502063",
+      "name": "fedora44-full-stable-set",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    }
+  ],
+  "log_sha256": {
+    "ci-unit.log.gz": "24c6ccefd280434bed0b149f130df9dc5a22b9cc7fc7a3535bd61c9ec5412b95",
+    "ci-security.log.gz": "505dca4d334038b763a76e82700e2adc27188c4b338e7e4e9d49a581a82e5f08"
+  },
+  "note": "Subsequent documentation-only evidence commit CI is separately visible on the draft PR; no cloud provider or production acceptance is claimed."
+}

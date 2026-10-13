@@ -27,7 +27,9 @@ def verify_root_set(roots):
 def lifecycle_oidc(raw, jwks, lifecycle, *, pins, now, minimum_epoch):
     payload = require_attestation(lifecycle, "jwks-lifecycle")
     required = {"issuer", "jwks_sha256", "epoch", "fetched_at", "revoked_kids", "issued_at", "expires_at"}
-    if (set(payload) != required or payload["issuer"] != "https://token.actions.githubusercontent.com" or
+    # The HTTPS client requires a nonce; offline legacy callers retain the
+    # original contract. Never strip a signed nonce or manufacture an attestation.
+    if (set(payload) not in (required, required | {"nonce"}) or payload["issuer"] != "https://token.actions.githubusercontent.com" or
             payload["jwks_sha256"] != digest(jwks) or type(payload["epoch"]) is not int or payload["epoch"] < minimum_epoch or
             type(payload["fetched_at"]) is not int or not 0 <= now - payload["fetched_at"] <= 3600 or
             not payload["issued_at"] <= now < payload["expires_at"] or not isinstance(payload["revoked_kids"], list) or

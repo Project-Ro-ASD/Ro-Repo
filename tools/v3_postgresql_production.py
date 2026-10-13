@@ -107,7 +107,7 @@ def provisioning_sql(schema="ro_v3", owner="ro_v3_owner", writer="ro_v3_writer")
         "-- Configure hostssl + SCRAM/client certificates, database CONNECT grants, fsync/full_page_writes, backup and independent checkpoints separately.", ""])
 
 
-def initialize_empty_rehearsal(adapter, signer, attestation, *, audit_key, audit_key_sha256, now):
+def initialize_empty_rehearsal(adapter, signer, attestation, *, audit_key, audit_key_sha256, now, guard=None, consumed=None):
     """Seed a provisioned EMPTY test ledger after independent empty-state proof.
 
     Never revive a missing head in an existing ledger. Production initialization
@@ -117,7 +117,8 @@ def initialize_empty_rehearsal(adapter, signer, attestation, *, audit_key, audit
     from v3_backend_ledger import Ledger
     payload = require_attestation(attestation, "empty-stable")
     required = {"database", "schema", "storage_commit", "inventory_sha256", "remote_sha256", "stable_absent", "writer_exclusive", "issued_at", "expires_at"}
-    if (set(payload) != required or payload["database"] != adapter.config["dbname"] or payload["schema"] != adapter.config["schema"] or
+    observation_fields = {"nonce", "origin", "observation", "history_sha256"}
+    if (set(payload) not in (required, required | observation_fields) or payload["database"] != adapter.config["dbname"] or payload["schema"] != adapter.config["schema"] or
             not re.fullmatch(r"[a-f0-9]{40}", payload["storage_commit"]) or not HEX.fullmatch(payload["inventory_sha256"]) or not HEX.fullmatch(payload["remote_sha256"]) or
             payload["stable_absent"] is not True or payload["writer_exclusive"] is not True or not payload["issued_at"] <= now < payload["expires_at"] or
             signer.key_sha256 != audit_key_sha256 or digest(audit_key) != audit_key_sha256):
@@ -129,7 +130,13 @@ def initialize_empty_rehearsal(adapter, signer, attestation, *, audit_key, audit
         for name in ("head", "attempts", "consumed", "views", "events"):
             if db.execute("SELECT COUNT(*) FROM " + name).fetchone()[0] != 0:
                 raise PlanningError("refusing to initialize nonempty provisioned ledger")
+        if guard:
+            guard(db)
         from v3_backend_trust import canonical
         db.execute("INSERT INTO head VALUES(1,?)", (canonical({"digest": None, "generation": 0, "last_verified": None}).decode(),))
+        for kind, identity in (consumed or {}).items():
+            ledger.consume(db, kind, identity, "empty-initialize-" + attestation.sha256)
         ledger._append(db, "empty-initialize-" + attestation.sha256, None)
+        if guard:
+            guard(db)
         return ledger._integrity(db)

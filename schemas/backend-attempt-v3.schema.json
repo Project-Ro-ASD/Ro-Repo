@@ -684,6 +684,120 @@
                 },
                 "post": {
                   "type": "object"
+                },
+                "deployment_requests": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "pre": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "idempotency_key",
+                        "binding"
+                      ],
+                      "properties": {
+                        "idempotency_key": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "binding": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "attempt_id",
+                            "phase",
+                            "git_commit",
+                            "result_stable_sha256",
+                            "publication_sha256",
+                            "authorization_sha256"
+                          ],
+                          "properties": {
+                            "attempt_id": {
+                              "type": "string",
+                              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+                            },
+                            "phase": {
+                              "enum": [
+                                "pre",
+                                "post"
+                              ]
+                            },
+                            "git_commit": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{40}$"
+                            },
+                            "result_stable_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "publication_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "authorization_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "post": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "idempotency_key",
+                        "binding"
+                      ],
+                      "properties": {
+                        "idempotency_key": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "binding": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "attempt_id",
+                            "phase",
+                            "git_commit",
+                            "result_stable_sha256",
+                            "publication_sha256",
+                            "authorization_sha256"
+                          ],
+                          "properties": {
+                            "attempt_id": {
+                              "type": "string",
+                              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$"
+                            },
+                            "phase": {
+                              "enum": [
+                                "pre",
+                                "post"
+                              ]
+                            },
+                            "git_commit": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{40}$"
+                            },
+                            "result_stable_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "publication_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            },
+                            "authorization_sha256": {
+                              "type": "string",
+                              "pattern": "^[a-f0-9]{64}$"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
