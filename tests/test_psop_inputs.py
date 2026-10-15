@@ -12,9 +12,11 @@ from psop_context import Context, Evidence, SEAL
 from psop_history import read_archive, assess_history, availability_request
 from psop_genesis import verify_genesis, genesis_request
 from psop_inputs import acquire
+from psop_plan import prepare
 from psop_signing import MetadataSigner
 from v3_promotion_planner import PlanningError, plan
 from v3_backend_trust import canonical, digest
+from v3_policy_profile import sha
 from ro_repo import _sign_file_exact, ContractError
 from test_v3_signed_beta_history import REG, S1, pub
 import psop_audit
@@ -102,6 +104,20 @@ class InputTests(unittest.TestCase):
             self.first["published_at"] = when
             with self.subTest(when=when), self.assertRaises(PlanningError):
                 self.history()
+
+    def test_planner_cannot_borrow_authenticated_availability_from_another_candidate(self):
+        h = self.history()
+        beta = copy.deepcopy(S1)
+        for package in beta["packages"]:
+            package["published_signed_artifact_sha256"] = "f" * 64
+        self.assertNotEqual(plan(beta, None, REG, "ro-assist")["candidate_sha256"], self.candidate)
+        i = Evidence({"context": self.context.pin, "group": "ro-assist", "registry_sha256": sha(REG),
+            "archive_sha256": h.data["archive"]["archive_sha256"], "previous_stable_sha256": None,
+            "pins": {"main_sha": "a" * 40, "pages_sha": "b" * 40}, "manifests": {"beta": beta}}, SEAL)
+        g = verify_genesis(i, h, self.context.envelope("genesis", genesis_request(i, h), now=NOW),
+                           context=self.context, now=NOW)
+        with self.assertRaisesRegex(PlanningError, "different candidate"):
+            prepare(i, "ro-assist", REG, {}, history=h, genesis=g, context=self.context, now=UTC)
 
     def test_signed_archive_unknown_field_is_rejected_even_when_resigned(self):
         self.record["allow_missing_evidence"] = True

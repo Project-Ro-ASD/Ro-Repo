@@ -49,6 +49,7 @@ def assess_history(signed_archive, api_observations, availability_evidence, *, c
         return value
     # API records are retained as observations, never used as authentication.
     base = {"context": context.pin, "archive": signed_archive, "observed_api": api_observations,
+            "candidate_sha256": candidate,
             "production_dwell": "BLOCKED", "status": "BLOCKED", "first_seen": None,
             "unproven_intervals": True, "publishable": False}
     if availability_evidence is None:

@@ -19,7 +19,7 @@
     {
       "mode": "0o644",
       "path": "tests/psop-offline-e2e.py",
-      "sha256": "a1f8f72e1a80bfe32da6781b2b767007b008ffd5812c1c28b60d7403dc11b7a9"
+      "sha256": "d3daca2f3502e350cce994a8c7c1e9f9856e671897e40de2f46270cbee86b060"
     },
     {
       "mode": "0o644",
@@ -29,7 +29,7 @@
     {
       "mode": "0o644",
       "path": "tests/test_psop_inputs.py",
-      "sha256": "1ff68014098889fb2874886fe9d655aad8055c196fb02fdb892d07c64db0a22f"
+      "sha256": "22ccca2836ce3563d2a52e8763e2d00ef2d944dfb3d74f1bcb205a3667559a28"
     },
     {
       "mode": "0o644",
@@ -59,7 +59,7 @@
     {
       "mode": "0o644",
       "path": "tools/psop_history.py",
-      "sha256": "17335cb3e683a8e614b79d91de875ad611db26dd9d5c6e9184fefc8dfc1b7d0c"
+      "sha256": "3d9e558bd495955bc970d1d01daa16039fd704b2695605dc3830b8006256a19a"
     },
     {
       "mode": "0o644",
@@ -79,7 +79,7 @@
     {
       "mode": "0o644",
       "path": "tools/psop_plan.py",
-      "sha256": "bf27676d152660af0bd4c9a9452587e74b88f2d829fab0c1418285bc3a1c8cdc"
+      "sha256": "0ae74fec5c03e043073edcfdb42db36dee7aa18af2973da93a67749582317f72"
     },
     {
       "mode": "0o644",
@@ -102,6 +102,6 @@
       "sha256": "c47d4e6a6cca52bf4fac62a0138d05df4328a02f5ce787697b30bc751bdfb100"
     }
   ],
-  "inventory_sha256": "f8efcfe95aececf94867345baee2be6ac7a0bb3fffb9bb515a2d45eb27d0ca88",
+  "inventory_sha256": "c1a4ee92c40ee697987bec8a85ab2344135d0587f4ac7940673029e52fb4b0e8",
   "scope": "PSOP code/schema/test source at local acceptance; docs/logs excluded to avoid self-reference"
 }

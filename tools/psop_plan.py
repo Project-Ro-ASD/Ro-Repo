@@ -32,6 +32,8 @@ def prepare(inputs, group, registry, evidence, *, history, genesis, context, now
     elif genesis is not None:
         raise PlanningError("genesis cannot replace an existing stable base")
     p = plan(i["manifests"]["beta"], i["manifests"].get("stable"), registry, group)
+    if h["candidate_sha256"] != p["candidate_sha256"]:
+        raise PlanningError("history availability belongs to a different candidate")
     policy = require_complete(p, registry)
     first = h["first_seen"]
     dwell = evaluate(p, [{**first, "promotion_group": group, "candidate_sha256": p["candidate_sha256"]}],

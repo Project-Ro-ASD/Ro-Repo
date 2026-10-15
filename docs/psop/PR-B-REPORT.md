@@ -24,7 +24,7 @@ Exact source inventory, local logs ve E2E çıktıları:
 | Gerçek RPM/GPG negatifleri | PASS_REJECTION | Wrong root/role, rehashed unsigned RPM, actual wrong-arch header, partial group, missing availability/dependency, kısa dwell ve production metadata key. |
 | Eski immutable byte ve receipt korunması | PASS | Current Beta/snapshot/history marker'ları korunur; sonraki publication önceki receipt checkpoint'ini değiştirmez. |
 | 234-file / Beta / Strict V3 guard | PASS | Original baseline/digest aynı; yalnız explicit PSOP additions. Workflow/production profile/key/registry değişmedi. |
-| Yerel full discovery | PASS | 619 başlangıcı + 32 yeni test = 651; exact log/komut `tests.json` içinde. Yeni test skip/allow-failure/assertion kaldırma yok. |
+| Yerel full discovery | PASS | 619 başlangıcı + 33 yeni test = 652; exact log/komut `tests.json` içinde. Yeni test skip/allow-failure/assertion kaldırma yok. |
 | Final-head CI | Gerekli | Exact head ve mevcut sekiz check'in son sonuçları PR'ın checks/teslim açıklamasında doğrulanır. Historical veya yerel PASS CI yerine sayılmaz. |
 | Gerçek production first-seen/dwell/test authority | BLOCKED | Synthetic issuer ve consistent claim gerçek üretim kanıtına yükseltilmez. |
 | DNF5 client descriptor/state / external Pages HTTPS / GUI | UNVERIFIED | PR-C'ye aittir; bu milestone'da tamamlandı denmez. |
@@ -32,8 +32,12 @@ Exact source inventory, local logs ve E2E çıktıları:
 | Strict V3 / PSOP production activation | BLOCKED | Mevcut hard-deny ve disabled workflow aynıdır; bütün PSOP artifacts publishable=false. |
 
 Geliştirme sırasında raw bytes evidence hashing ve moving global checkpoint'in eski
-receipt'i değiştirmesi tespit edilip düzeltildi. PASS, yalnız raporlanan final
+receipt'i değiştirmesi tespit edilip düzeltildi. Son incelemede history
+candidate digest'i planner candidate'ına ayrıca bağlandı; başka candidate'tan
+dwell taşınması unit ve gerçek RPM E2E negatifinde reddedilir. PASS, yalnız raporlanan final
 koşular içindir; önceki başarısız geliştirme koşuları başarılı kabul edilmez.
+Sandbox içindeki tekrar koşusunda GPG agent socket erişimi reddedildi; final
+local koşular disposable test anahtarlarıyla socket erişimi olan ortamda yapıldı.
 
 ## PR-C'ye kalanlar
 

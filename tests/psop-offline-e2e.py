@@ -188,6 +188,19 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                     history=history, genesis=genesis, context=context, now=utc(now))
                 negatives["missing_availability"] = reject(lambda: prepare(inputs, group, registry,
                     {"claim": claim, "attestation": attestation}, history=missing, genesis=genesis, context=context, now=utc(now)))
+                if stable is None:
+                    other_manifest = json.loads((beta2 / "repository-snapshot-v1.json").read_bytes())
+                    other_candidate = plan(other_manifest, None, registry, group)["candidate_sha256"]
+                    assert other_candidate != p["candidate_sha256"]
+                    other_first = {"publication_run": "102", "published_at": first["published_at"]}
+                    other_history = assess_history(archive, [], context.envelope("availability",
+                        availability_request(archive, other_candidate, other_first), now=now),
+                        context=context, candidate=other_candidate, now=utc(now))
+                    other_genesis = verify_genesis(inputs, other_history, context.envelope("genesis",
+                        genesis_request(inputs, other_history), now=now), context=context, now=now)
+                    negatives["other_candidate_dwell"] = reject(lambda: prepare(inputs, group, registry,
+                        {"claim": claim, "attestation": attestation}, history=other_history,
+                        genesis=other_genesis, context=context, now=utc(now)), "different candidate")
                 if stable is not None:
                     recent_first = {**first, "published_at": utc(now - 86400)}
                     recent = assess_history(archive, [], context.envelope("availability",
