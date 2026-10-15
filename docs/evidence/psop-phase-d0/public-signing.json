@@ -1,0 +1,105 @@
+{
+  "publications": [
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35530066972"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35586124137"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35587617947"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35599214422"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id",
+        "store_tree_sha256"
+      ],
+      "metadata_signature": "PASS",
+      "run": "36123484599"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id",
+        "store_tree_sha256"
+      ],
+      "metadata_signature": "PASS",
+      "run": "37935890476"
+    }
+  ],
+  "publishable": false,
+  "scope": "read-only extracted public inputs; no DNF or private keys",
+  "snapshots": [
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 3,
+      "snapshot_id": "repo-f44-20260920-001"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 3,
+      "snapshot_id": "repo-f44-20260921-001"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 24,
+      "snapshot_id": "repo-f44-20260929-001"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 26,
+      "snapshot_id": "repo-f44-20261006-001"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 30,
+      "snapshot_id": "repo-f44-20261009-001"
+    }
+  ],
+  "strict_history": {
+    "reason": "unexpected signed publication fields",
+    "status": "BLOCKED"
+  }
+}
