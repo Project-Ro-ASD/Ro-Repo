@@ -1,0 +1,25 @@
+{
+  "phase": "A",
+  "production_activation": false,
+  "profile": "psop-pages-stable",
+  "provider_guarantees": {
+    "deadline_fencing": false,
+    "global_cdn_freshness": false,
+    "pages_build_ordering": false
+  },
+  "public_roots": {
+    "metadata": {
+      "fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+      "path": "keys/production/ro-asd-metadata-signing-public.asc",
+      "sha256": "4eaf0b2903e60442c2f05325a43d85046bba850059b732dfc71e330f5e9e0809"
+    },
+    "rpm": {
+      "fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+      "path": "keys/production/ro-asd-rpm-signing-public.asc",
+      "sha256": "d73e92fcbf1dc9f8900459fa34b5eaa053570f11532ffc8e53373e8289b7ee51"
+    }
+  },
+  "schema_version": 1,
+  "strict_v3_compatible": false,
+  "writer_authority": []
+}

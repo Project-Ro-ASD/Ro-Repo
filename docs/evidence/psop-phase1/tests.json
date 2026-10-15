@@ -1,0 +1,73 @@
+{
+  "checks": {
+    "public_signing_recheck": "PASS",
+    "py_compile": "PASS",
+    "source_preservation": "PASS",
+    "strict_archive_history": "BLOCKED: unexpected signed publication fields"
+  },
+  "ci": {
+    "checks_succeeded": 8,
+    "evidence": "ci.json",
+    "latest_head_checks": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/79/checks",
+    "result": "PASS",
+    "tested_head": "72186d7c5dce4cc8d38c3a456bb53bdf216bf885"
+  },
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "runs": [
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "log": "main-unit.log.gz",
+      "name": "main-unit",
+      "result": "PASS",
+      "scope": "main runtime before final PSOP test discovery",
+      "seconds": 300.69,
+      "tests": 608
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_psop_contract.py -v",
+      "log": "psop-contract.log.gz",
+      "name": "psop-contract",
+      "result": "PASS",
+      "scope": "PR-A new contracts",
+      "seconds": 0.434,
+      "tests": 11
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_v3_provider_fault_injection.py -v",
+      "log": "pr78-fault.log.gz",
+      "name": "pr78-fault",
+      "result": "PASS",
+      "scope": "PR #78 exact head diagnostic, disposable /tmp copy",
+      "seconds": 59.532,
+      "tests": 4
+    },
+    {
+      "command": "PYTHONPATH=tests:tools python3 -m unittest test_v3_live_provider.LiveProviderTests.test_simultaneous_different_publishers_have_one_git_cas_winner -v",
+      "log": "pr78-race.log.gz",
+      "name": "pr78-race",
+      "result": "PASS",
+      "scope": "PR #78 exact head diagnostic, disposable /tmp copy",
+      "seconds": 3.242,
+      "tests": 1
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "log": "sandbox-attempt.log.gz",
+      "name": "sandbox-attempt",
+      "result": "FAIL",
+      "scope": "sandbox disallowed sockets; not a passing test run",
+      "seconds": 186.447,
+      "tests": 585
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -v",
+      "log": "final-unit.log.gz",
+      "name": "final-unit",
+      "result": "PASS",
+      "scope": "main plus 11 PSOP tests, final complete discovery",
+      "seconds": 306.476,
+      "tests": 619
+    }
+  ]
+}
