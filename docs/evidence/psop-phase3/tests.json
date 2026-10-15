@@ -12,14 +12,14 @@
     "command": "python3 -m unittest discover -s tests -v",
     "count": 679,
     "log": "full-discovery.log.gz",
-    "seconds": 334.747,
+    "seconds": 529.86,
     "skips": 0,
     "status": "PASS"
   },
   "local_execution_source": {
     "binding": "exact source inventory matches delivered code; not a claim that the uncommitted local run had the future PR commit SHA",
     "dirty": true,
-    "head": "9284bdc04b7ed7f0b2c1ec6a34942eb7e36317c3"
+    "head": "0c5fe80038ee81ddbdee8938148fe4c3553cd56a"
   },
   "local_https": {
     "command": "python3 tests/psop-pages-disposable-acceptance.py --mode local --output /out/local-https.json",
@@ -43,5 +43,5 @@
   "production_activation": "BLOCKED",
   "psop_tests_in_full_discovery": 71,
   "publishable": false,
-  "source_inventory_sha256": "6488aba7af22248d39d00f82363bd5e27f43673898e453d6404754df4ff79d5d"
+  "source_inventory_sha256": "ee66d14350a2d59074d401ff7109d73ad901856d4fcae9dc87afbdb7210e44f5"
 }

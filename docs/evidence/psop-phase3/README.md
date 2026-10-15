@@ -13,7 +13,7 @@ BLOCKED.** Original 652 tests are preserved; final local full discovery is
 | [pr-b-baseline.json](pr-b-baseline.json), [pr-b-baseline.log.gz](pr-b-baseline.log.gz) | Unmodified default PR-B three-flow real RPM publication baseline; observer is not enabled in this run. |
 | [external-pages.json](external-pages.json) | Actual external-mode refusal: BLOCKED, exit 2, zero requests, no authorized target. It is not a Pages PASS. |
 | [fault-matrix.json](fault-matrix.json) | Exact executed test IDs for delayed CAS, expiry, race, lost response, process death, UNKNOWN, complete-member faults and wrong public receipts. |
-| [source-inventory.json](source-inventory.json) | SHA256/mode inventory of all code/tests/schemas/config/public keys/workflows. Digest `6488aba7af22248d39d00f82363bd5e27f43673898e453d6404754df4ff79d5d`. |
+| [source-inventory.json](source-inventory.json) | SHA256/mode inventory of all code/tests/schemas/config/public keys/workflows. Digest `ee66d14350a2d59074d401ff7109d73ad901856d4fcae9dc87afbdb7210e44f5`. |
 | [source-audit.json](source-audit.json), [refs.json](refs.json) | Original 234-file protection and public pins unchanged; initial main/Pages/#78 references. Final remote checks are also recorded in PR delivery. |
 | [pr78-reference.json](pr78-reference.json) | Read-only exact-head counterexample review; no merge/cherry-pick or copied test suite. |
 
@@ -33,7 +33,7 @@ PSOP's own `gpgcheck`, `repo_gpgcheck`, `sslverify` are 1 and
 `skip_if_unavailable` is 0. DNF consumes a frozen verified file view after actual
 TLS/complete-byte verification, avoiding a second mutable CDN read.
 
-Source capture honestly records the local precommit main HEAD and dirty workspace.
+Source capture honestly records the local precommit HEAD and dirty workspace.
 The exact source inventory binds those executions to delivered code; it does not
 pretend that a future commit SHA existed during a precommit test. GitHub runtime
 artifacts separately record checkout/run context. Final-head CI (eight existing
@@ -56,3 +56,9 @@ freshness, Pages ordering, provider deadline fencing, native aarch64, GUI or
 production authority. See [readiness](../../psop/READINESS-REPORT.md),
 [runbook](../../psop/OPERATOR-RUNBOOK.md) and
 [API map](../../psop/PR-C-IMPLEMENTATION.md).
+
+Initial CI failure is preserved in [ci-checkout-failure.json](ci-checkout-failure.json)
+and [ci-initial-failure.log.gz](ci-initial-failure.log.gz). Git was absent at checkout,
+so archive fallback omitted `.git`; the exact-source collector correctly stopped.
+Runtime installation now precedes checkout, with a regression assertion. No test
+or source-verification requirement was removed. Final acceptance is rerun separately.

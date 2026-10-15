@@ -99,6 +99,6 @@
       ]
     }
   ],
-  "source_inventory_sha256": "6488aba7af22248d39d00f82363bd5e27f43673898e453d6404754df4ff79d5d",
+  "source_inventory_sha256": "ee66d14350a2d59074d401ff7109d73ad901856d4fcae9dc87afbdb7210e44f5",
   "status": "PASS_LOCAL_MODEL_REGRESSION"
 }

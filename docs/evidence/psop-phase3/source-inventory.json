@@ -23,7 +23,7 @@
     {
       "mode": "0o644",
       "path": ".github/workflows/psop-acceptance-tests.yml",
-      "sha256": "12a31d674bbd5b6378e849b2170be65f6d05d9aa6e4f33a683b7c2b86c2dc606"
+      "sha256": "91f44122efa0c5292390ee86c9d5512454601060728c7974c1236193782f0249"
     },
     {
       "mode": "0o644",
@@ -368,7 +368,7 @@
     {
       "mode": "0o644",
       "path": "tests/test_psop_provider_faults.py",
-      "sha256": "e57a989f75d0b3a64bb47615bb62e86d774366318dac521f6981811c0436c4bd"
+      "sha256": "51afc49da64c9c919e449c643385b09b283c35e83709c1378ce3247cd4c19d1d"
     },
     {
       "mode": "0o644",
@@ -1002,5 +1002,5 @@
     }
   ],
   "scope": "Exact tools/tests/schema/config/public-key/workflow bytes; documentation excluded",
-  "sha256": "6488aba7af22248d39d00f82363bd5e27f43673898e453d6404754df4ff79d5d"
+  "sha256": "ee66d14350a2d59074d401ff7109d73ad901856d4fcae9dc87afbdb7210e44f5"
 }

@@ -1,0 +1,11 @@
+{
+  "cause": "Git absent during checkout; checkout used an archive without .git. Exact commit collector correctly refused.",
+  "final_head_results": "See exact final PR checks/delivery; this failed run is never counted PASS",
+  "fix": "Install disposable runtime including Git before checkout; enforce ordering in existing CI isolation test.",
+  "head": "0c5fe80038ee81ddbdee8938148fe4c3553cd56a",
+  "job_id": "116540630137",
+  "phase": "evidence capture before native transactions",
+  "run_id": "38769305661",
+  "status": "FAIL",
+  "verification_not_relaxed": true
+}

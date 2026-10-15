@@ -6,31 +6,31 @@
       "returncode": 1,
       "ro_assist_installed": false,
       "status": "PASS_REJECTION",
-      "stdout_stderr_sha256": "7720c6ddcb297566dec537f8cdfead506ad344c1537f800ea44cc097ca223e48"
+      "stdout_stderr_sha256": "1943e78c33e050d0e8eb3556142ef079fbaa66e92a13f84a40c6accdb84a2c1c"
     },
     "missing-dependency": {
       "returncode": 1,
       "ro_assist_installed": false,
       "status": "PASS_REJECTION",
-      "stdout_stderr_sha256": "9e93b6e5f834e0abab5fcc1133a6bbbd48bcba7a314a4bde15f144633a9560a4"
+      "stdout_stderr_sha256": "ffa78e1b525a50ef38375f864939161e675979bb94be7ece7d09df9e07b044a3"
     },
     "unsigned-rpm": {
       "returncode": 1,
       "ro_assist_installed": false,
       "status": "PASS_REJECTION",
-      "stdout_stderr_sha256": "461d1890a19513a517966d593dba05705955bf4d70bec39fb00a86b694201afa"
+      "stdout_stderr_sha256": "a038250e87432ca57670171039a9342fc68ae35fa1c5e709b96c783aada5e7fd"
     },
     "wrong-metadata-key": {
       "returncode": 1,
       "ro_assist_installed": false,
       "status": "PASS_REJECTION",
-      "stdout_stderr_sha256": "77d2347a89d28021571f1da4f410f66b526d89a858228c217ce6d724cb623999"
+      "stdout_stderr_sha256": "1a9ce379b61abf49ca8d8449f7476ec548008f78d6e077abc238e3166653d584"
     },
     "wrong-rpm-key": {
       "returncode": 1,
       "ro_assist_installed": false,
       "status": "PASS_REJECTION",
-      "stdout_stderr_sha256": "4d9fd3bb746ca39b1f7cfef88a214dee1f908a260e46942edcb67942f90530c4"
+      "stdout_stderr_sha256": "ef2d0c714d1b1a01d47a49c71512d73250b165f5a4ad212fe9025a8cbfa2d597"
     }
   },
   "dnf_transport": "verified-frozen-file-view-after-full-HTTPS-acquisition",
@@ -45,7 +45,7 @@
   "native_cases": [
     {
       "case": "genesis",
-      "descriptor_sha256": "d9e11d5f6a1a97e44fc4924429736999f25ddbd7c2f02fd494083be1cb4bbff8",
+      "descriptor_sha256": "47fb45132ca00933d7cb3ff34bb27c2311a864d871f1d551a6c80e9fe86ab164",
       "https_negatives": {
         "expired_descriptor": "PASS_REJECTION",
         "missing_member": "PASS_REJECTION",
@@ -62,7 +62,7 @@
     },
     {
       "case": "selected-plus-retained-successor",
-      "descriptor_sha256": "aa55b3aa4248f02d7ccc43a93aea2f8a73273bb67ce387a162ccef5abbeba1d1",
+      "descriptor_sha256": "f4847c939ac395bad2fcfdc84328f1308bac62bc1fe4f297234bdaa7ffaffc8d",
       "https_negatives": {
         "actual_dnf_transaction_failure": "PASS_REJECTION",
         "expired_descriptor": "PASS_REJECTION",
@@ -83,13 +83,13 @@
     },
     {
       "case": "native-install",
-      "descriptor_sha256": "2732719a5cd8fd6029da100e483ae64a9655a255f8ccc87f8e9246373af4f35a",
+      "descriptor_sha256": "80218ade283c6f691056c6db261fa40ab7895ae67aac801a4ca2d131d219c65d",
       "installed_version": "1.0",
       "status": "PASS"
     },
     {
       "case": "native-upgrade",
-      "descriptor_sha256": "28709e4b6cb8d3dcf562cb50f4d51c8cbc7fb9be2ecd702185f5d3e2331b6579",
+      "descriptor_sha256": "11c3c6ae33de3a4cb40823fdc9b0e17369cb0058ddfbc14270655534d39bd4ac",
       "installed_version": "2.0",
       "status": "PASS"
     }
@@ -155,7 +155,7 @@
     },
     "scope": "official-Fedora-gzip-dependency-base-before-PSOP-overlay",
     "status": "PASS_OBSERVATION",
-    "stdout_stderr_sha256": "5e975a4429fa183fab6ef3f7b65d62d4287f3ea570d89fbffb7959e1419688d7"
+    "stdout_stderr_sha256": "6461242a248edf84b1427fe4b82cab662a41d5ab11b2df87b43c970bb4bc51e1"
   },
   "pages_build_ordering": "UNVERIFIED",
   "production_activation": "BLOCKED",
@@ -168,6 +168,6 @@
     "rpm": "RPM version 6.0.2"
   },
   "scope": "psop-fedora44-native-dnf5",
-  "source_inventory_sha256": "6488aba7af22248d39d00f82363bd5e27f43673898e453d6404754df4ff79d5d",
+  "source_inventory_sha256": "ee66d14350a2d59074d401ff7109d73ad901856d4fcae9dc87afbdb7210e44f5",
   "status": "PASS"
 }

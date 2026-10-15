@@ -11,11 +11,13 @@ jobs:
     container: fedora:44
     timeout-minutes: 30
     steps:
+      # Checkout falls back to an archive without .git when Git is missing.
+      # Evidence must identify the actual checkout, so install Git first.
+      - name: Install disposable test runtime
+        run: dnf -y install python3 python3-jsonschema python3-yaml rpm rpm-build rpm-sign createrepo_c gnupg2 openssl dnf5 git
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - name: Install disposable test runtime
-        run: dnf -y install python3 python3-jsonschema python3-yaml rpm rpm-build rpm-sign createrepo_c gnupg2 openssl dnf5 git
       - name: Verify original source boundary
         run: python3 tools/psop_audit.py source
       - name: Preserve PR-B three-flow real RPM baseline

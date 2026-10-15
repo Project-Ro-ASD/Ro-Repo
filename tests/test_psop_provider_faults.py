@@ -118,6 +118,10 @@ class CIIsolationTests(unittest.TestCase):
         self.assertEqual(set(v["jobs"]), {"psop-fedora44-acceptance"})
         for job in v["jobs"].values():
             self.assertEqual(job["container"], "fedora:44")
+            checkout = next(i for i, step in enumerate(job["steps"]) if step.get("uses", "").startswith("actions/checkout@"))
+            runtime = next(i for i, step in enumerate(job["steps"]) if step.get("name") == "Install disposable test runtime")
+            self.assertLess(runtime, checkout, "Git must exist before checkout; archive fallback has no commit metadata")
+            self.assertIn("git", job["steps"][runtime]["run"].split())
             for forbidden in ("environment", "permissions", "continue-on-error", "if"):
                 self.assertNotIn(forbidden, job)
             for step in job["steps"]:
