@@ -1,0 +1,39 @@
+{
+  "added_tests": 32,
+  "base_test_count": 619,
+  "dnf5_client_acceptance": "UNVERIFIED",
+  "external_pages_https": "UNVERIFIED",
+  "final_head_ci": "Verify exact PR head in GitHub checks and delivery description; local evidence does not grant CI success",
+  "full_discovery": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "count": 651,
+    "log": "full-discovery.log.gz",
+    "seconds": 281.465,
+    "skips": 0,
+    "status": "PASS"
+  },
+  "gui": "UNVERIFIED",
+  "host": {
+    "python": "3.14.8",
+    "system": "Linux-7.2.9-201.fc44.x86_64-x86_64-with-glibc2.43"
+  },
+  "offline_e2e": {
+    "ci_scope": "Standalone local acceptance; existing CI workflows are unchanged",
+    "command": "podman run --rm --network none --security-opt label=disable -e PYTHONDONTWRITEBYTECODE=1 -v /home/smurat/Ro-ASD/Ro-Repo:/source:ro -v /tmp/psop-b-evidence:/out -w /source localhost/ro-v3-backend-test-runtime:20261012 python3 tests/psop-offline-e2e.py /out/e2e.json",
+    "image_id": "1af38c532d564f256e338805615599f203d8f22895a07ce7d88d013cfda73105",
+    "log": "offline-e2e.log.gz",
+    "negative_assertions": 16,
+    "publications": 3,
+    "result": "e2e.json",
+    "status": "PASS"
+  },
+  "production_activation": "BLOCKED",
+  "psop_targeted": {
+    "command": "python3 -m unittest discover -s tests -p 'test_psop_*.py' -v",
+    "count": 43,
+    "log": "psop-targeted.log.gz",
+    "status": "PASS"
+  },
+  "publishable": false,
+  "source_inventory_sha256": "f8efcfe95aececf94867345baee2be6ac7a0bb3fffb9bb515a2d45eb27d0ca88"
+}

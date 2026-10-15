@@ -1,0 +1,11 @@
+{
+  "main": "e11ad5160d4dbd53a320562742ad66190d408f6e",
+  "pages_storage": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+  "pr78": {
+    "draft": true,
+    "head": "7a979ab0dffa4654c32ae8c5c0b1a05940180c3a",
+    "state": "OPEN"
+  },
+  "production_activation": "BLOCKED",
+  "verification": "read-only git ls-remote and gh pr view, before implementation and after local acceptance"
+}

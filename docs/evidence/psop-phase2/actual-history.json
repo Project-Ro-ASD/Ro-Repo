@@ -1,0 +1,12 @@
+{
+  "scope": "read-only actual production public history; no production authority",
+  "pages_commit": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+  "signed_publications": 6,
+  "legacy_compatibility": "PASS_ORIGINAL_SIGNATURES",
+  "archive_sha256": "e0d0c291c77ad9e7c4823b60193f1f438c7df00a28b2a3a46b646974bebeb5b3",
+  "observed_timestamps": "UNTRUSTED_FOR_DWELL",
+  "availability_coverage": "BLOCKED",
+  "production_dwell": "BLOCKED",
+  "production_activation": "BLOCKED",
+  "publishable": false
+}
