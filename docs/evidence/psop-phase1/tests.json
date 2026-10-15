@@ -5,7 +5,13 @@
     "source_preservation": "PASS",
     "strict_archive_history": "BLOCKED: unexpected signed publication fields"
   },
-  "ci": "PENDING; see live PR checks",
+  "ci": {
+    "checks_succeeded": 8,
+    "evidence": "ci.json",
+    "latest_head_checks": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/79/checks",
+    "result": "PASS",
+    "tested_head": "72186d7c5dce4cc8d38c3a456bb53bdf216bf885"
+  },
   "production_activation": "BLOCKED",
   "publishable": false,
   "runs": [

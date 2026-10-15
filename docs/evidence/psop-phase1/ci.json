@@ -1,0 +1,59 @@
+{
+  "checks": [
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034420/job/116385363326",
+      "name": "backend-security",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034417/job/116385363332",
+      "name": "acceptance-runtime-contract",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034417/job/116385363009",
+      "name": "unit-policy",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034440/job/116385363412",
+      "name": "security-contracts",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034417/job/116385363469",
+      "name": "fedora44-e2e",
+      "state": "SUCCESS",
+      "workflow": "Ro-Repo V2 tests"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034420/job/116385362915",
+      "name": "closure-tls-postgresql",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034440/job/116385363227",
+      "name": "fedora44-full-stable-set",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated integration acceptance"
+    },
+    {
+      "link": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034420/job/116385363258",
+      "name": "postgres-transactions",
+      "state": "SUCCESS",
+      "workflow": "V3 isolated backend rehearsal"
+    }
+  ],
+  "followup": "Only CI evidence and documentation are updated after this tested implementation commit; latest head checks remain required.",
+  "observed_at_utc": "2026-10-15T11:04:07.209380+00:00",
+  "pr": 79,
+  "production_activation": "BLOCKED",
+  "repository": "Project-Ro-ASD/Ro-Repo",
+  "result": "PASS",
+  "source_head": "72186d7c5dce4cc8d38c3a456bb53bdf216bf885"
+}

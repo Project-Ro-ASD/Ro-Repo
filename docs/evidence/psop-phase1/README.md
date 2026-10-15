@@ -14,6 +14,7 @@ kayıtlarıdır; production approval, deployment receipt veya activation değild
 | `base-protected-files.json` | Exact main'den 234 existing workflow/runtime/config/key/schema/script/test/legacy file SHA256 ve Git mode. Helper'daki baseline digest ile kısaltma da reddedilir. |
 | `source.json` | Phase-A source/profile audit; PASS olsa bile publishable=false, production BLOCKED. |
 | `tests.json`, `*.log.gz` | Exact komut, exit/result ve local diagnostic/test logları; sandbox socket hatası ayrı etiketlenir. CI sonucu GitHub PR head'ine ayrıca bağlıdır. |
+| `ci.json` | Implementation head `72186d7` için sekiz GitHub CI check'inin SUCCESS kaydı ve job/run bağlantıları. Bu kanıtı ekleyen sonraki commit yalnız belge/CI kaydı değiştirir; son head checks ayrıca izlenir. |
 
 Public inputların tekrar hazırlanması (yalnız yerel disposable dizin):
 

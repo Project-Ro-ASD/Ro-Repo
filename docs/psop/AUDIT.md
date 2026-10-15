@@ -23,6 +23,9 @@ veya gelecekteki provider davranışı hakkında garanti değildir.
 | 12 Ekim real acceptance | `released/acceptance.json` 11 case PASS; `publishable=false`, production BLOCKED | PASS tarihsel test kanıtı |
 | Strict V3 | `production_publish`/`activate_production` hard deny; disabled workflow bütün job'ları false | BLOCKED, korunuyor |
 
+Bu başlangıç audit'inden sonra oluşturulan tek PSOP PR'ına **#79** tahsis edildi.
+Başlangıç 404 kaydı, bu PR açıldıktan sonra #79 mevcut değil iddiası değildir.
+
 Main/Pages ve PR kayıtları GitHub API ile, local object'ler fetch sonrası SHA ile
 karşılaştırıldı. Çalışma ilk başta #78 branch'inde açılmıştı; değişiklik yapılmadan
 exact main'den `codex/psop-phase1-contract` oluşturuldu. #78 commit'i yalnız read-only

@@ -25,7 +25,7 @@ signing, required evidence, client fail-closed ve UNKNOWN successor block zorunl
 | Denetim | Sonuç | Kanıt / etkisi |
 | --- | --- | --- |
 | Main/Pages/current Beta/run/#77/#78 referansları | PASS | `github-before/after.json`; iki API observation seti içerik olarak aynı. |
-| Başlangıçta #79 varlığı | UNVERIFIED | İki başlangıç GET'i 404; PR-A açılırken bu numara tahsis edilebilir. |
+| Başlangıçta #79 varlığı | UNVERIFIED → bu PR oluşturuldu | İki başlangıç GET'i 404 idi; sonrasında PR-A'ya #79 tahsis edildi. |
 | Tarihsel araştırma ve immutable history | PASS | 300 reachable tree, Stable hit yok; parent→child snapshot/history drift yok. Mutlak tarihsel yokluk UNVERIFIED. |
 | Production public signing | PASS | Beş snapshot, 86 physical RPM path, altı publication; helper recheck snapshot/build/run bağlarını da doğrular. |
 | Client keyring/repo trust | PASS | Signed RPM payload: canonical public key hashes, Beta açık, Stable kapalı; iki GPG check açık. |
@@ -33,13 +33,21 @@ signing, required evidence, client fail-closed ve UNKNOWN successor block zorunl
 | Yerel testler | PASS | Son tam discovery: **619/619**, bunun 11'i yeni PSOP testi. Önceki main-runtime seti 608/608; `tests.json` ve compressed loglar kayıtlı. |
 | Sandbox ilk full deneme | FAIL — ortam kısıtı | Loopback/GPG socket izinleri nedeniyle 55 error; izinli yerel tekrarları ayrı kaydedildi. Bu deneme başarılı test kanıtı sayılmaz. |
 | PR #78 diagnostic | PASS | Exact head'in `/tmp` kopyası; fault tests ve güçlendirilmiş CAS race. Bu PR'a taşınmadı. |
-| GitHub CI | PENDING | Canlı PR checks esas alınır; testler skip/allow-failure ile geçirilmez. |
+| GitHub CI | PASS — 8/8 SUCCESS | `72186d7` implementation head'i için `ci.json`; sonradan yalnız CI kaydı/belgeler güncellendi. [Son head checks](https://github.com/Project-Ro-ASD/Ro-Repo/pull/79/checks) ayrıca zorunludur; skip/allow-failure değişikliği yok. |
 | Eski archive'ın Strict V3 history uyumu | BLOCKED | `unexpected signed publication fields`; imzalı tarih değiştirilmedi. |
 | Public first-availability witness, private custody, App/PAT/manual authority | UNVERIFIED | Public imza veya current API cevabı bunların kanıtı değildir. |
 | Environment/ruleset okuma | PASS | Reviewer/main-only policies var; `prevent_self_review=false`, min reviews 0, CODEOWNERS enforce false, Pages branch unprotected. |
 | PSOP writer isolation/approval/client implementation | BLOCKED | PR-B/PR-C ve activation gates gerekiyor. |
 | aarch64 / Plasma / gerçek VM/boot/installer kabulü | UNVERIFIED | 12 Ekim x86_64 DNF başarısı bu kapsamları karşılamaz. |
 | Strict V3 production / PSOP production | BLOCKED | Mevcut hard deny + disabled workflow; bu görev activation yetkisi vermiyor. |
+
+CI koşuları: [V2 tests](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034417),
+[V3 backend](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034420),
+[V3 integration](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38724034440).
+`unit-policy`, `fedora44-e2e`, `acceptance-runtime-contract`, `backend-security`,
+`postgres-transactions`, `closure-tls-postgresql`, `security-contracts` ve
+`fedora44-full-stable-set` başarılıdır. Local test kanıtından ayrı GitHub job
+state'leri kaydedildi; production activation hâlâ BLOCKED.
 
 ## Yeniden kullanım ve PR-B engelleri
 
