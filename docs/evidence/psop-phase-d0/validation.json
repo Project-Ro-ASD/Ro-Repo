@@ -1,0 +1,29 @@
+{
+  "observed_at_utc": "2026-10-15T17:40:51.451460+00:00",
+  "base_main": "65409834e8c1b66b954f2d610971f8d407e1e79e",
+  "source_boundary": "all tracked base files unchanged; new docs/evidence only",
+  "full_discovery": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "count": 679,
+    "skips": 0,
+    "status": "PASS",
+    "seconds": 264.819,
+    "log": "full-discovery.log.gz"
+  },
+  "sandbox_attempt": {
+    "status": "FAILED_ENVIRONMENT",
+    "count": 643,
+    "errors": 78,
+    "log": "sandbox-unit.log.gz",
+    "reason": "GPG/socket access restrictions; not PASS evidence"
+  },
+  "source_guard": "PASS",
+  "baseline_main_checks": {
+    "count": 9,
+    "status": "ALL_SUCCESS",
+    "evidence": "github-observations.json"
+  },
+  "final_pr_checks": "Verify exact final HEAD/check run head SHA in PR delivery report; no self-referential commit claim",
+  "production_activation": "BLOCKED",
+  "publishable": false
+}
