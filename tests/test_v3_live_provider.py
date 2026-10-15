@@ -2,6 +2,7 @@ import concurrent.futures
 import pathlib
 import ssl
 import sys
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -93,22 +94,38 @@ class LiveProviderTests(unittest.TestCase):
 
     def test_simultaneous_different_publishers_have_one_git_cas_winner(self):
         self.view()
+        before = self.storage.files(self.server.initial)
         other = Fixture(self.keys, attempt="publisher-two", version="0.2.6")
         self.addCleanup(other.close)
         other.advance("AUTHORIZED")
         signer = self.keys.signers["publication"]
         view = IsolatedStore(other.root).stage(other.result, other.approval, signer,
             origin="https://test.invalid", audit_key_sha256=self.keys.signers["audit"].key_sha256, now=NOW)
+        # Both clients must finish building against the SAME HEAD before
+        # either CAS is submitted; thread start timing alone proves no race.
+        ready = threading.Barrier(2)
         def publish(v, approval):
             try:
-                self.storage.stage(v, approval, expected=self.server.initial, publication_key=signer.public,
-                                   publication_pin=signer.key_sha256, now=NOW)
+                storage = GitHubStorage.rehearsal(self.server.transport, root=self.fx.root, **self.pins)
+                storage.stage(v, approval, expected=self.server.initial, publication_key=signer.public,
+                              publication_pin=signer.key_sha256, now=NOW,
+                              before_cas=lambda old,new: ready.wait(timeout=10))
                 return "won"
             except PlanningError:
                 return "conflict"
         with concurrent.futures.ThreadPoolExecutor(2) as pool:
             results = list(pool.map(lambda args: publish(*args), [(self.view_value, self.fx.approval), (view, other.approval)]))
         self.assertEqual(sorted(results), ["conflict", "won"])
+        updates = [b["variables"]["input"]["refUpdates"][0]
+                   for m,p,b in self.server.calls if m == "POST" and p == "/graphql"]
+        self.assertEqual(len(updates), 2)
+        self.assertEqual({u["beforeOid"] for u in updates}, {self.server.initial})
+        self.assertEqual(len({u["afterOid"] for u in updates}), 2)
+        self.assertIn(self.storage.head(), {u["afterOid"] for u in updates})
+        after = self.storage.files(self.storage.head())
+        self.assertEqual({p: after[p] for p in before}, before)
+        self.assertEqual(sum("v3/publications/" + v.descriptor["request"]["attempt_id"] + ".json" in after
+                             for v in (self.view_value, view)), 1)
 
     def test_stale_git_head_and_immutable_replacement_are_rejected(self):
         self.view()
