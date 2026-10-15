@@ -1,0 +1,38 @@
+[
+  {
+    "coverage": "single network observation; not all CDN PoPs",
+    "http_status": 200,
+    "observed_at_utc": "2026-10-15T10:51:21.415580+00:00",
+    "publication": {
+      "channel": "beta",
+      "publication_run": "37935890476",
+      "published_at": "2026-10-09T13:19:15Z",
+      "schema_version": 1,
+      "snapshot_id": "repo-f44-20261009-001",
+      "store_tree_sha256": "78f855ca3c7d9f37495baa633e119e535ced15e6738fc47e2401f02752e47531"
+    },
+    "sha256": "e939e05867ee73e29c4167cd1a97924d76545e2e823c30bca4104b15f4a3716f",
+    "size": 258,
+    "url": "https://repo.ro-asd.org/rpm/fedora/44/beta/publication-v1.json"
+  },
+  {
+    "coverage": "single network observation; not all CDN PoPs",
+    "http_status": 200,
+    "observed_at_utc": "2026-10-15T10:51:21.742778+00:00",
+    "sha256": "303d747f46fd0dc059cf0244a10eedcd0a5bba80d3f64238cd4448d05d656c4f",
+    "size": 1557,
+    "url": "https://repo.ro-asd.org/rpm/fedora/44/beta/x86_64/repodata/repomd.xml"
+  },
+  {
+    "coverage": "single network observation; not all CDN PoPs",
+    "http_status": 404,
+    "observed_at_utc": "2026-10-15T10:51:22.027905+00:00",
+    "url": "https://repo.ro-asd.org/rpm/fedora/44/stable/x86_64/repodata/repomd.xml"
+  },
+  {
+    "coverage": "single network observation; not all CDN PoPs",
+    "http_status": 404,
+    "observed_at_utc": "2026-10-15T10:51:22.274317+00:00",
+    "url": "https://repo.ro-asd.org/rpm/fedora/44/stable/publication-v1.json"
+  }
+]

@@ -1,0 +1,196 @@
+{
+  "client_configs": {
+    "ro-asd-beta": {
+      "baseurl": "https://repo.ro-asd.org/rpm/fedora/44/beta/$basearch/",
+      "enabled": "1",
+      "gpgcheck": "1",
+      "gpgkey": "file:///etc/pki/rpm-gpg/REPODATA-GPG-KEY-ro-asd\nfile:///etc/pki/rpm-gpg/RPM-GPG-KEY-ro-asd",
+      "metadata_expire": "300",
+      "name": "Ro-ASD Fedora 44 Beta - $basearch",
+      "priority": "10",
+      "repo_gpgcheck": "1",
+      "skip_if_unavailable": "0"
+    },
+    "ro-asd-beta-source": {
+      "baseurl": "https://repo.ro-asd.org/rpm/fedora/44/beta/source/",
+      "enabled": "0",
+      "gpgcheck": "1",
+      "gpgkey": "file:///etc/pki/rpm-gpg/REPODATA-GPG-KEY-ro-asd\nfile:///etc/pki/rpm-gpg/RPM-GPG-KEY-ro-asd",
+      "metadata_expire": "300",
+      "name": "Ro-ASD Fedora 44 Beta - Source",
+      "repo_gpgcheck": "1",
+      "skip_if_unavailable": "0"
+    },
+    "ro-asd-stable": {
+      "baseurl": "https://repo.ro-asd.org/rpm/fedora/44/stable/$basearch/",
+      "enabled": "0",
+      "gpgcheck": "1",
+      "gpgkey": "file:///etc/pki/rpm-gpg/REPODATA-GPG-KEY-ro-asd\nfile:///etc/pki/rpm-gpg/RPM-GPG-KEY-ro-asd",
+      "metadata_expire": "300",
+      "name": "Ro-ASD Fedora 44 Stable - $basearch",
+      "priority": "10",
+      "repo_gpgcheck": "1",
+      "skip_if_unavailable": "0"
+    },
+    "ro-asd-stable-source": {
+      "baseurl": "https://repo.ro-asd.org/rpm/fedora/44/stable/source/",
+      "enabled": "0",
+      "gpgcheck": "1",
+      "gpgkey": "file:///etc/pki/rpm-gpg/REPODATA-GPG-KEY-ro-asd\nfile:///etc/pki/rpm-gpg/RPM-GPG-KEY-ro-asd",
+      "metadata_expire": "300",
+      "name": "Ro-ASD Fedora 44 Stable - Source",
+      "repo_gpgcheck": "1",
+      "skip_if_unavailable": "0"
+    }
+  },
+  "client_keyring_payloads": {
+    "etc/pki/rpm-gpg/REPODATA-GPG-KEY-ro-asd": "4eaf0b2903e60442c2f05325a43d85046bba850059b732dfc71e330f5e9e0809",
+    "etc/pki/rpm-gpg/RPM-GPG-KEY-ro-asd": "d73e92fcbf1dc9f8900459fa34b5eaa053570f11532ffc8e53373e8289b7ee51"
+  },
+  "public_keys": {
+    "ro-asd-metadata-signing-public.asc": {
+      "public_listing": [
+        "pub:-:4096:1:B2186A6F2FD84CB3:1788974345:1946654345::-:::cSC::::::23::0:",
+        "fpr:::::::::9A66A082D96374DA27D7538FB2186A6F2FD84CB3:",
+        "uid:-::::1788974345::920893B06568D5A8728BD29ED66C06C14A9D2217::Ro-ASD Repository Signing <contact@roasd.org>::::::::::0:",
+        "sub:-:4096:1:9A62B8F9026E75E5:1788974667:1852046667:::::s::::::23:",
+        "fpr:::::::::1715DDA529B9ADB46D47CB389A62B8F9026E75E5:"
+      ],
+      "sha256": "4eaf0b2903e60442c2f05325a43d85046bba850059b732dfc71e330f5e9e0809"
+    },
+    "ro-asd-public.asc": {
+      "public_listing": [
+        "pub:-:4096:1:B2186A6F2FD84CB3:1788974345:1946654345::-:::cSC::::::23::0:",
+        "fpr:::::::::9A66A082D96374DA27D7538FB2186A6F2FD84CB3:",
+        "uid:-::::1788974345::920893B06568D5A8728BD29ED66C06C14A9D2217::Ro-ASD Repository Signing <contact@roasd.org>::::::::::0:",
+        "sub:-:4096:1:2E02DEE8828B769B:1788974433:1852046433:::::s::::::23:",
+        "fpr:::::::::38CB87F6FBD645309432A6E22E02DEE8828B769B:",
+        "sub:-:4096:1:9A62B8F9026E75E5:1788974667:1852046667:::::s::::::23:",
+        "fpr:::::::::1715DDA529B9ADB46D47CB389A62B8F9026E75E5:"
+      ],
+      "sha256": "8719d48f3002ec346c0f00a041fbb152ea38c6e1ab07a87e642d4b1c5759e54b"
+    },
+    "ro-asd-rpm-signing-public.asc": {
+      "public_listing": [
+        "pub:-:4096:1:B2186A6F2FD84CB3:1788974345:1946654345::-:::cSC::::::23::0:",
+        "fpr:::::::::9A66A082D96374DA27D7538FB2186A6F2FD84CB3:",
+        "uid:-::::1788974345::920893B06568D5A8728BD29ED66C06C14A9D2217::Ro-ASD Repository Signing <contact@roasd.org>::::::::::0:",
+        "sub:-:4096:1:2E02DEE8828B769B:1788974433:1852046433:::::s::::::23:",
+        "fpr:::::::::38CB87F6FBD645309432A6E22E02DEE8828B769B:"
+      ],
+      "sha256": "d73e92fcbf1dc9f8900459fa34b5eaa053570f11532ffc8e53373e8289b7ee51"
+    }
+  },
+  "publications": [
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35530066972"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35586124137"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35587617947"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id"
+      ],
+      "metadata_signature": "PASS",
+      "run": "35599214422"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id",
+        "store_tree_sha256"
+      ],
+      "metadata_signature": "PASS",
+      "run": "36123484599"
+    },
+    {
+      "fields": [
+        "channel",
+        "publication_run",
+        "published_at",
+        "schema_version",
+        "snapshot_id",
+        "store_tree_sha256"
+      ],
+      "metadata_signature": "PASS",
+      "run": "37935890476"
+    }
+  ],
+  "scope": "read-only production public bytes; no DNF transactions",
+  "snapshots": [
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 3,
+      "snapshot_id": "repo-f44-20260920-001",
+      "snapshot_sha256": "7edd4af6914d63937deb42d2f733a6568378d17b6aeaf1a633b16db086187d71"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 3,
+      "snapshot_id": "repo-f44-20260921-001",
+      "snapshot_sha256": "20889abf076cd9fd30cefe825746cbc39b70e0022afa7159fed52ca16691fa13"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 24,
+      "snapshot_id": "repo-f44-20260929-001",
+      "snapshot_sha256": "f57c3605af5dad81c86ffe856a38488a5d052b3a29ef7db4639a30ad4246ef23"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 26,
+      "snapshot_id": "repo-f44-20261006-001",
+      "snapshot_sha256": "96ebbabe14d406bbf1de4efc43232012bd631be0b68a074e4333d1d090297031"
+    },
+    {
+      "metadata_and_rpm_signatures": "PASS",
+      "rpm_paths": 30,
+      "snapshot_id": "repo-f44-20261009-001",
+      "snapshot_sha256": "c2afc6d079537ddc6576c643e2d49445d3ba47b310ef4a3faf03789b336bbfd7"
+    }
+  ],
+  "source_client_rpms": {
+    "ro-asd-keyring-0.1.0-1.fc44.noarch.rpm": "550bed6c0856240882e4814a6d84b72f987b3b31fc4fde9a8ad98465786b346d",
+    "ro-asd-repos-0.1.1-1.fc44.noarch.rpm": "affb5bbf6be84c23b09c199909a33fef24fc6a1b1057ac8c2ed20037c6fc3455"
+  },
+  "source_pages_commit": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+  "strict_history": {
+    "reason": "unexpected signed publication fields",
+    "status": "BLOCKED"
+  }
+}

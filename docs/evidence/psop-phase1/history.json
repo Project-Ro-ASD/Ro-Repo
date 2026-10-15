@@ -1,0 +1,18 @@
+{
+  "commit": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+  "deleted_or_unreachable_history": "UNVERIFIED",
+  "historical_absence": "NO_HITS_IN_REACHABLE_TREES",
+  "immutable_drift": [],
+  "immutable_history": "PASS",
+  "publishable": false,
+  "reachable_commits_checked": 300,
+  "shallow": false,
+  "snapshots": [
+    "repo-f44-20260920-001",
+    "repo-f44-20260921-001",
+    "repo-f44-20260929-001",
+    "repo-f44-20261006-001",
+    "repo-f44-20261009-001"
+  ],
+  "stable_tree_hits": []
+}

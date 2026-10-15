@@ -1,0 +1,1624 @@
+{
+  "method": "GET",
+  "observations": [
+    {
+      "data": {
+        "_links": {
+          "html": "https://github.com/Project-Ro-ASD/Ro-Repo/tree/main",
+          "self": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches/main"
+        },
+        "commit": {
+          "author": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/199722016?v=4",
+            "events_url": "https://api.github.com/users/minitheguitarist/events{/privacy}",
+            "followers_url": "https://api.github.com/users/minitheguitarist/followers",
+            "following_url": "https://api.github.com/users/minitheguitarist/following{/other_user}",
+            "gists_url": "https://api.github.com/users/minitheguitarist/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/minitheguitarist",
+            "id": 199722016,
+            "login": "minitheguitarist",
+            "node_id": "U_kgDOC-eEIA",
+            "organizations_url": "https://api.github.com/users/minitheguitarist/orgs",
+            "received_events_url": "https://api.github.com/users/minitheguitarist/received_events",
+            "repos_url": "https://api.github.com/users/minitheguitarist/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/minitheguitarist/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/minitheguitarist/subscriptions",
+            "type": "User",
+            "url": "https://api.github.com/users/minitheguitarist",
+            "user_view_type": "public"
+          },
+          "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/3d4b56bd7509988f3715305ab9e2e09394635448/comments",
+          "commit": {
+            "author": {
+              "date": "2026-10-13T22:06:44Z",
+              "email": "arslansemihmurat@gmail.com",
+              "name": "Semih Murat"
+            },
+            "comment_count": 0,
+            "committer": {
+              "date": "2026-10-13T22:06:44Z",
+              "email": "noreply@github.com",
+              "name": "GitHub"
+            },
+            "message": "Merge pull request #77 from Project-Ro-ASD/codex/v3-disposable-pages-project-url\n\nfix(v3): restrict disposable Pages project URL support to authorized test repo",
+            "tree": {
+              "sha": "f3cf7d1d8917f600fc7aeb7d19416d7f0ca43aae",
+              "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees/f3cf7d1d8917f600fc7aeb7d19416d7f0ca43aae"
+            },
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits/3d4b56bd7509988f3715305ab9e2e09394635448",
+            "verification": {
+              "payload": "tree f3cf7d1d8917f600fc7aeb7d19416d7f0ca43aae\nparent 13db29a883abad0dc643107197cbc177b75107ef\nparent ceccfebba19328e11a98a3a112160e80b12d5bd3\nauthor Semih Murat <arslansemihmurat@gmail.com> 1791929204 +0300\ncommitter GitHub <noreply@github.com> 1791929204 +0300\n\nMerge pull request #77 from Project-Ro-ASD/codex/v3-disposable-pages-project-url\n\nfix(v3): restrict disposable Pages project URL support to authorized test repo",
+              "reason": "valid",
+              "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqzqt0CRC1aQ7uu5UhlAAA0CYQAACOxHhSHlilK1jzQCOjTIwn\n6i0EQXg8dn2qopTT2+xmiThF7eA74/aE9tmnmLejsLJIne58s+DuH/PEjCD8O/Ae\naQqBk0DmvTp9aJz64Lf5huPdvkji5OeZ22B4KgHCntSDTX/qO+b0L8LDIad83s1O\nbDmsNSTebxKyZyR/gzkVJvi5q7SuHv4kzkYYUhuzQKh1rp00JaQt771cel/jfXuY\nbT6xYes1p3CLD/ExImIjq3lROchTpfdEZlUfm4+o8yU5/O6uo4w/MqucHHK5a86z\naFHNItDr4Fk5ipN1cPzHNTxTYTb43SqGTxCjl1eB+/SnYIxvGNZfKZuRDnk5lS4Y\nmQJm6u5L9NWtQwCMq2NcsasREi3RHTBpLBaBHsm4/NSud0xKp4yt4/SPXkfaYFHN\nQX1aBLs+hk4hnQolwZoDliLSdcbjw03tM7FYCNasrpXbxejvktaRZ21v6YiwuT1T\nsTlKyjOVToQoy3/Mum04VaJvd3MD6FzcyxfQWa0s+M3fb93sW3EaLBFuXugE1zkY\n5ZmPP9mYJvX3H4y1U8hlPjvKRV5+IjYg+DaKLfryfDkTwu4pWXXn2tByQCwSV6YI\n0ANH6tQgukRas+jc1/G0+WR36ArVFjOjFxnOBC17eDUD+rMiidP3arJ0ndNO2OS/\nHw0kEck3vHoMlOUv7NvK\n=A0V+\n-----END PGP SIGNATURE-----\n",
+              "verified": true,
+              "verified_at": "2026-10-13T22:06:45Z"
+            }
+          },
+          "committer": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+            "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+            "followers_url": "https://api.github.com/users/web-flow/followers",
+            "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+            "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/web-flow",
+            "id": 19864447,
+            "login": "web-flow",
+            "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+            "organizations_url": "https://api.github.com/users/web-flow/orgs",
+            "received_events_url": "https://api.github.com/users/web-flow/received_events",
+            "repos_url": "https://api.github.com/users/web-flow/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+            "type": "User",
+            "url": "https://api.github.com/users/web-flow",
+            "user_view_type": "public"
+          },
+          "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/commit/3d4b56bd7509988f3715305ab9e2e09394635448",
+          "node_id": "C_kwDORRv31doAKDNkNGI1NmJkNzUwOTk4OGYzNzE1MzA1YWI5ZTJlMDkzOTQ2MzU0NDg",
+          "parents": [
+            {
+              "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/commit/13db29a883abad0dc643107197cbc177b75107ef",
+              "sha": "13db29a883abad0dc643107197cbc177b75107ef",
+              "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/13db29a883abad0dc643107197cbc177b75107ef"
+            },
+            {
+              "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/commit/ceccfebba19328e11a98a3a112160e80b12d5bd3",
+              "sha": "ceccfebba19328e11a98a3a112160e80b12d5bd3",
+              "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/ceccfebba19328e11a98a3a112160e80b12d5bd3"
+            }
+          ],
+          "sha": "3d4b56bd7509988f3715305ab9e2e09394635448",
+          "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/3d4b56bd7509988f3715305ab9e2e09394635448"
+        },
+        "name": "main",
+        "protected": true,
+        "protection": {
+          "enabled": false,
+          "required_status_checks": {
+            "checks": [],
+            "contexts": [],
+            "enforcement_level": "off"
+          }
+        },
+        "protection_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches/main/protection"
+      },
+      "endpoint": "branches/main",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "_links": {
+          "html": "https://github.com/Project-Ro-ASD/Ro-Repo/tree/pages-storage",
+          "self": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches/pages-storage"
+        },
+        "commit": {
+          "author": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/44036562?v=4",
+            "events_url": "https://api.github.com/users/actions/events{/privacy}",
+            "followers_url": "https://api.github.com/users/actions/followers",
+            "following_url": "https://api.github.com/users/actions/following{/other_user}",
+            "gists_url": "https://api.github.com/users/actions/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/actions",
+            "id": 44036562,
+            "login": "actions",
+            "node_id": "MDEyOk9yZ2FuaXphdGlvbjQ0MDM2NTYy",
+            "organizations_url": "https://api.github.com/users/actions/orgs",
+            "received_events_url": "https://api.github.com/users/actions/received_events",
+            "repos_url": "https://api.github.com/users/actions/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/actions/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/actions/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/actions",
+            "user_view_type": "public"
+          },
+          "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/097ba6ba7ab73d87c36f7ec9829b017b083b1883/comments",
+          "commit": {
+            "author": {
+              "date": "2026-10-09T13:20:10Z",
+              "email": "actions@users.noreply.github.com",
+              "name": "Ro-Repo Beta Publisher"
+            },
+            "comment_count": 0,
+            "committer": {
+              "date": "2026-10-09T13:20:10Z",
+              "email": "actions@users.noreply.github.com",
+              "name": "Ro-Repo Beta Publisher"
+            },
+            "message": "beta: publish repo-f44-20261009-001 from run 37935890476",
+            "tree": {
+              "sha": "69fda4e20cf3082631228a5a7eca5b0ee3b2b0b1",
+              "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees/69fda4e20cf3082631228a5a7eca5b0ee3b2b0b1"
+            },
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits/097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+            "verification": {
+              "payload": null,
+              "reason": "unsigned",
+              "signature": null,
+              "verified": false,
+              "verified_at": null
+            }
+          },
+          "committer": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/44036562?v=4",
+            "events_url": "https://api.github.com/users/actions/events{/privacy}",
+            "followers_url": "https://api.github.com/users/actions/followers",
+            "following_url": "https://api.github.com/users/actions/following{/other_user}",
+            "gists_url": "https://api.github.com/users/actions/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/actions",
+            "id": 44036562,
+            "login": "actions",
+            "node_id": "MDEyOk9yZ2FuaXphdGlvbjQ0MDM2NTYy",
+            "organizations_url": "https://api.github.com/users/actions/orgs",
+            "received_events_url": "https://api.github.com/users/actions/received_events",
+            "repos_url": "https://api.github.com/users/actions/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/actions/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/actions/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/actions",
+            "user_view_type": "public"
+          },
+          "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/commit/097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+          "node_id": "C_kwDORRv31doAKDA5N2JhNmJhN2FiNzNkODdjMzZmN2VjOTgyOWIwMTdiMDgzYjE4ODM",
+          "parents": [
+            {
+              "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/commit/b895bf0091a095c3528013f8ba83bad563bb3cc6",
+              "sha": "b895bf0091a095c3528013f8ba83bad563bb3cc6",
+              "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/b895bf0091a095c3528013f8ba83bad563bb3cc6"
+            }
+          ],
+          "sha": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+          "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits/097ba6ba7ab73d87c36f7ec9829b017b083b1883"
+        },
+        "name": "pages-storage",
+        "protected": false,
+        "protection": {
+          "enabled": false,
+          "required_status_checks": {
+            "checks": [],
+            "contexts": [],
+            "enforcement_level": "off"
+          }
+        },
+        "protection_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches/pages-storage/protection"
+      },
+      "endpoint": "branches/pages-storage",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "_links": {
+          "comments": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/77/comments"
+          },
+          "commits": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/77/commits"
+          },
+          "html": {
+            "href": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/77"
+          },
+          "issue": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/77"
+          },
+          "review_comment": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/comments{/number}"
+          },
+          "review_comments": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/77/comments"
+          },
+          "self": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/77"
+          },
+          "statuses": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/ceccfebba19328e11a98a3a112160e80b12d5bd3"
+          }
+        },
+        "active_lock_reason": null,
+        "additions": 443,
+        "assignee": null,
+        "assignees": [],
+        "author_association": "MEMBER",
+        "auto_merge": null,
+        "base": {
+          "label": "Project-Ro-ASD:main",
+          "ref": "main",
+          "repo": {
+            "allow_forking": true,
+            "archive_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/{archive_format}{/ref}",
+            "archived": false,
+            "assignees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/assignees{/user}",
+            "blobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/blobs{/sha}",
+            "branches_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches{/branch}",
+            "clone_url": "https://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "collaborators_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/collaborators{/collaborator}",
+            "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/comments{/number}",
+            "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits{/sha}",
+            "compare_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/compare/{base}...{head}",
+            "contents_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contents/{+path}",
+            "contributors_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contributors",
+            "created_at": "2026-02-16T18:55:28Z",
+            "default_branch": "main",
+            "deployments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/deployments",
+            "description": "ro-repo resmi uygulama reposu",
+            "disabled": false,
+            "downloads_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/downloads",
+            "events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/events",
+            "fork": false,
+            "forks": 0,
+            "forks_count": 0,
+            "forks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/forks",
+            "full_name": "Project-Ro-ASD/Ro-Repo",
+            "git_commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits{/sha}",
+            "git_refs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/refs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/tags{/sha}",
+            "git_url": "git://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "has_discussions": false,
+            "has_downloads": false,
+            "has_issues": true,
+            "has_pages": true,
+            "has_projects": true,
+            "has_pull_requests": true,
+            "has_wiki": true,
+            "homepage": null,
+            "hooks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/hooks",
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "id": 1159460821,
+            "is_template": false,
+            "issue_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/comments{/number}",
+            "issue_events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/events{/number}",
+            "issues_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues{/number}",
+            "keys_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/keys{/key_id}",
+            "labels_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/labels{/name}",
+            "language": "Python",
+            "languages_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/languages",
+            "license": {
+              "key": "gpl-3.0",
+              "name": "GNU General Public License v3.0",
+              "node_id": "MDc6TGljZW5zZTk=",
+              "spdx_id": "GPL-3.0",
+              "url": "https://api.github.com/licenses/gpl-3.0"
+            },
+            "merges_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/merges",
+            "milestones_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/milestones{/number}",
+            "mirror_url": null,
+            "name": "Ro-Repo",
+            "node_id": "R_kgDORRv31Q",
+            "notifications_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/notifications{?since,all,participating}",
+            "open_issues": 2,
+            "open_issues_count": 2,
+            "owner": {
+              "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+              "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+              "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+              "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+              "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+              "gravatar_id": "",
+              "html_url": "https://github.com/Project-Ro-ASD",
+              "id": 248876122,
+              "login": "Project-Ro-ASD",
+              "node_id": "O_kgDODtWMWg",
+              "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+              "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+              "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+              "site_admin": false,
+              "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+              "type": "Organization",
+              "url": "https://api.github.com/users/Project-Ro-ASD",
+              "user_view_type": "public"
+            },
+            "private": false,
+            "pull_request_creation_policy": "all",
+            "pulls_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls{/number}",
+            "pushed_at": "2026-10-13T22:28:18Z",
+            "releases_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/releases{/id}",
+            "size": 99299,
+            "ssh_url": "git@github.com:Project-Ro-ASD/Ro-Repo.git",
+            "stargazers_count": 0,
+            "stargazers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/stargazers",
+            "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/{sha}",
+            "subscribers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscribers",
+            "subscription_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscription",
+            "svn_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/tags",
+            "teams_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/teams",
+            "topics": [],
+            "trees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees{/sha}",
+            "updated_at": "2026-10-13T22:06:49Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo",
+            "visibility": "public",
+            "watchers": 0,
+            "watchers_count": 0,
+            "web_commit_signoff_required": false
+          },
+          "sha": "13db29a883abad0dc643107197cbc177b75107ef",
+          "user": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+            "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+            "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+            "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/Project-Ro-ASD",
+            "id": 248876122,
+            "login": "Project-Ro-ASD",
+            "node_id": "O_kgDODtWMWg",
+            "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+            "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+            "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/Project-Ro-ASD",
+            "user_view_type": "public"
+          }
+        },
+        "body": "Disposable GitHub Pages proje adresi k\u00f6k HTTPS origin do\u011frulamas\u0131nda reddedildi\u011fi i\u00e7in ger\u00e7ek acceptance runner staging a\u015famas\u0131nda duruyordu. `minitheguitarist/ro-v3-disposable-pages` i\u00e7in a\u00e7\u0131k operat\u00f6r yetkisi ve i\u015faretli \u00f6zel test k\u00f6k\u00fc gerektiren `DisposablePagesProject` kapsam\u0131 eklendi. Yaln\u0131z tam Pages adresi ve tek trailing slash kabul edilir; runner ayn\u0131 kapsam\u0131 immutable URL \u00fcretimi, IsolatedStore staging ve HTTPSReader i\u00e7in kullan\u0131r.\n\nYanl\u0131\u015f host/repo, traversal, credential/port, percent encoding, kontrol karakterleri ve query/fragment (bo\u015f olanlar dahil) provider eri\u015fiminden \u00f6nce reddedilir. \u00dc\u00e7 signed baseurl tam proje/digest/architecture e\u015fle\u015fmesiyle do\u011frulan\u0131r; kalan descriptor s\u00f6zle\u015fmesi de\u011fi\u015fmeyen root-origin schema ile kontrol edilir. Signed descriptor de\u011fi\u015ftirilmez. Scoped reopen ayn\u0131 test k\u00f6k\u00fcn\u00fc ve exact signed URL'leri gerektirir. Varsay\u0131lan k\u00f6k-origin kural\u0131, production schema/client ve repo.ro-asd.org davran\u0131\u015f\u0131 korunur.\n\nValidation: disposable Fedora 44 konteynerinde full unit/security paketi 608/608 PASS (14 yeni test dahil), backend rehearsal ve py_compile PASS. 40 k\u00f6t\u00fc proje URL varyant\u0131 immutable_url/HTTPSReader/staging ve provider eri\u015fimi \u00f6ncesindeki runner kontrollerinde reddedildi; mocked-provider runner ger\u00e7ek stage/reader koduyla PASS. Native DNF5 URL override ve PostgreSQL CAS/TLS/restricted-role/fresh-first-recovery E2E PASS. PR CI 8/8 SUCCESS: unit-policy, security-contracts, backend-security, closure-tls-postgresql, postgres-transactions, fedora44-e2e, fedora44-full-stable-set, acceptance-runtime-contract.\n\nCI: [V2/full suite/runtime](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38474083197), [V3 security/Fedora](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38474083381), [backend/PostgreSQL](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38474083230).\n\nDe\u011fi\u015fen dosyalar: tools/v3_immutable_view.py, tests/v3-pages-disposable-acceptance.py, tests/test_v3_disposable_pages_urls.py, docs/V3-GITHUB-PAGES-FINALIZATION.md. Dok\u00fcmanda do\u011frulanm\u0131\u015f repository ID/node ID ve tam proje URL'si ile rerun komutu bulunur.\n\nDisposable cloud write runner \u00e7al\u0131\u015ft\u0131r\u0131lmad\u0131. Test deposuna/Pages'e ger\u00e7ek yazma, pages-storage veya production workflow/settings/domain/key/client-config de\u011fi\u015fikli\u011fi yap\u0131lmad\u0131. Yaln\u0131z bu PR dal\u0131 yay\u0131mland\u0131. publishable:false ve production activation BLOCKED korunur; deadline fencing/build ordering do\u011frulanm\u0131\u015f say\u0131lmaz. Draft olarak b\u0131rak\u0131n; merge etmeyin.",
+        "changed_files": 4,
+        "closed_at": "2026-10-13T22:06:45Z",
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/77/comments",
+        "commits": 1,
+        "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/77/commits",
+        "created_at": "2026-10-13T21:54:47Z",
+        "deletions": 23,
+        "diff_url": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/77.diff",
+        "draft": false,
+        "head": {
+          "label": "Project-Ro-ASD:codex/v3-disposable-pages-project-url",
+          "ref": "codex/v3-disposable-pages-project-url",
+          "repo": {
+            "allow_forking": true,
+            "archive_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/{archive_format}{/ref}",
+            "archived": false,
+            "assignees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/assignees{/user}",
+            "blobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/blobs{/sha}",
+            "branches_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches{/branch}",
+            "clone_url": "https://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "collaborators_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/collaborators{/collaborator}",
+            "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/comments{/number}",
+            "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits{/sha}",
+            "compare_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/compare/{base}...{head}",
+            "contents_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contents/{+path}",
+            "contributors_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contributors",
+            "created_at": "2026-02-16T18:55:28Z",
+            "default_branch": "main",
+            "deployments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/deployments",
+            "description": "ro-repo resmi uygulama reposu",
+            "disabled": false,
+            "downloads_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/downloads",
+            "events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/events",
+            "fork": false,
+            "forks": 0,
+            "forks_count": 0,
+            "forks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/forks",
+            "full_name": "Project-Ro-ASD/Ro-Repo",
+            "git_commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits{/sha}",
+            "git_refs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/refs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/tags{/sha}",
+            "git_url": "git://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "has_discussions": false,
+            "has_downloads": false,
+            "has_issues": true,
+            "has_pages": true,
+            "has_projects": true,
+            "has_pull_requests": true,
+            "has_wiki": true,
+            "homepage": null,
+            "hooks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/hooks",
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "id": 1159460821,
+            "is_template": false,
+            "issue_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/comments{/number}",
+            "issue_events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/events{/number}",
+            "issues_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues{/number}",
+            "keys_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/keys{/key_id}",
+            "labels_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/labels{/name}",
+            "language": "Python",
+            "languages_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/languages",
+            "license": {
+              "key": "gpl-3.0",
+              "name": "GNU General Public License v3.0",
+              "node_id": "MDc6TGljZW5zZTk=",
+              "spdx_id": "GPL-3.0",
+              "url": "https://api.github.com/licenses/gpl-3.0"
+            },
+            "merges_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/merges",
+            "milestones_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/milestones{/number}",
+            "mirror_url": null,
+            "name": "Ro-Repo",
+            "node_id": "R_kgDORRv31Q",
+            "notifications_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/notifications{?since,all,participating}",
+            "open_issues": 2,
+            "open_issues_count": 2,
+            "owner": {
+              "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+              "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+              "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+              "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+              "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+              "gravatar_id": "",
+              "html_url": "https://github.com/Project-Ro-ASD",
+              "id": 248876122,
+              "login": "Project-Ro-ASD",
+              "node_id": "O_kgDODtWMWg",
+              "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+              "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+              "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+              "site_admin": false,
+              "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+              "type": "Organization",
+              "url": "https://api.github.com/users/Project-Ro-ASD",
+              "user_view_type": "public"
+            },
+            "private": false,
+            "pull_request_creation_policy": "all",
+            "pulls_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls{/number}",
+            "pushed_at": "2026-10-13T22:28:18Z",
+            "releases_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/releases{/id}",
+            "size": 99299,
+            "ssh_url": "git@github.com:Project-Ro-ASD/Ro-Repo.git",
+            "stargazers_count": 0,
+            "stargazers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/stargazers",
+            "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/{sha}",
+            "subscribers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscribers",
+            "subscription_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscription",
+            "svn_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/tags",
+            "teams_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/teams",
+            "topics": [],
+            "trees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees{/sha}",
+            "updated_at": "2026-10-13T22:06:49Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo",
+            "visibility": "public",
+            "watchers": 0,
+            "watchers_count": 0,
+            "web_commit_signoff_required": false
+          },
+          "sha": "ceccfebba19328e11a98a3a112160e80b12d5bd3",
+          "user": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+            "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+            "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+            "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/Project-Ro-ASD",
+            "id": 248876122,
+            "login": "Project-Ro-ASD",
+            "node_id": "O_kgDODtWMWg",
+            "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+            "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+            "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/Project-Ro-ASD",
+            "user_view_type": "public"
+          }
+        },
+        "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/77",
+        "id": 4849977484,
+        "issue_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/77",
+        "labels": [],
+        "locked": false,
+        "maintainer_can_modify": false,
+        "merge_commit_sha": "3d4b56bd7509988f3715305ab9e2e09394635448",
+        "mergeable": null,
+        "mergeable_state": "unknown",
+        "merged": true,
+        "merged_at": "2026-10-13T22:06:45Z",
+        "merged_by": {
+          "avatar_url": "https://avatars.githubusercontent.com/u/199722016?v=4",
+          "events_url": "https://api.github.com/users/minitheguitarist/events{/privacy}",
+          "followers_url": "https://api.github.com/users/minitheguitarist/followers",
+          "following_url": "https://api.github.com/users/minitheguitarist/following{/other_user}",
+          "gists_url": "https://api.github.com/users/minitheguitarist/gists{/gist_id}",
+          "gravatar_id": "",
+          "html_url": "https://github.com/minitheguitarist",
+          "id": 199722016,
+          "login": "minitheguitarist",
+          "node_id": "U_kgDOC-eEIA",
+          "organizations_url": "https://api.github.com/users/minitheguitarist/orgs",
+          "received_events_url": "https://api.github.com/users/minitheguitarist/received_events",
+          "repos_url": "https://api.github.com/users/minitheguitarist/repos",
+          "site_admin": false,
+          "starred_url": "https://api.github.com/users/minitheguitarist/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/minitheguitarist/subscriptions",
+          "type": "User",
+          "url": "https://api.github.com/users/minitheguitarist",
+          "user_view_type": "public"
+        },
+        "milestone": null,
+        "node_id": "PR_kwDORRv31c8AAAABIRTIjA",
+        "number": 77,
+        "patch_url": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/77.patch",
+        "rebaseable": null,
+        "requested_reviewers": [],
+        "requested_teams": [
+          {
+            "description": "Release engineering and repository publication maintainers for Ro-ASD",
+            "html_url": "https://github.com/orgs/Project-Ro-ASD/teams/release-engineering",
+            "id": 19418500,
+            "members_url": "https://api.github.com/organizations/248876122/team/19418500/members{/member}",
+            "name": "release-engineering",
+            "node_id": "T_kwDODtWMWs4BKE2E",
+            "notification_setting": "notifications_enabled",
+            "organization_id": 248876122,
+            "parent": null,
+            "permission": "pull",
+            "privacy": "closed",
+            "repositories_url": "https://api.github.com/organizations/248876122/team/19418500/repos",
+            "slug": "release-engineering",
+            "type": "organization",
+            "url": "https://api.github.com/organizations/248876122/team/19418500"
+          }
+        ],
+        "review_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/comments{/number}",
+        "review_comments": 0,
+        "review_comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/77/comments",
+        "state": "closed",
+        "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/ceccfebba19328e11a98a3a112160e80b12d5bd3",
+        "title": "fix(v3): restrict disposable Pages project URL support to authorized test repo",
+        "updated_at": "2026-10-13T22:06:45Z",
+        "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/77",
+        "user": {
+          "avatar_url": "https://avatars.githubusercontent.com/u/199722016?v=4",
+          "events_url": "https://api.github.com/users/minitheguitarist/events{/privacy}",
+          "followers_url": "https://api.github.com/users/minitheguitarist/followers",
+          "following_url": "https://api.github.com/users/minitheguitarist/following{/other_user}",
+          "gists_url": "https://api.github.com/users/minitheguitarist/gists{/gist_id}",
+          "gravatar_id": "",
+          "html_url": "https://github.com/minitheguitarist",
+          "id": 199722016,
+          "login": "minitheguitarist",
+          "node_id": "U_kgDOC-eEIA",
+          "organizations_url": "https://api.github.com/users/minitheguitarist/orgs",
+          "received_events_url": "https://api.github.com/users/minitheguitarist/received_events",
+          "repos_url": "https://api.github.com/users/minitheguitarist/repos",
+          "site_admin": false,
+          "starred_url": "https://api.github.com/users/minitheguitarist/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/minitheguitarist/subscriptions",
+          "type": "User",
+          "url": "https://api.github.com/users/minitheguitarist",
+          "user_view_type": "public"
+        }
+      },
+      "endpoint": "pulls/77",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "_links": {
+          "comments": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/78/comments"
+          },
+          "commits": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/78/commits"
+          },
+          "html": {
+            "href": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/78"
+          },
+          "issue": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/78"
+          },
+          "review_comment": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/comments{/number}"
+          },
+          "review_comments": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/78/comments"
+          },
+          "self": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/78"
+          },
+          "statuses": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/7a979ab0dffa4654c32ae8c5c0b1a05940180c3a"
+          }
+        },
+        "active_lock_reason": null,
+        "additions": 505,
+        "assignee": null,
+        "assignees": [],
+        "author_association": "MEMBER",
+        "auto_merge": null,
+        "base": {
+          "label": "Project-Ro-ASD:main",
+          "ref": "main",
+          "repo": {
+            "allow_forking": true,
+            "archive_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/{archive_format}{/ref}",
+            "archived": false,
+            "assignees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/assignees{/user}",
+            "blobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/blobs{/sha}",
+            "branches_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches{/branch}",
+            "clone_url": "https://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "collaborators_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/collaborators{/collaborator}",
+            "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/comments{/number}",
+            "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits{/sha}",
+            "compare_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/compare/{base}...{head}",
+            "contents_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contents/{+path}",
+            "contributors_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contributors",
+            "created_at": "2026-02-16T18:55:28Z",
+            "default_branch": "main",
+            "deployments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/deployments",
+            "description": "ro-repo resmi uygulama reposu",
+            "disabled": false,
+            "downloads_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/downloads",
+            "events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/events",
+            "fork": false,
+            "forks": 0,
+            "forks_count": 0,
+            "forks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/forks",
+            "full_name": "Project-Ro-ASD/Ro-Repo",
+            "git_commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits{/sha}",
+            "git_refs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/refs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/tags{/sha}",
+            "git_url": "git://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "has_discussions": false,
+            "has_downloads": false,
+            "has_issues": true,
+            "has_pages": true,
+            "has_projects": true,
+            "has_pull_requests": true,
+            "has_wiki": true,
+            "homepage": null,
+            "hooks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/hooks",
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "id": 1159460821,
+            "is_template": false,
+            "issue_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/comments{/number}",
+            "issue_events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/events{/number}",
+            "issues_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues{/number}",
+            "keys_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/keys{/key_id}",
+            "labels_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/labels{/name}",
+            "language": "Python",
+            "languages_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/languages",
+            "license": {
+              "key": "gpl-3.0",
+              "name": "GNU General Public License v3.0",
+              "node_id": "MDc6TGljZW5zZTk=",
+              "spdx_id": "GPL-3.0",
+              "url": "https://api.github.com/licenses/gpl-3.0"
+            },
+            "merges_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/merges",
+            "milestones_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/milestones{/number}",
+            "mirror_url": null,
+            "name": "Ro-Repo",
+            "node_id": "R_kgDORRv31Q",
+            "notifications_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/notifications{?since,all,participating}",
+            "open_issues": 2,
+            "open_issues_count": 2,
+            "owner": {
+              "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+              "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+              "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+              "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+              "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+              "gravatar_id": "",
+              "html_url": "https://github.com/Project-Ro-ASD",
+              "id": 248876122,
+              "login": "Project-Ro-ASD",
+              "node_id": "O_kgDODtWMWg",
+              "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+              "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+              "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+              "site_admin": false,
+              "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+              "type": "Organization",
+              "url": "https://api.github.com/users/Project-Ro-ASD",
+              "user_view_type": "public"
+            },
+            "private": false,
+            "pull_request_creation_policy": "all",
+            "pulls_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls{/number}",
+            "pushed_at": "2026-10-13T22:28:18Z",
+            "releases_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/releases{/id}",
+            "size": 99299,
+            "ssh_url": "git@github.com:Project-Ro-ASD/Ro-Repo.git",
+            "stargazers_count": 0,
+            "stargazers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/stargazers",
+            "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/{sha}",
+            "subscribers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscribers",
+            "subscription_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscription",
+            "svn_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/tags",
+            "teams_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/teams",
+            "topics": [],
+            "trees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees{/sha}",
+            "updated_at": "2026-10-13T22:06:49Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo",
+            "visibility": "public",
+            "watchers": 0,
+            "watchers_count": 0,
+            "web_commit_signoff_required": false
+          },
+          "sha": "3d4b56bd7509988f3715305ab9e2e09394635448",
+          "user": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+            "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+            "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+            "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/Project-Ro-ASD",
+            "id": 248876122,
+            "login": "Project-Ro-ASD",
+            "node_id": "O_kgDODtWMWg",
+            "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+            "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+            "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/Project-Ro-ASD",
+            "user_view_type": "public"
+          }
+        },
+        "body": "Admission s\u0131ras\u0131nda ge\u00e7erli olan bir CAS, provider kuyru\u011funda approval s\u00fcresi bittikten sonra uygulanabilir; ba\u015far\u0131l\u0131 Pages API kay\u0131tlar\u0131 da eski public snapshot'\u0131n daha sonra g\u00f6r\u00fcnmesini \u00f6nlemez. Bu PR bu iki eksik s\u0131n\u0131r\u0131 deterministik yerel kar\u015f\u0131 \u00f6rneklerle kapsar. \u00dcretim kodu de\u011fi\u015fmez ve sa\u011flay\u0131c\u0131ya yeni g\u00fcvenlik garantisi atfedilmez.\n\n\u00d6nce mevcut response-loss, shared-ledger admission, expected-head CAS, restart, missing/mixed-byte ve immutable-history testleri envanterlendi. Gereksiz tekrar yerine 4 yeni test eklendi: queued CAS + approval expiry + kay\u0131p yan\u0131t + persisted reconciliation; yeni POST_VERIFIED build sonras\u0131 eski build/client availability; publication/advertisement/5 payload \u00fcyesinde 14 missing/stale CDN fault; mevcut after-db-intent testi d\u0131\u015f\u0131nda kalan d\u00f6rt branch-coordinator I/O kesinti s\u0131n\u0131r\u0131. Mevcut yar\u0131\u015f testi ayr\u0131 adapter'lar ve before_cas barrier ile ayn\u0131 HEAD \u00fczerinde iki farkl\u0131 target ve iki CAS iste\u011fini zorunlu k\u0131lar.\n\nSenaryo de\u011ferlendirmesi: local rejection/reconciliation/integrity assertions PASS. Strict provider deadline enforcement BLOCKED; native deadline fencing UNVERIFIED. Late Pages/CDN ordering/freshness UNVERIFIED. Eski snapshot g\u00f6r\u00fcn\u00fcrse byte verification/client update BLOCKED olur, client state/repo ve ledger geriye d\u00f6nmez. Exact-target CONFIRMED yaln\u0131z commit g\u00f6zlemidir; expired authority'yi, stable/discovery veya production aktivasyonunu a\u00e7maz. Her yeni senaryoda \u00f6nceki immutable + beta/history byte'lar\u0131 korunur.\n\nYeni dok\u00fcman docs/V3-PROVIDER-FAULT-INJECTION.md yedi senaryonun \u00f6nceki test envanterini, PASS/BLOCKED/UNVERIFIED matrisini, resm\u00ee GitHub API s\u00f6zle\u015fmesi ile \u00e7\u0131kar\u0131m ayr\u0131m\u0131n\u0131 ve gereken mutation-boundary deadline/epoch, ger\u00e7ek request drain, exclusive custody ve deployment generation-fence mimari engellerini a\u00e7\u0131klar. Snapshot opener ger\u00e7ek HTTPSReader/byte verifier kodunu \u00e7al\u0131\u015ft\u0131r\u0131r; TLS, canl\u0131 CDN veya canl\u0131 ba\u011f\u0131ms\u0131z witness kabul\u00fc say\u0131lmaz. Restart yeni persisted Ledger/Backend/provider nesneleridir; mevcut PostgreSQL process-death testleri yerine ge\u00e7mez.\n\nValidation: disposable, a\u011fs\u0131z Fedora 44 konteynerinde full unit/security 612/612 PASS (4 yeni test dahil), g\u00fc\u00e7lendirilen CAS yar\u0131\u015f testi PASS, backend rehearsal ve py_compile PASS. Yeni CDN matrisi 14 missing/stale fault; restart matrisi d\u00f6rt yeni d\u0131\u015f-I/O s\u0131n\u0131r\u0131d\u0131r. PR CI 8/8 SUCCESS: unit-policy, security-contracts, backend-security, closure-tls-postgresql, postgres-transactions, fedora44-e2e, fedora44-full-stable-set, acceptance-runtime-contract.\n\nCI: [full/V2/runtime](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38478090856), [V3 security/Fedora](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38478090857), [backend/PostgreSQL](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/38478090782).\n\nDe\u011fi\u015fiklikler yaln\u0131z tests/test_v3_provider_fault_injection.py, tests/test_v3_live_provider.py ve iki docs dosyas\u0131d\u0131r. Ger\u00e7ek GitHub/Pages disposable runner, RPM terfisi veya production aktivasyonu \u00e7al\u0131\u015ft\u0131r\u0131lmad\u0131. pages-storage, beta/stable workflow'lar\u0131, production tools/schema/client/security locks de\u011fi\u015ftirilmedi. Yaln\u0131z bu draft PR dal\u0131 yay\u0131mland\u0131. Draft b\u0131rak\u0131n; merge etmeyin.",
+        "changed_files": 4,
+        "closed_at": null,
+        "comments": 0,
+        "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/78/comments",
+        "commits": 1,
+        "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/78/commits",
+        "created_at": "2026-10-13T22:28:58Z",
+        "deletions": 2,
+        "diff_url": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/78.diff",
+        "draft": true,
+        "head": {
+          "label": "Project-Ro-ASD:codex/v3-provider-fault-injection",
+          "ref": "codex/v3-provider-fault-injection",
+          "repo": {
+            "allow_forking": true,
+            "archive_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/{archive_format}{/ref}",
+            "archived": false,
+            "assignees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/assignees{/user}",
+            "blobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/blobs{/sha}",
+            "branches_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches{/branch}",
+            "clone_url": "https://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "collaborators_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/collaborators{/collaborator}",
+            "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/comments{/number}",
+            "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits{/sha}",
+            "compare_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/compare/{base}...{head}",
+            "contents_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contents/{+path}",
+            "contributors_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contributors",
+            "created_at": "2026-02-16T18:55:28Z",
+            "default_branch": "main",
+            "deployments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/deployments",
+            "description": "ro-repo resmi uygulama reposu",
+            "disabled": false,
+            "downloads_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/downloads",
+            "events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/events",
+            "fork": false,
+            "forks": 0,
+            "forks_count": 0,
+            "forks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/forks",
+            "full_name": "Project-Ro-ASD/Ro-Repo",
+            "git_commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits{/sha}",
+            "git_refs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/refs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/tags{/sha}",
+            "git_url": "git://github.com/Project-Ro-ASD/Ro-Repo.git",
+            "has_discussions": false,
+            "has_downloads": false,
+            "has_issues": true,
+            "has_pages": true,
+            "has_projects": true,
+            "has_pull_requests": true,
+            "has_wiki": true,
+            "homepage": null,
+            "hooks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/hooks",
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "id": 1159460821,
+            "is_template": false,
+            "issue_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/comments{/number}",
+            "issue_events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/events{/number}",
+            "issues_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues{/number}",
+            "keys_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/keys{/key_id}",
+            "labels_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/labels{/name}",
+            "language": "Python",
+            "languages_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/languages",
+            "license": {
+              "key": "gpl-3.0",
+              "name": "GNU General Public License v3.0",
+              "node_id": "MDc6TGljZW5zZTk=",
+              "spdx_id": "GPL-3.0",
+              "url": "https://api.github.com/licenses/gpl-3.0"
+            },
+            "merges_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/merges",
+            "milestones_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/milestones{/number}",
+            "mirror_url": null,
+            "name": "Ro-Repo",
+            "node_id": "R_kgDORRv31Q",
+            "notifications_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/notifications{?since,all,participating}",
+            "open_issues": 2,
+            "open_issues_count": 2,
+            "owner": {
+              "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+              "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+              "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+              "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+              "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+              "gravatar_id": "",
+              "html_url": "https://github.com/Project-Ro-ASD",
+              "id": 248876122,
+              "login": "Project-Ro-ASD",
+              "node_id": "O_kgDODtWMWg",
+              "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+              "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+              "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+              "site_admin": false,
+              "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+              "type": "Organization",
+              "url": "https://api.github.com/users/Project-Ro-ASD",
+              "user_view_type": "public"
+            },
+            "private": false,
+            "pull_request_creation_policy": "all",
+            "pulls_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls{/number}",
+            "pushed_at": "2026-10-13T22:28:18Z",
+            "releases_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/releases{/id}",
+            "size": 99299,
+            "ssh_url": "git@github.com:Project-Ro-ASD/Ro-Repo.git",
+            "stargazers_count": 0,
+            "stargazers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/stargazers",
+            "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/{sha}",
+            "subscribers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscribers",
+            "subscription_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscription",
+            "svn_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+            "tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/tags",
+            "teams_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/teams",
+            "topics": [],
+            "trees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees{/sha}",
+            "updated_at": "2026-10-13T22:06:49Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo",
+            "visibility": "public",
+            "watchers": 0,
+            "watchers_count": 0,
+            "web_commit_signoff_required": false
+          },
+          "sha": "7a979ab0dffa4654c32ae8c5c0b1a05940180c3a",
+          "user": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+            "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+            "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+            "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/Project-Ro-ASD",
+            "id": 248876122,
+            "login": "Project-Ro-ASD",
+            "node_id": "O_kgDODtWMWg",
+            "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+            "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+            "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/Project-Ro-ASD",
+            "user_view_type": "public"
+          }
+        },
+        "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/78",
+        "id": 4850300011,
+        "issue_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/78",
+        "labels": [],
+        "locked": false,
+        "maintainer_can_modify": false,
+        "merge_commit_sha": "0ea155b1425e2e6a10e4c57bd58d812fefcac5d6",
+        "mergeable": true,
+        "mergeable_state": "clean",
+        "merged": false,
+        "merged_at": null,
+        "merged_by": null,
+        "milestone": null,
+        "node_id": "PR_kwDORRv31c8AAAABIRm0aw",
+        "number": 78,
+        "patch_url": "https://github.com/Project-Ro-ASD/Ro-Repo/pull/78.patch",
+        "rebaseable": true,
+        "requested_reviewers": [],
+        "requested_teams": [],
+        "review_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/comments{/number}",
+        "review_comments": 0,
+        "review_comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/78/comments",
+        "state": "open",
+        "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/7a979ab0dffa4654c32ae8c5c0b1a05940180c3a",
+        "title": "test(v3): exercise delayed CAS and reordered Pages builds",
+        "updated_at": "2026-10-13T22:35:57Z",
+        "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls/78",
+        "user": {
+          "avatar_url": "https://avatars.githubusercontent.com/u/199722016?v=4",
+          "events_url": "https://api.github.com/users/minitheguitarist/events{/privacy}",
+          "followers_url": "https://api.github.com/users/minitheguitarist/followers",
+          "following_url": "https://api.github.com/users/minitheguitarist/following{/other_user}",
+          "gists_url": "https://api.github.com/users/minitheguitarist/gists{/gist_id}",
+          "gravatar_id": "",
+          "html_url": "https://github.com/minitheguitarist",
+          "id": 199722016,
+          "login": "minitheguitarist",
+          "node_id": "U_kgDOC-eEIA",
+          "organizations_url": "https://api.github.com/users/minitheguitarist/orgs",
+          "received_events_url": "https://api.github.com/users/minitheguitarist/received_events",
+          "repos_url": "https://api.github.com/users/minitheguitarist/repos",
+          "site_admin": false,
+          "starred_url": "https://api.github.com/users/minitheguitarist/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/minitheguitarist/subscriptions",
+          "type": "User",
+          "url": "https://api.github.com/users/minitheguitarist",
+          "user_view_type": "public"
+        }
+      },
+      "endpoint": "pulls/78",
+      "status": "PASS"
+    },
+    {
+      "endpoint": "pulls/79",
+      "error": {
+        "documentation_url": "https://docs.github.com/rest/pulls/pulls#get-a-pull-request",
+        "message": "Not Found",
+        "status": "404"
+      },
+      "status": "UNVERIFIED"
+    },
+    {
+      "data": {
+        "actor": {
+          "avatar_url": "https://avatars.githubusercontent.com/u/199722016?v=4",
+          "events_url": "https://api.github.com/users/minitheguitarist/events{/privacy}",
+          "followers_url": "https://api.github.com/users/minitheguitarist/followers",
+          "following_url": "https://api.github.com/users/minitheguitarist/following{/other_user}",
+          "gists_url": "https://api.github.com/users/minitheguitarist/gists{/gist_id}",
+          "gravatar_id": "",
+          "html_url": "https://github.com/minitheguitarist",
+          "id": 199722016,
+          "login": "minitheguitarist",
+          "node_id": "U_kgDOC-eEIA",
+          "organizations_url": "https://api.github.com/users/minitheguitarist/orgs",
+          "received_events_url": "https://api.github.com/users/minitheguitarist/received_events",
+          "repos_url": "https://api.github.com/users/minitheguitarist/repos",
+          "site_admin": false,
+          "starred_url": "https://api.github.com/users/minitheguitarist/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/minitheguitarist/subscriptions",
+          "type": "User",
+          "url": "https://api.github.com/users/minitheguitarist",
+          "user_view_type": "public"
+        },
+        "artifacts_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476/artifacts",
+        "cancel_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476/cancel",
+        "check_suite_id": 102784100806,
+        "check_suite_node_id": "CS_kwDORRv31c8AAAAX7mjpxg",
+        "check_suite_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/check-suites/102784100806",
+        "conclusion": "success",
+        "created_at": "2026-10-09T13:18:20Z",
+        "display_title": "Publish exact snapshot to remote beta",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_commit": {
+          "author": {
+            "email": "arslansemihmurat@gmail.com",
+            "name": "Semih Murat"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub"
+          },
+          "id": "2a4678c1f97e9caa35bd4ded65675f48c1cd93bb",
+          "message": "Merge pull request #43 from Project-Ro-ASD/fix/file-conflicts-rpm-types-f44\n\nfix(acceptance): allow compatible shared RPM directories",
+          "timestamp": "2026-10-09T12:40:31Z",
+          "tree_id": "a08fbf8f921dee1e6d1c837f17615b7c7f56e668"
+        },
+        "head_repository": {
+          "archive_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/{archive_format}{/ref}",
+          "assignees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/assignees{/user}",
+          "blobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/blobs{/sha}",
+          "branches_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches{/branch}",
+          "collaborators_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/collaborators{/collaborator}",
+          "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/comments{/number}",
+          "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits{/sha}",
+          "compare_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/compare/{base}...{head}",
+          "contents_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contents/{+path}",
+          "contributors_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contributors",
+          "deployments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/deployments",
+          "description": "ro-repo resmi uygulama reposu",
+          "downloads_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/downloads",
+          "events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/events",
+          "fork": false,
+          "forks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/forks",
+          "full_name": "Project-Ro-ASD/Ro-Repo",
+          "git_commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits{/sha}",
+          "git_refs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/refs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/tags{/sha}",
+          "hooks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/hooks",
+          "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+          "id": 1159460821,
+          "issue_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/comments{/number}",
+          "issue_events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/events{/number}",
+          "issues_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues{/number}",
+          "keys_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/keys{/key_id}",
+          "labels_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/labels{/name}",
+          "languages_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/languages",
+          "merges_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/merges",
+          "milestones_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/milestones{/number}",
+          "name": "Ro-Repo",
+          "node_id": "R_kgDORRv31Q",
+          "notifications_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/notifications{?since,all,participating}",
+          "owner": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+            "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+            "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+            "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/Project-Ro-ASD",
+            "id": 248876122,
+            "login": "Project-Ro-ASD",
+            "node_id": "O_kgDODtWMWg",
+            "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+            "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+            "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/Project-Ro-ASD",
+            "user_view_type": "public"
+          },
+          "private": false,
+          "pulls_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls{/number}",
+          "releases_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/releases{/id}",
+          "stargazers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/stargazers",
+          "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/{sha}",
+          "subscribers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscribers",
+          "subscription_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscription",
+          "tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/tags",
+          "teams_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/teams",
+          "trees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees{/sha}",
+          "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo"
+        },
+        "head_sha": "2a4678c1f97e9caa35bd4ded65675f48c1cd93bb",
+        "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476",
+        "id": 37935890476,
+        "jobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476/jobs",
+        "logs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476/logs",
+        "name": "Publish exact snapshot to remote beta",
+        "node_id": "WFR_kwLORRv31c8AAAAI1SfALA",
+        "path": ".github/workflows/publish-remote-beta.yml",
+        "previous_attempt_url": null,
+        "pull_requests": [],
+        "referenced_workflows": [],
+        "repository": {
+          "archive_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/{archive_format}{/ref}",
+          "assignees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/assignees{/user}",
+          "blobs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/blobs{/sha}",
+          "branches_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/branches{/branch}",
+          "collaborators_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/collaborators{/collaborator}",
+          "comments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/comments{/number}",
+          "commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/commits{/sha}",
+          "compare_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/compare/{base}...{head}",
+          "contents_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contents/{+path}",
+          "contributors_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/contributors",
+          "deployments_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/deployments",
+          "description": "ro-repo resmi uygulama reposu",
+          "downloads_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/downloads",
+          "events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/events",
+          "fork": false,
+          "forks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/forks",
+          "full_name": "Project-Ro-ASD/Ro-Repo",
+          "git_commits_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/commits{/sha}",
+          "git_refs_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/refs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/tags{/sha}",
+          "hooks_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/hooks",
+          "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo",
+          "id": 1159460821,
+          "issue_comment_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/comments{/number}",
+          "issue_events_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues/events{/number}",
+          "issues_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/issues{/number}",
+          "keys_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/keys{/key_id}",
+          "labels_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/labels{/name}",
+          "languages_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/languages",
+          "merges_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/merges",
+          "milestones_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/milestones{/number}",
+          "name": "Ro-Repo",
+          "node_id": "R_kgDORRv31Q",
+          "notifications_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/notifications{?since,all,participating}",
+          "owner": {
+            "avatar_url": "https://avatars.githubusercontent.com/u/248876122?v=4",
+            "events_url": "https://api.github.com/users/Project-Ro-ASD/events{/privacy}",
+            "followers_url": "https://api.github.com/users/Project-Ro-ASD/followers",
+            "following_url": "https://api.github.com/users/Project-Ro-ASD/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Project-Ro-ASD/gists{/gist_id}",
+            "gravatar_id": "",
+            "html_url": "https://github.com/Project-Ro-ASD",
+            "id": 248876122,
+            "login": "Project-Ro-ASD",
+            "node_id": "O_kgDODtWMWg",
+            "organizations_url": "https://api.github.com/users/Project-Ro-ASD/orgs",
+            "received_events_url": "https://api.github.com/users/Project-Ro-ASD/received_events",
+            "repos_url": "https://api.github.com/users/Project-Ro-ASD/repos",
+            "site_admin": false,
+            "starred_url": "https://api.github.com/users/Project-Ro-ASD/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Project-Ro-ASD/subscriptions",
+            "type": "Organization",
+            "url": "https://api.github.com/users/Project-Ro-ASD",
+            "user_view_type": "public"
+          },
+          "private": false,
+          "pulls_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pulls{/number}",
+          "releases_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/releases{/id}",
+          "stargazers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/stargazers",
+          "statuses_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/statuses/{sha}",
+          "subscribers_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscribers",
+          "subscription_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/subscription",
+          "tags_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/tags",
+          "teams_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/teams",
+          "trees_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/git/trees{/sha}",
+          "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo"
+        },
+        "rerun_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476/rerun",
+        "run_attempt": 1,
+        "run_number": 7,
+        "run_started_at": "2026-10-09T13:18:20Z",
+        "status": "completed",
+        "triggering_actor": {
+          "avatar_url": "https://avatars.githubusercontent.com/u/199722016?v=4",
+          "events_url": "https://api.github.com/users/minitheguitarist/events{/privacy}",
+          "followers_url": "https://api.github.com/users/minitheguitarist/followers",
+          "following_url": "https://api.github.com/users/minitheguitarist/following{/other_user}",
+          "gists_url": "https://api.github.com/users/minitheguitarist/gists{/gist_id}",
+          "gravatar_id": "",
+          "html_url": "https://github.com/minitheguitarist",
+          "id": 199722016,
+          "login": "minitheguitarist",
+          "node_id": "U_kgDOC-eEIA",
+          "organizations_url": "https://api.github.com/users/minitheguitarist/orgs",
+          "received_events_url": "https://api.github.com/users/minitheguitarist/received_events",
+          "repos_url": "https://api.github.com/users/minitheguitarist/repos",
+          "site_admin": false,
+          "starred_url": "https://api.github.com/users/minitheguitarist/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/minitheguitarist/subscriptions",
+          "type": "User",
+          "url": "https://api.github.com/users/minitheguitarist",
+          "user_view_type": "public"
+        },
+        "updated_at": "2026-10-09T13:20:52Z",
+        "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/runs/37935890476",
+        "workflow_id": 362820287,
+        "workflow_url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/actions/workflows/362820287"
+      },
+      "endpoint": "actions/runs/37935890476",
+      "status": "PASS"
+    },
+    {
+      "data": [
+        {
+          "_links": {
+            "html": {
+              "href": "https://github.com/Project-Ro-ASD/Ro-Repo/rules/22656730"
+            },
+            "self": {
+              "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/rulesets/22656730"
+            }
+          },
+          "created_at": "2026-09-09T18:49:11.480+03:00",
+          "enforcement": "active",
+          "id": 22656730,
+          "name": "Protect main",
+          "node_id": "RRS_lACqUmVwb3NpdG9yec5FG_fVzgFZtto",
+          "source": "Project-Ro-ASD/Ro-Repo",
+          "source_type": "Repository",
+          "target": "branch",
+          "updated_at": "2026-09-09T18:49:11.549+03:00"
+        }
+      ],
+      "endpoint": "rulesets",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "_links": {
+          "html": {
+            "href": "https://github.com/Project-Ro-ASD/Ro-Repo/rules/22656730"
+          },
+          "self": {
+            "href": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/rulesets/22656730"
+          }
+        },
+        "bypass_actors": [],
+        "conditions": {
+          "ref_name": {
+            "exclude": [],
+            "include": [
+              "~DEFAULT_BRANCH"
+            ]
+          }
+        },
+        "created_at": "2026-09-09T18:49:11.480+03:00",
+        "current_user_can_bypass": "never",
+        "enforcement": "active",
+        "id": 22656730,
+        "name": "Protect main",
+        "node_id": "RRS_lACqUmVwb3NpdG9yec5FG_fVzgFZtto",
+        "rules": [
+          {
+            "type": "deletion"
+          },
+          {
+            "type": "non_fast_forward"
+          },
+          {
+            "parameters": {
+              "allowed_merge_methods": [
+                "merge",
+                "squash",
+                "rebase"
+              ],
+              "dismiss_stale_reviews_on_push": false,
+              "dismissal_restriction": {
+                "allowed_actors": [],
+                "enabled": false
+              },
+              "require_code_owner_review": false,
+              "require_extra_approval_for_unattributed_changes": true,
+              "require_last_push_approval": false,
+              "required_approving_review_count": 0,
+              "required_review_thread_resolution": false,
+              "required_reviewers": []
+            },
+            "type": "pull_request"
+          },
+          {
+            "parameters": {
+              "do_not_enforce_on_create": false,
+              "required_status_checks": [
+                {
+                  "context": "unit-policy",
+                  "integration_id": 15368
+                },
+                {
+                  "context": "fedora44-e2e",
+                  "integration_id": 15368
+                }
+              ],
+              "strict_required_status_checks_policy": true
+            },
+            "type": "required_status_checks"
+          }
+        ],
+        "source": "Project-Ro-ASD/Ro-Repo",
+        "source_type": "Repository",
+        "target": "branch",
+        "updated_at": "2026-09-09T18:49:11.549+03:00"
+      },
+      "endpoint": "rulesets/22656730",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "environments": [
+          {
+            "can_admins_bypass": true,
+            "created_at": "2026-09-25T09:01:59Z",
+            "deployment_branch_policy": null,
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/deployments/activity_log?environments_filter=copilot",
+            "id": 22728800829,
+            "name": "copilot",
+            "node_id": "EN_kwDORRv31c8AAAAFSr36PQ",
+            "protection_rules": [],
+            "updated_at": "2026-09-25T09:01:59Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/environments/copilot"
+          },
+          {
+            "can_admins_bypass": true,
+            "created_at": "2026-02-17T08:39:13Z",
+            "deployment_branch_policy": {
+              "custom_branch_policies": true,
+              "protected_branches": false
+            },
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/deployments/activity_log?environments_filter=github-pages",
+            "id": 12176974335,
+            "name": "github-pages",
+            "node_id": "EN_kwDORRv31c8AAAAC1c3h_w",
+            "protection_rules": [
+              {
+                "id": 48168289,
+                "node_id": "GA_kwDORRv31c4C3v1h",
+                "type": "branch_policy"
+              }
+            ],
+            "updated_at": "2026-02-17T08:39:13Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/environments/github-pages"
+          },
+          {
+            "can_admins_bypass": false,
+            "created_at": "2026-09-09T16:23:17Z",
+            "deployment_branch_policy": {
+              "custom_branch_policies": true,
+              "protected_branches": false
+            },
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/deployments/activity_log?environments_filter=repo-beta",
+            "id": 21580089616,
+            "name": "repo-beta",
+            "node_id": "EN_kwDORRv31c8AAAAFBkYJEA",
+            "protection_rules": [
+              {
+                "id": 65064325,
+                "node_id": "GA_kwDORRv31c4D4M2F",
+                "type": "branch_policy"
+              },
+              {
+                "id": 65064595,
+                "node_id": "GA_kwDORRv31c4D4M6T",
+                "prevent_self_review": false,
+                "reviewers": [
+                  {
+                    "reviewer": {
+                      "description": "Release engineering and repository publication maintainers for Ro-ASD",
+                      "html_url": "https://github.com/orgs/Project-Ro-ASD/teams/release-engineering",
+                      "id": 19418500,
+                      "members_url": "https://api.github.com/organizations/248876122/team/19418500/members{/member}",
+                      "name": "release-engineering",
+                      "node_id": "T_kwDODtWMWs4BKE2E",
+                      "notification_setting": "notifications_enabled",
+                      "organization_id": 248876122,
+                      "parent": null,
+                      "permission": "pull",
+                      "privacy": "closed",
+                      "repositories_url": "https://api.github.com/organizations/248876122/team/19418500/repos",
+                      "slug": "release-engineering",
+                      "type": "organization",
+                      "url": "https://api.github.com/organizations/248876122/team/19418500"
+                    },
+                    "type": "Team"
+                  }
+                ],
+                "type": "required_reviewers"
+              }
+            ],
+            "updated_at": "2026-09-09T16:30:01Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/environments/repo-beta"
+          },
+          {
+            "can_admins_bypass": false,
+            "created_at": "2026-09-09T16:38:16Z",
+            "deployment_branch_policy": {
+              "custom_branch_policies": true,
+              "protected_branches": false
+            },
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/deployments/activity_log?environments_filter=repo-production-signing",
+            "id": 21581148934,
+            "name": "repo-production-signing",
+            "node_id": "EN_kwDORRv31c8AAAAFBlYzBg",
+            "protection_rules": [
+              {
+                "id": 65065504,
+                "node_id": "GA_kwDORRv31c4D4NIg",
+                "type": "branch_policy"
+              },
+              {
+                "id": 65065534,
+                "node_id": "GA_kwDORRv31c4D4NI-",
+                "prevent_self_review": false,
+                "reviewers": [
+                  {
+                    "reviewer": {
+                      "description": "Release engineering and repository publication maintainers for Ro-ASD",
+                      "html_url": "https://github.com/orgs/Project-Ro-ASD/teams/release-engineering",
+                      "id": 19418500,
+                      "members_url": "https://api.github.com/organizations/248876122/team/19418500/members{/member}",
+                      "name": "release-engineering",
+                      "node_id": "T_kwDODtWMWs4BKE2E",
+                      "notification_setting": "notifications_enabled",
+                      "organization_id": 248876122,
+                      "parent": null,
+                      "permission": "pull",
+                      "privacy": "closed",
+                      "repositories_url": "https://api.github.com/organizations/248876122/team/19418500/repos",
+                      "slug": "release-engineering",
+                      "type": "organization",
+                      "url": "https://api.github.com/organizations/248876122/team/19418500"
+                    },
+                    "type": "Team"
+                  }
+                ],
+                "type": "required_reviewers"
+              }
+            ],
+            "updated_at": "2026-09-09T16:38:58Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/environments/repo-production-signing"
+          },
+          {
+            "can_admins_bypass": false,
+            "created_at": "2026-09-09T16:35:40Z",
+            "deployment_branch_policy": {
+              "custom_branch_policies": true,
+              "protected_branches": false
+            },
+            "html_url": "https://github.com/Project-Ro-ASD/Ro-Repo/deployments/activity_log?environments_filter=repo-stable",
+            "id": 21580966970,
+            "name": "repo-stable",
+            "node_id": "EN_kwDORRv31c8AAAAFBlNsOg",
+            "protection_rules": [
+              {
+                "id": 65065362,
+                "node_id": "GA_kwDORRv31c4D4NGS",
+                "type": "branch_policy"
+              },
+              {
+                "id": 65065444,
+                "node_id": "GA_kwDORRv31c4D4NHk",
+                "prevent_self_review": false,
+                "reviewers": [
+                  {
+                    "reviewer": {
+                      "description": "Release engineering and repository publication maintainers for Ro-ASD",
+                      "html_url": "https://github.com/orgs/Project-Ro-ASD/teams/release-engineering",
+                      "id": 19418500,
+                      "members_url": "https://api.github.com/organizations/248876122/team/19418500/members{/member}",
+                      "name": "release-engineering",
+                      "node_id": "T_kwDODtWMWs4BKE2E",
+                      "notification_setting": "notifications_enabled",
+                      "organization_id": 248876122,
+                      "parent": null,
+                      "permission": "pull",
+                      "privacy": "closed",
+                      "repositories_url": "https://api.github.com/organizations/248876122/team/19418500/repos",
+                      "slug": "release-engineering",
+                      "type": "organization",
+                      "url": "https://api.github.com/organizations/248876122/team/19418500"
+                    },
+                    "type": "Team"
+                  }
+                ],
+                "type": "required_reviewers"
+              }
+            ],
+            "updated_at": "2026-09-09T16:37:44Z",
+            "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/environments/repo-stable"
+          }
+        ],
+        "total_count": 5
+      },
+      "endpoint": "environments",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "branch_policies": [
+          {
+            "id": 59535621,
+            "name": "main",
+            "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k1OTUzNTYyMQ==",
+            "type": "branch"
+          }
+        ],
+        "total_count": 1
+      },
+      "endpoint": "environments/repo-beta/deployment-branch-policies",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "branch_policies": [
+          {
+            "id": 59536334,
+            "name": "main",
+            "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k1OTUzNjMzNA==",
+            "type": "branch"
+          }
+        ],
+        "total_count": 1
+      },
+      "endpoint": "environments/repo-stable/deployment-branch-policies",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "branch_policies": [
+          {
+            "id": 59536448,
+            "name": "main",
+            "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k1OTUzNjQ0OA==",
+            "type": "branch"
+          }
+        ],
+        "total_count": 1
+      },
+      "endpoint": "environments/repo-production-signing/deployment-branch-policies",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "branch_policies": [
+          {
+            "id": 43213882,
+            "name": "main",
+            "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k0MzIxMzg4Mg==",
+            "type": "branch"
+          },
+          {
+            "id": 60512885,
+            "name": "pages-storage",
+            "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k2MDUxMjg4NQ==",
+            "type": "branch"
+          }
+        ],
+        "total_count": 2
+      },
+      "endpoint": "environments/github-pages/deployment-branch-policies",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "build_type": "legacy",
+        "cname": "repo.ro-asd.org",
+        "custom_404": false,
+        "html_url": "http://repo.ro-asd.org/",
+        "https_certificate": {
+          "description": "The certificate has been approved.",
+          "domains": [
+            "repo.ro-asd.org"
+          ],
+          "expires_at": "2026-12-19",
+          "state": "approved"
+        },
+        "https_enforced": false,
+        "pending_domain_unverified_at": null,
+        "protected_domain_state": "verified",
+        "public": true,
+        "source": {
+          "branch": "pages-storage",
+          "path": "/"
+        },
+        "status": "built",
+        "url": "https://api.github.com/repos/Project-Ro-ASD/Ro-Repo/pages"
+      },
+      "endpoint": "pages",
+      "status": "PASS"
+    },
+    {
+      "data": {
+        "total_count": 0,
+        "workflow_runs": []
+      },
+      "endpoint": "actions/workflows/promote-remote-stable.yml/runs?per_page=100",
+      "status": "PASS"
+    }
+  ],
+  "observed_at_utc": "2026-10-15T10:55:57.801788+00:00",
+  "publishable": false,
+  "repository": "Project-Ro-ASD/Ro-Repo",
+  "secret_endpoints_requested": false
+}
