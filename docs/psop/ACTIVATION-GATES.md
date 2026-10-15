@@ -4,6 +4,16 @@
 gözlem zamanı, actor ve reviewer kaydı gerekir. Eksik/FAIL/UNVERIFIED/BLOCKED gate
 kapalıdır. Bu dosya bir çalıştırma veya dispatch talimatı değildir.
 
+[Implementation contract](IMPLEMENTATION-CONTRACT.md) aşamaları bu production
+gate'lerini gevşetmez: PR-B approval/signing, durable ledger/outbox ve ortak gateway
+dahil uygulama kodunu yalnız disposable/test publication için geliştirir; PR-C
+client descriptor/state, gerçek Fedora 44 DNF5, negatif/fault/HTTPS kabulü, Beta
+regresyonları ve operator runbook/readiness raporunu tamamlar. Production gate'leri
+kapalıyken bu izole geliştirme ve testler yapılabilir; gerçek production hedefe
+erişim yetkisi çıkarılamaz. Writer custody cutover, GitHub ayarları ve canlı Stable
+aktivasyonu PR-B/PR-C'nin dışındaki ayrı operatör aşamasıdır; yalnız açık
+yetkilendirme ve bütün gate'ler geçtikten sonra yapılabilir.
+
 | Gate | Gerekli kanıt | Şimdiki durum |
 | --- | --- | --- |
 | G-01 Scope ve yeniden audit | Reviewed PSOP implementation, pinned main/Pages/registry/trust; `source` guard PR-B için bilinçli yeni kontratla değiştirilmiş. | PR-A hazırlık PASS; implementation BLOCKED. |

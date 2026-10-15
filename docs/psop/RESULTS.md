@@ -49,7 +49,7 @@ CI koşuları: [V2 tests](https://github.com/Project-Ro-ASD/Ro-Repo/actions/runs
 `fedora44-full-stable-set` başarılıdır. Local test kanıtından ayrı GitHub job
 state'leri kaydedildi; production activation hâlâ BLOCKED.
 
-## Yeniden kullanım ve PR-B engelleri
+## Yeniden kullanım, aşama dağılımı ve açık girdiler
 
 Planner/composer/RPM preflight/policy profile/full-set DNF/deterministic metadata,
 source/history/API pinning, group/receipt validation, ledger/outbox/fenced publisher
@@ -57,11 +57,19 @@ ve immutable client verification mekanikleri yeniden kullanılır. Production/te
 scope sınırları korunur. Ayrıntılı dosya/API/dependency haritası
 [implementation contract](IMPLEMENTATION-CONTRACT.md) içindedir.
 
-PR-B öncesinde legacy archive/first-seen witness semantiği, writer custody geçiş
-tasarımı, explicit genesis kanıtı ve PSOP client descriptor/local monotonic state
-politikası çözülmelidir. Bağımsız olmayan review düzeni ve gerçek required-test
-authority üretim gate'i olarak açık kalır. Provider'ın üç sınırlaması yeni
-boolean/receipt alanlarıyla PASS yapılamaz.
+PR-B verified inputs/history/genesis, planner/composer, deterministic result,
+PSOP approval/signing, durable ledger/outbox ve ortak writer gateway uygulamasını
+yalnız disposable/test publication için geliştirir. Legacy archive/first-seen witness
+ve explicit genesis semantiği bu aşamada çözülür; yeterli kanıt yoksa fail closed
+kalır. PR-C client descriptor/local monotonic state entegrasyonunu, gerçek Fedora
+44 DNF5, imza/hash negatifleri, provider fault injection, disposable Pages HTTPS,
+Beta regresyonları ve operator runbook/readiness raporunu tamamlar.
+
+Gerçek writer custody/V2 cutover, GitHub ayarları ve canlı Stable aktivasyonu ayrı
+operatör aşamasıdır; açık yetkilendirme ve bütün gate'ler geçmeden yapılamaz.
+Production writer/secret ve activation B/C boyunca kapalı kalır. Bağımsız olmayan
+review düzeni ve gerçek required-test authority üretim gate'i olarak açık kalır.
+Provider'ın üç sınırlaması yeni boolean/receipt alanlarıyla PASS yapılamaz.
 
 ## Beta ve production'a müdahale edilmediğinin kanıtı
 

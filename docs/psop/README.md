@@ -34,5 +34,17 @@ python3 -m unittest discover -s tests -v
 
 Audit çıktısındaki PASS yalnız belirtilen denetimi ifade eder. Bütün çıktılar
 `publishable=false` kalır. Audit çıktısı protected approval veya yayın receipt'i
-değildir. Bu PR'ın merge edilmesi bile Stable'ı açmaz; PR-B ve PR-C de aşağıdaki
-gates kapanmadan production activation yetkisi vermez.
+değildir. Bu PR'ın merge edilmesi bile Stable'ı açmaz. Sonraki aşamaların
+[kesin kapsamı](IMPLEMENTATION-CONTRACT.md):
+
+- PR-B: verified inputs/history/genesis, planner/composer, deterministic result,
+  PSOP approval/signing, durable ledger/outbox ve ortak gateway uygulaması;
+  publication yalnız disposable/test ortamında.
+- PR-C: client descriptor/state entegrasyonu, gerçek Fedora 44 DNF5, imza/hash
+  negatifleri, provider fault injection, disposable Pages HTTPS, Beta regresyonları
+  ve operator runbook/readiness raporu.
+- Ayrı operatör aşaması: açık yetkilendirme ve bütün activation gate'leri sonrası
+  gerçek writer custody/V2 cutover, GitHub ayarları ve canlı Stable aktivasyonu.
+
+Production writer, secret erişimi/provisioning, V2 cutover ve activation PR-B ve
+PR-C boyunca kapalı kalır. Güvenlik mimarisi ve Strict V3 production kilidi korunur.
