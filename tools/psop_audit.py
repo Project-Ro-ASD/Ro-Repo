@@ -21,6 +21,17 @@ REPOSITORY = "Project-Ro-ASD/Ro-Repo"
 PROTECTED = (".github", "config", "fixtures", "keys", "schemas", "scripts", "tools",
              "tests", "store", "x86_64", "aarch64", "noarch", "SRPMS")
 ADDITIONS = {"tools/psop_audit.py", "tests/test_psop_contract.py"}
+# Explicit PR-B additions only. The original 234-file baseline/digest is intact.
+# No wildcard, new workflow, credential file or production activation entry point.
+ADDITIONS |= {
+    "tools/psop_context.py", "tools/psop_inputs.py", "tools/psop_history.py",
+    "tools/psop_genesis.py", "tools/psop_plan.py", "tools/psop_result.py",
+    "tools/psop_authorization.py", "tools/psop_signing.py", "tools/psop_ledger.py",
+    "tools/psop_outbox.py", "tools/psop_storage_gateway.py", "tools/psop_receipts.py",
+    "schemas/psop-review-v1.schema.json", "schemas/psop-approval-v1.schema.json",
+    "schemas/psop-publication-v1.schema.json", "tests/test_psop_publisher.py",
+    "tests/test_psop_inputs.py", "tests/psop_support.py", "tests/psop-offline-e2e.py",
+}
 PUBLIC_ROOTS = {
     "rpm": {"path": "keys/production/ro-asd-rpm-signing-public.asc",
             "sha256": "d73e92fcbf1dc9f8900459fa34b5eaa053570f11532ffc8e53373e8289b7ee51",

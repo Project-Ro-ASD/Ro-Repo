@@ -1,0 +1,107 @@
+{
+  "base_main": "e11ad5160d4dbd53a320562742ad66190d408f6e",
+  "files": [
+    {
+      "mode": "0o644",
+      "path": "schemas/psop-approval-v1.schema.json",
+      "sha256": "bfd0672497c72289bcb8cd51b2348c55d88508794be943c7753726b9be9150c9"
+    },
+    {
+      "mode": "0o644",
+      "path": "schemas/psop-publication-v1.schema.json",
+      "sha256": "c94c788da9a237bc8fee47ec57c9a3138466b1104754491a7320657fdb9cddc6"
+    },
+    {
+      "mode": "0o644",
+      "path": "schemas/psop-review-v1.schema.json",
+      "sha256": "3b2fa8a8a25ea84f550e907359b1aaca1d00894dde60ca5566846f8063d20e83"
+    },
+    {
+      "mode": "0o644",
+      "path": "tests/psop-offline-e2e.py",
+      "sha256": "d3daca2f3502e350cce994a8c7c1e9f9856e671897e40de2f46270cbee86b060"
+    },
+    {
+      "mode": "0o644",
+      "path": "tests/psop_support.py",
+      "sha256": "a433b477a84d5cebe9191f797474b4663d3c1561200c9a9adbf93005cdc57b28"
+    },
+    {
+      "mode": "0o644",
+      "path": "tests/test_psop_inputs.py",
+      "sha256": "22ccca2836ce3563d2a52e8763e2d00ef2d944dfb3d74f1bcb205a3667559a28"
+    },
+    {
+      "mode": "0o644",
+      "path": "tests/test_psop_publisher.py",
+      "sha256": "2b40a8862a56926f1e67ebeabc3423d649614d08aec015fcfec4d1f4aa1b6c5e"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_audit.py",
+      "sha256": "178db00e2d8731c02a6d200ef6d8691a7a5ee98c2ccdb0a3626cacf1795a5814"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_authorization.py",
+      "sha256": "3ed6626b5de5f580ab3acd5686bde61357595935fd4f41c0a1e89e09a6ee6973"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_context.py",
+      "sha256": "b69e34252037863f205b837ab7006e1cbd2ee2e31672183056710340c0b48faa"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_genesis.py",
+      "sha256": "6eae463ffed70f406c4651e408097d0a29932c49c574ab19c704f0c719063317"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_history.py",
+      "sha256": "3d9e558bd495955bc970d1d01daa16039fd704b2695605dc3830b8006256a19a"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_inputs.py",
+      "sha256": "ac695e0942ef6300e4ab27a2f7de56a2fd3e7b7e28a9c168076c408c394bd809"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_ledger.py",
+      "sha256": "3b19a27d444a8e7457ef388bbd12fefb427c2144278d733ea671f9ed1241551d"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_outbox.py",
+      "sha256": "f5d3c97555c6783a8b95547e1f222f6a6a7b930ed721f6c0c176620c9e95dccc"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_plan.py",
+      "sha256": "0ae74fec5c03e043073edcfdb42db36dee7aa18af2973da93a67749582317f72"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_receipts.py",
+      "sha256": "cc385e822cd29f4e10b14fbb58b31453c7eebab2d69b804c2cfbd693bc71cc48"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_result.py",
+      "sha256": "3e21a733c4d4efe43e2920b08d2e3a6a8a10b3ef75cf8611d51cb4fdd76c17b6"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_signing.py",
+      "sha256": "adc203c5c1f47d6a4e254003c30ceac68d45343896f0d1689f8ba98f879ba347"
+    },
+    {
+      "mode": "0o644",
+      "path": "tools/psop_storage_gateway.py",
+      "sha256": "c47d4e6a6cca52bf4fac62a0138d05df4328a02f5ce787697b30bc751bdfb100"
+    }
+  ],
+  "inventory_sha256": "c1a4ee92c40ee697987bec8a85ab2344135d0587f4ac7940673029e52fb4b0e8",
+  "scope": "PSOP code/schema/test source at local acceptance; docs/logs excluded to avoid self-reference"
+}
