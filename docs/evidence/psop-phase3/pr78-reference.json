@@ -1,0 +1,12 @@
+{
+  "diff_sha256": "0618b652ad40932f663647d364f569d8d4498c935465da7df7a284c842183cf7",
+  "head": "7a979ab0dffa4654c32ae8c5c0b1a05940180c3a",
+  "method": "gh pr diff 78 read-only; no merge/cherry-pick/test-code copy",
+  "production_provider_guarantees": "UNVERIFIED",
+  "reviewed_scenarios": [
+    "delayed admitted CAS after approval expiry",
+    "old build finishing after newer post-verification",
+    "stale/missing every public member",
+    "restart at I/O boundaries"
+  ]
+}

@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "psop-client-descriptor-v1.schema.json",
+  "title": "PSOP disposable client descriptor; never production authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "domain",
+    "context",
+    "origin",
+    "generation",
+    "previous_generation",
+    "previous_result_sha256",
+    "result_sha256",
+    "signed_inventory",
+    "publication_sha256",
+    "receipt",
+    "receipt_sha256",
+    "metadata_key",
+    "rollback_authority",
+    "production_activation",
+    "publishable",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "domain": {
+      "const": "psop-client-descriptor-test-1"
+    },
+    "context": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "origin": {
+      "type": "string",
+      "format": "uri"
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "previous_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "previous_result_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "result_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "signed_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "publication_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "domain",
+        "context",
+        "attempt",
+        "writer",
+        "status",
+        "approval_sha256",
+        "result_sha256",
+        "evidence_sha256",
+        "before_git",
+        "target_git",
+        "created_at",
+        "admitted_at",
+        "observed_at",
+        "checkpoint",
+        "provider_deadline_fencing",
+        "pages_build_ordering",
+        "global_cdn_freshness",
+        "production_activation",
+        "publishable",
+        "requested_at",
+        "identity",
+        "publication_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "domain": {
+          "const": "psop-publication-test-1"
+        },
+        "context": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "attempt": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+        },
+        "writer": {
+          "enum": [
+            "psop-stable",
+            "v2-snapshot",
+            "v2-beta",
+            "v2-rollback",
+            "v2-stable"
+          ]
+        },
+        "status": {
+          "enum": [
+            "STAGED",
+            "UNKNOWN",
+            "COMPLETE",
+            "COMMITTED_EXPIRED",
+            "ABORTED"
+          ]
+        },
+        "approval_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "result_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "evidence_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "before_git": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "target_git": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "created_at": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "admitted_at": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "observed_at": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "checkpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "seq",
+            "sha256"
+          ],
+          "properties": {
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "provider_deadline_fencing": {
+          "const": "UNVERIFIED"
+        },
+        "pages_build_ordering": {
+          "const": "UNVERIFIED"
+        },
+        "global_cdn_freshness": {
+          "const": "UNVERIFIED"
+        },
+        "production_activation": {
+          "const": "BLOCKED"
+        },
+        "publishable": {
+          "const": false
+        },
+        "requested_at": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "issuer",
+            "repository",
+            "actor",
+            "run_id",
+            "run_attempt"
+          ],
+          "properties": {
+            "issuer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "repository": {
+              "type": "string",
+              "minLength": 1
+            },
+            "actor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "run_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "run_attempt": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "publication_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "receipt_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "metadata_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "fingerprint"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^[A-F0-9]{40}$"
+        }
+      }
+    },
+    "rollback_authority": {
+      "const": false
+    },
+    "production_activation": {
+      "const": "BLOCKED"
+    },
+    "publishable": {
+      "const": false
+    },
+    "issued_at": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "expires_at": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

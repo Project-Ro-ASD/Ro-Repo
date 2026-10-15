@@ -1,0 +1,34 @@
+name: PSOP disposable client acceptance
+"on":
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  psop-fedora44-acceptance:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install disposable test runtime
+        run: dnf -y install python3 python3-jsonschema python3-yaml rpm rpm-build rpm-sign createrepo_c gnupg2 openssl dnf5 git
+      - name: Verify original source boundary
+        run: python3 tools/psop_audit.py source
+      - name: Preserve PR-B three-flow real RPM baseline
+        run: |
+          mkdir psop-evidence
+          python3 tests/psop-offline-e2e.py psop-evidence/pr-b-baseline.json
+      - name: Real Fedora 44 DNF5 and local HTTPS client acceptance
+        run: python3 tests/psop-fedora44-dnf5-e2e.py psop-evidence/fedora44-dnf5-https.json --official-upstream
+      - name: Upload exact disposable observations
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: psop-disposable-${{ github.run_id }}-${{ github.run_attempt }}
+          path: psop-evidence/
+          if-no-files-found: error
+          retention-days: 14

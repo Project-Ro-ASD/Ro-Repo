@@ -1,0 +1,8 @@
+{
+  "network_requests": 0,
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "reason": "NO_PREEXISTING_EXPLICITLY_AUTHORIZED_TEST_TARGET",
+  "scope": "external-disposable-pages",
+  "status": "BLOCKED"
+}

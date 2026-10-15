@@ -1,0 +1,47 @@
+{
+  "added_tests": 27,
+  "base_tests": 652,
+  "external_pages": {
+    "command": "python3 tests/psop-pages-disposable-acceptance.py --mode external --output /tmp/psop-c-evidence/external-pages.json",
+    "exit_code": 2,
+    "network_requests": 0,
+    "status": "BLOCKED"
+  },
+  "final_head_ci": "Required: original eight jobs plus new psop-fedora44-acceptance; exact final head/run links verified in PR checks and delivery description",
+  "full_discovery": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "count": 679,
+    "log": "full-discovery.log.gz",
+    "seconds": 334.747,
+    "skips": 0,
+    "status": "PASS"
+  },
+  "local_execution_source": {
+    "binding": "exact source inventory matches delivered code; not a claim that the uncommitted local run had the future PR commit SHA",
+    "dirty": true,
+    "head": "9284bdc04b7ed7f0b2c1ec6a34942eb7e36317c3"
+  },
+  "local_https": {
+    "command": "python3 tests/psop-pages-disposable-acceptance.py --mode local --output /out/local-https.json",
+    "network": "none (loopback TLS fixture only)",
+    "status": "PASS"
+  },
+  "native_dnf5": {
+    "cases": 4,
+    "client_negative_assertions": 17,
+    "command": "python3 tests/psop-fedora44-dnf5-e2e.py /out/fedora44-accepted.json --official-upstream",
+    "dnf_negative_assertions": 5,
+    "image_id": "1af38c532d564f256e338805615599f203d8f22895a07ce7d88d013cfda73105",
+    "network": "Public Fedora downloads only; no GitHub test publication",
+    "status": "PASS"
+  },
+  "pr_b_default_e2e": {
+    "cases": 3,
+    "command": "python3 tests/psop-offline-e2e.py /out/pr-b-baseline.json",
+    "status": "PASS"
+  },
+  "production_activation": "BLOCKED",
+  "psop_tests_in_full_discovery": 71,
+  "publishable": false,
+  "source_inventory_sha256": "6488aba7af22248d39d00f82363bd5e27f43673898e453d6404754df4ff79d5d"
+}

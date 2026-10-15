@@ -1,0 +1,12 @@
+{
+  "base_main": "9284bdc04b7ed7f0b2c1ec6a34942eb7e36317c3",
+  "method": "read-only git ls-remote and gh pr view before work; refs rechecked at delivery",
+  "pages_storage": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+  "pr78": {
+    "draft": true,
+    "head": "7a979ab0dffa4654c32ae8c5c0b1a05940180c3a",
+    "state": "OPEN"
+  },
+  "pr80_merged_commit": "9284bdc04b7ed7f0b2c1ec6a34942eb7e36317c3",
+  "production_activation": "BLOCKED"
+}
