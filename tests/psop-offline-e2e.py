@@ -52,7 +52,7 @@ def reject(call, contains=None):
     raise AssertionError("unsafe input accepted")
 
 
-def main(output):
+def main(output, observer=None):
     now = int(dt.datetime.now(dt.timezone.utc).timestamp())
     utc = lambda n: dt.datetime.fromtimestamp(n, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with tempfile.TemporaryDirectory(prefix="psop-rpm-fixtures-") as directory:
@@ -238,6 +238,8 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                 assert receipt["status"] == "COMPLETE" and receipt["production_activation"] == "BLOCKED"
                 reopened = Gateway(Ledger(context, clock=lambda: now), context)
                 assert reopened.apply("local-1") == receipt
+                if observer is not None and stable is None:
+                    observer("genesis", locals())
                 # Attack recomputes all plan/inventory hashes for an unsigned
                 # binary. Actual rpmkeys, not hash self-consistency, must reject.
                 tampered = context.path("unsigned-negative");shutil.copytree(prepared.composition, tampered)
@@ -328,6 +330,8 @@ install -Dm0644 /dev/null %{{buildroot}}/usr/share/{name}/fixture
                         "ro-control-0:1.0-1.fc44.noarch", "ro-control-0:1.0-1.fc44.src",
                         "ro-assist-0:2.0-1.fc44.noarch", "ro-assist-0:2.0-1.fc44.src"}
                     assert reopened.apply("local-1") == receipt
+                    if observer is not None:
+                        observer("selected-plus-retained-successor", locals())
                     cases.append({"case": "successor-from-committed-psop-stable-after-restart", "status": "PASS",
                         "receipt": receipt2, "old_immutable_bytes_preserved": True, "closure": r2.data["closure"]})
                 subprocess.run(["gpgconf", "--homedir", str(signer.home), "--kill", "gpg-agent"], capture_output=True)

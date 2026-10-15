@@ -32,6 +32,14 @@ ADDITIONS |= {
     "schemas/psop-publication-v1.schema.json", "tests/test_psop_publisher.py",
     "tests/test_psop_inputs.py", "tests/psop_support.py", "tests/psop-offline-e2e.py",
 }
+# PR-C integration only; the original baseline and PR-B list stay intact.
+ADDITIONS |= {
+    "tools/psop_client.py", "tools/psop_pages.py", "schemas/psop-client-descriptor-v1.schema.json",
+    "tests/psop_client_support.py", "tests/psop_acceptance_support.py", "tests/test_psop_client.py",
+    "tests/test_psop_provider_faults.py", "tests/psop-fedora44-dnf5-e2e.py",
+    "tests/psop-pages-disposable-acceptance.py", ".github/workflows/psop-acceptance-tests.yml",
+    "tests/psop_evidence.py",
+}
 PUBLIC_ROOTS = {
     "rpm": {"path": "keys/production/ro-asd-rpm-signing-public.asc",
             "sha256": "d73e92fcbf1dc9f8900459fa34b5eaa053570f11532ffc8e53373e8289b7ee51",

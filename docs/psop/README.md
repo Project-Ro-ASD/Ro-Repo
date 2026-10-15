@@ -1,5 +1,10 @@
 # Pages Stable Operational Profile — PR-A
 
+Güncel uygulama/kabul kayıtları: [PR-B](PR-B-IMPLEMENTATION.md),
+[PR-C API haritası](PR-C-IMPLEMENTATION.md), [readiness](READINESS-REPORT.md) ve
+[operator runbook](OPERATOR-RUNBOOK.md). Aşağıdaki PR-A anlatımı tarihseldir;
+production activation bu aşamaların tamamında **BLOCKED** kalır.
+
 15 Ekim 2026. **Hazırlık sözleşmesi; production activation BLOCKED.** Temel:
 `3d4b56bd7509988f3715305ab9e2e09394635448`. Bu PR yeni bir publisher kurmaz.
 

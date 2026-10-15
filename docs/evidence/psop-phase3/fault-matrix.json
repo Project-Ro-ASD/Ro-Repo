@@ -1,0 +1,104 @@
+{
+  "actual_github_provider_guarantees": "UNVERIFIED",
+  "log": "full-discovery.log.gz",
+  "production_activation": "BLOCKED",
+  "scenarios": [
+    {
+      "scenario": "delayed_admitted_CAS_after_expiry",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_provider_faults.PublisherAuthorityFaultTests.test_delayed_cas_then_expiry_cannot_issue_client_authority"
+      ]
+    },
+    {
+      "scenario": "response_loss_repeated_exact_reconciliation",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_provider_faults.PublisherAuthorityFaultTests.test_response_loss_requires_exact_target_and_idempotent_reconciliation_before_descriptor"
+      ]
+    },
+    {
+      "scenario": "writer_race_same_HEAD",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_publisher.PublisherTests.test_two_independent_gateway_instances_have_one_admission_winner"
+      ]
+    },
+    {
+      "scenario": "process_death_before_after_provider_CAS",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_publisher.PublisherTests.test_process_death_before_and_after_cas_retains_durable_unknown"
+      ]
+    },
+    {
+      "scenario": "UNKNOWN_successor_and_base_HEAD_timeout_rejection",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_publisher.PublisherTests.test_base_head_and_timeout_do_not_resolve_unknown",
+        "test_psop_publisher.PublisherTests.test_all_simulated_writers_share_pending_realm"
+      ]
+    },
+    {
+      "scenario": "restart_target_and_blob_verification",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_publisher.PublisherTests.test_lost_response_reconciles_exact_target_after_restart_without_cas_retry",
+        "test_psop_publisher.PublisherTests.test_prepared_blob_hash_mismatch_is_rejected_before_cas"
+      ]
+    },
+    {
+      "scenario": "old_Pages_build_after_full_probe",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_client.ExternalIdentityModelTests.test_successful_old_build_appearing_after_full_probe_is_rejected"
+      ]
+    },
+    {
+      "scenario": "CDN_each_member_missing_stale_mixed_and_git_ahead",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_provider_faults.PublicVisibilityFaultTests.test_old_build_mixed_stale_missing_members_never_become_public_success"
+      ]
+    },
+    {
+      "scenario": "wrong_public_result_success_receipt",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_provider_faults.PublicVisibilityFaultTests.test_wrong_success_receipt_cannot_authenticate_a_different_public_result"
+      ]
+    },
+    {
+      "scenario": "signed_old_descriptor_known_rollback_vs_first_client",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_client.ClientTests.test_signed_old_replay_and_generation_rollback_leave_state_unchanged",
+        "test_psop_client.ClientTests.test_valid_old_descriptor_is_not_a_latest_proof_for_first_client"
+      ]
+    },
+    {
+      "scenario": "actual_client_process_death_atomic_pointer",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_client.ClientTests.test_actual_process_death_journal_and_active_commit_recover_after_restart"
+      ]
+    },
+    {
+      "scenario": "Beta_snapshot_history_receipt_bytes",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_publisher.PublisherTests.test_previous_beta_snapshot_history_blobs_preserved",
+        "test_psop_publisher.PublisherTests.test_old_receipt_and_bytes_stay_fixed_after_next_publication"
+      ]
+    },
+    {
+      "scenario": "Strict_V3_production_lock",
+      "status": "PASS",
+      "test_ids": [
+        "test_psop_contract.PhaseAContractTests.test_strict_v3_locks_reject_psop_objects"
+      ]
+    }
+  ],
+  "source_inventory_sha256": "ee66d14350a2d59074d401ff7109d73ad901856d4fcae9dc87afbdb7210e44f5",
+  "status": "PASS_LOCAL_MODEL_REGRESSION"
+}

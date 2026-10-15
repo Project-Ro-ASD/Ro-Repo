@@ -1,0 +1,164 @@
+{
+  "cases": [
+    {
+      "case": "genesis",
+      "closure": {
+        "aarch64": "PASS_LOCAL_RPM_TEST",
+        "x86_64": "PASS_LOCAL_RPM_TEST"
+      },
+      "deterministic_unsigned_result": true,
+      "negatives": {
+        "actual_wrong_arch_header": "PASS_REJECTION",
+        "missing_availability": "PASS_REJECTION",
+        "other_candidate_dwell": "PASS_REJECTION",
+        "partial_group": "PASS_REJECTION",
+        "production_signing_role": "PASS_REJECTION",
+        "unsigned_rehashed_rpm": "PASS_REJECTION",
+        "wrong_public_root_hash": "PASS_REJECTION",
+        "wrong_rpm_signing_role": "PASS_REJECTION"
+      },
+      "production_dwell": "BLOCKED",
+      "receipt": {
+        "admitted_at": 1792074896,
+        "approval_sha256": "1ca7e3d3502980775a670db36af5814d3e3a5920557ffc7d8eb6e4d07d63a7e2",
+        "attempt": "local-1",
+        "before_git": null,
+        "checkpoint": {
+          "seq": 8,
+          "sha256": "d2de0c5f60df1d0c0ff03aa0320514cc97f0d29915e2d6cb6371e7fed583918f"
+        },
+        "context": "636e3232db335fdcf24e1555151b0381734918bde916bebdd46eb6a2307e4388",
+        "created_at": 1792074896,
+        "domain": "psop-publication-test-1",
+        "evidence_sha256": "d04edce39eb9560892150f048759f6d3840ba992c1f6699fa3a35b4d9164e296",
+        "global_cdn_freshness": "UNVERIFIED",
+        "identity": {
+          "actor": "42",
+          "issuer": "https://psop-12f84986b1874ec49dea023c78de8e1a.invalid/issuer",
+          "repository": "psop-test/12f84986b1874ec49dea023c78de8e1a",
+          "run_attempt": "1",
+          "run_id": "101"
+        },
+        "observed_at": 1792074896,
+        "pages_build_ordering": "UNVERIFIED",
+        "production_activation": "BLOCKED",
+        "provider_deadline_fencing": "UNVERIFIED",
+        "publication_sha256": "d903c2cde6bbbe72f85cc50e5699c840210532a344ead437e7b95ea89bb4596e",
+        "publishable": false,
+        "requested_at": 1792074896,
+        "result_sha256": "2b4253d2d7da2cfc3cd7921f150200a571a8e0fd03ebd4db6a3665601def5651",
+        "schema_version": 1,
+        "status": "COMPLETE",
+        "target_git": "dbb45294dfc0609f3d98b333f8355dd32c24acee",
+        "writer": "psop-stable"
+      },
+      "rpm_paths": 3,
+      "status": "PASS"
+    },
+    {
+      "case": "successor-from-committed-psop-stable-after-restart",
+      "closure": {
+        "aarch64": "PASS_LOCAL_RPM_TEST",
+        "x86_64": "PASS_LOCAL_RPM_TEST"
+      },
+      "old_immutable_bytes_preserved": true,
+      "receipt": {
+        "admitted_at": 1792074896,
+        "approval_sha256": "fa02b7866e2486f62b3469ea96260854ea80dd19a80733ee9e9615d5aba9f175",
+        "attempt": "local-2",
+        "before_git": "dbb45294dfc0609f3d98b333f8355dd32c24acee",
+        "checkpoint": {
+          "seq": 14,
+          "sha256": "52fd8297b20c3d5a04cbd8d1f1bf8e8d6d5a90193ac6578eb0ac5df90bc29c6c"
+        },
+        "context": "636e3232db335fdcf24e1555151b0381734918bde916bebdd46eb6a2307e4388",
+        "created_at": 1792074896,
+        "domain": "psop-publication-test-1",
+        "evidence_sha256": "31280981c418fd8510a02bb94063273dd5869b8704dcfb4550dcc0a76409cf3e",
+        "global_cdn_freshness": "UNVERIFIED",
+        "identity": {
+          "actor": "42",
+          "issuer": "https://psop-12f84986b1874ec49dea023c78de8e1a.invalid/issuer",
+          "repository": "psop-test/12f84986b1874ec49dea023c78de8e1a",
+          "run_attempt": "1",
+          "run_id": "101"
+        },
+        "observed_at": 1792074896,
+        "pages_build_ordering": "UNVERIFIED",
+        "production_activation": "BLOCKED",
+        "provider_deadline_fencing": "UNVERIFIED",
+        "publication_sha256": "26b4679d396b5df0b7ed8cb8278e55d5d879bf97eef4abe4c168f97fc5114da0",
+        "publishable": false,
+        "requested_at": 1792074896,
+        "result_sha256": "e3193393e60f9221e1abc8776fdf5e8a26adaa72fa60d24e77e3c492c22f0df2",
+        "schema_version": 1,
+        "status": "COMPLETE",
+        "target_git": "042eac559683b1c898d5ec580001b516d09ef901",
+        "writer": "psop-stable"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "selected-plus-retained",
+      "closure": {
+        "aarch64": "PASS_LOCAL_RPM_TEST",
+        "x86_64": "PASS_LOCAL_RPM_TEST"
+      },
+      "deterministic_unsigned_result": true,
+      "negatives": {
+        "actual_wrong_arch_header": "PASS_REJECTION",
+        "missing_availability": "PASS_REJECTION",
+        "missing_retained_dependency": "PASS_REJECTION",
+        "partial_group": "PASS_REJECTION",
+        "production_signing_role": "PASS_REJECTION",
+        "short_canonical_dwell": "PASS_REJECTION",
+        "unsigned_rehashed_rpm": "PASS_REJECTION",
+        "wrong_public_root_hash": "PASS_REJECTION",
+        "wrong_rpm_signing_role": "PASS_REJECTION"
+      },
+      "production_dwell": "BLOCKED",
+      "receipt": {
+        "admitted_at": 1792074896,
+        "approval_sha256": "03f9cb9adf833be249b5cd98fb9fb244518448602a2ec75ac323138cd5540c17",
+        "attempt": "local-1",
+        "before_git": null,
+        "checkpoint": {
+          "seq": 9,
+          "sha256": "03c45cec3d95e3eb104f8a91c4ef72162adae6f24b1e29a764a903f0b5808199"
+        },
+        "context": "eda55eb2b8c9bc0bfc7e64d95f35e5bacc6ba4510fd842651954f8b0728d7c7a",
+        "created_at": 1792074896,
+        "domain": "psop-publication-test-1",
+        "evidence_sha256": "464a35473fdaa16fbd678a52963fa5d37b150f8f0336abbbaa7f93ebc24d0b46",
+        "global_cdn_freshness": "UNVERIFIED",
+        "identity": {
+          "actor": "42",
+          "issuer": "https://psop-6f9bf3818733407cb1f49e0fc957cfa8.invalid/issuer",
+          "repository": "psop-test/6f9bf3818733407cb1f49e0fc957cfa8",
+          "run_attempt": "1",
+          "run_id": "101"
+        },
+        "observed_at": 1792074896,
+        "pages_build_ordering": "UNVERIFIED",
+        "production_activation": "BLOCKED",
+        "provider_deadline_fencing": "UNVERIFIED",
+        "publication_sha256": "9d2951dcb271fc48451e23a6a3d526588feb9696693122cb6407a25b47039722",
+        "publishable": false,
+        "requested_at": 1792074896,
+        "result_sha256": "1105aac74a207dcd097a8d017d2efeece5f88415d51c08d4945143d5c31b0bb0",
+        "schema_version": 1,
+        "status": "COMPLETE",
+        "target_git": "84f7c86d2923048b8eaac865365f7166562d83b5",
+        "writer": "psop-stable"
+      },
+      "rpm_paths": 6,
+      "status": "PASS"
+    }
+  ],
+  "dnf5_client_acceptance": "UNVERIFIED",
+  "external_pages_https": "UNVERIFIED",
+  "gui": "UNVERIFIED",
+  "production_activation": "BLOCKED",
+  "publishable": false,
+  "scope": "psop-local-disposable-rpm-gpg-sqlite-git-e2e"
+}
