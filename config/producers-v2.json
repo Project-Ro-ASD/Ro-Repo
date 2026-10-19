@@ -95,6 +95,38 @@
       ]
     },
     {
+      "repository": "Project-Ro-ASD/ro-widgets",
+      "owner": "Project-Ro-ASD/ro-widgets maintainers",
+      "components": [
+        {
+          "component": "ro-widgets",
+          "package_names": [
+            "ro-widgets"
+          ],
+          "architectures": [
+            "noarch"
+          ],
+          "risk_class": "critical-desktop",
+          "promotion_group": "ro-widgets",
+          "required_tests": [
+            "dependency-solve",
+            "clean-install",
+            "upgrade",
+            "file-conflict",
+            "rpmlint",
+            "smoke",
+            "plasma-integration",
+            "login-session"
+          ],
+          "srpm_required": true,
+          "sbom_required": false,
+          "allow_fedora_override": false,
+          "trusted_signer_workflow": "Project-Ro-ASD/ro-widgets/.github/workflows/release.yml",
+          "require_complete_architecture_set": true
+        }
+      ]
+    },
+    {
       "repository": "Project-Ro-ASD/Ro-ASD-release",
       "owner": "Project-Ro-ASD/Ro-ASD-release maintainers",
       "components": [

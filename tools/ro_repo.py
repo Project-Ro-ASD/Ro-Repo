@@ -1030,7 +1030,7 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
                               passphrase_file, parent=None,
                               test_only_metadata_public_key=None,
                               test_only_rpm_public_key=None,
-                              test_only_allow_unattested=False):
+                              test_only_allow_unattested=False, base_snapshot=None):
     """Build an immutable production candidate snapshot from exact signing runs."""
     if not re.fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}", snapshot_id):
         raise ContractError("invalid snapshot ID")
@@ -1063,6 +1063,16 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
         test_only_allow_unattested=test_only_allow_unattested,
     )
 
+    retained, inheritance = [], None
+    if base_snapshot is not None:
+        if parent is None or parent == snapshot_id:
+            raise ContractError("incremental candidate requires a distinct exact parent")
+        from v2_candidate import plan
+        retained, inheritance = plan(
+            base_snapshot, components, parent, gnupghome, str(rpm_key_id),
+            metadata_fpr, rpm_public_key,
+        )
+
     output = pathlib.Path(output)
     final = output / "snapshots/fedora/44" / snapshot_id
     if final.exists():
@@ -1078,11 +1088,24 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
         packages = []
         nevras = {}
         historical = {}
+        if base_snapshot is not None:
+            for old in load(pathlib.Path(base_snapshot) / "repository-snapshot-v1.json")["packages"]:
+                historical[old["nevra"]] = old["producer_artifact_sha256"]
         for old_manifest in (output / "snapshots/fedora/44").glob("*/repository-snapshot-v1.json"):
             for old in load(old_manifest).get("packages", []):
                 historical[old["nevra"]] = old["producer_artifact_sha256"]
 
         component_evidence = []
+        if base_snapshot is not None:
+            from v2_selected_stable import rpm_paths
+        for item, header, source in retained:
+            for source_path in rpm_paths(source, item):
+                destination = stage / source_path.relative_to(source)
+                shutil.copy2(source_path, destination)
+                if digest(destination) != item["published_signed_artifact_sha256"]:
+                    raise ContractError("inherited RPM copy changed")
+            packages.append(dict(item))
+            nevras[item["nevra"]] = item["published_signed_artifact_sha256"]
         for component in components:
             component_evidence.append({
                 "signing_run": component["signing_run"],
@@ -1123,6 +1146,12 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
                     "published_signed_artifact_sha256": package["signed_digest"],
                     "producer_manifest_digest": package["manifest_digest"],
                 })
+
+        if base_snapshot is not None:
+            checks = [(next(rpm_paths(stage, p)), p["architecture"]) for p in packages]
+            ok, conflicts = repository_file_conflict_check(checks)
+            if not ok:
+                raise ContractError(f"candidate repository file conflicts: {conflicts}")
 
         repodata = {}
         for arch, repo in repos.items():
@@ -1167,6 +1196,8 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
             "metadata_signing_fingerprint": metadata_fpr,
             "components": component_evidence,
         }
+        if inheritance is not None:
+            build_evidence["inherited_snapshot"] = inheritance
         validate_schema(build_evidence, "snapshot-build-evidence-v1")
         build_evidence_path = stage / "snapshot-build-evidence-v1.json"
         save(build_evidence_path, build_evidence)
@@ -2423,7 +2454,7 @@ def cli():
     x=s.add_parser("sign-accepted-component"); x.add_argument("--accepted",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--test-only-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("write-snapshot-input"); x.add_argument("--runs",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
     x=s.add_parser("build-snapshot"); x.add_argument("--signed",type=pathlib.Path,required=True); x.add_argument("--manifests",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--parent"); x.add_argument("--test-only-allow-unattested-acceptance",action="store_true")
-    x=s.add_parser("build-production-snapshot"); x.add_argument("--components",type=pathlib.Path,required=True); x.add_argument("--source-runs",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--parent"); x.add_argument("--test-only-metadata-public-key",type=pathlib.Path); x.add_argument("--test-only-rpm-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
+    x=s.add_parser("build-production-snapshot"); x.add_argument("--components",type=pathlib.Path,required=True); x.add_argument("--source-runs",type=pathlib.Path,required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--rpm-key-id",required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--workflow-run",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--parent"); x.add_argument("--base-snapshot",type=pathlib.Path); x.add_argument("--test-only-metadata-public-key",type=pathlib.Path); x.add_argument("--test-only-rpm-public-key",type=pathlib.Path); x.add_argument("--test-only-allow-unattested",action="store_true")
     x=s.add_parser("verify-production-candidate"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--candidate-run",required=True)
     x=s.add_parser("stage-pages-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True)
     x=s.add_parser("validate-json"); x.add_argument("--schema",required=True); x.add_argument("--input",type=pathlib.Path,required=True)
@@ -2476,7 +2507,7 @@ def main():
         elif a.command=="sign-accepted-component": sign_accepted_component(a.accepted,a.output,a.gnupghome,a.key_id,a.workflow_run,a.passphrase_file,a.test_only_public_key,a.test_only_allow_unattested)
         elif a.command=="write-snapshot-input": write_snapshot_input(a.output,a.runs)
         elif a.command=="build-snapshot": build_snapshot(a.signed,a.manifests,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.parent,a.test_only_allow_unattested_acceptance)
-        elif a.command=="build-production-snapshot": build_production_snapshot(a.components,a.source_runs,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.workflow_run,a.passphrase_file,a.parent,a.test_only_metadata_public_key,a.test_only_rpm_public_key,a.test_only_allow_unattested)
+        elif a.command=="build-production-snapshot": build_production_snapshot(a.components,a.source_runs,a.output,a.snapshot_id,a.gnupghome,a.metadata_key_id,a.rpm_key_id,a.workflow_run,a.passphrase_file,a.parent,a.test_only_metadata_public_key,a.test_only_rpm_public_key,a.test_only_allow_unattested,a.base_snapshot)
         elif a.command=="verify-production-candidate": verify_production_candidate(a.snapshot,a.gnupghome,a.candidate_run)
         elif a.command=="stage-pages-snapshot": print(json.dumps(stage_pages_snapshot(a.snapshot,a.site_root),sort_keys=True))
         elif a.command=="validate-json": validate_schema(load(a.input),a.schema)

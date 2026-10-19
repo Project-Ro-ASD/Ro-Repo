@@ -12,7 +12,7 @@ name: Build immutable production candidate snapshot
         required: true
         type: string
       parent_snapshot:
-        description: Optional exact parent snapshot ID
+        description: Optional exact verified Pages snapshot to inherit completely and extend
         required: false
         type: string
 
@@ -41,11 +41,19 @@ jobs:
       - name: Checkout trusted Ro-Repo source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      - name: Checkout immutable parent storage for incremental composition
+        if: inputs.parent_snapshot != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: parent-storage
+          persist-credentials: false
+
       - name: Install snapshot tools
         run: |
           dnf -y install \
             gh jq python3 python3-jsonschema \
-            rpm createrepo_c gnupg2
+            rpm python3-rpm createrepo_c gnupg2
 
       - name: Resolve exact signing runs and download immutable inputs
         shell: bash
@@ -134,7 +142,7 @@ jobs:
 
           parent_args=()
           if [[ -n "$PARENT_SNAPSHOT" ]]; then
-            parent_args=(--parent "$PARENT_SNAPSHOT")
+            parent_args=(--parent "$PARENT_SNAPSHOT" --base-snapshot "parent-storage/snapshots/fedora/44/$PARENT_SNAPSHOT")
           fi
 
           tools/ro-repo build-production-snapshot \
