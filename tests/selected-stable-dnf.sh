@@ -45,12 +45,24 @@ PYCODE
 # Empty architecture is still a valid repository; its metadata must load.
 common=(--releasever=44 --use-host-config --setopt="reposdir=$work/repos" --setopt=install_weak_deps=False --setopt=keepcache=False --disable-repo='*' --enable-repo=fedora --enable-repo=updates --enable-repo=selected-stable)
 common+=(--setopt="fedora.excludepkgs=$owned_names" --setopt="updates.excludepkgs=$owned_names")
+verify_nevras() {
+  local phase="$1" installroot="$2" package name actual
+  shift 2
+  for package in "$@"; do
+    name="${package%-*}"
+    name="${name%-*}"
+    actual="$(rpm --root "$installroot" -q --qf '%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\n' "$name" || true)"
+    if [[ "$actual" != "$package" ]]; then
+      printf 'NEVRA mismatch (%s): expected %s; installed %s\n' "$phase" "$package" "$actual" >&2
+      return 1
+    fi
+    printf 'VERIFIED %s: %s\n' "$phase" "$package"
+  done
+}
 dnf5 -y --installroot="$work/clean" "${common[@]}" makecache
 if ((${#packages[@]})); then
   dnf5 -y --installroot="$work/clean" "${common[@]}" install "${packages[@]}"
-  for package in "${packages[@]}"; do
-    rpm --root "$work/clean" -q --qf '%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\n' "$package" | grep -Fx "$package"
-  done
+  verify_nevras clean "$work/clean" "${packages[@]}"
 fi
 if [[ -n "$baseline" && -d "$baseline" ]]; then
   # Install the entire previous Stable using the same independent dependency sources.
@@ -61,13 +73,33 @@ for p in json.load(open(sys.argv[1]+'/repository-snapshot-v1.json'))['packages']
     if p['architecture'] in (sys.argv[2], 'noarch'): print(p['nevra'])
 PY
 )
-  if ((${#old[@]})); then dnf5 -y --installroot="$work/upgrade" "${common[@]}" install "${old[@]}"; fi
+  if ((${#old[@]})); then
+    dnf5 -y --installroot="$work/upgrade" "${common[@]}" install "${old[@]}"
+    verify_nevras baseline "$work/upgrade" "${old[@]}"
+  fi
   sed -i "s|baseurl=file://.*|baseurl=file://$candidate/rpm/\$basearch|" "$work/repos/selected.repo"
   dnf5 -y --installroot="$work/upgrade" "${common[@]}" clean all
-  if ((${#packages[@]})); then
-    dnf5 -y --installroot="$work/upgrade" "${common[@]}" upgrade "${packages[@]}"
-    for package in "${packages[@]}"; do
-      rpm --root "$work/upgrade" -q --qf '%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\n' "$package" | grep -Fx "$package"
-    done
+  # DNF5 upgrade does not install newly introduced groups. Classify targets
+  # against the installed baseline before performing either transaction.
+  installed=()
+  added=()
+  for package in "${packages[@]}"; do
+    name="${package%-*}"
+    name="${name%-*}"
+    if rpm --root "$work/upgrade" -q "$name" >/dev/null 2>&1; then
+      installed+=("$package")
+    else
+      added+=("$package")
+    fi
+  done
+  if ((${#installed[@]})); then
+    dnf5 -y --installroot="$work/upgrade" "${common[@]}" upgrade --no-allow-downgrade "${installed[@]}"
+    # An explicit older NEVRA may be ignored by upgrade. Reject it here before
+    # install can accept that NEVRA as a request to downgrade an existing name.
+    verify_nevras upgraded "$work/upgrade" "${installed[@]}"
   fi
+  if ((${#added[@]})); then
+    dnf5 -y --installroot="$work/upgrade" "${common[@]}" install --no-allow-downgrade "${added[@]}"
+  fi
+  verify_nevras transition "$work/upgrade" "${packages[@]}"
 fi

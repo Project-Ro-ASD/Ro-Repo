@@ -49,12 +49,12 @@
     "tests/selected-stable-dnf.sh": {
       "mode": "100755",
       "previous_sha256": null,
-      "sha256": "5dcc47990c83497eae18132d1a134106e3a96f9d827c3d667dc5c7bb149b901f"
+      "sha256": "73cdebade76411d212c0cd104de71156868eb860a354b35fe8835b61c865ff8f"
     },
     "tests/selected-stable-e2e.py": {
       "mode": "100644",
       "previous_sha256": null,
-      "sha256": "d80d70eff2781c6be635a78028e55065291603cc00e0531419add4adef56b88f"
+      "sha256": "a1f27f41998bd2f112416aa75c6c06b36064cf83ace65ed1e613e9744c745f77"
     },
     "tests/test_selected_stable.py": {
       "mode": "100644",

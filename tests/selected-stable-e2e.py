@@ -84,7 +84,7 @@ License: MIT
                 signed = work / 'signed' / path.name
                 signed.parent.mkdir(exist_ok=True)
                 producer_digest = rr.digest(path)
-                rr._sign_rpm_exact(path, signed, full, rpm_key, passphrase)
+                rr._sign_rpm_exact(path, signed, full, rpm_key + '!', passphrase)
                 item = {'filename': path.name, 'nevra': header['nevra'], 'architecture': header['architecture'],
                         'producer_artifact_sha256': producer_digest, 'published_signed_artifact_sha256': rr.digest(signed),
                         'producer_manifest_digest': 'a' * 64}
@@ -146,15 +146,34 @@ License: MIT
                     stage(site, out, home)
                 return audit, out
 
+            def targets(*builds):
+                return {item['nevra'] for build_id in builds for item, _ in packages[build_id]
+                        if item['architecture'] in {'x86_64', 'noarch'}}
+
+            def transition(label, candidate, baseline, expected):
+                result = rr.run([str(ROOT / 'tests/selected-stable-dnf.sh'), str(candidate), str(baseline)])
+                verified = set()
+                for line in result.stdout.splitlines():
+                    if line.startswith('VERIFIED transition: '):
+                        verified.add(line.removeprefix('VERIFIED transition: '))
+                        print(line, flush=True)
+                assert verified == expected, (label, verified, expected)
+                print(f'PASS DNF5 transition: {label}', flush=True)
+
             check_failure(lambda: promote('ro-assist', expected_id='repo-f44-20260101-999'))
             check_failure(lambda: promote('ro-assist', expected_run='999'))
             first, first_bundle = promote('ro-control')
             assert first['changed'] and not first['retained_packages']
             first_snapshot = site / 'snapshots/fedora/44' / first['snapshot_id']
+            control_targets = targets(('ro-control', '1'))
+            assert {p['nevra'] for p in rr.load(first_snapshot / 'repository-snapshot-v1.json')['packages']
+                    if p['architecture'] in {'x86_64', 'noarch'}} == control_targets
             rr.run([str(ROOT / 'tests/selected-stable-dnf.sh'), str(first_snapshot)])
             before = {p.relative_to(site / 'rpm/fedora/44/stable'): p.read_bytes() for p in (site / 'rpm/fedora/44/stable').rglob('*.rpm')}
             second, second_bundle = promote('ro-assist')
             second_snapshot = site / 'snapshots/fedora/44' / second['snapshot_id']
+            transition('ro-control only -> ro-control + ro-assist', second_snapshot, first_snapshot,
+                       control_targets | targets(('ro-assist', '1')))
             for rel, data in before.items():
                 assert (site / 'rpm/fedora/44/stable' / rel).read_bytes() == data
             unchanged = rr.directory_tree_digest(site / 'rpm/fedora/44/stable')
@@ -163,15 +182,29 @@ License: MIT
             assert unchanged == rr.directory_tree_digest(site / 'rpm/fedora/44/stable')
             multi, _ = promote('ro-kde-dolphin')
             assert len(multi['selected_packages']) == 4
+            multi_snapshot = site / 'snapshots/fedora/44' / multi['snapshot_id']
+            transition('add complete Dolphin group to existing Stable', multi_snapshot, second_snapshot,
+                       control_targets | targets(('ro-assist', '1'), ('dolphin', '1')))
             branding, _ = promote('ro-asd-branding')
             assert len(branding['selected_packages']) == 2
             previous_snapshot = site / 'snapshots/fedora/44' / branding['snapshot_id']
+            transition('add noarch branding to existing Stable', previous_snapshot, multi_snapshot,
+                       control_targets | targets(('ro-assist', '1'), ('dolphin', '1'), ('ro-asd-branding', '1')))
             beta_id = snapshot(101, packages['ro-control', '1'] + packages['ro-assist', '2'] + packages['dolphin', '1'] + packages['ro-asd-branding', '1'])
             upgraded, bundle = promote('ro-assist', expected_run='101', publish=False)
             # Failure during channel replacement restores old view.
             old_digest = rr.directory_tree_digest(site / 'rpm/fedora/44/stable')
             new_snap = bundle / 'snapshots/fedora/44' / upgraded['snapshot_id']
-            rr.run([str(ROOT / 'tests/selected-stable-dnf.sh'), str(new_snap), str(previous_snapshot)])
+            transition('upgrade installed ro-assist 1 -> 2', new_snap, previous_snapshot,
+                       control_targets | targets(('ro-assist', '2'), ('dolphin', '1'), ('ro-asd-branding', '1')))
+            try:
+                transition('reject ro-assist downgrade 2 -> 1', previous_snapshot, new_snap,
+                           control_targets | targets(('ro-assist', '1'), ('dolphin', '1'), ('ro-asd-branding', '1')))
+            except rr.ContractError as exc:
+                assert 'NEVRA mismatch (upgraded): expected ro-assist-0:1-1.fc44.x86_64; installed ro-assist-0:2-1.fc44.x86_64' in str(exc), str(exc)
+                print('PASS DNF5 transition: downgrade 2 -> 1 rejected with installed version 2 preserved', flush=True)
+            else:
+                raise AssertionError('DNF5 transition accepted a downgrade')
             real_rename = os.rename
             def failing_rename(src, dest):
                 if pathlib.Path(src).name == 'stable' and pathlib.Path(src).parent.name.startswith('.stable-'):
