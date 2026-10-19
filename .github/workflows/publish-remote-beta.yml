@@ -13,7 +13,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: ro-repo-remote-beta
+  group: ro-repo-pages-storage
   cancel-in-progress: false
 
 jobs:
@@ -169,6 +169,8 @@ jobs:
           fi
 
           git -C pages-site commit -m "beta: publish $SNAPSHOT_ID from run $GITHUB_RUN_ID"
+          git -C pages-site fetch origin pages-storage
+          test "$(git -C pages-site rev-parse HEAD^)" = "$(git -C pages-site rev-parse FETCH_HEAD)"
           git -C pages-site push origin HEAD:pages-storage
 
       - name: Beta publication summary

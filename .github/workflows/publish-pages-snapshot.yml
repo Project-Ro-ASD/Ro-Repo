@@ -121,6 +121,8 @@ jobs:
           fi
 
           git -C pages-site commit -m "publish: $SNAPSHOT_ID from candidate run $CANDIDATE_RUN"
+          git -C pages-site fetch origin pages-storage
+          test "$(git -C pages-site rev-parse HEAD^)" = "$(git -C pages-site rev-parse FETCH_HEAD)"
           git -C pages-site push origin HEAD:pages-storage
 
       - name: Publication summary

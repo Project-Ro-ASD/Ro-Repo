@@ -1,0 +1,77 @@
+{
+  "base_baseline_sha256": "62d32c79d1c86f0aacd3d22f087712389a79122f2cb28b342226b29a600925f1",
+  "files": {
+    ".github/workflows/promote-remote-stable.yml": {
+      "mode": "100644",
+      "previous_sha256": "20bfeac68d7aebffc09ef6ac9bb66f825b306c2c7e44e490cea575b2034c1b2a",
+      "sha256": "8d1f97db624015840f4117c6d0e77d84668dda895f5bdf5caaca30329df9f0ff"
+    },
+    ".github/workflows/promote-selected-stable.yml": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "7894f211af3e810defe6a9b636fc07e35d8278fc0cd836b2cb3a88858e25bde9"
+    },
+    ".github/workflows/publish-pages-snapshot.yml": {
+      "mode": "100644",
+      "previous_sha256": "cde01be8ce3d3ed35525eacfb7c51432e9b3529c10809d902fa936e2b1bcbe94",
+      "sha256": "a818877e77e1f566fc2ceb18811b02a4f968e9cdf236394b2e76fe5c966e321b"
+    },
+    ".github/workflows/publish-remote-beta.yml": {
+      "mode": "100644",
+      "previous_sha256": "37e60630a9e5ada9b5d7321629a9fb10b386f06055917160315cd07ebb291136",
+      "sha256": "effae3c89afabdb36925d44d20b4e4e383036e66467040b47aed77dfeca0fdb6"
+    },
+    ".github/workflows/rollback-remote-beta.yml": {
+      "mode": "100644",
+      "previous_sha256": "3618b777e97123d7e16b94a0fd9e0af6f1b61caf8a231c371a565f91e7643046",
+      "sha256": "382054b965bfd60fb2edc421fe64a2cd7d4048a780621350339d2bee75894063"
+    },
+    ".github/workflows/rollback-remote-stable.yml": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "c8c30fa1a78b232829dd134886b80ace10ec3c856c9ae9fb4c12f81dfe57d0ac"
+    },
+    ".github/workflows/test.yml": {
+      "mode": "100644",
+      "previous_sha256": "ced071b61afc09446b6c9508567b1155fc8974f1ea173da4e24669b13a52560e",
+      "sha256": "35993b6a80c27330f71eecbfe3f05fd5cc0d897ceb042da346ee4c269f77b085"
+    },
+    "schemas/rollback-evidence-v1.schema.json": {
+      "mode": "100644",
+      "previous_sha256": "f731913b99c4fe2421c957c0146e9e90d55702b33ad5d9f164fa94362fb23dc7",
+      "sha256": "1c66fefe9f504c36631a3a7865cd4858a46f14f44b433ea560a58a6ec94de1b5"
+    },
+    "scripts/stage_selected_stable.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "d176d94988203dede009c07e1bd47d47e83a713ed93359442b69323e85422756"
+    },
+    "tests/selected-stable-dnf.sh": {
+      "mode": "100755",
+      "previous_sha256": null,
+      "sha256": "73cdebade76411d212c0cd104de71156868eb860a354b35fe8835b61c865ff8f"
+    },
+    "tests/selected-stable-e2e.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "a1f27f41998bd2f112416aa75c6c06b36064cf83ace65ed1e613e9744c745f77"
+    },
+    "tests/test_selected_stable.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "48c22b109f6c5de30a9fb15662710f267c8ec93b1c019e9797e2e8de1389897b"
+    },
+    "tools/ro_repo.py": {
+      "mode": "100644",
+      "previous_sha256": "6ef67377258f9eb4e19594a9312eede99d972fa9b51a5503dcb1116feae3b416",
+      "sha256": "d3a5f141056d22166c6322d4932c26b757172f0316f3f4cfbdb6f395050ab249"
+    },
+    "tools/v2_selected_stable.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "5e07b05b5e061e2c46db66cf84dba20ab47cb6e51fcd59e80b2a6bd23dc05364"
+    }
+  },
+  "schema_version": 1,
+  "scope": "Reviewed V2 selected Stable source changes; no PSOP activation authority"
+}

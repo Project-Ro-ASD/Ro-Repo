@@ -16,6 +16,8 @@ import tempfile
 
 BASE_MAIN = "3d4b56bd7509988f3715305ab9e2e09394635448"
 PAGES_COMMIT = "097ba6ba7ab73d87c36f7ec9829b017b083b1883"
+V2_REVIEWED_CONTRACT_SHA256 = "481e9c6a57cf7e92e8b2b3ab0cd6dff7ef3c27386974323a556c9e5ddf3a5e57"
+V2_REVIEWED_CONTRACT = "docs/v2-selected-stable-source-contract.json"
 BASELINE_SHA256 = "62d32c79d1c86f0aacd3d22f087712389a79122f2cb28b342226b29a600925f1"
 REPOSITORY = "Project-Ro-ASD/Ro-Repo"
 PROTECTED = (".github", "config", "fixtures", "keys", "schemas", "scripts", "tools",
@@ -107,8 +109,24 @@ def audit_source(root, baseline):
     if baseline.get("base_main") != BASE_MAIN or baseline_hash != BASELINE_SHA256:
         raise AuditError("missing or incorrect phase-A source baseline")
     root = pathlib.Path(root)
+    # Preserve the historical phase-A baseline. This separately pinned review
+    # contract permits only exact V2 source bytes, never wildcard exemptions.
+    files = dict(baseline["files"])
+    contract_path = root / V2_REVIEWED_CONTRACT
+    if contract_path.exists():
+        raw = _read(root, V2_REVIEWED_CONTRACT)
+        if hashlib.sha256(raw).hexdigest() != V2_REVIEWED_CONTRACT_SHA256:
+            raise AuditError("incorrect reviewed V2 source contract")
+        contract = json.loads(raw)
+        if contract["base_baseline_sha256"] != BASELINE_SHA256:
+            raise AuditError("V2 source contract baseline mismatch")
+        for rel, change in contract["files"].items():
+            previous = files.get(rel)
+            if change["previous_sha256"] != (previous["sha256"] if previous else None):
+                raise AuditError("V2 source contract prior digest mismatch")
+            files[rel] = {"sha256": change["sha256"], "mode": change["mode"]}
     issues = []
-    for rel, expected in baseline["files"].items():
+    for rel, expected in files.items():
         try:
             raw = _read(root, rel)
             mode = "100755" if (root / rel).stat().st_mode & stat.S_IXUSR else "100644"
@@ -127,7 +145,7 @@ def audit_source(root, baseline):
                 continue
             if path.is_dir() and not path.is_symlink():
                 continue
-            if rel not in baseline["files"] and rel not in ADDITIONS:
+            if rel not in files and rel not in ADDITIONS:
                 issues.append("unreviewed addition: " + rel)
     return {"source_preservation": "FAIL" if issues else "PASS", "issues": sorted(set(issues)),
             "base_main": BASE_MAIN, "publishable": False, "production_activation": "BLOCKED"}
