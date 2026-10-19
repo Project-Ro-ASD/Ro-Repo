@@ -9,7 +9,7 @@
     ".github/workflows/promote-selected-stable.yml": {
       "mode": "100644",
       "previous_sha256": null,
-      "sha256": "5d77e98dff55e9f9100f106c68233c6d61aad9eb3fa3f597b542be44d6289d64"
+      "sha256": "7894f211af3e810defe6a9b636fc07e35d8278fc0cd836b2cb3a88858e25bde9"
     },
     ".github/workflows/publish-pages-snapshot.yml": {
       "mode": "100644",
@@ -54,7 +54,7 @@
     "tests/selected-stable-e2e.py": {
       "mode": "100644",
       "previous_sha256": null,
-      "sha256": "b317b5a32d9e22258d4f2df529766a67d0244b003a45c9dce3283321b4cab242"
+      "sha256": "d80d70eff2781c6be635a78028e55065291603cc00e0531419add4adef56b88f"
     },
     "tests/test_selected_stable.py": {
       "mode": "100644",

@@ -198,6 +198,21 @@ License: MIT
             victim.write_bytes(original + b'corrupt')
             check_failure(lambda: promote('ro-assist', expected_run='101'))
             victim.write_bytes(original)
+            # An unsigned RPM with a matching, freshly signed test manifest
+            # must still fail the independent trusted RPM signature check.
+            mp = beta_snap / 'repository-snapshot-v1.json'
+            manifest_bytes = mp.read_bytes()
+            signature_bytes = pathlib.Path(str(mp) + '.asc').read_bytes()
+            rr.run(['rpm', '--delsign', str(victim)])
+            altered = rr.load(mp)
+            next(p for p in altered['packages'] if p['filename'] == victim.name)['published_signed_artifact_sha256'] = rr.digest(victim)
+            rr.save(mp, altered)
+            pathlib.Path(str(mp) + '.asc').unlink()
+            rr._sign_file_exact(mp, home, meta_key, passphrase)
+            check_failure(lambda: promote('ro-assist', expected_run='101'))
+            victim.write_bytes(original)
+            mp.write_bytes(manifest_bytes)
+            pathlib.Path(str(mp) + '.asc').write_bytes(signature_bytes)
             victim.unlink()
             check_failure(lambda: promote('ro-assist', expected_run='101'))
             victim.write_bytes(original)

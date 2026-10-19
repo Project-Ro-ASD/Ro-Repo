@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-24.04
     container: fedora:44
     environment: repo-production-signing
+    timeout-minutes: 25
     outputs:
       changed: ${{ steps.compose.outputs.changed }}
     steps:
@@ -129,6 +130,7 @@ jobs:
     runs-on: ubuntu-24.04
     container: fedora:44
     environment: repo-stable
+    timeout-minutes: 25
     permissions:
       contents: write
     steps:
