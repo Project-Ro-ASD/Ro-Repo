@@ -1,6 +1,8 @@
 import copy
 import pathlib
 import sys
+import subprocess
+import tempfile
 import unittest
 import yaml
 
@@ -61,6 +63,43 @@ class SelectedGroupTests(unittest.TestCase):
             self.assertEqual(workflow['concurrency'], {'group': 'ro-repo-pages-storage', 'cancel-in-progress': False})
             self.assertIn('rev-parse FETCH_HEAD', text)
             self.assertNotIn('--force', text)
+
+    def test_git_guard_rejects_stale_writer_without_changing_remote_stable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = pathlib.Path(temp)
+            def git(where, *args):
+                return subprocess.run(['git', '-C', str(where), *args], check=True,
+                                      text=True, capture_output=True).stdout.strip()
+            remote = root / 'remote.git'
+            subprocess.run(['git', 'init', '--bare', str(remote)], check=True, capture_output=True)
+            first = root / 'pages-site'
+            second = root / 'second'
+            git(root, 'clone', str(remote), str(first))
+            for checkout in (first,):
+                git(checkout, 'config', 'user.name', 'V2 test')
+                git(checkout, 'config', 'user.email', 'test@invalid')
+            stable = first / 'stable'
+            stable.write_bytes(b'previous signed Stable')
+            git(first, 'add', '.')
+            git(first, '-c', 'commit.gpgsign=false', 'commit', '-m', 'base')
+            git(first, 'push', 'origin', 'HEAD:pages-storage')
+            git(root, 'clone', '--branch', 'pages-storage', str(remote), str(second))
+            git(second, 'config', 'user.name', 'V2 test')
+            git(second, 'config', 'user.email', 'test@invalid')
+            stable.write_bytes(b'candidate Stable')
+            git(first, 'add', '.')
+            git(first, '-c', 'commit.gpgsign=false', 'commit', '-m', 'candidate')
+            (second / 'beta').write_bytes(b'independent newer Beta')
+            git(second, 'add', '.')
+            git(second, '-c', 'commit.gpgsign=false', 'commit', '-m', 'other writer')
+            git(second, 'push', 'origin', 'HEAD:pages-storage')
+            text = (ROOT / '.github/workflows/publish-remote-beta.yml').read_text()
+            start = text.index('          git -C pages-site fetch origin pages-storage')
+            end = text.index('          git -C pages-site push origin HEAD:pages-storage', start)
+            snippet = text[start:end] + '          git -C pages-site push origin HEAD:pages-storage'
+            result = subprocess.run(['bash', '-e', '-c', snippet], cwd=root, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(git(remote, 'show', 'pages-storage:stable'), 'previous signed Stable')
 
     def test_dispatch_contract_and_native_validation_before_publish(self):
         text = (ROOT / '.github/workflows/promote-selected-stable.yml').read_text()

@@ -59,7 +59,7 @@
     "tests/test_selected_stable.py": {
       "mode": "100644",
       "previous_sha256": null,
-      "sha256": "7ac634e064ad886ca5bc98631a78aff8580a3c56c25ab39bebd0cbe987594ac6"
+      "sha256": "48c22b109f6c5de30a9fb15662710f267c8ec93b1c019e9797e2e8de1389897b"
     },
     "tools/ro_repo.py": {
       "mode": "100644",
