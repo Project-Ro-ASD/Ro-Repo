@@ -1,6 +1,11 @@
 {
   "base_baseline_sha256": "62d32c79d1c86f0aacd3d22f087712389a79122f2cb28b342226b29a600925f1",
   "files": {
+    ".github/workflows/build-candidate-snapshot.yml": {
+      "mode": "100644",
+      "previous_sha256": "0afb575c2fcc9f905206018c0a8de86d87510162a6c84f41d9675da52b0b31f6",
+      "sha256": "0400d1ce74b34cacd3ecd5f4d82adcf386e3760e7a3aeb78993097e4643c8970"
+    },
     ".github/workflows/promote-remote-stable.yml": {
       "mode": "100644",
       "previous_sha256": "20bfeac68d7aebffc09ef6ac9bb66f825b306c2c7e44e490cea575b2034c1b2a",
@@ -34,17 +39,32 @@
     ".github/workflows/test.yml": {
       "mode": "100644",
       "previous_sha256": "ced071b61afc09446b6c9508567b1155fc8974f1ea173da4e24669b13a52560e",
-      "sha256": "35993b6a80c27330f71eecbfe3f05fd5cc0d897ceb042da346ee4c269f77b085"
+      "sha256": "08e18ced3c1d2b22dd9c03d87112ad599932003603851c6b9c88e01133c8e132"
+    },
+    "config/producers-v2.json": {
+      "mode": "100644",
+      "previous_sha256": "b011cd414d690f715572bed88054b0acf2fc18695dfebf2aef2e85cc9ba289c8",
+      "sha256": "08297c4fed21272a977eb6beeef0e61f7989d5f4eeda1fcbb080db031be71861"
     },
     "schemas/rollback-evidence-v1.schema.json": {
       "mode": "100644",
       "previous_sha256": "f731913b99c4fe2421c957c0146e9e90d55702b33ad5d9f164fa94362fb23dc7",
       "sha256": "1c66fefe9f504c36631a3a7865cd4858a46f14f44b433ea560a58a6ec94de1b5"
     },
+    "schemas/snapshot-build-evidence-v1.schema.json": {
+      "mode": "100644",
+      "previous_sha256": "4a0404c1a2b6dc538eaa93f154b1965420d51a359e53c4373487801a6b424568",
+      "sha256": "64179cb7bad93f7cb9194b73b6fb3490cabed7deb8b0e7457d98268ea0cef7d4"
+    },
     "scripts/stage_selected_stable.py": {
       "mode": "100644",
       "previous_sha256": null,
       "sha256": "d176d94988203dede009c07e1bd47d47e83a713ed93359442b69323e85422756"
+    },
+    "tests/candidate-expansion-e2e.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "6a2753634781aae9acdc6287e57e97633f3b10fede4921579102c447ac966ee7"
     },
     "tests/selected-stable-dnf.sh": {
       "mode": "100755",
@@ -61,10 +81,20 @@
       "previous_sha256": null,
       "sha256": "48c22b109f6c5de30a9fb15662710f267c8ec93b1c019e9797e2e8de1389897b"
     },
+    "tests/test_v2_candidate.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "704e136afaf5f793432b8f6a9311e4b3fc4ab8e0e42c55a2e3f88fc471cdf2d7"
+    },
     "tools/ro_repo.py": {
       "mode": "100644",
       "previous_sha256": "6ef67377258f9eb4e19594a9312eede99d972fa9b51a5503dcb1116feae3b416",
-      "sha256": "d3a5f141056d22166c6322d4932c26b757172f0316f3f4cfbdb6f395050ab249"
+      "sha256": "a40c327e4c2267a5be66cd72d8caf57ddbea5007d473e61272d72d09cd778779"
+    },
+    "tools/v2_candidate.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "572b75229a8e1b83a766947c5c23d3749261e8adcd5e2c7dac469bcefd58cef2"
     },
     "tools/v2_selected_stable.py": {
       "mode": "100644",
@@ -73,5 +103,5 @@
     }
   },
   "schema_version": 1,
-  "scope": "Reviewed V2 selected Stable source changes; no PSOP activation authority"
+  "scope": "Reviewed V2 selected Stable and incremental Fedora 44 Beta source changes; no PSOP activation authority"
 }

@@ -91,25 +91,69 @@ License: MIT
                 result.append((item, signed))
             packages[(name, version)] = result
 
-        # These are disposable RPM fixtures, never producer acceptance evidence.
-        # Model the actual 23-entry Beta including Dolphin's three binaries.
-        build('dolphin', '26.08.1', ('libs', 'devel'))
-        for name, version in [('ro-asd-branding','0.1.0'), ('ro-asd-defaults','0.1.0'),
-                              ('ro-asd-desktop-standard','0.1.0'), ('ro-asd-kernel-policy','0.1.0'),
-                              ('ro-asd-keyring','0.1.0'), ('ro-asd-release','0.1.2'), ('ro-asd-repos','0.1.1')]:
-            build(name, version, noarch=True)
-        build('ro-assist', '0.2.5')
-        build('ro-assist', '0.2.5', target='aarch64')
-        build('ro-installer', '2.4.4')
-        build('ro-installer', '2.4.5')
-        build('ro-theme', '1.1.5', noarch=True)
-        build('ro-widgets', '99.0', noarch=True)  # explicitly synthetic future version
+        actual_root = os.environ.get('RO_CANDIDATE_ACTUAL_INPUTS')
+        if actual_root:
+            # Re-key only disposable COPIES to exercise real producer payloads.
+            # No test result or key is production acceptance/signing evidence.
+            actual = pathlib.Path(actual_root)
+            parent = actual / 'baseline/snapshots/fedora/44/repo-f44-20261009-001'
+            verify_home = work / 'verify-production'
+            verify_home.mkdir(mode=0o700)
+            rr.run(['gpg','--batch','--import',str(ROOT/'keys/production/ro-asd-metadata-signing-public.asc')],
+                   dict(os.environ,GNUPGHOME=str(verify_home)))
+            original = rr.verify_snapshot(parent,verify_home)
+            original_entries = selected.inventory(parent,original)
+            rr.verify_signed_rpms([next(selected.rpm_paths(parent,e[0])) for e in original_entries],
+                                 ROOT/'keys/production/ro-asd-rpm-signing-public.asc')
+            registry = rr.load_producer_registry(ROOT/'config/producers-v2.json')
+            def add_actual(path):
+                header=rr.rpm_header(path)
+                policy=rr.resolve_package_policy(registry,header['name'])
+                signed=work/'signed'/path.name
+                signed.parent.mkdir(exist_ok=True)
+                producer_digest=rr.digest(path)
+                unsigned=work/'test-rekey-input'/path.name
+                unsigned.parent.mkdir(exist_ok=True)
+                shutil.copy2(path,unsigned)
+                rr.run(['rpmsign','--delsign',str(unsigned)])
+                rr._sign_rpm_exact(unsigned,signed,full,rpm_key+'!',passphrase)
+                item=dict(filename=path.name,nevra=header['nevra'],architecture=header['architecture'],
+                          producer_artifact_sha256=producer_digest,
+                          published_signed_artifact_sha256=rr.digest(signed),producer_manifest_digest='a'*64)
+                packages.setdefault((policy['component'],header['version']),[]).append((item,signed))
+            for entry in original_entries:
+                add_actual(next(selected.rpm_paths(parent,entry[0])))
+            for folder, identity in [('installer',('Project-Ro-ASD/ro-Installer','v2.4.5',417687254,'a402892ad5380bc7b26e4b66ce748d3a911b2446')),
+                                     ('theme',('Project-Ro-ASD/Ro-Theme','v1.1.5',417133054,'a366e6a5cd84c9006f1f5d84ddb666089983e09c'))]:
+                assets=actual/folder
+                manifest=rr.load(assets/'component-artifact-manifest-v1.json')
+                assert tuple(manifest[k] for k in ['source_repository','release_tag','release_id','source_commit'])==identity
+                for item in manifest['artifacts']:
+                    path=assets/item['filename']
+                    assert rr.digest(path)==item['producer_artifact_sha256']
+                    add_actual(path)
+            print('Verified production parent and pinned real producer payload digests; test copies use temporary keys',flush=True)
+        else:
+            # These are disposable RPM fixtures, never producer acceptance evidence.
+            # Model the actual 23-entry Beta including Dolphin's three binaries.
+            build('dolphin', '26.08.1', ('libs', 'devel'))
+            for name, version in [('ro-asd-branding','0.1.0'), ('ro-asd-defaults','0.1.0'),
+                                  ('ro-asd-desktop-standard','0.1.0'), ('ro-asd-kernel-policy','0.1.0'),
+                                  ('ro-asd-keyring','0.1.0'), ('ro-asd-release','0.1.2'), ('ro-asd-repos','0.1.1')]:
+                build(name, version, noarch=True)
+            build('ro-assist', '0.2.5')
+            build('ro-assist', '0.2.5', target='aarch64')
+            build('ro-installer', '2.4.4')
+            build('ro-installer', '2.4.5')
+            build('ro-theme', '1.1.5', noarch=True)
+            build('ro-widgets', '99.0', noarch=True)  # explicitly synthetic future version
         # Build a fully verified parent with the existing production composer.
         def components_for(builds):
             result = []
             for index, key in enumerate(builds, 1):
                 name, version = key
-                policy = rr.resolve_package_policy(rr.load_producer_registry(ROOT / 'config/producers-v2.json'), name)
+                policy = next(p for p in rr.component_policies(rr.load_producer_registry(ROOT / 'config/producers-v2.json'))
+                              if p['component'] == name or name in p['package_names'])
                 entries = []
                 for item, path in packages[key]:
                     header = rr.rpm_header(path)
@@ -120,7 +164,7 @@ License: MIT
                                'release_tag':'fixture-'+version, 'release_id':index, 'producer_workflow_run':index,
                                'acceptance_manifest_digest':'a'*64, 'packages':entries})
             return result
-        baseline_keys = list(packages)[:-3]
+        baseline_keys = list(packages)[:-(2 if actual_root else 3)]
         source_runs = work / 'runs.json'
         def compose(builds, number, base=None):
             components = components_for(builds)
@@ -143,24 +187,26 @@ License: MIT
             for _, path in packages[key]:
                 path.unlink()
         new = [('ro-installer','2.4.5'), ('ro-theme','1.1.5'), ('ro-widgets','99.0')]
+        if actual_root:
+            new = new[:2]
         partial = compose(new[:2], 99, base)
         assert len(rr.load(partial/'repository-snapshot-v1.json')['packages']) == 25
         candidate = compose(new, 101, base)
         after, evidence = rr.verify_production_candidate(candidate, home, 101)
         retained = evidence['inherited_snapshot']['retained_packages']
         assert len(before['packages']) == 23
-        assert len(after['packages']) == 27
+        assert len(after['packages']) == (25 if actual_root else 27)
         assert len(retained) == 21
-        assert len(after['packages']) == len(before['packages'])+4
+        assert len(after['packages']) == len(before['packages'])+(2 if actual_root else 4)
         for item in retained:
             for old_path, new_path in zip(selected.rpm_paths(base,item),selected.rpm_paths(candidate,item)):
                 assert old_path.read_bytes() == new_path.read_bytes()
         assert rr.directory_tree_digest(base) == parent_tree
-        for name in ('ro-theme','ro-widgets'):
+        for name in (('ro-theme',) if actual_root else ('ro-theme','ro-widgets')):
             item = next(p for p in after['packages'] if p['filename'].startswith(name+'-') and p['architecture']=='noarch')
             assert len(list(selected.rpm_paths(candidate,item))) == 2
         rr.run(['bash', str(ROOT/'tests/selected-stable-dnf.sh'), str(candidate), str(base)])
-        print('PASS Fedora 44 DNF5: clean install, Installer 2.4.4 -> 2.4.5, Theme install, synthetic Widgets install', flush=True)
+        print('PASS Fedora 44 DNF5: clean install, Installer 2.4.4 -> 2.4.5, Theme install; '+('real producer payloads, Widgets skipped' if actual_root else 'synthetic fixtures including Widgets'), flush=True)
         check_failure(lambda: compose(new, 102, candidate))
         # A valid older signed Installer is rejected before composition.
         packages['ro-installer','2.4.4'] = [(item,next(selected.rpm_paths(base,item))) for item in before['packages'] if item['filename'].startswith('ro-installer-')]

@@ -123,3 +123,18 @@ synthetic fixture, never an accepted producer release. The signing transport
 handoff is mocked in this composer test; existing signing tests cover that
 boundary. The normal acceptance, rollback, Pages CAS and PR #83 regressions
 remain mandatory.
+
+For read-only testing of the actual producer payloads, set
+`RO_CANDIDATE_ACTUAL_INPUTS` to a directory containing `baseline/` (the Pages
+checkout root), `installer/` and `theme/` (the exact downloaded release assets),
+then run `python3 tests/candidate-expansion-e2e.py` inside Fedora 44. This mode
+first verifies the production parent and pinned asset digests. It removes old
+signatures only from disposable copies, signs those copies with temporary test
+keys and tests the actual package payloads in a 23 → 25 transition. It does not
+create production acceptance evidence or production-signed candidate artefacts.
+
+The existing source-preservation audit uses the PR #83 exact-file review
+contract. This PR updates that contract's hashes for the five modified V2
+runtime/config/workflow files and three added source/test files, plus its pinned
+contract digest. The original 234-file baseline, production public roots,
+protected writer workflows, activation guards and authority rules are unchanged.
