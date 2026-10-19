@@ -81,3 +81,46 @@ jobs:
       - run: dnf -y install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c gnupg2 dnf5
       - name: V2 selected Stable real signed RPM and DNF5 regression
         run: python3 tests/selected-stable-e2e.py
+
+  incremental-candidate-fedora44:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: dnf -y install python3 python3-jsonschema python3-rpm rpm rpm-build rpm-sign createrepo_c gnupg2 dnf5
+      - name: V2 incremental candidate signed RPM and DNF5 regression
+        run: python3 tests/candidate-expansion-e2e.py
+
+  pinned-producer-candidate-fedora44:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - run: dnf -y install git gh jq python3 python3-jsonschema python3-rpm rpm rpm-build rpm-sign createrepo_c gnupg2 dnf5
+      - name: Read exact historical production snapshot
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 097ba6ba7ab73d87c36f7ec9829b017b083b1883
+          path: actual/baseline
+          persist-credentials: false
+          sparse-checkout: snapshots/fedora/44/repo-f44-20261009-001
+      - name: Read pinned immutable producer assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api repos/Project-Ro-ASD/ro-Installer/releases/417687254 > /tmp/installer-release.json
+          jq -e '.immutable == true and .id == 417687254 and .tag_name == "v2.4.5"' /tmp/installer-release.json
+          gh api repos/Project-Ro-ASD/Ro-Theme/releases/417133054 > /tmp/theme-release.json
+          jq -e '.immutable == true and .id == 417133054 and .tag_name == "v1.1.5"' /tmp/theme-release.json
+          gh release download v2.4.5 --repo Project-Ro-ASD/ro-Installer --dir actual/installer
+          gh release download v1.1.5 --repo Project-Ro-ASD/Ro-Theme --dir actual/theme
+      - name: Real producer payload install and upgrade with disposable signing keys
+        env:
+          RO_CANDIDATE_ACTUAL_INPUTS: ${{ github.workspace }}/actual
+        run: python3 tests/candidate-expansion-e2e.py
