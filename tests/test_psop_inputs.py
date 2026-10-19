@@ -169,7 +169,9 @@ class InputTests(unittest.TestCase):
         baseline = json.loads((ROOT / "docs/evidence/psop-phase1/base-protected-files.json").read_text())
         self.assertEqual(len(baseline["files"]), 234)
         dest = self.root / "source";dest.mkdir()
-        for rel in baseline["files"]:
+        reviewed = json.loads((ROOT / psop_audit.V2_REVIEWED_CONTRACT).read_text())
+        protected = set(baseline["files"]) | set(reviewed["files"]) | {psop_audit.V2_REVIEWED_CONTRACT}
+        for rel in protected:
             target = dest / rel;target.parent.mkdir(parents=True, exist_ok=True);shutil.copy2(ROOT / rel, target)
         self.assertEqual(psop_audit.audit_source(dest, baseline)["issues"], [])
         for rel in ("tools/psop_production.py", "tools/psop_credentials.json", ".github/workflows/psop-write.yml"):
