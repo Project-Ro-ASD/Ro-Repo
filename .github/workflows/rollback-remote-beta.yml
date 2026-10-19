@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ro-repo-remote-beta
+  group: ro-repo-pages-storage
   cancel-in-progress: false
 
 jobs:
@@ -76,6 +76,8 @@ jobs:
           git -C pages-site add             "rpm/fedora/44/beta"             "rollbacks/fedora/44/beta/$GITHUB_RUN_ID.json"
 
           git -C pages-site commit             -m "beta: rollback to publication $TARGET_PUBLICATION_RUN via run $GITHUB_RUN_ID"
+          git -C pages-site fetch origin pages-storage
+          test "$(git -C pages-site rev-parse HEAD^)" = "$(git -C pages-site rev-parse FETCH_HEAD)"
           git -C pages-site push origin HEAD:pages-storage
 
       - name: Rollback summary

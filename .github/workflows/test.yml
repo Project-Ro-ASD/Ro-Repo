@@ -71,3 +71,13 @@ jobs:
       - name: Run acceptance runtime contract tests
         shell: bash
         run: python3 -m unittest tests.test_acceptance_runtime -v
+
+  selected-stable-fedora44:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: dnf -y install python3 python3-jsonschema rpm rpm-build rpm-sign createrepo_c gnupg2 dnf5
+      - name: V2 selected Stable real signed RPM and DNF5 regression
+        run: python3 tests/selected-stable-e2e.py

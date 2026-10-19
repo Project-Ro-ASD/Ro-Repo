@@ -1,0 +1,254 @@
+name: Promote selected V2 group to Stable
+"on":
+  workflow_dispatch:
+    inputs:
+      promotion_group:
+        description: Single complete producer promotion group
+        required: true
+        type: choice
+        options:
+          - desktop-theme
+          - ro-asd-branding
+          - ro-asd-defaults
+          - ro-asd-desktop-standard
+          - ro-asd-kernel-policy
+          - ro-asd-keyring
+          - ro-asd-release
+          - ro-asd-repos
+          - ro-assist
+          - ro-control
+          - ro-installer
+          - ro-kde-dolphin
+      beta_snapshot_id:
+        description: Expected current Beta snapshot ID
+        required: true
+        type: string
+      beta_publication_run:
+        description: Expected current Beta publication run ID
+        required: true
+        type: string
+      reason:
+        description: Required manual promotion reason (no dwell requirement)
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: ro-repo-pages-storage
+  cancel-in-progress: false
+jobs:
+  compose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    environment: repo-production-signing
+    outputs:
+      changed: ${{ steps.compose.outputs.changed }}
+    steps:
+      - name: Install V2 tools
+        run: dnf -y install git python3 python3-jsonschema rpm gnupg2 createrepo_c
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: source
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: pages-storage
+          path: pages-site
+      - name: Compose and sign metadata using existing production role
+        id: compose
+        shell: bash
+        env:
+          GROUP: ${{ inputs.promotion_group }}
+          BETA_SNAPSHOT: ${{ inputs.beta_snapshot_id }}
+          BETA_RUN: ${{ inputs.beta_publication_run }}
+          REASON: ${{ inputs.reason }}
+          KEY_B64: ${{ secrets.RO_REPO_METADATA_SIGNING_SUBKEY_B64 }}
+          PASSPHRASE: ${{ secrets.RO_REPO_METADATA_SIGNING_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          set +x
+          signing_tmp="$(mktemp -d)"
+          trap 'GNUPGHOME="$signing_tmp/home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true; rm -rf "$signing_tmp"' EXIT
+          umask 077
+          mkdir -m 700 "$signing_tmp/home"
+          printf '%s' "$KEY_B64" | base64 --decode > "$signing_tmp/key"
+          printf '%s' "$PASSPHRASE" > "$signing_tmp/passphrase"
+          unset KEY_B64 PASSPHRASE
+          GNUPGHOME="$signing_tmp/home" gpg --batch --import "$signing_tmp/key"
+          fingerprint="$(awk -F= '$1 == "METADATA_SIGNING" {print $2}' source/keys/production/production-fingerprints.txt)"
+          python3 source/tools/v2_selected_stable.py             --site pages-site --output bundle --group "$GROUP"             --beta-snapshot-id "$BETA_SNAPSHOT" --beta-publication-run "$BETA_RUN"             --reason "$REASON" --workflow-run "$GITHUB_RUN_ID"             --home "$signing_tmp/home" --metadata-key "$fingerprint"             --passphrase-file "$signing_tmp/passphrase"
+          if [[ -d bundle ]]; then
+            git -C pages-site rev-parse HEAD > bundle/pages-base-sha
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'Selected signed RPMs already match Stable; no publication required.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: steps.compose.outputs.changed == 'true'
+        with:
+          name: selected-stable-${{ github.run_id }}
+          path: bundle/
+          if-no-files-found: error
+          retention-days: 90
+  validate:
+    needs: compose
+    if: needs.compose.outputs.changed == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    container: fedora:44
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: source
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: pages-storage
+          path: pages-site
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: selected-stable-${{ github.run_id }}
+          path: bundle
+      - run: dnf -y install python3 python3-jsonschema rpm gnupg2 dnf5
+      - name: Native Fedora 44 DNF5 clean install and previous Stable upgrade
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot="$(python3 -c 'import json; print(json.load(open("bundle/selected-promotion.json"))["snapshot_id"])')"
+          previous="$(python3 -c 'import json; p=json.load(open("bundle/selected-promotion.json"))["previous_stable"]; print(p["snapshot_id"] if p else "")')"
+          baseline=""
+          if [[ -n "$previous" ]]; then baseline="pages-site/snapshots/fedora/44/$previous"; fi
+          source/tests/selected-stable-dnf.sh "bundle/snapshots/fedora/44/$snapshot" "$baseline"
+  publish:
+    needs: [compose, validate]
+    if: needs.compose.outputs.changed == 'true'
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    environment: repo-stable
+    permissions:
+      contents: write
+    steps:
+      - run: dnf -y install git python3 python3-jsonschema rpm gnupg2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: source
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: pages-storage
+          path: pages-site
+          persist-credentials: true
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: selected-stable-${{ github.run_id }}
+          path: bundle
+      - name: Reverify, stage and commit with compare-and-swap guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="$(cat bundle/pages-base-sha)"
+          test "$(git -C pages-site rev-parse HEAD)" = "$base"
+          home="$(mktemp -d)"
+          chmod 700 "$home"
+          trap 'GNUPGHOME="$home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true; rm -rf "$home"' EXIT
+          GNUPGHOME="$home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
+          python3 source/scripts/stage_selected_stable.py pages-site bundle "$home"
+          git -C pages-site config user.name 'Ro-Repo Selected Stable Publisher'
+          git -C pages-site config user.email 'actions@users.noreply.github.com'
+          git -C pages-site add snapshots/fedora/44 rpm/fedora/44/stable publications/fedora/44/stable promotions/fedora/44
+          git -C pages-site commit -m "stable: selected group promotion via run $GITHUB_RUN_ID"
+          git -C pages-site fetch origin pages-storage
+          test "$(git -C pages-site rev-parse FETCH_HEAD)" = "$base"
+          git -C pages-site push origin HEAD:pages-storage
+
+  verify-remote-stable:
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      PUBLICATION_RUN: ${{ github.run_id }}
+      REMOTE_BASE: https://repo.ro-asd.org/rpm/fedora/44/stable
+    steps:
+      - name: Checkout trusted Ro-Repo source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+
+      - name: Checkout published Pages storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: pages-site
+          fetch-depth: 1
+
+      - name: Install remote verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl gnupg python3-jsonschema
+
+      - name: Resolve published Stable snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot="$(python3 -c 'import json; print(json.load(open("pages-site/rpm/fedora/44/stable/publication-v1.json"))["snapshot_id"])')"
+          echo "SNAPSHOT_ID=$snapshot" >> "$GITHUB_ENV"
+
+      - name: Verify stable is the exact immutable snapshot locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          for arch in x86_64 aarch64 source; do
+            diff -qr               "pages-site/snapshots/fedora/44/$SNAPSHOT_ID/rpm/$arch"               "pages-site/rpm/fedora/44/stable/$arch"
+          done
+
+      - name: Wait for exact stable publication to reach Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          found=0
+          for attempt in $(seq 1 30); do
+            if curl --proto '=https' --tlsv1.2 --fail --silent --show-error                 "$REMOTE_BASE/publication-v1.json?run=$GITHUB_RUN_ID-$attempt"                 -o "$RUNNER_TEMP/publication-v1.json"; then
+              remote_run="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["publication_run"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              remote_snapshot="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot_id"])' "$RUNNER_TEMP/publication-v1.json" 2>/dev/null || true)"
+              if [[ "$remote_run" == "$GITHUB_RUN_ID" && "$remote_snapshot" == "$SNAPSHOT_ID" ]]; then
+                found=1
+                break
+              fi
+            fi
+            sleep 10
+          done
+          [[ "$found" -eq 1 ]]
+
+      - name: Verify complete remote stable tree byte-for-byte
+        shell: bash
+        run: |
+          set -euo pipefail
+          local_root="pages-site/rpm/fedora/44/stable"
+          remote_tmp="$RUNNER_TEMP/remote-stable"
+          mkdir -p "$remote_tmp"
+
+          while IFS= read -r -d '' path; do
+            rel="${path#"$local_root/"}"
+            mkdir -p "$remote_tmp/$(dirname "$rel")"
+            curl               --proto '=https'               --tlsv1.2               --fail               --silent               --show-error               "$REMOTE_BASE/$rel?run=$GITHUB_RUN_ID"               --output "$remote_tmp/$rel"
+            cmp --silent "$path" "$remote_tmp/$rel"
+          done < <(find "$local_root" -type f -print0 | sort -z)
+
+      - name: Verify remote stable publication signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify_home="$RUNNER_TEMP/remote-stable-gnupg"
+          mkdir -m 700 "$verify_home"
+          GNUPGHOME="$verify_home" gpg --batch --import             "pages-site/snapshots/fedora/44/$SNAPSHOT_ID/keys/REPODATA-GPG-KEY-ro-asd"
+
+          GNUPGHOME="$verify_home" gpg --batch --verify             "$RUNNER_TEMP/remote-stable/publication-v1.json.asc"             "$RUNNER_TEMP/remote-stable/publication-v1.json"
+
+          GNUPGHOME="$verify_home" gpgconf --kill gpg-agent >/dev/null 2>&1 || true
+          rm -rf "$verify_home"
+

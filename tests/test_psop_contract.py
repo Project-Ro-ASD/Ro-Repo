@@ -76,7 +76,9 @@ class PhaseAContractTests(unittest.TestCase):
     def test_source_guard_detects_workflow_authority_and_runtime_mutations(self):
         with tempfile.TemporaryDirectory() as temp:
             root = pathlib.Path(temp)
-            for rel in self.baseline["files"]:
+            reviewed = json.loads((ROOT / audit.V2_REVIEWED_CONTRACT).read_text())
+            protected_files = set(self.baseline["files"]) | set(reviewed["files"]) | {audit.V2_REVIEWED_CONTRACT}
+            for rel in protected_files:
                 dest = root / rel
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(ROOT / rel, dest)
@@ -84,6 +86,7 @@ class PhaseAContractTests(unittest.TestCase):
                         ".github/workflows/promote-remote-stable.yml",
                         ".github/workflows/v3-stable-promotion-disabled.yml",
                         "tools/v3_fenced_publisher.py", audit.PUBLIC_ROOTS["metadata"]["path"]):
+                self.assertEqual(audit.audit_source(root, self.baseline)["issues"], [])
                 path = root / rel
                 original = path.read_bytes()
                 path.write_bytes(original + b"\n# unauthorized mutation\n")
@@ -105,6 +108,17 @@ class PhaseAContractTests(unittest.TestCase):
                 audit.validate_profile(self.profile, root)
             self.assertIn("missing/unsafe: " + audit.PUBLIC_ROOTS["metadata"]["path"],
                           audit.audit_source(root, self.baseline)["issues"])
+
+    def test_reviewed_v2_contract_is_exact_and_cannot_be_shortened(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = pathlib.Path(temp)
+            target = root / audit.V2_REVIEWED_CONTRACT
+            target.parent.mkdir(parents=True)
+            data = json.loads((ROOT / audit.V2_REVIEWED_CONTRACT).read_text())
+            data["files"].pop("tools/v2_selected_stable.py")
+            target.write_text(json.dumps(data))
+            with self.assertRaisesRegex(audit.AuditError, "reviewed V2 source contract"):
+                audit.audit_source(root, self.baseline)
 
     def test_baseline_cannot_be_shortened_to_hide_changed_writers(self):
         baseline = copy.deepcopy(self.baseline)

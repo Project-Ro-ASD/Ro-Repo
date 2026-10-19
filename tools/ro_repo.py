@@ -1888,8 +1888,8 @@ def stage_remote_channel(publication_dir, site_root, channel, gnupghome):
 def rollback_remote_channel(site_root, channel, target_publication_run, rollback_run,
                             reason, gnupghome):
     """Rollback a mutable remote channel to an earlier signed publication history entry."""
-    if channel != "beta":
-        raise ContractError("remote rollback currently supports beta only")
+    if channel not in {"beta", "stable"}:
+        raise ContractError("remote rollback supports beta/stable only")
 
     target_run = _normalize_numeric_identity(target_publication_run)
     current_rollback_run = _normalize_numeric_identity(rollback_run)
@@ -1939,6 +1939,17 @@ def rollback_remote_channel(site_root, channel, target_publication_run, rollback
         target_publication_dir, snapshot, channel, gnupghome
     )
 
+    if channel == "stable":
+        manifest = verify_snapshot(snapshot, gnupghome)
+        rpm_paths = []
+        for package in manifest["packages"]:
+            arch = package["architecture"]
+            folder = "source" if arch in {"src", "nosrc"} else "x86_64" if arch == "noarch" else arch
+            rpm_paths.append(snapshot / "rpm" / folder / package["filename"])
+        verify_signed_rpms(rpm_paths, ROOT / "keys/production/ro-asd-rpm-signing-public.asc")
+
+    if (site_root / "rollbacks/fedora/44" / channel / f"{current_rollback_run}.json").exists():
+        raise ContractError("rollback evidence run already exists")
     result = stage_remote_channel(
         target_publication_dir, site_root, channel, gnupghome
     )
@@ -2419,7 +2430,7 @@ def cli():
     x=s.add_parser("verify-snapshot"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--gnupghome",type=pathlib.Path)
     x=s.add_parser("build-signed-remote-publication"); x.add_argument("--snapshot",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--publication-run",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True); x.add_argument("--metadata-key-id",required=True); x.add_argument("--passphrase-file",type=pathlib.Path,required=True); x.add_argument("--reuse-store-from",type=pathlib.Path)
     x=s.add_parser("stage-remote-channel"); x.add_argument("--publication",type=pathlib.Path,required=True); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
-    x=s.add_parser("rollback-remote-channel"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta"],required=True); x.add_argument("--target-publication-run",required=True); x.add_argument("--rollback-run",required=True); x.add_argument("--reason",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
+    x=s.add_parser("rollback-remote-channel"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--target-publication-run",required=True); x.add_argument("--rollback-run",required=True); x.add_argument("--reason",required=True); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("prepare-remote-stable-promotion"); x.add_argument("--site-root",type=pathlib.Path,required=True); x.add_argument("--validation",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--validation-run",required=True); x.add_argument("--approved-by",required=True); x.add_argument("--output",type=pathlib.Path,required=True)
     x=s.add_parser("publish-local"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--snapshot-id",required=True); x.add_argument("--channel",choices=["beta","stable"],required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
     x=s.add_parser("promote-snapshot"); x.add_argument("--output",type=pathlib.Path,required=True); x.add_argument("--promotion",type=pathlib.Path,required=True); x.add_argument("--publication-run",default="local"); x.add_argument("--gnupghome",type=pathlib.Path,required=True)
