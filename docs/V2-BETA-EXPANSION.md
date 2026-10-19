@@ -138,3 +138,9 @@ contract. This PR updates that contract's hashes for the five modified V2
 runtime/config/workflow files and three added source/test files, plus its pinned
 contract digest. The original 234-file baseline, production public roots,
 protected writer workflows, activation guards and authority rules are unchanged.
+
+The `pinned-producer-candidate-fedora44` PR CI job automates this actual-payload
+mode with a sparse read-only checkout of the exact historical Pages commit and
+exact immutable Installer/Theme release IDs. Checkout credentials are not
+persisted; the download token is confined to the read-only download step. No
+production signing key or protected publication environment is available.

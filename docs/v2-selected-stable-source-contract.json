@@ -39,7 +39,7 @@
     ".github/workflows/test.yml": {
       "mode": "100644",
       "previous_sha256": "ced071b61afc09446b6c9508567b1155fc8974f1ea173da4e24669b13a52560e",
-      "sha256": "08e18ced3c1d2b22dd9c03d87112ad599932003603851c6b9c88e01133c8e132"
+      "sha256": "2b36292c7ebca04503ec5dc35f17510d9a351837227e83e9e537fe49390c610f"
     },
     "config/producers-v2.json": {
       "mode": "100644",
