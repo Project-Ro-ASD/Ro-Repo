@@ -12,7 +12,7 @@ name: Build immutable production candidate snapshot
         required: true
         type: string
       parent_snapshot:
-        description: Optional exact verified Pages snapshot to inherit completely and extend
+        description: 'Required for incremental builds: exact Pages snapshot to verify and inherit; omit only for a new initial snapshot'
         required: false
         type: string
 

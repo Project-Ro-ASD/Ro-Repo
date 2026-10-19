@@ -1036,6 +1036,13 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
         raise ContractError("invalid snapshot ID")
     if parent is not None and not re.fullmatch(r"repo-f44-[0-9]{8}-[0-9]{3}", parent):
         raise ContractError("invalid parent snapshot ID")
+    if (parent is None) != (base_snapshot is None):
+        raise ContractError("incremental candidate requires both parent and base snapshot")
+    if parent is not None:
+        if parent == snapshot_id:
+            raise ContractError("incremental candidate requires a distinct exact parent")
+        if pathlib.Path(base_snapshot).name != parent:
+            raise ContractError("base snapshot directory identity differs from parent")
     build_run = _normalize_numeric_identity(workflow_run)
     if build_run is None:
         raise ContractError("snapshot workflow run must be a positive numeric identifier")
@@ -1065,8 +1072,6 @@ def build_production_snapshot(components_root, source_runs_path, output, snapsho
 
     retained, inheritance = [], None
     if base_snapshot is not None:
-        if parent is None or parent == snapshot_id:
-            raise ContractError("incremental candidate requires a distinct exact parent")
         from v2_candidate import plan
         retained, inheritance = plan(
             base_snapshot, components, parent, gnupghome, str(rpm_key_id),

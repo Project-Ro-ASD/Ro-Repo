@@ -3,6 +3,7 @@ import json
 import os
 import pathlib
 import sys
+import tempfile
 import types
 import unittest
 import yaml
@@ -11,6 +12,60 @@ from unittest import mock
 sys.path.insert(0, str(pathlib.Path(__file__).parents[1] / 'tools'))
 import ro_repo as rr
 import v2_candidate as candidate
+
+
+class SnapshotParameterTests(unittest.TestCase):
+    snapshot_id = 'repo-f44-20261020-001'
+    parent_id = 'repo-f44-20261009-001'
+
+    def build(self, output, **kwargs):
+        return rr.build_production_snapshot(
+            '/unused/components', '/unused/runs.json', output, self.snapshot_id,
+            '/unused/keys', 'B'*40, 'A'*40, 123, '/unused/passphrase', **kwargs)
+
+    def assert_rejected_before_signing(self, message, **kwargs):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(rr, '_validate_passphrase_file') as passphrase, \
+             mock.patch.object(rr, 'require_secret_signing_subkey') as keys, \
+             mock.patch.object(rr, 'verify_signed_component_bundle') as bundle:
+            output = pathlib.Path(tmp)/'candidate'
+            with self.assertRaisesRegex(rr.ContractError, message):
+                self.build(output, **kwargs)
+            passphrase.assert_not_called()
+            keys.assert_not_called()
+            bundle.assert_not_called()
+            self.assertFalse(output.exists())
+
+    def test_parent_without_base_rejected(self):
+        self.assert_rejected_before_signing('requires both', parent=self.parent_id)
+
+    def test_base_without_parent_rejected(self):
+        for base in (pathlib.Path('/snapshots')/self.parent_id, ''):
+            with self.subTest(base=base):
+                self.assert_rejected_before_signing('requires both', base_snapshot=base)
+
+    def test_parent_cannot_be_candidate_itself(self):
+        self.assert_rejected_before_signing(
+            'distinct exact parent', parent=self.snapshot_id,
+            base_snapshot=pathlib.Path('/snapshots')/self.snapshot_id)
+
+    def test_wrong_or_empty_base_identity_rejected(self):
+        for base in ('/snapshots/repo-f44-20261009-002', ''):
+            with self.subTest(base=base):
+                self.assert_rejected_before_signing(
+                    'directory identity differs', parent=self.parent_id, base_snapshot=base)
+
+    def test_empty_parent_does_not_become_initial_snapshot(self):
+        self.assert_rejected_before_signing('invalid parent', parent='')
+
+    def test_initial_and_matching_incremental_inputs_reach_normal_verification(self):
+        for kwargs in ({}, dict(parent=self.parent_id,
+                                base_snapshot=pathlib.Path('/snapshots')/self.parent_id)):
+            with self.subTest(kwargs=kwargs), mock.patch.object(
+                    rr, '_validate_passphrase_file', side_effect=rr.ContractError('normal verification reached')) as verify:
+                with self.assertRaisesRegex(rr.ContractError, 'normal verification reached'):
+                    self.build('/unused/output', **kwargs)
+                verify.assert_called_once_with('/unused/passphrase')
 
 
 class IncrementalCandidateTests(unittest.TestCase):

@@ -4,7 +4,7 @@
     ".github/workflows/build-candidate-snapshot.yml": {
       "mode": "100644",
       "previous_sha256": "0afb575c2fcc9f905206018c0a8de86d87510162a6c84f41d9675da52b0b31f6",
-      "sha256": "0400d1ce74b34cacd3ecd5f4d82adcf386e3760e7a3aeb78993097e4643c8970"
+      "sha256": "93650a681c9092b2f9225b629a2b392b31d5e81d285f60bf05428c3eaf1c6a7b"
     },
     ".github/workflows/promote-remote-stable.yml": {
       "mode": "100644",
@@ -84,12 +84,12 @@
     "tests/test_v2_candidate.py": {
       "mode": "100644",
       "previous_sha256": null,
-      "sha256": "704e136afaf5f793432b8f6a9311e4b3fc4ab8e0e42c55a2e3f88fc471cdf2d7"
+      "sha256": "601877886f1251a1bb4b5320bdef0bfa25416bb473dfe5c5b6cebee059fbafc3"
     },
     "tools/ro_repo.py": {
       "mode": "100644",
       "previous_sha256": "6ef67377258f9eb4e19594a9312eede99d972fa9b51a5503dcb1116feae3b416",
-      "sha256": "a40c327e4c2267a5be66cd72d8caf57ddbea5007d473e61272d72d09cd778779"
+      "sha256": "4ac8dbf242d5c419ddea5617fda45663450a8a47676f05f3edd1e70847e3a87b"
     },
     "tools/v2_candidate.py": {
       "mode": "100644",
