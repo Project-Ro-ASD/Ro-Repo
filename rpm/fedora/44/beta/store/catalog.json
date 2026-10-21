@@ -22,8 +22,31 @@
       "priority": 2,
       "source": "Ro-Repo",
       "summary": "Ro i\u00e7in yard\u0131mc\u0131 ara\u00e7lar ve rehberler."
+    },
+    {
+      "architectures": [
+        "aarch64",
+        "x86_64"
+      ],
+      "category": "Sistem",
+      "description": "Ro Control, Ro da\u011f\u0131t\u0131m\u0131na \u00f6zel sistem ayarlar\u0131n\u0131 ve temel yap\u0131land\u0131rmalar\u0131 tek yerden y\u00f6netmek i\u00e7in geli\u015ftirilen resmi uygulamad\u0131r.",
+      "developer": "Project Ro",
+      "epoch": 0,
+      "featured": true,
+      "icon": "icons/ro-control.svg",
+      "iconSha256": "587d1cc026ffb5be5c152d64d0b0685bef40a53658dfa9f434ea1862a6e10915",
+      "id": "ro-control",
+      "installPackage": "ro-control",
+      "latestRelease": "1.fc44",
+      "latestVersion": "1.3.4",
+      "name": "Ro Control",
+      "packageName": "ro-control",
+      "packageType": "rpm",
+      "priority": 1,
+      "source": "Ro-Repo",
+      "summary": "Ro sistem ayarlar\u0131n\u0131 kolayca y\u00f6netin."
     }
   ],
   "schemaVersion": 2,
-  "snapshotId": "repo-f44-20261020-002"
+  "snapshotId": "repo-f44-20261021-001"
 }
