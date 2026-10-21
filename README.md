@@ -36,3 +36,5 @@ Ayrintilar [docs/OPERATIONS.md](docs/OPERATIONS.md), manuel GitHub ve anahtar
 islemleri [docs/MANUAL-SETUP.md](docs/MANUAL-SETUP.md) dosyasindadir. Faz 1
 yalniz yerel dosya sistemi backend'ini uygular; domain, Pages, R2 ve production
 anahtari kapsam disidir.
+
+Tek bileşenli V2 Beta yayını: [Türkçe kullanım rehberi](docs/PUBLISH-COMPONENT-BETA.md).

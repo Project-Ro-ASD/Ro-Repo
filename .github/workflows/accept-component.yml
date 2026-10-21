@@ -1,7 +1,23 @@
 name: Accept pinned producer component
+run-name: "accept-component [${{ inputs.request_id || 'manual' }}]"
 "on":
   workflow_dispatch:
     inputs:
+      expected_source_commit:
+        description: Optional orchestrator source SHA; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      request_deadline:
+        description: Optional orchestrator epoch deadline; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      request_id:
+        description: Optional orchestrator correlation ID; omit for manual operation
+        required: false
+        default: ''
+        type: string
       repository:
         description: Exact allowlisted owner/repository
         required: true
@@ -28,6 +44,24 @@ jobs:
     container: fedora:44
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Validate orchestrated source and deadline before this job
+        if: inputs.request_id != '' || inputs.expected_source_commit != '' || inputs.request_deadline != ''
+        shell: bash
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+          EXPECTED_SOURCE: ${{ inputs.expected_source_commit }}
+          REQUEST_DEADLINE: ${{ inputs.request_deadline }}
+        run: |
+          set -euo pipefail
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_REPOSITORY" == 'Project-Ro-ASD/Ro-Repo' ]]
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_SHA" == "$EXPECTED_SOURCE" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == 1 ]]
+          [[ "$REQUEST_DEADLINE" =~ ^[1-9][0-9]{9}$ ]]
+          [[ "$(date +%s)" -lt "$REQUEST_DEADLINE" ]]
+
       - name: Initialize provisional acceptance report
         shell: bash
         env:
@@ -349,6 +383,24 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Validate orchestrated source and deadline before this job
+        if: inputs.request_id != '' || inputs.expected_source_commit != '' || inputs.request_deadline != ''
+        shell: bash
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+          EXPECTED_SOURCE: ${{ inputs.expected_source_commit }}
+          REQUEST_DEADLINE: ${{ inputs.request_deadline }}
+        run: |
+          set -euo pipefail
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_REPOSITORY" == 'Project-Ro-ASD/Ro-Repo' ]]
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_SHA" == "$EXPECTED_SOURCE" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == 1 ]]
+          [[ "$REQUEST_DEADLINE" =~ ^[1-9][0-9]{9}$ ]]
+          [[ "$(date +%s)" -lt "$REQUEST_DEADLINE" ]]
+
       - name: Install production RPM signing tools
         run: dnf -y install gnupg2 python3 python3-jsonschema rpm rpm-sign
       - name: Download accepted component from this workflow run

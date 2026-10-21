@@ -1,8 +1,29 @@
 name: Publish exact snapshot to remote beta
+run-name: "publish-remote-beta [${{ inputs.request_id || 'manual' }}]"
 
 "on":
   workflow_dispatch:
     inputs:
+      expected_source_commit:
+        description: Optional orchestrator source SHA; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      request_deadline:
+        description: Optional orchestrator epoch deadline; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      expected_storage_commit:
+        description: Optional exact Pages head precondition; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      request_id:
+        description: Optional orchestrator correlation ID; omit for manual operation
+        required: false
+        default: ''
+        type: string
       snapshot_id:
         description: Exact immutable snapshot ID already present in Pages storage
         required: true
@@ -25,12 +46,33 @@ jobs:
       name: repo-production-signing
     timeout-minutes: 20
     env:
+      REQUEST_ID: ${{ inputs.request_id }}
+      EXPECTED_STORAGE_COMMIT: ${{ inputs.expected_storage_commit }}
+      REQUEST_DEADLINE: ${{ inputs.request_deadline }}
       SNAPSHOT_ID: ${{ inputs.snapshot_id }}
     steps:
       - name: Checkout trusted Ro-Repo source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: source
+
+      - name: Validate orchestrated source and deadline before this job
+        if: inputs.request_id != '' || inputs.expected_source_commit != '' || inputs.request_deadline != ''
+        shell: bash
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+          EXPECTED_SOURCE: ${{ inputs.expected_source_commit }}
+          REQUEST_DEADLINE: ${{ inputs.request_deadline }}
+        run: |
+          set -euo pipefail
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_REPOSITORY" == 'Project-Ro-ASD/Ro-Repo' ]]
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_SHA" == "$EXPECTED_SOURCE" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == 1 ]]
+          [[ "$REQUEST_DEADLINE" =~ ^[1-9][0-9]{9}$ ]]
+          [[ "$(date +%s)" -lt "$REQUEST_DEADLINE" ]]
 
       - name: Checkout exact Pages storage
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -110,12 +152,33 @@ jobs:
       contents: write
       actions: read
     env:
+      REQUEST_ID: ${{ inputs.request_id }}
+      EXPECTED_STORAGE_COMMIT: ${{ inputs.expected_storage_commit }}
+      REQUEST_DEADLINE: ${{ inputs.request_deadline }}
       SNAPSHOT_ID: ${{ inputs.snapshot_id }}
     steps:
       - name: Checkout trusted Ro-Repo source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: source
+
+      - name: Validate orchestrated source and deadline before this job
+        if: inputs.request_id != '' || inputs.expected_source_commit != '' || inputs.request_deadline != ''
+        shell: bash
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+          EXPECTED_SOURCE: ${{ inputs.expected_source_commit }}
+          REQUEST_DEADLINE: ${{ inputs.request_deadline }}
+        run: |
+          set -euo pipefail
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_REPOSITORY" == 'Project-Ro-ASD/Ro-Repo' ]]
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_SHA" == "$EXPECTED_SOURCE" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == 1 ]]
+          [[ "$REQUEST_DEADLINE" =~ ^[1-9][0-9]{9}$ ]]
+          [[ "$(date +%s)" -lt "$REQUEST_DEADLINE" ]]
 
       - name: Install Git before writable Pages checkout
         run: |
@@ -152,6 +215,8 @@ jobs:
           GNUPGHOME="$verify_home" gpg --batch --import source/keys/production/ro-asd-metadata-signing-public.asc
 
           source/tools/ro-repo verify-snapshot             --snapshot "$snapshot"             --gnupghome "$verify_home"
+
+          python3 source/scripts/component_beta_storage_guard.py pages-site
 
           result="$(source/tools/ro-repo stage-remote-channel             --publication signed-publication             --site-root pages-site             --channel beta             --gnupghome "$verify_home")"
           printf '%s\n' "$result"
@@ -194,6 +259,9 @@ jobs:
     permissions:
       contents: read
     env:
+      REQUEST_ID: ${{ inputs.request_id }}
+      EXPECTED_STORAGE_COMMIT: ${{ inputs.expected_storage_commit }}
+      REQUEST_DEADLINE: ${{ inputs.request_deadline }}
       SNAPSHOT_ID: ${{ inputs.snapshot_id }}
       PUBLICATION_RUN: ${{ github.run_id }}
       REMOTE_BASE: https://repo.ro-asd.org/rpm/fedora/44/beta
@@ -202,6 +270,24 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: source
+
+      - name: Validate orchestrated source and deadline before this job
+        if: inputs.request_id != '' || inputs.expected_source_commit != '' || inputs.request_deadline != ''
+        shell: bash
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+          EXPECTED_SOURCE: ${{ inputs.expected_source_commit }}
+          REQUEST_DEADLINE: ${{ inputs.request_deadline }}
+        run: |
+          set -euo pipefail
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_REPOSITORY" == 'Project-Ro-ASD/Ro-Repo' ]]
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_SHA" == "$EXPECTED_SOURCE" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == 1 ]]
+          [[ "$REQUEST_DEADLINE" =~ ^[1-9][0-9]{9}$ ]]
+          [[ "$(date +%s)" -lt "$REQUEST_DEADLINE" ]]
 
       - name: Checkout published Pages storage
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

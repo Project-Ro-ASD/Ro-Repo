@@ -1,8 +1,29 @@
 name: Publish immutable candidate snapshot to Pages storage
+run-name: "publish-pages-snapshot [${{ inputs.request_id || 'manual' }}]"
 
 "on":
   workflow_dispatch:
     inputs:
+      expected_source_commit:
+        description: Optional orchestrator source SHA; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      request_deadline:
+        description: Optional orchestrator epoch deadline; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      expected_storage_commit:
+        description: Optional exact Pages head precondition; mandatory with request_id
+        required: false
+        default: ''
+        type: string
+      request_id:
+        description: Optional orchestrator correlation ID; omit for manual operation
+        required: false
+        default: ''
+        type: string
       candidate_run:
         description: Exact successful candidate snapshot workflow run ID
         required: true
@@ -29,6 +50,9 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       CANDIDATE_RUN: ${{ inputs.candidate_run }}
+      REQUEST_ID: ${{ inputs.request_id }}
+      EXPECTED_STORAGE_COMMIT: ${{ inputs.expected_storage_commit }}
+      REQUEST_DEADLINE: ${{ inputs.request_deadline }}
       SNAPSHOT_ID: ${{ inputs.snapshot_id }}
       CANDIDATE_ARTIFACT: candidate-snapshot-${{ inputs.snapshot_id }}-${{ inputs.candidate_run }}
     steps:
@@ -36,6 +60,24 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: source
+
+      - name: Validate orchestrated source and deadline before this job
+        if: inputs.request_id != '' || inputs.expected_source_commit != '' || inputs.request_deadline != ''
+        shell: bash
+        env:
+          REQUEST_ID: ${{ inputs.request_id }}
+          EXPECTED_SOURCE: ${{ inputs.expected_source_commit }}
+          REQUEST_DEADLINE: ${{ inputs.request_deadline }}
+        run: |
+          set -euo pipefail
+          [[ "$REQUEST_ID" =~ ^[0-9a-f]{32}$ ]]
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_REPOSITORY" == 'Project-Ro-ASD/Ro-Repo' ]]
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_SHA" == "$EXPECTED_SOURCE" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" == 1 ]]
+          [[ "$REQUEST_DEADLINE" =~ ^[1-9][0-9]{9}$ ]]
+          [[ "$(date +%s)" -lt "$REQUEST_DEADLINE" ]]
 
       - name: Install verification and publication tools
         run: |
@@ -107,6 +149,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 source/scripts/component_beta_storage_guard.py pages-site
+
           source/tools/ro-repo stage-pages-snapshot \
             --snapshot "$CANDIDATE_ROOT" \
             --site-root pages-site

@@ -1,10 +1,15 @@
 {
   "base_baseline_sha256": "62d32c79d1c86f0aacd3d22f087712389a79122f2cb28b342226b29a600925f1",
   "files": {
+    ".github/workflows/accept-component.yml": {
+      "mode": "100644",
+      "previous_sha256": "085e24fbef750043ee8e4f03b73cd39bb25fbdf970044d1b3a586e940863f02f",
+      "sha256": "1500d8d0cca2910786f7d07f42bc88c775578c66b60c72e73148ab07a9f4770a"
+    },
     ".github/workflows/build-candidate-snapshot.yml": {
       "mode": "100644",
       "previous_sha256": "0afb575c2fcc9f905206018c0a8de86d87510162a6c84f41d9675da52b0b31f6",
-      "sha256": "93650a681c9092b2f9225b629a2b392b31d5e81d285f60bf05428c3eaf1c6a7b"
+      "sha256": "407235def16a9a8cde5902f7e9962e7c9a388c6613515e08115e623db2da58bf"
     },
     ".github/workflows/promote-remote-stable.yml": {
       "mode": "100644",
@@ -16,15 +21,20 @@
       "previous_sha256": null,
       "sha256": "7894f211af3e810defe6a9b636fc07e35d8278fc0cd836b2cb3a88858e25bde9"
     },
+    ".github/workflows/publish-component-beta.yml": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "033c6635a562fdaf541f303c071910c444a6dddb79a784ebd6653fcb868c80d7"
+    },
     ".github/workflows/publish-pages-snapshot.yml": {
       "mode": "100644",
       "previous_sha256": "cde01be8ce3d3ed35525eacfb7c51432e9b3529c10809d902fa936e2b1bcbe94",
-      "sha256": "a818877e77e1f566fc2ceb18811b02a4f968e9cdf236394b2e76fe5c966e321b"
+      "sha256": "68264b5689de0bf3209052963a747904e0c4ae445ba0e168b51d4c2a699d3337"
     },
     ".github/workflows/publish-remote-beta.yml": {
       "mode": "100644",
       "previous_sha256": "37e60630a9e5ada9b5d7321629a9fb10b386f06055917160315cd07ebb291136",
-      "sha256": "effae3c89afabdb36925d44d20b4e4e383036e66467040b47aed77dfeca0fdb6"
+      "sha256": "400828b7d6a1c5072def84fd9dbcab3b959a958b34cae675ab6fde9527102207"
     },
     ".github/workflows/rollback-remote-beta.yml": {
       "mode": "100644",
@@ -56,6 +66,11 @@
       "previous_sha256": "4a0404c1a2b6dc538eaa93f154b1965420d51a359e53c4373487801a6b424568",
       "sha256": "64179cb7bad93f7cb9194b73b6fb3490cabed7deb8b0e7457d98268ea0cef7d4"
     },
+    "scripts/component_beta_storage_guard.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "d87c1b45efbafa0bb447344716264ea646dbb162318bc21c10384a2f0d382fda"
+    },
     "scripts/stage_selected_stable.py": {
       "mode": "100644",
       "previous_sha256": null,
@@ -76,6 +91,11 @@
       "previous_sha256": null,
       "sha256": "a1f27f41998bd2f112416aa75c6c06b36064cf83ace65ed1e613e9744c745f77"
     },
+    "tests/test_component_beta.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "c6b1778d187b5f3a22fdf1ead5347fe9b92f765e3eb13a7aa35365eb894229a8"
+    },
     "tests/test_selected_stable.py": {
       "mode": "100644",
       "previous_sha256": null,
@@ -85,6 +105,11 @@
       "mode": "100644",
       "previous_sha256": null,
       "sha256": "601877886f1251a1bb4b5320bdef0bfa25416bb473dfe5c5b6cebee059fbafc3"
+    },
+    "tools/component_beta.py": {
+      "mode": "100644",
+      "previous_sha256": null,
+      "sha256": "c8f1f0d99f9cf77afbfa4d03ab403858264c64889e600a6d35bc78a556f449a6"
     },
     "tools/ro_repo.py": {
       "mode": "100644",

@@ -1,0 +1,65 @@
+name: Publish component to Beta
+run-name: "Publish ${{ inputs.component }} ${{ inputs.tag }} to Beta"
+
+"on":
+  workflow_dispatch:
+    inputs:
+      component:
+        description: Registered component ID, e.g. ro-theme
+        required: true
+        type: string
+      tag:
+        description: Exact immutable release tag, e.g. v1.1.10
+        required: true
+        type: string
+      preflight_only:
+        description: Check eligibility without dispatching any publication stage
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: write
+
+# Separate from child locks: holding the Pages lock here would deadlock.
+concurrency:
+  group: ro-repo-component-beta-orchestrator
+  cancel-in-progress: false
+
+jobs:
+  orchestrate:
+    if: github.repository == 'Project-Ro-ASD/Ro-Repo' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    timeout-minutes: 240
+    steps:
+      - name: Install read-only Fedora 44 verification tools
+        run: dnf -y install git gh python3 python3-jsonschema rpm gnupg2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Read current immutable storage
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: pages-storage
+          path: storage
+          persist-credentials: false
+      - name: Preflight and sequence exact V2 Beta workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMPONENT: ${{ inputs.component }}
+          TAG: ${{ inputs.tag }}
+          PREFLIGHT_ONLY: ${{ inputs.preflight_only }}
+        run: python3 tools/component_beta.py
+      - name: Report completed and blocked stages
+        if: always()
+        run: python3 tools/component_beta.py --summary-only
+      - name: Preserve orchestration state
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: component-beta-state-${{ github.run_id }}
+          path: component-beta-state.json
+          if-no-files-found: warn
+          retention-days: 90
