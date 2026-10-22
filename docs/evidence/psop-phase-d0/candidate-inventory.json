@@ -1,0 +1,1067 @@
+{
+  "policies": [
+    {
+      "architectures": [
+        "aarch64",
+        "x86_64"
+      ],
+      "component": "ro-control",
+      "fedora_release": 44,
+      "minimum_beta_days": 7,
+      "package_names": [
+        "ro-control"
+      ],
+      "promotion_group": "ro-control",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/ro-Control",
+      "required_tests": [
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "normal-app",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Control/.github/workflows/release.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "aarch64",
+        "x86_64"
+      ],
+      "component": "ro-assist",
+      "fedora_release": 44,
+      "minimum_beta_days": 7,
+      "package_names": [
+        "ro-assist"
+      ],
+      "promotion_group": "ro-assist",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/ro-Assist",
+      "required_tests": [
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "normal-app",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Assist/.github/workflows/release.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-theme",
+      "fedora_release": 44,
+      "minimum_beta_days": 7,
+      "package_names": [
+        "ro-theme"
+      ],
+      "promotion_group": "desktop-theme",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-Theme",
+      "required_tests": [
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "login-session",
+        "plasma-integration",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-desktop",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-Theme/.github/workflows/release.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-release",
+      "fedora_release": 44,
+      "minimum_beta_days": 14,
+      "package_names": [
+        "ro-asd-release"
+      ],
+      "promotion_group": "ro-asd-release",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "boot",
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "qemu",
+        "reboot",
+        "recovery",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-system",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-keyring",
+      "fedora_release": 44,
+      "minimum_beta_days": 14,
+      "package_names": [
+        "ro-asd-keyring"
+      ],
+      "promotion_group": "ro-asd-keyring",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "boot",
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "qemu",
+        "reboot",
+        "recovery",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-system",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-keyring.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-repos",
+      "fedora_release": 44,
+      "minimum_beta_days": 14,
+      "package_names": [
+        "ro-asd-repos"
+      ],
+      "promotion_group": "ro-asd-repos",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "boot",
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "qemu",
+        "reboot",
+        "recovery",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-system",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-repos.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-defaults",
+      "fedora_release": 44,
+      "minimum_beta_days": 14,
+      "package_names": [
+        "ro-asd-defaults"
+      ],
+      "promotion_group": "ro-asd-defaults",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "boot",
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "qemu",
+        "reboot",
+        "recovery",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-system",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-defaults.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-branding",
+      "fedora_release": 44,
+      "minimum_beta_days": 7,
+      "package_names": [
+        "ro-asd-branding"
+      ],
+      "promotion_group": "ro-asd-branding",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "login-session",
+        "plasma-integration",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-desktop",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-branding.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-desktop-standard",
+      "fedora_release": 44,
+      "minimum_beta_days": 7,
+      "package_names": [
+        "ro-asd-desktop-standard"
+      ],
+      "promotion_group": "ro-asd-desktop-standard",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "login-session",
+        "plasma-integration",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-desktop",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-desktop-standard.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "noarch"
+      ],
+      "component": "ro-asd-kernel-policy",
+      "fedora_release": 44,
+      "minimum_beta_days": 14,
+      "package_names": [
+        "ro-asd-kernel-policy"
+      ],
+      "promotion_group": "ro-asd-kernel-policy",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-ASD-release",
+      "required_tests": [
+        "boot",
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "qemu",
+        "reboot",
+        "recovery",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-system",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-ASD-release/.github/workflows/release-kernel-policy.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "x86_64"
+      ],
+      "component": "ro-installer",
+      "fedora_release": 44,
+      "minimum_beta_days": 14,
+      "package_names": [
+        "ro-installer"
+      ],
+      "promotion_group": "ro-installer",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/ro-Installer",
+      "required_tests": [
+        "boot",
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "qemu",
+        "reboot",
+        "recovery",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-system",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/ro-Installer/.github/workflows/release.yml",
+      "version": "ro-repo-v3-policy-1"
+    },
+    {
+      "architectures": [
+        "x86_64"
+      ],
+      "component": "ro-kde-dolphin",
+      "fedora_release": 44,
+      "minimum_beta_days": 7,
+      "package_names": [
+        "dolphin",
+        "dolphin-devel",
+        "dolphin-libs"
+      ],
+      "promotion_group": "ro-kde-dolphin",
+      "registry_sha256": "e6685e359c916b6ede06a00f0b01393feb9c4491ae21fc5f919f3e2c43a16733",
+      "repository": "Project-Ro-ASD/Ro-KDE-Dolphin",
+      "required_tests": [
+        "clean-install",
+        "dependency-solve",
+        "file-conflict",
+        "login-session",
+        "plasma-integration",
+        "rpmlint",
+        "smoke",
+        "upgrade"
+      ],
+      "risk_class": "critical-desktop",
+      "srpm_required": true,
+      "trusted_signer_workflow": "Project-Ro-ASD/Ro-KDE-Dolphin/.github/workflows/release.yml",
+      "version": "ro-repo-v3-policy-1"
+    }
+  ],
+  "production_test_authority": "UNVERIFIED",
+  "snapshots": [
+    {
+      "manifest": {
+        "created_at": "2026-09-20T16:36:15Z",
+        "creation_provenance": {
+          "run": "35523196901",
+          "tool": "ro-repo-v2"
+        },
+        "fedora_release": 44,
+        "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+        "packages": [
+          {
+            "architecture": "aarch64",
+            "filename": "ro-assist-0.2.4-1.fc44.aarch64.rpm",
+            "nevra": "ro-assist-0:0.2.4-1.fc44.aarch64",
+            "producer_artifact_sha256": "bcf3c7a8508fc21ee750322365d203e3b01f33b78f243818d5efdd34394ee5a0",
+            "producer_manifest_digest": "1b61f29523ae8e7a18be02fe53eb7447a7e85d39bef07e68512d0a867f68dcb8",
+            "published_signed_artifact_sha256": "653829d27decac6cd153ca928ddc8df4f3095156e4514c72d7fa945362c12956"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-assist-0.2.4-1.fc44.src.rpm",
+            "nevra": "ro-assist-0:0.2.4-1.fc44.src",
+            "producer_artifact_sha256": "1424c0e0bea2adcb4fa73ad293d03b9e175693c73c5f1002972d55ae836f5328",
+            "producer_manifest_digest": "1b61f29523ae8e7a18be02fe53eb7447a7e85d39bef07e68512d0a867f68dcb8",
+            "published_signed_artifact_sha256": "bba9e1b56b32edaa2b29a6a66c37062451bc04bba291a55bfdaf97f9ded0da3e"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-assist-0.2.4-1.fc44.x86_64.rpm",
+            "nevra": "ro-assist-0:0.2.4-1.fc44.x86_64",
+            "producer_artifact_sha256": "a3e5975f3bd28d3c6281456d8af8136fefda4a7e72effdc218dc20b13ab2c2b7",
+            "producer_manifest_digest": "1b61f29523ae8e7a18be02fe53eb7447a7e85d39bef07e68512d0a867f68dcb8",
+            "published_signed_artifact_sha256": "2345ebce6ddd91ef495d9759db1590a1c4b97259ce05acf96a6007c8ccae9411"
+          }
+        ],
+        "parent_snapshot": null,
+        "repositories": {
+          "aarch64": {
+            "repomd_sha256": "68d932f63570ebedd540112cf5bc5d8f328a79d4d0f7fd719b13776dd129842f",
+            "repomd_signature_sha256": "8292e5238d0c0f889cc513e0405e21256e7d21d8fc99eee989bae97d6bba38f8"
+          },
+          "source": {
+            "repomd_sha256": "ab2f384f4527746cd4505969b82e6c10353cff7fbe87128165b63bc86f6179d6",
+            "repomd_signature_sha256": "48370fe48e937636f46636d2a8cb77fb323ec137f6c1aa591849cfb11264cf91"
+          },
+          "x86_64": {
+            "repomd_sha256": "58c9f01e68416d5f32fc47afb8bdbaab61fb2ae0a6c53a0dce7eea0020576c60",
+            "repomd_signature_sha256": "1a2d4f39eceb2dee1b9ce59415996f35f46de418d3de619bcf70ebc6943b5f85"
+          }
+        },
+        "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260920-001"
+      },
+      "path": "snapshots/fedora/44/repo-f44-20260920-001/repository-snapshot-v1.json",
+      "sha256": "7edd4af6914d63937deb42d2f733a6568378d17b6aeaf1a633b16db086187d71"
+    },
+    {
+      "manifest": {
+        "created_at": "2026-09-21T12:17:55Z",
+        "creation_provenance": {
+          "run": "35598643758",
+          "tool": "ro-repo-v2"
+        },
+        "fedora_release": 44,
+        "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+        "packages": [
+          {
+            "architecture": "aarch64",
+            "filename": "ro-assist-0.2.5-1.fc44.aarch64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.aarch64",
+            "producer_artifact_sha256": "90c00490a42f9e32a1ebc222ebed3600c3cd0c822658b3ecfc722eae3386204e",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "ecb3f5cc7e3a3925b95b19e4212839d24253cf3692a7886895d8ae6a3142b5fa"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-assist-0.2.5-1.fc44.src.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.src",
+            "producer_artifact_sha256": "510acd42117cb7c1c1ea662806d8e88a5b54f53c5420760976d3757cc3e0df40",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "eac047b81a6ab1b47a5260e1f667d536bede5236f624d836fd405a3b08c1d150"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-assist-0.2.5-1.fc44.x86_64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.x86_64",
+            "producer_artifact_sha256": "535a16712954b5ec33661f2d2fdc0aa85657f38947c2ff0fdf00554aad107e5b",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "cd716518b6042ee9a9ec35f805dfbc47742872681503648e97104539c2d1435c"
+          }
+        ],
+        "parent_snapshot": "repo-f44-20260920-001",
+        "repositories": {
+          "aarch64": {
+            "repomd_sha256": "8c0a8a96962be5e998c4325b1784e4ba2fa28a013b22b21fe1f649d728c2ece2",
+            "repomd_signature_sha256": "79176ed58fa67b8e64d8c2ae4d4af8fe987b47ecd23eb4784e2ac077b81ddb38"
+          },
+          "source": {
+            "repomd_sha256": "5be2e36e47a1a319ae8d5dabef4f5bbe6beb8661a483a7b77fac1f6aadd4feeb",
+            "repomd_signature_sha256": "3b33264b146938da22a56f8655e9bb0ad5673736e8cfa1a3d292f84ef9b8edc9"
+          },
+          "x86_64": {
+            "repomd_sha256": "1d10e9363dc506b123df01d35b580f64d8292eeb653363470188024bd79b2f52",
+            "repomd_signature_sha256": "dd23d722ad3cfab9831a60efbf6df4c2e46fef54e14253bc73215f282058402e"
+          }
+        },
+        "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260921-001"
+      },
+      "path": "snapshots/fedora/44/repo-f44-20260921-001/repository-snapshot-v1.json",
+      "sha256": "20889abf076cd9fd30cefe825746cbc39b70e0022afa7159fed52ca16691fa13"
+    },
+    {
+      "manifest": {
+        "created_at": "2026-09-29T16:01:42Z",
+        "creation_provenance": {
+          "run": "36594551583",
+          "tool": "ro-repo-v2"
+        },
+        "fedora_release": 44,
+        "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+        "packages": [
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-branding-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-branding-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "07a0b4f6ade769a562d7fcff6548c16f710749d6a2a515156983407962fe6423",
+            "producer_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+            "published_signed_artifact_sha256": "417a572885f9c1a94f715cc4e154abd95671084fcd310fa1ac3215dc7ca43592"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-branding-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-branding-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "838f712b5e7c19d55eb64725792c511bc527c7511144e92e188d9142d3cf704b",
+            "producer_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+            "published_signed_artifact_sha256": "19d9c28065292e51444436703f7102da3df49e3eaaceebf516c5a10a21ecc4c2"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-defaults-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-defaults-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "a5d7f677970edfe494b0812ea649aa7c344faab2ecdbb3e1ec72a80bc4142c96",
+            "producer_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+            "published_signed_artifact_sha256": "de8ffa9c890e71c89af7e2a3f4a1a24886272e0e6e207b682b8f2b7f0b04b728"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-defaults-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-defaults-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "a2edd1327d7268f06779323fddc2a2145cf4d90851517fdaa020e67fb79a740e",
+            "producer_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+            "published_signed_artifact_sha256": "1ee941ad9ef093906a868caa4a531fabb6a72a67d20be5d6bfc9e731026a7c3a"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-desktop-standard-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-desktop-standard-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "9384d957ed8d5273b215c1d89875f80442228f5686f25a15a74cd1be40047ce5",
+            "producer_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+            "published_signed_artifact_sha256": "8f5a46599e645935da6e794f84b979bfd6791c6382f8b97e3935d8397a47ca87"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-desktop-standard-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-desktop-standard-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "afcc2f27b2f5fa215f3e7a0384c0d117eaca3e9e6069f7a3a962b34992731958",
+            "producer_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+            "published_signed_artifact_sha256": "eea9953ba1ea09f7efef46e62fdeb3d0e645af4670a989c22f5215cd0a938829"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-kernel-policy-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-kernel-policy-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "ace38cd913e587d105ab3798a448095f9654737a5a773cc6ec248637efec640f",
+            "producer_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+            "published_signed_artifact_sha256": "97abe09776c0b11f29b066da00896800c88eec5345ceab51501f4dd17ddff901"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-kernel-policy-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-kernel-policy-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "e52ba8492a779a994b572397fec8c5d903184dd331f300ed4c83cbff5a8e9313",
+            "producer_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+            "published_signed_artifact_sha256": "214a51f32967a3b1eb34735630719e8fc30fe1e26121c0efa7221adcdfde3da1"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-keyring-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-keyring-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "da5bc8e42f1b21202ab01a3046a44d9f005fd4dc6212a39a9c05e341e6b82e69",
+            "producer_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+            "published_signed_artifact_sha256": "550bed6c0856240882e4814a6d84b72f987b3b31fc4fde9a8ad98465786b346d"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-keyring-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-keyring-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "28e1be6ab7e9ba10bd79011529280f84b00b7260e5905a226773a86154d08e4a",
+            "producer_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+            "published_signed_artifact_sha256": "5345392ab3dec7d7f6a49763d6216756a3a847d4a96c17937e437c057bdfd194"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-release-0.1.2-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-release-0:0.1.2-1.fc44.noarch",
+            "producer_artifact_sha256": "d177a63e785c198c8a732e4dcfc3476e6fba6721000095c073c2bf49c62303d6",
+            "producer_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+            "published_signed_artifact_sha256": "bbd7cc809db8d13a34524f466ce4c50ce3008ece1e61393840ed1b707d2b1589"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-release-0.1.2-1.fc44.src.rpm",
+            "nevra": "ro-asd-release-0:0.1.2-1.fc44.src",
+            "producer_artifact_sha256": "8492fab6f01a9b3e7a8587e59747cba9cf185eaebb02b5563b34ebc43b49dc6b",
+            "producer_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+            "published_signed_artifact_sha256": "19291b2c16330459b8fe30078f45b734a86784616a535a1f873ac6b672eba289"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-repos-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-repos-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "a3bddc51311d9c63aa98ad67e089a144656fd9c9a19ca36d75d91f3d985e4d42",
+            "producer_manifest_digest": "a18e6d4436dd7ba3b1f8ce1414d68ae132f4834752a03d71dfbdc43420c818a9",
+            "published_signed_artifact_sha256": "39c8d58ecd699f2183aa622a0c8fb4fc8ff358538876bffebe8abbdb449347d1"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-repos-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-repos-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "622a0da25a30a23f692e011846b2b95732fbe2c57dd3a6ac7086e19716b446fb",
+            "producer_manifest_digest": "a18e6d4436dd7ba3b1f8ce1414d68ae132f4834752a03d71dfbdc43420c818a9",
+            "published_signed_artifact_sha256": "691382de442f0e61b434bf1ecd2d152933e8b09b41259ed2f9275f7bf9a67c45"
+          },
+          {
+            "architecture": "aarch64",
+            "filename": "ro-assist-0.2.5-1.fc44.aarch64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.aarch64",
+            "producer_artifact_sha256": "90c00490a42f9e32a1ebc222ebed3600c3cd0c822658b3ecfc722eae3386204e",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "ecb3f5cc7e3a3925b95b19e4212839d24253cf3692a7886895d8ae6a3142b5fa"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-assist-0.2.5-1.fc44.src.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.src",
+            "producer_artifact_sha256": "510acd42117cb7c1c1ea662806d8e88a5b54f53c5420760976d3757cc3e0df40",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "eac047b81a6ab1b47a5260e1f667d536bede5236f624d836fd405a3b08c1d150"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-assist-0.2.5-1.fc44.x86_64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.x86_64",
+            "producer_artifact_sha256": "535a16712954b5ec33661f2d2fdc0aa85657f38947c2ff0fdf00554aad107e5b",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "cd716518b6042ee9a9ec35f805dfbc47742872681503648e97104539c2d1435c"
+          }
+        ],
+        "parent_snapshot": "repo-f44-20260921-001",
+        "repositories": {
+          "aarch64": {
+            "repomd_sha256": "1d6b0cd985f17da42f3e15417de33232f6f557c92663aa85e119d4955e122354",
+            "repomd_signature_sha256": "580c00a505ddef2482bcf95e479f5801b55b1bb21b7b116d67a219b1123afd61"
+          },
+          "source": {
+            "repomd_sha256": "603209b0a809573c2e60337993e452f2b4ee6957d94131eaa5238fa4658f374b",
+            "repomd_signature_sha256": "2e6828b592f7e442a410974d325f3d8dc976f3ad29fd0e940fbf7943de81f2ba"
+          },
+          "x86_64": {
+            "repomd_sha256": "e36203fb0cd854ec963757da45c2d1858d63ca4cfe297254f6b39248375330f8",
+            "repomd_signature_sha256": "cd5ea5151c2634d7d749bbf53339528513ca8bc1ad9238a760d76555a16daae6"
+          }
+        },
+        "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260929-001"
+      },
+      "path": "snapshots/fedora/44/repo-f44-20260929-001/repository-snapshot-v1.json",
+      "sha256": "f57c3605af5dad81c86ffe856a38488a5d052b3a29ef7db4639a30ad4246ef23"
+    },
+    {
+      "manifest": {
+        "created_at": "2026-10-06T19:36:33Z",
+        "creation_provenance": {
+          "run": "37519823464",
+          "tool": "ro-repo-v2"
+        },
+        "fedora_release": 44,
+        "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+        "packages": [
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-branding-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-branding-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "07a0b4f6ade769a562d7fcff6548c16f710749d6a2a515156983407962fe6423",
+            "producer_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+            "published_signed_artifact_sha256": "417a572885f9c1a94f715cc4e154abd95671084fcd310fa1ac3215dc7ca43592"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-branding-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-branding-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "838f712b5e7c19d55eb64725792c511bc527c7511144e92e188d9142d3cf704b",
+            "producer_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+            "published_signed_artifact_sha256": "19d9c28065292e51444436703f7102da3df49e3eaaceebf516c5a10a21ecc4c2"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-defaults-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-defaults-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "a5d7f677970edfe494b0812ea649aa7c344faab2ecdbb3e1ec72a80bc4142c96",
+            "producer_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+            "published_signed_artifact_sha256": "de8ffa9c890e71c89af7e2a3f4a1a24886272e0e6e207b682b8f2b7f0b04b728"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-defaults-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-defaults-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "a2edd1327d7268f06779323fddc2a2145cf4d90851517fdaa020e67fb79a740e",
+            "producer_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+            "published_signed_artifact_sha256": "1ee941ad9ef093906a868caa4a531fabb6a72a67d20be5d6bfc9e731026a7c3a"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-desktop-standard-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-desktop-standard-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "9384d957ed8d5273b215c1d89875f80442228f5686f25a15a74cd1be40047ce5",
+            "producer_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+            "published_signed_artifact_sha256": "8f5a46599e645935da6e794f84b979bfd6791c6382f8b97e3935d8397a47ca87"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-desktop-standard-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-desktop-standard-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "afcc2f27b2f5fa215f3e7a0384c0d117eaca3e9e6069f7a3a962b34992731958",
+            "producer_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+            "published_signed_artifact_sha256": "eea9953ba1ea09f7efef46e62fdeb3d0e645af4670a989c22f5215cd0a938829"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-kernel-policy-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-kernel-policy-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "ace38cd913e587d105ab3798a448095f9654737a5a773cc6ec248637efec640f",
+            "producer_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+            "published_signed_artifact_sha256": "97abe09776c0b11f29b066da00896800c88eec5345ceab51501f4dd17ddff901"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-kernel-policy-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-kernel-policy-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "e52ba8492a779a994b572397fec8c5d903184dd331f300ed4c83cbff5a8e9313",
+            "producer_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+            "published_signed_artifact_sha256": "214a51f32967a3b1eb34735630719e8fc30fe1e26121c0efa7221adcdfde3da1"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-keyring-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-keyring-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "da5bc8e42f1b21202ab01a3046a44d9f005fd4dc6212a39a9c05e341e6b82e69",
+            "producer_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+            "published_signed_artifact_sha256": "550bed6c0856240882e4814a6d84b72f987b3b31fc4fde9a8ad98465786b346d"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-keyring-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-keyring-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "28e1be6ab7e9ba10bd79011529280f84b00b7260e5905a226773a86154d08e4a",
+            "producer_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+            "published_signed_artifact_sha256": "5345392ab3dec7d7f6a49763d6216756a3a847d4a96c17937e437c057bdfd194"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-release-0.1.2-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-release-0:0.1.2-1.fc44.noarch",
+            "producer_artifact_sha256": "d177a63e785c198c8a732e4dcfc3476e6fba6721000095c073c2bf49c62303d6",
+            "producer_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+            "published_signed_artifact_sha256": "bbd7cc809db8d13a34524f466ce4c50ce3008ece1e61393840ed1b707d2b1589"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-release-0.1.2-1.fc44.src.rpm",
+            "nevra": "ro-asd-release-0:0.1.2-1.fc44.src",
+            "producer_artifact_sha256": "8492fab6f01a9b3e7a8587e59747cba9cf185eaebb02b5563b34ebc43b49dc6b",
+            "producer_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+            "published_signed_artifact_sha256": "19291b2c16330459b8fe30078f45b734a86784616a535a1f873ac6b672eba289"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-repos-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-repos-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "a3bddc51311d9c63aa98ad67e089a144656fd9c9a19ca36d75d91f3d985e4d42",
+            "producer_manifest_digest": "a18e6d4436dd7ba3b1f8ce1414d68ae132f4834752a03d71dfbdc43420c818a9",
+            "published_signed_artifact_sha256": "39c8d58ecd699f2183aa622a0c8fb4fc8ff358538876bffebe8abbdb449347d1"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-repos-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-repos-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "622a0da25a30a23f692e011846b2b95732fbe2c57dd3a6ac7086e19716b446fb",
+            "producer_manifest_digest": "a18e6d4436dd7ba3b1f8ce1414d68ae132f4834752a03d71dfbdc43420c818a9",
+            "published_signed_artifact_sha256": "691382de442f0e61b434bf1ecd2d152933e8b09b41259ed2f9275f7bf9a67c45"
+          },
+          {
+            "architecture": "aarch64",
+            "filename": "ro-assist-0.2.5-1.fc44.aarch64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.aarch64",
+            "producer_artifact_sha256": "90c00490a42f9e32a1ebc222ebed3600c3cd0c822658b3ecfc722eae3386204e",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "ecb3f5cc7e3a3925b95b19e4212839d24253cf3692a7886895d8ae6a3142b5fa"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-assist-0.2.5-1.fc44.src.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.src",
+            "producer_artifact_sha256": "510acd42117cb7c1c1ea662806d8e88a5b54f53c5420760976d3757cc3e0df40",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "eac047b81a6ab1b47a5260e1f667d536bede5236f624d836fd405a3b08c1d150"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-assist-0.2.5-1.fc44.x86_64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.x86_64",
+            "producer_artifact_sha256": "535a16712954b5ec33661f2d2fdc0aa85657f38947c2ff0fdf00554aad107e5b",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "cd716518b6042ee9a9ec35f805dfbc47742872681503648e97104539c2d1435c"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-installer-2.4.4-1.fc44.src.rpm",
+            "nevra": "ro-installer-0:2.4.4-1.fc44.src",
+            "producer_artifact_sha256": "13671342e1cbeaa48b3c41a165c3e820effc5698e2413491257bf01ccd9f33f5",
+            "producer_manifest_digest": "fdafd7a66a05aca34e82c5eb13caf4b6fd96d5009c9d3a0adf1ba4e47ea36549",
+            "published_signed_artifact_sha256": "49fc2a4ddad9818eab9d1b5a81285c4ef07bcb664d9aff47bce825b33cc65b81"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-installer-2.4.4-1.fc44.x86_64.rpm",
+            "nevra": "ro-installer-0:2.4.4-1.fc44.x86_64",
+            "producer_artifact_sha256": "e3752b4cf0397034c16a94fc7047c2241c2add450f43bf9232d3cb333f7561ac",
+            "producer_manifest_digest": "fdafd7a66a05aca34e82c5eb13caf4b6fd96d5009c9d3a0adf1ba4e47ea36549",
+            "published_signed_artifact_sha256": "2d976ee5672cf0fea1e08874b92479f49314ad1e7c4a4548b4d0bf352ea2c046"
+          }
+        ],
+        "parent_snapshot": "repo-f44-20260929-001",
+        "repositories": {
+          "aarch64": {
+            "repomd_sha256": "15dbf052e8c7ce3ed98ec720f4a3a66d8479a8a06a27bb54066182585188b2f0",
+            "repomd_signature_sha256": "7d327861d54742e4df55a0d8304cee7725f5b53aab89ccfdd3f72b7ae27910e0"
+          },
+          "source": {
+            "repomd_sha256": "9e02b05341916c404098d725a1b016ec32eecdfb914c23ad7abb1810c9fc344a",
+            "repomd_signature_sha256": "ed685d95a4fbe598444d16f6259be07677febd8c8d98ba61a59d0082a1074889"
+          },
+          "x86_64": {
+            "repomd_sha256": "4225da629c9168dffebb5b6f6c8150c0f3ff8c1e498a4951ca5c2cf94224b4dc",
+            "repomd_signature_sha256": "76d383442d4a8fe8cc72404e14ec136d36adf464cbe4ab391c7e37d52a8ae826"
+          }
+        },
+        "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20261006-001"
+      },
+      "path": "snapshots/fedora/44/repo-f44-20261006-001/repository-snapshot-v1.json",
+      "sha256": "96ebbabe14d406bbf1de4efc43232012bd631be0b68a074e4333d1d090297031"
+    },
+    {
+      "manifest": {
+        "created_at": "2026-10-09T13:09:58Z",
+        "creation_provenance": {
+          "run": "37934749345",
+          "tool": "ro-repo-v2"
+        },
+        "fedora_release": 44,
+        "metadata_signing_fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+        "packages": [
+          {
+            "architecture": "src",
+            "filename": "dolphin-26.08.1-1.roasd1.fc44.src.rpm",
+            "nevra": "dolphin-0:26.08.1-1.roasd1.fc44.src",
+            "producer_artifact_sha256": "643164d443045d532e3c988291939a00d6fa65569e4bd2c79b4e22fd711d9706",
+            "producer_manifest_digest": "2c2427849d7fdead5aed8876e4bb0b4e7452bb6f277f4968f6a2c61aa201f848",
+            "published_signed_artifact_sha256": "6a062751008c3f07f21eac9d085fffa29c5c63c6e2d582ccdf317cd162ed4b47"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "dolphin-26.08.1-1.roasd1.fc44.x86_64.rpm",
+            "nevra": "dolphin-0:26.08.1-1.roasd1.fc44.x86_64",
+            "producer_artifact_sha256": "9c20107acc39d542e515e08426612150561fb73902a90b695a7bea887e0f6c45",
+            "producer_manifest_digest": "2c2427849d7fdead5aed8876e4bb0b4e7452bb6f277f4968f6a2c61aa201f848",
+            "published_signed_artifact_sha256": "44cf45a1e6922e2f95fc1abe038a275f7641a723a94f1c8a419e636bb2e2611e"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "dolphin-devel-26.08.1-1.roasd1.fc44.x86_64.rpm",
+            "nevra": "dolphin-devel-0:26.08.1-1.roasd1.fc44.x86_64",
+            "producer_artifact_sha256": "cb023ad40859f8b95ea2fa08506c51488293d82bb3484139ab85d92b1d5ad505",
+            "producer_manifest_digest": "2c2427849d7fdead5aed8876e4bb0b4e7452bb6f277f4968f6a2c61aa201f848",
+            "published_signed_artifact_sha256": "09ffafbe15fa4f520023e58537fe063210614f8d482165ee8e863669adda3cf8"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "dolphin-libs-26.08.1-1.roasd1.fc44.x86_64.rpm",
+            "nevra": "dolphin-libs-0:26.08.1-1.roasd1.fc44.x86_64",
+            "producer_artifact_sha256": "64503cf55fdf79e677e187676d8f6e27af93cad4293ea6131bfa429e69ed9068",
+            "producer_manifest_digest": "2c2427849d7fdead5aed8876e4bb0b4e7452bb6f277f4968f6a2c61aa201f848",
+            "published_signed_artifact_sha256": "9a03c924a60e0cf9382a93b1bd6ef7b5e07ef7dc31d22c999281fed559239dd7"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-branding-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-branding-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "07a0b4f6ade769a562d7fcff6548c16f710749d6a2a515156983407962fe6423",
+            "producer_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+            "published_signed_artifact_sha256": "417a572885f9c1a94f715cc4e154abd95671084fcd310fa1ac3215dc7ca43592"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-branding-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-branding-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "838f712b5e7c19d55eb64725792c511bc527c7511144e92e188d9142d3cf704b",
+            "producer_manifest_digest": "428e69052d8a17ce33ca717ab0a8397746ec4fa1ca80ca66053df9134bbed11a",
+            "published_signed_artifact_sha256": "19d9c28065292e51444436703f7102da3df49e3eaaceebf516c5a10a21ecc4c2"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-defaults-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-defaults-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "a5d7f677970edfe494b0812ea649aa7c344faab2ecdbb3e1ec72a80bc4142c96",
+            "producer_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+            "published_signed_artifact_sha256": "de8ffa9c890e71c89af7e2a3f4a1a24886272e0e6e207b682b8f2b7f0b04b728"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-defaults-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-defaults-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "a2edd1327d7268f06779323fddc2a2145cf4d90851517fdaa020e67fb79a740e",
+            "producer_manifest_digest": "0e85cc70b09fa0f674d5c45151105b175c3398763460a111e7120438f7dcd6c5",
+            "published_signed_artifact_sha256": "1ee941ad9ef093906a868caa4a531fabb6a72a67d20be5d6bfc9e731026a7c3a"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-desktop-standard-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-desktop-standard-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "9384d957ed8d5273b215c1d89875f80442228f5686f25a15a74cd1be40047ce5",
+            "producer_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+            "published_signed_artifact_sha256": "8f5a46599e645935da6e794f84b979bfd6791c6382f8b97e3935d8397a47ca87"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-desktop-standard-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-desktop-standard-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "afcc2f27b2f5fa215f3e7a0384c0d117eaca3e9e6069f7a3a962b34992731958",
+            "producer_manifest_digest": "71137494c1eaa2c6b9c9bbd1c26218a1b633e1c515ec7d209cc112b30fc8f379",
+            "published_signed_artifact_sha256": "eea9953ba1ea09f7efef46e62fdeb3d0e645af4670a989c22f5215cd0a938829"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-kernel-policy-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-kernel-policy-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "ace38cd913e587d105ab3798a448095f9654737a5a773cc6ec248637efec640f",
+            "producer_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+            "published_signed_artifact_sha256": "97abe09776c0b11f29b066da00896800c88eec5345ceab51501f4dd17ddff901"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-kernel-policy-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-kernel-policy-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "e52ba8492a779a994b572397fec8c5d903184dd331f300ed4c83cbff5a8e9313",
+            "producer_manifest_digest": "3a01055f2ae5a77ab28f2e2087427c7ef58c41732bda1b363add824b9d1b6deb",
+            "published_signed_artifact_sha256": "214a51f32967a3b1eb34735630719e8fc30fe1e26121c0efa7221adcdfde3da1"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-keyring-0.1.0-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-keyring-0:0.1.0-1.fc44.noarch",
+            "producer_artifact_sha256": "da5bc8e42f1b21202ab01a3046a44d9f005fd4dc6212a39a9c05e341e6b82e69",
+            "producer_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+            "published_signed_artifact_sha256": "550bed6c0856240882e4814a6d84b72f987b3b31fc4fde9a8ad98465786b346d"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-keyring-0.1.0-1.fc44.src.rpm",
+            "nevra": "ro-asd-keyring-0:0.1.0-1.fc44.src",
+            "producer_artifact_sha256": "28e1be6ab7e9ba10bd79011529280f84b00b7260e5905a226773a86154d08e4a",
+            "producer_manifest_digest": "db18c386dd242d6cc99ac54b7e98d452bbab5c621426ff23f1ee0b21b2e202f2",
+            "published_signed_artifact_sha256": "5345392ab3dec7d7f6a49763d6216756a3a847d4a96c17937e437c057bdfd194"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-release-0.1.2-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-release-0:0.1.2-1.fc44.noarch",
+            "producer_artifact_sha256": "d177a63e785c198c8a732e4dcfc3476e6fba6721000095c073c2bf49c62303d6",
+            "producer_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+            "published_signed_artifact_sha256": "bbd7cc809db8d13a34524f466ce4c50ce3008ece1e61393840ed1b707d2b1589"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-release-0.1.2-1.fc44.src.rpm",
+            "nevra": "ro-asd-release-0:0.1.2-1.fc44.src",
+            "producer_artifact_sha256": "8492fab6f01a9b3e7a8587e59747cba9cf185eaebb02b5563b34ebc43b49dc6b",
+            "producer_manifest_digest": "787c78eb42b40e988c0decc7c6a0384457d5bccd112820cf10635c6ad991b240",
+            "published_signed_artifact_sha256": "19291b2c16330459b8fe30078f45b734a86784616a535a1f873ac6b672eba289"
+          },
+          {
+            "architecture": "noarch",
+            "filename": "ro-asd-repos-0.1.1-1.fc44.noarch.rpm",
+            "nevra": "ro-asd-repos-0:0.1.1-1.fc44.noarch",
+            "producer_artifact_sha256": "d74b123c046975cdd91f1c4e8b8078eb3d3a26152942d7a06cf82bbcc2610725",
+            "producer_manifest_digest": "99c06b6a4f9f6b12c17614359b5a82f982a863d8a80d10113804c1db39124d1e",
+            "published_signed_artifact_sha256": "affb5bbf6be84c23b09c199909a33fef24fc6a1b1057ac8c2ed20037c6fc3455"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-asd-repos-0.1.1-1.fc44.src.rpm",
+            "nevra": "ro-asd-repos-0:0.1.1-1.fc44.src",
+            "producer_artifact_sha256": "6af22294711102d85d0053d70bc2a55aaddd8f5afeac59efcb41c8b22aa036c9",
+            "producer_manifest_digest": "99c06b6a4f9f6b12c17614359b5a82f982a863d8a80d10113804c1db39124d1e",
+            "published_signed_artifact_sha256": "b1f47f076d68374258eea07ae15357d8646d80318356beaba5efa79ab6bb8437"
+          },
+          {
+            "architecture": "aarch64",
+            "filename": "ro-assist-0.2.5-1.fc44.aarch64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.aarch64",
+            "producer_artifact_sha256": "90c00490a42f9e32a1ebc222ebed3600c3cd0c822658b3ecfc722eae3386204e",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "ecb3f5cc7e3a3925b95b19e4212839d24253cf3692a7886895d8ae6a3142b5fa"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-assist-0.2.5-1.fc44.src.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.src",
+            "producer_artifact_sha256": "510acd42117cb7c1c1ea662806d8e88a5b54f53c5420760976d3757cc3e0df40",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "eac047b81a6ab1b47a5260e1f667d536bede5236f624d836fd405a3b08c1d150"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-assist-0.2.5-1.fc44.x86_64.rpm",
+            "nevra": "ro-assist-0:0.2.5-1.fc44.x86_64",
+            "producer_artifact_sha256": "535a16712954b5ec33661f2d2fdc0aa85657f38947c2ff0fdf00554aad107e5b",
+            "producer_manifest_digest": "f5aefdf0427674051c34d182ee8514441bb114d85a0b16f7b0173d3348cea880",
+            "published_signed_artifact_sha256": "cd716518b6042ee9a9ec35f805dfbc47742872681503648e97104539c2d1435c"
+          },
+          {
+            "architecture": "src",
+            "filename": "ro-installer-2.4.4-1.fc44.src.rpm",
+            "nevra": "ro-installer-0:2.4.4-1.fc44.src",
+            "producer_artifact_sha256": "13671342e1cbeaa48b3c41a165c3e820effc5698e2413491257bf01ccd9f33f5",
+            "producer_manifest_digest": "fdafd7a66a05aca34e82c5eb13caf4b6fd96d5009c9d3a0adf1ba4e47ea36549",
+            "published_signed_artifact_sha256": "49fc2a4ddad9818eab9d1b5a81285c4ef07bcb664d9aff47bce825b33cc65b81"
+          },
+          {
+            "architecture": "x86_64",
+            "filename": "ro-installer-2.4.4-1.fc44.x86_64.rpm",
+            "nevra": "ro-installer-0:2.4.4-1.fc44.x86_64",
+            "producer_artifact_sha256": "e3752b4cf0397034c16a94fc7047c2241c2add450f43bf9232d3cb333f7561ac",
+            "producer_manifest_digest": "fdafd7a66a05aca34e82c5eb13caf4b6fd96d5009c9d3a0adf1ba4e47ea36549",
+            "published_signed_artifact_sha256": "2d976ee5672cf0fea1e08874b92479f49314ad1e7c4a4548b4d0bf352ea2c046"
+          }
+        ],
+        "parent_snapshot": "repo-f44-20261006-001",
+        "repositories": {
+          "aarch64": {
+            "repomd_sha256": "4c2daa10a9949cb9b4005f8b4d8a08ad4d4bf843c4db79a033c14ebb8c5a85f6",
+            "repomd_signature_sha256": "0dbbcd1c397d4194fd1d439a70bdb1943862ac899713e19f427447a41c834322"
+          },
+          "source": {
+            "repomd_sha256": "474ddd25f9e2dfd3b21a469d162259e3c6a27adc29b3dbe0ca4cc303e9a53f29",
+            "repomd_signature_sha256": "3714485fad137fc5b64670232fe8640bc117a2c5d82b32fa330daa8278ca260f"
+          },
+          "x86_64": {
+            "repomd_sha256": "303d747f46fd0dc059cf0244a10eedcd0a5bba80d3f64238cd4448d05d656c4f",
+            "repomd_signature_sha256": "b764a9d6066b0fac011661ab0c0b490f8a14ab6c4ab89dbe1faa2df7772ffb08"
+          }
+        },
+        "rpm_signing_fingerprint": "38CB87F6FBD645309432A6E22E02DEE8828B769B",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20261009-001"
+      },
+      "path": "snapshots/fedora/44/repo-f44-20261009-001/repository-snapshot-v1.json",
+      "sha256": "c2afc6d079537ddc6576c643e2d49445d3ba47b310ef4a3faf03789b336bbfd7"
+    }
+  ],
+  "storage_commit": "097ba6ba7ab73d87c36f7ec9829b017b083b1883",
+  "tracked_root_rpms": [
+    "SRPMS/ro-control-0.1.0-1.fc42.src.rpm",
+    "SRPMS/ro-theme-1.0.0-1.fc43.src.rpm",
+    "SRPMS/ro-theme-1.0.1-1.fc43.src.rpm",
+    "aarch64/ro-assist-0.1.0-1.aarch64.rpm",
+    "aarch64/ro-assist-0.1.1-1.aarch64.rpm",
+    "aarch64/ro-assist-0.1.2-1.aarch64.rpm",
+    "aarch64/ro-assist-0.2.0-1.aarch64.rpm",
+    "aarch64/ro-assist-0.2.1.aarch64.rpm",
+    "aarch64/ro-control-1.0.0-1.aarch64.rpm",
+    "aarch64/ro-control-1.3.0-1.aarch64.rpm",
+    "aarch64/ro-control-1.3.1-1.aarch64.rpm",
+    "aarch64/ro-control-v1.1.0.aarch64.rpm",
+    "aarch64/ro-control-v1.2.0.aarch64.rpm",
+    "noarch/ro-theme-1.0.1-1.fc43.noarch.rpm",
+    "x86_64/ro-assist-0.1.0-1.x86_64.rpm",
+    "x86_64/ro-assist-0.1.1-1.x86_64.rpm",
+    "x86_64/ro-assist-0.1.2-1.x86_64.rpm",
+    "x86_64/ro-assist-0.2.0-1.x86_64.rpm",
+    "x86_64/ro-assist-0.2.1.x86_64.rpm",
+    "x86_64/ro-control-1.0.0-1.x86_64.rpm",
+    "x86_64/ro-control-1.3.0-1.x86_64.rpm",
+    "x86_64/ro-control-1.3.1-1.x86_64.rpm",
+    "x86_64/ro-control-v1.1.0.x86_64.rpm",
+    "x86_64/ro-control-v1.2.0.x86_64.rpm"
+  ]
+}

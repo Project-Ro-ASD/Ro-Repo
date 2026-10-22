@@ -1,0 +1,89 @@
+{
+  "first_public_availability": "UNVERIFIED",
+  "legacy_archive": {
+    "status": "PASS_ORIGINAL_SIGNATURES"
+  },
+  "observed_at_utc": "2026-10-15T17:32:24.963957+00:00",
+  "production_dwell": "BLOCKED",
+  "public_metadata_root": {
+    "fingerprint": "1715DDA529B9ADB46D47CB389A62B8F9026E75E5",
+    "path": "keys/production/ro-asd-metadata-signing-public.asc",
+    "sha256": "4eaf0b2903e60442c2f05325a43d85046bba850059b732dfc71e330f5e9e0809"
+  },
+  "publications": [
+    {
+      "path": "publications/fedora/44/beta/35530066972",
+      "sha256": "3e83a30341c7c73b4d51b41afdaf30def5b0601e1772c7e2d9bf00ac189a1de0",
+      "signature": "PASS",
+      "signed_record": {
+        "channel": "beta",
+        "publication_run": "35530066972",
+        "published_at": "2026-09-20T18:45:39Z",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260920-001"
+      }
+    },
+    {
+      "path": "publications/fedora/44/beta/35586124137",
+      "sha256": "3ce5316e4f9827531286728530f1e582396ed6fa60a6cc63617d06bab35e27c5",
+      "signature": "PASS",
+      "signed_record": {
+        "channel": "beta",
+        "publication_run": "35586124137",
+        "published_at": "2026-09-21T09:58:44Z",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260920-001"
+      }
+    },
+    {
+      "path": "publications/fedora/44/beta/35587617947",
+      "sha256": "072a26d9fd72b4d2df084c94e229e25a3a7aa3b4e8daa421fb38a21fb30f1c2c",
+      "signature": "PASS",
+      "signed_record": {
+        "channel": "beta",
+        "publication_run": "35587617947",
+        "published_at": "2026-09-21T10:14:32Z",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260920-001"
+      }
+    },
+    {
+      "path": "publications/fedora/44/beta/35599214422",
+      "sha256": "9df3d76ada327cb9b32e794a9f7d225bf4515cdb1485c931ad1566fd0f741d9d",
+      "signature": "PASS",
+      "signed_record": {
+        "channel": "beta",
+        "publication_run": "35599214422",
+        "published_at": "2026-09-21T12:23:47Z",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260921-001"
+      }
+    },
+    {
+      "path": "publications/fedora/44/beta/36123484599",
+      "sha256": "ff673585f13458a466e02c4360aa659f98689ff666dcb78bbab157d51c300603",
+      "signature": "PASS",
+      "signed_record": {
+        "channel": "beta",
+        "publication_run": "36123484599",
+        "published_at": "2026-09-25T10:22:40Z",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20260921-001",
+        "store_tree_sha256": "cedebcfc862e8bd9c02e6819e7485b6b86408576b62e51f11bb7cfefdcec3fb8"
+      }
+    },
+    {
+      "path": "publications/fedora/44/beta/37935890476",
+      "sha256": "e939e05867ee73e29c4167cd1a97924d76545e2e823c30bca4104b15f4a3716f",
+      "signature": "PASS",
+      "signed_record": {
+        "channel": "beta",
+        "publication_run": "37935890476",
+        "published_at": "2026-10-09T13:19:15Z",
+        "schema_version": 1,
+        "snapshot_id": "repo-f44-20261009-001",
+        "store_tree_sha256": "78f855ca3c7d9f37495baa633e119e535ced15e6738fc47e2401f02752e47531"
+      }
+    }
+  ]
+}
