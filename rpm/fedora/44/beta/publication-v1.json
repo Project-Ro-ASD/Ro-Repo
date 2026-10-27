@@ -1,8 +1,8 @@
 {
   "channel": "beta",
-  "publication_run": "40515127429",
-  "published_at": "2026-10-27T13:48:13Z",
+  "publication_run": "40518419209",
+  "published_at": "2026-10-27T14:14:00Z",
   "schema_version": 1,
-  "snapshot_id": "repo-f44-20261027-001",
-  "store_tree_sha256": "8ac2a0b2a7c4596c61834eda0a5ddd1b9ee4cdd0aff70c5c604e2a12c5600a83"
+  "snapshot_id": "repo-f44-20261027-002",
+  "store_tree_sha256": "772959f637859b6632dbdb00a8424be544cdac9a0dd46982352a1f25c6c717df"
 }
